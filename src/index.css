@@ -1,0 +1,152 @@
+:root {
+    font-family: Lato, Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-size: 16px;
+    font-weight: 400;
+
+    color-scheme: light dark;
+    color: #333333;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+
+    --primary-color: var(--oceanic-primary);
+    --primary-color-hover: #10889c;
+    --secondary-color: var(--oceanic-secondary);
+    --dark-color: #24292e;
+    --background-color: var(--oceanic-bg);
+    --green-color: #44ffd2;
+    --pink-color: #ff8484;
+    --focus-color: var(--primary-color);
+
+    --border-radius-small: 5px;
+    --border-radius-normal: 10px;
+    --border-radius-large: 20px;
+
+    --shadow-offset: 4px;
+    --shadow-blur: 8px;
+    --float-offset: -4px;
+
+    --border-color-light: rgba(0, 0, 0, .12);
+    --delete-red: #fd5858;
+    --success-green: #76cd87;
+    --info-yellow: #ffcd0d;
+    --heart-icon-filled: #ff6d75;
+    --heart-icon-hover: #ff3d47;
+    --background-grey: #eff0f0;
+
+    --small-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.12),
+    0px 1px 2px rgba(0, 0, 0, 0.24);
+
+    /* Medium Box Shadow */
+    --medium-box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16),
+    0px 3px 6px rgba(0, 0, 0, 0.23);
+
+    /* Large Box Shadow */
+    --large-box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.19),
+    0px 6px 6px rgba(0, 0, 0, 0.23);
+
+    /* Tile Box Shadow */
+    --tile-box-shadow: 1px 2px 8px -2px rgba(0, 0, 0, 0.3);
+
+    --fab-size: 60px;
+
+    --max-content-width: 1400px;
+    --mobile-breakpoint: 1000px;
+
+    --spacing-large: 60px;
+    --spacing-normal: 20px;
+    --spacing-small: 10px;
+    --spacing-x-small: 5px;
+
+    --font-size-small: 0.9rem;
+    --font-size-normal: 1rem;
+    --font-size-large: 1.4rem;
+    --font-size-x-large: 2rem;
+    --font-size-xx-large: 3rem;
+
+    --heading-font-family: 'lato';
+
+    --text-color-light: #ffffff;
+    --text-color-medium: #656565;
+    --text-color-dark: #333333;
+    --placeholder-color: #9f9f9f;
+
+    --header-background: var(--dark-color);
+    --header-text-color: var(--text-color-light);
+
+    --tooltip-background-color: var(--secondary-color);
+    --tooltip-border-color: var(--text-color-light);
+    --tooltip-text-color: var(--text-color-light);
+
+    --footer-background-color: #f8f8f8;
+
+
+    --oceanic-primary: #4F97A3; /* Muted teal-blue */
+    --oceanic-secondary: #FDE3A7; /* Soft, creamy yellow */
+    --oceanic-bg: #F6F8FA; /* Cool, light gray */
+    --oceanic-text: #2A2E35; /* Charcoal gray */
+    --oceanic-highlight: #6997AF; /* Dusty slate-blue */
+
+    --urban-primary: #7C6F52; /* Warm, medium brown */
+    --urban-secondary: #C2B397; /* Light taupe */
+    --urban-bg: #F9F8F3; /* Light off-white */
+    --urban-text: #2F2E2D; /* Near-black */
+    --urban-highlight: #B0C4A1; /* Soft sage green */
+
+    --candy-primary: #F6C3CF; /* Dusty rose-pink */
+    --candy-secondary: #FBE8D3; /* Pale peach */
+    --candy-bg: #FFFFFF; /* Clean white */
+    --candy-text: #4E4C4A; /* Warm gray */
+    --candy-highlight: #E5EFB0; /* Soft lime/greenish yellow */
+
+    --mystic-primary: #3F2A56; /* Rich eggplant */
+    --mystic-secondary: #FECF53; /* Warm gold */
+    --mystic-bg: #FBFBFB; /* Near-white */
+    --mystic-text: #2A2A2E; /* Dark gray w/ hint of purple */
+    --mystic-highlight: #BBB0C9; /* Muted lavender-gray */
+
+
+    --minimal-primary: #E1E2E3; /* Light, cool gray */
+    --minimal-secondary: #C8C9CB; /* Medium gray */
+    --minimal-bg: #FFFFFF; /* White */
+    --minimal-text: #1E1F21; /* Almost black */
+    --minimal-highlight: #8B8C8E; /* Charcoal gray */
+}
+
+body {
+    margin: 0;
+    overflow-x: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-color: #bb86fc; /* Lighter purple for buttons and highlights */
+        --primary-hover-color: #3700b3; /* Keep a bold hover color */
+        --secondary-color: #03dac6; /* Accent color works well in dark mode */
+        --text-color: rgba(255, 255, 255, 0.87); /* Light text for readability */
+        --background-color-dark: #121212; /* Darker background for true dark mode */
+        --sidebar-bg-color: #1e1e1e; /* Sidebar background blends with dark theme */
+        --sidebar-text-color: rgba(255, 255, 255, 0.7); /* Sidebar text with lighter contrast */
+        --header-bg-color: #3700b3; /* Header background in dark mode */
+        --button-bg-color: var(--primary-color);
+        --button-text-color: black; /* Ensure text on buttons in dark mode has contrast */
+        --button-disabled-color: rgba(255, 255, 255, 0.3); /* Faded for disabled buttons */
+        --input-border-color: rgba(255, 255, 255, 0.5); /* Subtle border for input fields */
+
+        --footer-background-color: #333333;
+        --text-color-dark: #ffffff;
+
+
+        /*=============================================
+        =            1) Oceanic Calm                 =
+        =============================================*/
+
+
+    }
+}
+
+
