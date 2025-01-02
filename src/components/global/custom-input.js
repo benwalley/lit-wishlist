@@ -11,6 +11,7 @@ class MyTextInput extends LitElement {
             type: { type: String },
             passwordVisible: { type: Boolean },
             floatingLabel: { type: Boolean },
+            fullWidth: {type: Boolean}
         };
     }
 
@@ -22,6 +23,7 @@ class MyTextInput extends LitElement {
         this.type = 'text';
         this.passwordVisible = false; // Boolean for visibility
         this.floatingLabel = false; // Default to non-floating labels
+        this.fullWidth = true;
     }
 
     static get styles() {
@@ -29,6 +31,7 @@ class MyTextInput extends LitElement {
             :host {
                 display: inline-block;
                 font-family: sans-serif;
+                width: 100%;
             }
 
             .input-container {

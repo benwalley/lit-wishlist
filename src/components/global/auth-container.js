@@ -2,7 +2,7 @@ import { LitElement, html, css } from 'lit';
 import { observeState } from 'lit-element-state';
 import { userState } from '../../state/userStore.js';
 import './loading-screen.js';
-import {initRouter} from "../../router/main-router.js";
+import {initRouter, navigate} from "../../router/main-router.js";
 import {getCurrentUser} from "../../helpers/api/users.js";
 
 export class AuthContainer extends observeState(LitElement) {
@@ -24,6 +24,9 @@ export class AuthContainer extends observeState(LitElement) {
             const userData = await getCurrentUser();
             userState.userData = userData;
             userState.loadingUser = false;
+            if(!userData?.id) {
+                navigate('/')
+            }
         } catch(e) {
             console.log('user is not logged in')
             userState.loadingUser = false;

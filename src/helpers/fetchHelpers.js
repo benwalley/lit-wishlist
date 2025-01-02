@@ -128,7 +128,7 @@ async function refreshAuthToken() {
     }
 
     try {
-        const response = await fetch(`${envVars.API_BASE_URL}/auth/refresh`, {
+        const response = await fetch(`${envVars.API_URL}/auth/refresh`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -141,8 +141,10 @@ async function refreshAuthToken() {
             return false;
         }
 
-        const { token } = await response.json();
+        const tokenData = await response.json();
 
+        const token = tokenData?.jwtToken;
+        console.log(token)
         // Save the new JWT
         setJwt(token);
         return true;

@@ -1,10 +1,10 @@
 // custom-modal.js
-import { LitElement, html, css } from 'lit';
+import {LitElement, html, css} from 'lit';
 
 class CustomModal extends LitElement {
     static properties = {
-        triggerEvent: { type: String },
-        isOpen: { type: Boolean, state: true },
+        triggerEvent: {type: String},
+        isOpen: {type: Boolean, state: true},
     };
 
     constructor() {
@@ -21,54 +21,61 @@ class CustomModal extends LitElement {
     }
 
     static styles = css`
-    /* Overlay */
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      transition: opacity 0.3s ease;
-    }
+        /* Overlay */
 
-    /* Hidden by default */
-    .overlay[hidden] {
-      display: none;
-    }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.3s ease;
+        }
 
-    /* Modal content */
-    .modal {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 8px;
-      max-width: 600px;
-      width: 90%;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      position: relative;
-      outline: none;
-    }
+        /* Hidden by default */
 
-    /* Close button */
-    .close-button {
-      position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
-      background: transparent;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
+        .overlay[hidden] {
+            display: none;
+        }
 
-    /* Focus outline for accessibility */
-    .close-button:focus {
-      outline: 2px solid #000;
-    }
-  `;
+        /* Modal content */
+
+        .modal {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            max-width: 1200px;
+            width: 90%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            outline: none;
+            max-height: 80vh;
+            overflow: auto;
+        }
+
+        /* Close button */
+
+        .close-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Focus outline for accessibility */
+
+        .close-button:focus {
+            outline: 2px solid #000;
+        }
+    `;
 
     connectedCallback() {
         console.log('asdf')
