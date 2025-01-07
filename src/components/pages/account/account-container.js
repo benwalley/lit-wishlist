@@ -11,7 +11,8 @@ import './account-comments.js';
 import './account-lists.js';
 import './account-secondary-lists.js';
 import './logout-button.js'
-import '../../global/image-upload.js'
+import '../../global/image-upload/image-uploader.js'
+import '../../global/custom-image.js'
 
 // TODO: Add logout link
 export class AccountContainer extends LitElement {
@@ -47,7 +48,7 @@ export class AccountContainer extends LitElement {
                 
                 <section>
                     <logout-button></logout-button>
-                    <image-upload></image-upload>
+                    <image-uploader size="200"></image-uploader>
                 </section>
 
                 <section>
