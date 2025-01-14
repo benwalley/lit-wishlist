@@ -58,7 +58,7 @@ export class Avatar extends LitElement {
                         style="
             width: ${this.size}px; 
             height: ${this.size}px; 
-            font-size: ${this.size * 0.6}px;
+            font-size: ${this.size * 0.5}px;
           "
                 >
                     <img src="${this.imageUrl}" alt="${this.username || 'avatar'}" />
@@ -76,7 +76,7 @@ export class Avatar extends LitElement {
         style="
           width: ${this.size}px; 
           height: ${this.size}px;
-          font-size: ${this.size * 0.6}px;
+          font-size: ${this.size * 0.5}px;
           background: linear-gradient(to right, ${color1}, ${color2});
         "
       >

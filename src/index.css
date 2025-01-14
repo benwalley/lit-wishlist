@@ -1,26 +1,129 @@
 :root {
+    /* Base styling */
     font-family: Lato, Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     font-size: 16px;
     font-weight: 400;
-
-    color-scheme: light dark;
-    color: #333333;
-
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
+    /* Support both light and dark color schemes */
+    color-scheme: light dark;
 
-    --primary-color: var(--oceanic-primary);
-    --primary-color-hover: #10889c;
-    --secondary-color: var(--oceanic-secondary);
-    --dark-color: #24292e;
-    --background-color: var(--oceanic-bg);
-    --green-color: #44ffd2;
-    --pink-color: #ff8484;
+    /* ===========================================
+       1) Core Colors & Basic Variables
+       =========================================== */
+    /* Grayscale Design palette: https://grayscale.design/app?lums=97.40,92.33,83.88,70.37,49.35,28.33,14.82,6.37,1.30&palettes=%23000000,%23F6F5F9,%23FFF2CD,%23F8B8C5,%23ADE4C7,%239C8ADE&filters=0%7C0,0%7C0,0.2%7C-15.5,0%7C-6.1,0%7C-2,0.2%7C-7.7&names=,Neutral,sunny%20yellow,pink,mint,lavender&labels=,,,,, */
+/*// Grayscale Design palette: https://grayscale.design/app?lums=97.40,92.33,83.88,70.37,49.35,28.33,14.82,6.37,1.30&palettes=%23000000,%23FFF2CD,%23F8B8C5,%23ADE4C7,%239C8ADE&filters=0%7C0,0.2%7C-15.5,0%7C-6.1,0%7C-2,0.2%7C-7.7&names=Neutral,yellow,pink,mint,lavender&labels=,,,,*/
+
+    --grayscale-100: rgb(252, 252, 252);
+    --grayscale-200: rgb(246, 245, 249);
+    --grayscale-300: rgb(202, 216, 227);
+    --grayscale-400: rgb(236, 233, 241);
+    --grayscale-500: rgb(196, 196, 196);
+    --grayscale-600: rgb(145, 145, 145);
+    --grayscale-700: rgb(107, 107, 107);
+    --grayscale-800: rgb(42, 42, 52);
+    --grayscale-900: rgb(30, 30, 36);
+
+    --yellow-100: rgb(254, 252, 247);
+    --yellow-200: rgb(255, 246, 220);
+    --yellow-300: rgb(250, 235, 195);
+    --yellow-400: rgb(238, 217, 160);
+    --yellow-500: rgb(211, 184, 109);
+    --yellow-600: rgb(167, 143, 75);
+    --yellow-700: rgb(117, 107, 74);
+    --yellow-800: rgb(74, 71, 64);
+    --yellow-900: rgb(30, 30, 30);
+
+    --pink-100: rgb(254, 251, 252);
+    --pink-200: rgb(253, 244, 246);
+    --pink-300: rgb(251, 231, 235);
+    --pink-400: rgb(249, 208, 216);
+    --pink-500: rgb(246, 164, 180);
+    --pink-600: rgb(234, 101, 127);
+    --pink-700: rgb(206, 36, 70);
+    --pink-800: rgb(104, 60, 69);
+    --pink-900: rgb(58, 15, 24);
+
+    --mint-100: rgb(249, 253, 251);
+    --mint-200: rgb(238, 249, 243);
+    --mint-300: rgb(217, 242, 228);
+    --mint-400: rgb(178, 230, 202);
+    --mint-500: rgb(110, 205, 155);
+    --mint-600: rgb(60, 163, 108);
+    --mint-700: rgb(46, 121, 81);
+    --mint-800: rgb(32, 80, 55);
+    --mint-900: rgb(14, 34, 23);
+
+    --lavender-100: rgb(252, 252, 253);
+    --lavender-200: rgb(246, 246, 249);
+    --lavender-300: rgb(237, 235, 245);
+    --lavender-400: rgb(221, 215, 238);
+    --lavender-500: rgb(191, 180, 229);
+    --lavender-600: rgb(152, 132, 220);
+    --lavender-700: rgb(113, 90, 197);
+    --lavender-800: rgb(76, 58, 137);
+    --lavender-900: rgb(32, 26, 52);
+
+    --light-background-color: var(--grayscale-200);
+    --dark-background-color: #1E1E24;
+    --modal-light-background-color: #ffffff;
+    --modal-dark-background-color: #2A2A34;
+
+    /* ===========================================
+       2) Used Colors
+       =========================================== */
+    --primary-color: var(--lavender-600);
+    --secondary-color: var(--mint-500);
+    --accent-color-one: var(--yellow-200);
+    --accent-color-two: var(--pink-500);
+    --background-color: light-dark(var(--light-background-color), var(--dark-background-color));
+    --modal-background-color: light-dark(var(--modal-light-background-color), var(--modal-dark-background-color));
+
+    --option-select-background: light-dark(lightgrey, #000000);
+    --option-select-background-hover: light-dark(#f4f4f4, #4a4a4a);
+
+
     --focus-color: var(--primary-color);
+    --border-color: var(--grayscale-300);
+    --delete-red: #fd5858;
+    --success-green: var(--mint-600);
+    --info-yellow: var(--yellow-500);
+    --light-text-color: var(--grayscale-100);
+    --dark-text-color: var(--grayscale-900);
+    --text-color-light: light-dark(var(--light-text-color), var(--dark-text-color));
+    --text-color-dark: light-dark(var(--dark-text-color), var(--light-text-color));
+    --placeholder-color: var(--grayscale-600);
+    --header-background: light-dark(var(--grayscale-300), var(--grayscale-800));
+    --header-text-color: var(--text-color-dark);
+    --link-color: var(--lavender-800);
+
+
+
+    --tooltip-background-color: var(--modal-background-color);
+    --tooltip-text-color: var(--text-color-dark);
+
+    --footer-background-color: light-dark(var(--grayscale-400) ,var(--grayscale-800));
+
+    /* ===========================================
+        2) Buttons
+   =========================================== */
+    --primary-button-background: var(--primary-color);
+    --primary-button-hover-background: var(--lavender-700);
+    --primary-button-text: var(--text-color-dark);
+    --primary-button-hover-border: none;
+
+
+    --secondary-button-background: var(--secondary-color);
+    --secondary-button-hover-background: var(--mint-600);
+    --secondary-button-text: var(--dark-text-color);
+    --secondary-button-border: none;
+
+
+    --font-family: 'Lato';
 
     --border-radius-small: 5px;
     --border-radius-normal: 10px;
@@ -30,26 +133,17 @@
     --shadow-blur: 8px;
     --float-offset: -4px;
 
-    --border-color-light: rgba(0, 0, 0, .12);
-    --delete-red: #fd5858;
-    --success-green: #76cd87;
-    --info-yellow: #ffcd0d;
-    --heart-icon-filled: #ff6d75;
-    --heart-icon-hover: #ff3d47;
-    --background-grey: #eff0f0;
+
 
     --small-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.12),
     0px 1px 2px rgba(0, 0, 0, 0.24);
 
-    /* Medium Box Shadow */
     --medium-box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16),
     0px 3px 6px rgba(0, 0, 0, 0.23);
 
-    /* Large Box Shadow */
     --large-box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.19),
     0px 6px 6px rgba(0, 0, 0, 0.23);
 
-    /* Tile Box Shadow */
     --tile-box-shadow: 1px 2px 8px -2px rgba(0, 0, 0, 0.3);
 
     --fab-size: 60px;
@@ -70,83 +164,11 @@
 
     --heading-font-family: 'lato';
 
-    --text-color-light: #ffffff;
-    --text-color-medium: #656565;
-    --text-color-dark: #333333;
-    --placeholder-color: #9f9f9f;
 
-    --header-background: var(--dark-color);
-    --header-text-color: var(--text-color-light);
-
-    --tooltip-background-color: var(--secondary-color);
-    --tooltip-border-color: var(--text-color-light);
-    --tooltip-text-color: var(--text-color-light);
-
-    --footer-background-color: #f8f8f8;
-
-
-    --oceanic-primary: #4F97A3; /* Muted teal-blue */
-    --oceanic-secondary: #FDE3A7; /* Soft, creamy yellow */
-    --oceanic-bg: #F6F8FA; /* Cool, light gray */
-    --oceanic-text: #2A2E35; /* Charcoal gray */
-    --oceanic-highlight: #6997AF; /* Dusty slate-blue */
-
-    --urban-primary: #7C6F52; /* Warm, medium brown */
-    --urban-secondary: #C2B397; /* Light taupe */
-    --urban-bg: #F9F8F3; /* Light off-white */
-    --urban-text: #2F2E2D; /* Near-black */
-    --urban-highlight: #B0C4A1; /* Soft sage green */
-
-    --candy-primary: #F6C3CF; /* Dusty rose-pink */
-    --candy-secondary: #FBE8D3; /* Pale peach */
-    --candy-bg: #FFFFFF; /* Clean white */
-    --candy-text: #4E4C4A; /* Warm gray */
-    --candy-highlight: #E5EFB0; /* Soft lime/greenish yellow */
-
-    --mystic-primary: #3F2A56; /* Rich eggplant */
-    --mystic-secondary: #FECF53; /* Warm gold */
-    --mystic-bg: #FBFBFB; /* Near-white */
-    --mystic-text: #2A2A2E; /* Dark gray w/ hint of purple */
-    --mystic-highlight: #BBB0C9; /* Muted lavender-gray */
-
-
-    --minimal-primary: #E1E2E3; /* Light, cool gray */
-    --minimal-secondary: #C8C9CB; /* Medium gray */
-    --minimal-bg: #FFFFFF; /* White */
-    --minimal-text: #1E1F21; /* Almost black */
-    --minimal-highlight: #8B8C8E; /* Charcoal gray */
 }
 
 body {
     margin: 0;
     overflow-x: hidden;
+    background: var(--background-color);
 }
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --primary-color: #bb86fc; /* Lighter purple for buttons and highlights */
-        --primary-hover-color: #3700b3; /* Keep a bold hover color */
-        --secondary-color: #03dac6; /* Accent color works well in dark mode */
-        --text-color: rgba(255, 255, 255, 0.87); /* Light text for readability */
-        --background-color-dark: #121212; /* Darker background for true dark mode */
-        --sidebar-bg-color: #1e1e1e; /* Sidebar background blends with dark theme */
-        --sidebar-text-color: rgba(255, 255, 255, 0.7); /* Sidebar text with lighter contrast */
-        --header-bg-color: #3700b3; /* Header background in dark mode */
-        --button-bg-color: var(--primary-color);
-        --button-text-color: black; /* Ensure text on buttons in dark mode has contrast */
-        --button-disabled-color: rgba(255, 255, 255, 0.3); /* Faded for disabled buttons */
-        --input-border-color: rgba(255, 255, 255, 0.5); /* Subtle border for input fields */
-
-        --footer-background-color: #333333;
-        --text-color-dark: #ffffff;
-
-
-        /*=============================================
-        =            1) Oceanic Calm                 =
-        =============================================*/
-
-
-    }
-}
-
-

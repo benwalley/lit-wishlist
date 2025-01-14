@@ -13,28 +13,33 @@ export default css`
         text-decoration: none;
         font-weight: 500;
         cursor: pointer;
-        transition: background-color 0.3s, color 0.3s, transform 0.2s;
+        transition: all 0.3s;
+        gap: 7px;
+        
+        
+        &.fullWidth {
+            width: 100%;
+        }
 
         &.primary {
-            background-color: var(--primary-color); /* Primary blue */
-            color: #ffffff;
+            background-color: var(--primary-button-background);
+            color: var(--primary-button-text);
 
-            &:hover {
-                background-color: #1565c0;
-            }
-
-            &:focus {
-                box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.2);
+            &:hover,
+            &:focus{
+                background-color: var(--primary-button-hover-background);
+                outline: var(--primary-button-hover-border);
+                outline-offset: -2px;
             }
         }
 
         &.secondary {
-            background-color: var(--secondary-color); /* Light gray */
-            color: #1976d2;
-            border: 1px solid #1976d2;
+            background-color: var(--secondary-button-background);
+            color: var(--secondary-button-text);
+            border: var(--secondary-button-border);
 
             &:hover {
-                background-color: #e0e0e0;
+                background-color: var(--secondary-button-hover-background);
             }
 
             &:focus {
@@ -51,18 +56,20 @@ export default css`
             padding: 0.75rem 1.5rem;
             font-size: 1.25rem;
         }
-
-        &:hover,
-        &:focus,
-        &:active {
-            transform: scale(1.02); /* Slight scale effect for interaction */
-        }
+        
 
         &:disabled {
             background-color: #e0e0e0;
             color: #9e9e9e;
             cursor: not-allowed;
             pointer-events: none;
+        }
+        
+        &.button-as-link {
+            border: none;
+            padding: 0;
+            background: none;
+            border-radius: 0;
         }
     }
 

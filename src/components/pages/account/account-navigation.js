@@ -8,7 +8,7 @@ export class AccountNavigation extends LitElement {
     nav a {
       margin-right: 1rem;
       text-decoration: none;
-      color: blue;
+      color: var(--link-color);
     }
   `;
 

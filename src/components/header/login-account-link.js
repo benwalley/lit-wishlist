@@ -19,9 +19,9 @@ export class LoginAccountLink extends observeState(LitElement) {
             return html`<div>Loading...</div>`;
         }
         if (userState.userData) {
-            return html`<a href="/account" class="button primary">Account</a>`;
+            return html`<a href="/account" class="button secondary">Account</a>`;
         }
-        return html`<a href="/" class="button primary">Log In</a>`;
+        return html`<a href="/" class="button secondary">Log In</a>`;
     }
 }
 

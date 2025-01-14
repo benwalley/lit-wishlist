@@ -5,7 +5,7 @@ import '../../../svg/x.js'
 
 export class ImagePreview extends LitElement {
     static properties = {
-        imageId: {type: Number},
+        imageId: { type: String },
     };
 
     static styles = css`

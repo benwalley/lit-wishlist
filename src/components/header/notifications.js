@@ -43,7 +43,7 @@ export class NotificationsElement extends LitElement {
     render() {
         return html`
                 <button class="notifications-button" title="${this.notifications?.length} notifications">
-                    <bell-icon style="color: var(--text-color-light); width: 24px; height: 24px;"></bell-icon>
+                    <bell-icon style="color: var(--header-text-color); width: 24px; height: 24px;"></bell-icon>
                     <span class="number-notifications">${this.notifications.length}</span>
                 </button>
                 <custom-tooltip>You have ${this.notifications.length} notifications</custom-tooltip>

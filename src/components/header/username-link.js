@@ -20,7 +20,7 @@ export class UsernameLink extends observeState(LitElement) {
         
         a {
             display: block;
-            color: var(--text-color-light);
+            color: var(--header-text-color);
             font-size: 2rem;
             font-family: var(--heading-font-family, 'lato');
             text-decoration: none;

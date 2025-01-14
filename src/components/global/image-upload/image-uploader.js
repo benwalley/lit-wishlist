@@ -1,19 +1,20 @@
 import {LitElement, html, css} from 'lit';
-
+import {customFetch} from "../../../helpers/fetchHelpers.js";
 import './image-selector.js';
 import './image-preview.js';
 import './image-cropper.js';
-import {customFetch} from "../../../helpers/fetchHelpers.js"; // We'll assume we have the updated version
-// Also import './custom-modal.js' if needed.
+import '../custom-modal.js'
 
 class ImageUploader extends LitElement {
     static properties = {
-        imageId: {type: String},
-        isModalOpen: {type: Boolean},
-        rawSelectedImage: {type: String},
-
-        // Pass these in from outside, e.g. <image-uploader width="400" height="400"></image-uploader>
-        size: {type: Number},
+        /**
+         * Use a Number if your IDs are numeric. If you also allow string IDs from your server,
+         * change this to {type: String}.
+         */
+        imageId: { type: Number, reflect: true },
+        isModalOpen: { type: Boolean },
+        rawSelectedImage: { type: String },
+        size: { type: Number },
     };
 
     static styles = css`
@@ -28,32 +29,31 @@ class ImageUploader extends LitElement {
 
     constructor() {
         super();
-        this.imageId = '';
+        this.imageId = 0;
         this.isModalOpen = false;
         this.rawSelectedImage = null;
-        // Default values for the crop size, if not provided in HTML
-        this.size = 300;
+        this.size = 300; // default crop size
     }
 
     render() {
         return html`
             <div class="upload-container">
                 ${this.imageId
-                    ? html`
-                        <image-preview
-                                .imageId=${this.imageId}
-                                @remove-image=${this._handleRemoveImage}
-                        ></image-preview>
-                    `
-                    : html`
-                        <image-selector
-                                @image-selected=${this._handleImageSelected}
-                        ></image-selector>
-                    `
+                        ? html`
+                            <image-preview
+                                    .imageId=${this.imageId}
+                                    @remove-image=${this._handleRemoveImage}
+                            ></image-preview>
+                        `
+                        : html`
+                            <image-selector
+                                    @image-selected=${this._handleImageSelected}
+                            ></image-selector>
+                        `
                 }
             </div>
 
-            <!-- Our custom modal for cropping -->
+            <!-- Cropping modal -->
             <custom-modal .isOpen=${this.isModalOpen}>
                 <image-cropper
                         .imageSrc=${this.rawSelectedImage}
@@ -66,28 +66,30 @@ class ImageUploader extends LitElement {
     }
 
     /**
-     * Called when the user selects an image via file or URL in <image-selector>.
+     * Child <image-selector> has just given us a raw DataURL.
      */
     _handleImageSelected(e) {
-        const {rawImage} = e.detail;
-        this.rawSelectedImage = rawImage;
+        this.rawSelectedImage = e.detail.rawImage;
         this.isModalOpen = true;
     }
 
     /**
-     * Called when the user clicks "Choose" in <image-cropper>.
+     * Child <image-cropper> says user clicked "Choose" after cropping.
      */
     async _handleCropConfirmed(e) {
         const { croppedDataUrl } = e.detail;
-        // Attempt to upload the resulting cropped image
         try {
             const response = await this._uploadImageToDB(croppedDataUrl);
-            // Suppose the server responds with an object: { id: ..., publicUrl: ... }
+            // Suppose response = { success: true, imageId: 42, publicUrl: "..." }
             this.imageId = response.imageId;
-            // or, if you simply want to show the local DataURL, you could do:
-
+            // Dispatch event so parent can update its array
+            this.dispatchEvent(new CustomEvent('image-updated', {
+                detail: { imageId: this.imageId },
+                bubbles: true,
+                composed: true
+            }));
         } catch (error) {
-            console.error('Upload to DB failed:', error);
+            console.error(error);
             alert('Failed to upload image.');
         } finally {
             this.isModalOpen = false;
@@ -95,57 +97,8 @@ class ImageUploader extends LitElement {
         }
     }
 
-    _handleRemoveImage() {
-        this.imageId = '';
-        this.rawSelectedImage = null;
-    }
-
     /**
-     * Actually upload the cropped image to the server.
-     * Replace '/api/images/upload' with your endpoint's URL.
-     *
-     * @param {string} dataUrl The cropped DataURL from the cropper
-     */
-    async _uploadImageToDB(dataUrl) {
-        // Convert DataURL to Blob
-        const blob = this._dataURLToBlob(dataUrl);
-
-        // Build a FormData object to send via multipart/form-data
-        const formData = new FormData();
-        // The third parameter is the filename. Adjust as needed.
-        formData.append('image', blob, 'my_uploaded_image.jpg');
-
-        // POST to your server endpoint
-        const res = await customFetch('/images/upload', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!res.success) {
-            // If server returns an error code
-            throw new Error(`Server responded with ${res.status}`);
-        }
-        // Suppose your server returns JSON like { id: "some-uuid", publicUrl: "https://..." }
-        return res;
-    }
-
-    _dataURLToBlob(dataUrl) {
-        // DataURL structure: "data:[<media type>];base64,<data>"
-        const [header, base64] = dataUrl.split(',');
-        const binary = atob(base64);
-        const len = binary.length;
-        const buffer = new Uint8Array(len);
-        for (let i = 0; i < len; i++) {
-            buffer[i] = binary.charCodeAt(i);
-        }
-        // Extract the content type from the header: data:image/jpeg;base64
-        const match = header.match(/data:(.*);base64/);
-        const contentType = match ? match[1] : 'image/jpeg';
-        return new Blob([buffer], { type: contentType });
-    }
-
-    /**
-     * Called when user clicks "Cancel" in <image-cropper>.
+     * Child <image-cropper> says user clicked "Cancel."
      */
     _handleCropCancelled() {
         this.isModalOpen = false;
@@ -153,23 +106,45 @@ class ImageUploader extends LitElement {
     }
 
     /**
-     * Called when user clicks "X" in <image-preview>.
+     * Child <image-preview> says user clicked "X" to remove.
      */
     _handleRemoveImage() {
-        this.imageId = '';
-        this.rawSelectedImage = null;
+        this.imageId = 0;
+        // Also dispatch so parent knows this uploader is now "empty."
+        this.dispatchEvent(new CustomEvent('image-updated', {
+            detail: { imageId: this.imageId },
+            bubbles: true,
+            composed: true
+        }));
     }
 
-    /**
-     * Mock function to simulate an async DB upload.
-     */
-    _mockUploadToDB(dataUrl) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const generatedId = `img_${Math.random().toString(36).substr(2, 9)}`;
-                resolve({id: generatedId});
-            }, 1500);
+    async _uploadImageToDB(dataUrl) {
+        const blob = this._dataURLToBlob(dataUrl);
+        const formData = new FormData();
+        formData.append('image', blob, 'my_uploaded_image.jpg');
+
+        const res = await customFetch('/images/upload', {
+            method: 'POST',
+            body: formData
         });
+        if (!res.success) {
+            throw new Error(`Server responded with ${res.status}`);
+        }
+        // e.g. return { success: true, imageId: 42, publicUrl: "..." }
+        return res;
+    }
+
+    _dataURLToBlob(dataUrl) {
+        const [header, base64] = dataUrl.split(',');
+        const binary = atob(base64);
+        const len = binary.length;
+        const buffer = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            buffer[i] = binary.charCodeAt(i);
+        }
+        const match = header.match(/data:(.*);base64/);
+        const contentType = match ? match[1] : 'image/jpeg';
+        return new Blob([buffer], { type: contentType });
     }
 }
 

@@ -1,17 +1,32 @@
 import { LitElement, html, css } from 'lit';
+import { arrayConverter } from '../../helpers/arrayHelpers.js';
+import '../global/custom-input.js'
 
 class MultiInput extends LitElement {
     static properties = {
-        values: { type: String }, // Comma-separated string for initial values
-        sectionName: { type: String }, // Name of the section
-        placeholder: { type: String }, // Comma-separated string for placeholders
+
+        values: {
+            type: Array,
+            reflect: true,
+            converter: arrayConverter,
+        },
+        /**
+         * Name of the section, e.g. "My Links"
+         */
+        sectionName: { type: String },
+        /**
+         * Each key corresponds to a property in the row object.
+         */
+        placeholder: { type: String },
     };
 
     constructor() {
         super();
-        this.values = ''; // Default to empty string
-        this.sectionName = 'Default Section'; // Default section name
-        this.placeholder = 'Column 1'; // Default placeholder string
+        // Default to an empty array of objects
+        this.values = [];
+        this.sectionName = 'Default Section';
+        // By default, we only have one key named "Column 1".
+        this.placeholder = 'Column 1';
     }
 
     static styles = css`
@@ -33,12 +48,6 @@ class MultiInput extends LitElement {
             align-items: center;
         }
 
-        input {
-            flex: 1;
-            padding: 5px;
-            font-size: 1rem;
-        }
-
         button {
             padding: 5px 10px;
             font-size: 1rem;
@@ -51,46 +60,65 @@ class MultiInput extends LitElement {
         }
     `;
 
-    _getValuesArray() {
-        // Convert the comma-separated `values` string into an array of rows
-        return this.values
-            ? this.values.split(';').map((row) => row.split(','))
-            : [[]];
-    }
-
+    /**
+     * Parse the comma-separated `placeholder` into an array of keys.
+     * e.g. "url,displayName" => ["url", "displayName"]
+     */
     _getPlaceholderArray() {
-        // Convert the comma-separated `placeholder` string into an array
-        return this.placeholder ? this.placeholder.split(',') : ['Column 1'];
+        return this.placeholder
+            ? this.placeholder.split(',').map((p) => p.trim())
+            : ['Column1'];
     }
 
+    /**
+     * Add a new row object with the keys defined in placeholder.
+     */
     _addRow() {
-        const valuesArray = this._getValuesArray();
-        const placeholderArray = this._getPlaceholderArray();
-        const emptyRow = placeholderArray.map(() => ''); // Create an empty row
-        this.values = [...valuesArray, emptyRow.map((_) => '')]
-            .map((row) => row.join(','))
-            .join(';');
+        const keys = this._getPlaceholderArray();
+        // Create a new object where each key is an empty string
+        const newRow = {};
+        keys.forEach((k) => {
+            newRow[k] = '';
+        });
+
+        this.values = [...this.values, newRow];
         this._emitChange();
     }
 
+    /**
+     * Remove the row object at index `index`.
+     */
     _removeRow(index) {
-        const valuesArray = this._getValuesArray();
-        valuesArray.splice(index, 1);
-        this.values = valuesArray.map((row) => row.join(',')).join(';');
+        const newValues = [...this.values];
+        newValues.splice(index, 1);
+        this.values = newValues;
         this._emitChange();
     }
 
-    _updateValue(rowIndex, colIndex, event) {
-        const valuesArray = this._getValuesArray();
-        valuesArray[rowIndex][colIndex] = event.target.value;
-        this.values = valuesArray.map((row) => row.join(',')).join(';');
+    /**
+     * Update a specific key on the row object at (rowIndex).
+     */
+    _updateValue(rowIndex, key, event) {
+        // Make a shallow copy of the array
+        const newValues = [...this.values];
+        // Copy the row object we want to mutate
+        const rowCopy = { ...newValues[rowIndex] };
+        // Update the chosen key
+        rowCopy[key] = event.target.value;
+        // Put the updated object back in the array
+        newValues[rowIndex] = rowCopy;
+
+        this.values = newValues;
         this._emitChange();
     }
 
+    /**
+     * Dispatch an event so parent components can react to changes.
+     */
     _emitChange() {
         this.dispatchEvent(
             new CustomEvent('values-change', {
-                detail: { values: this._getValuesArray() },
+                detail: { values: this.values },
                 bubbles: true,
                 composed: true,
             })
@@ -98,32 +126,28 @@ class MultiInput extends LitElement {
     }
 
     render() {
-        const valuesArray = this._getValuesArray();
-        const placeholderArray = this._getPlaceholderArray();
+        const keys = this._getPlaceholderArray();
 
         return html`
-      <div class="container">
-        <div class="header">${this.sectionName}</div>
-        ${valuesArray.map(
-            (row, rowIndex) => html`
-            <div class="row">
-              ${placeholderArray.map(
-                (placeholder, colIndex) => html`
-                  <input
-                    type="text"
-                    .value=${row[colIndex] || ''}
-                    @input=${(e) => this._updateValue(rowIndex, colIndex, e)}
-                    placeholder=${placeholder}
-                  />
-                `
-            )}
-              <button @click=${() => this._removeRow(rowIndex)}>Delete</button>
+            <div class="container">
+                <div class="header">${this.sectionName}</div>
+                ${this.values.map((row, rowIndex) => html`
+                    <div class="row">
+                        ${keys.map((key) => html`
+                            <custom-input
+                                    type="text"
+                                    placeholder=${key}
+                                    .value=${row[key] ?? ''}
+                                    @input=${(e) => this._updateValue(rowIndex, key, e)}
+                            />
+                        `)}
+                        <button @click=${() => this._removeRow(rowIndex)}>Delete</button>
+                    </div>
+                `)}
+
+                <button class="add-button" @click=${this._addRow}>Add Row</button>
             </div>
-          `
-        )}
-        <button class="add-button" @click=${this._addRow}>Add Row</button>
-      </div>
-    `;
+        `;
     }
 }
 

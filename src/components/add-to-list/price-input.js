@@ -3,10 +3,10 @@ import buttonStyles from '../../css/buttons.js'
 
 class PriceInput extends LitElement {
     static properties = {
-        isRange: {type: Boolean},
-        singlePrice: {type: Number},
-        minPrice: {type: Number},
-        maxPrice: {type: Number},
+        isRange: {type: Boolean, reflect: true},
+        singlePrice: {type: Number, reflect: true},
+        minPrice: {type: Number, reflect: true},
+        maxPrice: {type: Number, reflect: true},
     };
 
     constructor() {

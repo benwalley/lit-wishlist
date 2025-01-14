@@ -6,8 +6,9 @@ class MyTextInput extends LitElement {
     static get properties() {
         return {
             label: { type: String },
+            size: {type: String},
             placeholder: {type: String},
-            value: { type: String },
+            value: { type: String, reflect: true },
             type: { type: String },
             passwordVisible: { type: Boolean },
             floatingLabel: { type: Boolean },
@@ -18,6 +19,7 @@ class MyTextInput extends LitElement {
     constructor() {
         super();
         this.label = '';
+        this.size = 'normal'
         this.value = '';
         this.placeholder = '';
         this.type = 'text';
@@ -30,7 +32,7 @@ class MyTextInput extends LitElement {
         return css`
             :host {
                 display: inline-block;
-                font-family: sans-serif;
+                font-family: var(--font-family);
                 width: 100%;
             }
 
@@ -44,14 +46,21 @@ class MyTextInput extends LitElement {
 
             input {
                 width: 100%;
-                border: 1px solid var(--border-color-light);
+                border: 1px solid var(--border-color);
                 border-radius: var(--border-radius-small);
-                padding: 16px 10px;
+                padding: 10px;
                 font-size: 1rem;
                 outline: none;
                 box-sizing: border-box;
                 transition: border-color 0.2s ease;
             }
+            
+            input.small {
+                padding: 6px;
+            }
+
+            input.large {
+                padding: 16px 10px;            }
 
             input:focus {
                 border-color: var(--focus-color);
@@ -60,7 +69,6 @@ class MyTextInput extends LitElement {
 
             label {
                 margin-bottom: 8px;
-                color: var(--text-color-dark);
                 font-size: 1rem;
                 transition: color 0.2s ease, transform 0.2s ease;
             }
@@ -146,6 +154,7 @@ class MyTextInput extends LitElement {
             <div class="input-container">
                 ${this._renderLabel()}
                 <input
+                        .class="${this.size}"
                         type="${this.type}"
                         .value="${this.value}"
                         placeholder="${this.placeholder}"
@@ -159,10 +168,9 @@ class MyTextInput extends LitElement {
 
     _handleInput(e) {
         this.value = e.target.value;
-        // Optionally, dispatch an event so parent can track changes:
-        // this.dispatchEvent(new CustomEvent('value-changed', {
-        //   detail: { value: this.value }
-        // }));
+        this.dispatchEvent(new CustomEvent('value-changed', {
+          detail: { value: this.value }
+        }));
     }
 }
 

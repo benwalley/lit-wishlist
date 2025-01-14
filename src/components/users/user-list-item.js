@@ -20,7 +20,7 @@ class UserItemComponent extends LitElement {
             filter: opacity(0.4);
             background: lightgrey;
             border: none;
-            border-bottom: 1px solid var(--border-color-light);
+            border-bottom: 1px solid var(--border-color);
             border-radius: 0;
             width: 100%;
             cursor: pointer;

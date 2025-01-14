@@ -1,15 +1,14 @@
 import {LitElement, html, css} from 'lit';
-import '../../svg/heart.js'
-import '../../svg/plus.js'
-import '../../svg/minus.js'
-import buttonStyles from '../../css/buttons.js'
+import '../../svg/heart.js';
+import '../../svg/plus.js';
+import '../../svg/minus.js';
+import buttonStyles from '../../css/buttons.js';
 
 class PrioritySelector extends LitElement {
     static get styles() {
         return [
             buttonStyles,
             css`
-                
                 .contents {
                     display: flex;
                     align-items: center;
@@ -24,8 +23,6 @@ class PrioritySelector extends LitElement {
                     align-items: center;
                     justify-content: center;
                 }
-
-
                 .hearts {
                     display: flex;
                     align-items: center;
@@ -36,12 +33,24 @@ class PrioritySelector extends LitElement {
     }
 
     static properties = {
-        value: {type: Number},
+        value: {type: Number, reflect: true},
     };
 
     constructor() {
         super();
         this.value = 1;
+    }
+
+    updated(changedProperties) {
+        if (changedProperties.has('value')) {
+            this.dispatchEvent(
+                new CustomEvent('priority-changed', {
+                    detail: { value: this.value },
+                    bubbles: true,
+                    composed: true,
+                })
+            );
+        }
     }
 
     setValue(index, state) {
@@ -72,31 +81,36 @@ class PrioritySelector extends LitElement {
                 remaining -= 0.5;
             }
             hearts.push(html`
-                <heart-icon
-                        .state="${state}"
-                        @state-changed="${(e) => this.setValue(i, e.detail)}"
-                ></heart-icon>
-            `);
+        <heart-icon
+          .state="${state}"
+          @state-changed="${(e) => this.setValue(i, e.detail)}"
+        ></heart-icon>
+      `);
         }
         return hearts;
     }
 
     render() {
         return html`
-            <h3>Priority</h3>
-            <div class="contents">
-                <button class="button primary" @click="${() => (this.value = Math.max(0, this.value - 0.5))}"
-                        ?disabled="${this.value <= 0}">
-                    <minus-icon style="width: 15px; height: 15px"></minus-icon>
-                </button>
-                <div class="hearts">${this.renderHearts()}</div>
-                <button @click="${() => (this.value = Math.min(5, this.value + 0.5))}" ?disabled="${this.value >= 5}">
-                    <plus-icon style="width: 15px; height: 15px"></plus-icon>
-                </button>
-            </div>
-        `;
+      <h3>Priority</h3>
+      <div class="contents">
+        <button
+          class="button primary"
+          @click="${() => (this.value = Math.max(0, this.value - 0.5))}"
+          ?disabled="${this.value <= 0}"
+        >
+          <minus-icon style="width: 15px; height: 15px"></minus-icon>
+        </button>
+        <div class="hearts">${this.renderHearts()}</div>
+        <button
+          @click="${() => (this.value = Math.min(5, this.value + 0.5))}"
+          ?disabled="${this.value >= 5}"
+        >
+          <plus-icon style="width: 15px; height: 15px"></plus-icon>
+        </button>
+      </div>
+    `;
     }
 }
 
 customElements.define('priority-selector', PrioritySelector);
-

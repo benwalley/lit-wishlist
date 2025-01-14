@@ -2,62 +2,61 @@ import {LitElement, html, css} from 'lit';
 import '../../global/custom-toggle.js'
 import '../../global/custom-tooltip.js'
 import '../../groups/your-groups-list.js'
+import buttonStyles from "../../../css/buttons.js";
 
 class VisibilitySelectorContainer extends LitElement {
-    static styles = css`
-        .container {
-            font-family: Arial, sans-serif;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 16px;
-            max-width: 600px;
-        }
-        
-        .public-toggle-label {
-            font-weight: bold;
-            font-size: var(--font-size-normal);
-        }
+    static get styles() {
+        return [
+            buttonStyles,
+            css`
+                .container {
+                    font-family: Arial, sans-serif;
+                    border: 1px solid #ccc;
+                    border-radius: 8px;
+                    padding: 16px;
+                    max-width: 600px;
+                }
 
-        .section {
-            margin-bottom: 16px;
-        }
+                .public-toggle-label {
+                    font-weight: bold;
+                    font-size: var(--font-size-normal);
+                }
 
-        .collapsible {
-            cursor: pointer;
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 10px;
-        }
+                .section {
+                    margin-bottom: 16px;
+                }
+                
 
-        .content {
-            display: none;
-            padding: 10px 10px 0 10px;
-            border-top: 1px solid #ddd;
-        }
+                .content {
+                    display: none;
+                    padding: 10px 10px 0 10px;
+                }
 
-        .content.active {
-            display: block;
-        }
+                .content.active {
+                    display: block;
+                }
 
-        .toggle-section {
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+                .toggle-section {
+                    margin-top: 10px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
 
-        select-by-group,
-        select-by-user {
-            display: block;
-            margin-top: 10px;
-        }
+                select-by-group,
+                select-by-user {
+                    display: block;
+                    margin-top: 10px;
+                }
 
-        .disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-    `;
+                .disabled {
+                    opacity: 0.5;
+                    pointer-events: none;
+                }
+            `
+        ];
+    }
+
 
     static properties = {
         isPublic: {type: Boolean},
@@ -83,12 +82,12 @@ class VisibilitySelectorContainer extends LitElement {
             <div class="container">
                 <h3>Who is this item visible to?</h3>
                 <div class="section">
-                    <div
-                        class="collapsible"
-                        @click="${this.toggleDetails}"
+                    <button type="button"
+                            class="collapsible button large primary fullWidth"
+                            @click="${this.toggleDetails}"
                     >
                         ${this.isDetailsExpanded ? 'Hide Details' : 'Show Details'}
-                    </div>
+                    </button>
                     <div
                             class="content ${this.isDetailsExpanded ? 'active' : ''}"
                     >
