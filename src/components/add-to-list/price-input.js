@@ -1,5 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from '../../css/buttons.js'
+import '../../svg/double-round-arrows.js'
 
 class PriceInput extends LitElement {
     static properties = {
@@ -23,19 +24,34 @@ class PriceInput extends LitElement {
             css`
                 .price-input-container {
                     display: grid;
-                    grid-template-columns: repeat(3, 1fr);
+                    grid-template-columns: repeat(2, 1fr) auto;
                     gap: 10px;
                 }
                 
                 .single-input {
                     grid-column: 1 / span 2;
                 }
+                
+                .button-text {
+                    display: none;
+                }
+                
+                @media (min-width: 768px) {
+                    .button-text {
+                        display: block;
+                    }
+                }
 
                 input {
                     padding: 5px;
                     font-size: 1rem;
                     width: 100px;
-                }`
+                }
+
+                double-round-arrows-icon {
+                    font-size: 1.2em;
+                }
+            `
         ]
     }
     ;
@@ -81,6 +97,7 @@ class PriceInput extends LitElement {
 
     render() {
         return html`
+            <strong>Price</strong>
             <div class="price-input-container">
                 ${this.isRange
                         ? html`
@@ -107,7 +124,10 @@ class PriceInput extends LitElement {
                             ></custom-input>
                         `}
                 <button @click=${this._toggleMode} class="button primary">
-                    ${this.isRange ? 'Switch to Single Price' : 'Switch to Range'}
+                    <span class="button-text">
+                        ${this.isRange ? 'Switch to Single Price' : 'Switch to Range'}
+                    </span>
+                    <double-round-arrows-icon></double-round-arrows-icon>
                 </button>
             </div>
         `;

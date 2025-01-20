@@ -2,8 +2,9 @@
 import { Router } from '@vaadin/router';
 import '../components/pages/guest-home/guest-home-container.js';
 import '../components/pages/account/account-container.js'
+import '../components/pages/list/list-view-container.js'
+import '../components/pages/listItem/item-view-container.js'
 import '../components/pages/not-found.js';
-import { userState } from '../state/userStore.js'; // Adjust the path as necessary
 
 
 const routes = [
@@ -14,6 +15,14 @@ const routes = [
     {
         path: '/account',
         component: 'account-container',
+    },
+    {
+        path: '/list/:listId',
+        component: 'list-view-container',
+    },
+    {
+        path: '/list/:listId/item/:itemId',
+        component: 'item-view-container',
     },
     {
         path: '(.*)',

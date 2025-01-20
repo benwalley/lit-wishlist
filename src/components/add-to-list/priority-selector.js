@@ -38,7 +38,7 @@ class PrioritySelector extends LitElement {
 
     constructor() {
         super();
-        this.value = 1;
+        this.value = 0;
     }
 
     updated(changedProperties) {

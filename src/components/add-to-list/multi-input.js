@@ -1,6 +1,9 @@
 import { LitElement, html, css } from 'lit';
 import { arrayConverter } from '../../helpers/arrayHelpers.js';
 import '../global/custom-input.js'
+import buttonStyles from "../../css/buttons.js";
+import '../../svg/delete.js'
+import '../../svg/plus.js'
 
 class MultiInput extends LitElement {
     static properties = {
@@ -29,36 +32,61 @@ class MultiInput extends LitElement {
         this.placeholder = 'Column 1';
     }
 
-    static styles = css`
-        .container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+    static get styles() {
+        return [
+            buttonStyles,
+            css`
+                .container {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                }
 
-        .header {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
+                .header {
+                    font-size: 1.2rem;
+                    font-weight: bold;
+                    margin-bottom: 10px;
+                }
 
-        .row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
+                .row {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr auto;
+                    gap: 10px;
+                    align-items: center;
+                    
+                }
+                
+                custom-input {
+                    grid-column: span 2;
+                }
+                
+                .delete-button {
+                    grid-column: 3;
+                    grid-row: 1 / span 2;                    
+                }
+                
+                @media (min-width: 550px) {
+                    custom-input {
+                        grid-column: span 1;
+                    }
 
-        button {
-            padding: 5px 10px;
-            font-size: 1rem;
-            cursor: pointer;
-        }
+                    .delete-button {
+                        grid-row: 1;
+                    }
+                }
 
-        .add-button {
-            margin-top: 10px;
-            align-self: flex-start;
-        }
-    `;
+                button {
+                    padding: 5px 10px;
+                    font-size: 1rem;
+                    cursor: pointer;
+                }
+
+                .add-button {
+                    align-self: flex-start;
+                }
+            `
+        ];
+    }
 
     /**
      * Parse the comma-separated `placeholder` into an array of keys.
@@ -136,16 +164,27 @@ class MultiInput extends LitElement {
                         ${keys.map((key) => html`
                             <custom-input
                                     type="text"
+                                    size="small"
                                     placeholder=${key}
                                     .value=${row[key] ?? ''}
                                     @input=${(e) => this._updateValue(rowIndex, key, e)}
                             />
                         `)}
-                        <button @click=${() => this._removeRow(rowIndex)}>Delete</button>
+                        <button 
+                                aria-label="Delete Row" 
+                                style="--icon-color: var(--delete-red);"
+                                class="icon-button delete-button"
+                                @click=${() => this._removeRow(rowIndex)}
+                        >
+                            <delete-icon></delete-icon>
+                        </button>
                     </div>
                 `)}
 
-                <button class="add-button" @click=${this._addRow}>Add Row</button>
+                <button class="secondary add-button" @click=${this._addRow}>
+                    <span>Add Row</span>
+                    <plus-icon></plus-icon>
+                </button>
             </div>
         `;
     }

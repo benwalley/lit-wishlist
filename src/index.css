@@ -26,7 +26,7 @@
     --grayscale-600: rgb(145, 145, 145);
     --grayscale-700: rgb(107, 107, 107);
     --grayscale-800: rgb(42, 42, 52);
-    --grayscale-900: rgb(30, 30, 36);
+    --grayscale-900: rgb(51, 51, 51);
 
     --yellow-100: rgb(254, 252, 247);
     --yellow-200: rgb(255, 246, 220);
@@ -67,6 +67,8 @@
     --lavender-700: rgb(113, 90, 197);
     --lavender-800: rgb(76, 58, 137);
     --lavender-900: rgb(32, 26, 52);
+
+    --blue: rgb(40, 129, 174);
 
     --light-background-color: var(--grayscale-200);
     --dark-background-color: #1E1E24;
@@ -149,7 +151,9 @@
     --fab-size: 60px;
 
     --max-content-width: 1400px;
-    --mobile-breakpoint: 1000px;
+    --small-breakpoint: 450px;
+    --medium-breakpoint: 768px;
+    --large-breakpoint: 1024px;
 
     --spacing-large: 60px;
     --spacing-normal: 20px;

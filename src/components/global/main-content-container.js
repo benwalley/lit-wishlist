@@ -18,9 +18,15 @@ export class MainContentContainer extends observeState(LitElement) {
         :host {
             flex-grow: 1;
             width: var(--max-content-width, 1400px);
-            max-width: calc(100% - 40px);
+            max-width: calc(100% - 20px);
             margin: 0 auto;
             display: grid;
+        }
+        
+        @media (min-width: 450px) {
+            :host {
+                max-width: calc(100% - 40px);
+            }
         }
     `;
 

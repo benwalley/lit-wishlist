@@ -11,12 +11,13 @@ import './priority-selector.js'
 import './images-selector.js'
 import './delete-automatically-selector.js'
 import './visibility-selector/visibility-selector-container.js'
+import '../lists/select-my-lists.js'
 import {customFetch} from "../../helpers/fetchHelpers.js";
 
 export class AddToListModal extends LitElement {
     static properties = {
         advancedOpen: { type: Boolean },
-
+        selectedListIds: { type: Array },
         // Form state variables
         itemName: { type: String },
         isPriceRange: {type: Boolean},
@@ -48,15 +49,16 @@ export class AddToListModal extends LitElement {
         this.minPrice = 0;
         this.maxPrice = 0;
         this.links = [{ url: '', displayName: '' }];
-        this.notes = '<p>Add notes here...</p>';
+        this.notes = '';
         this.images = [];
-        this.amount = 1;
+        this.amount = '';
         this.minAmount = 0;
         this.maxAmount = 0;
         this.priority = 1;
         this.isPublic = false;
         this.autoDelete = false;
         this.visibility = '';
+        this.selectedListIds = [];
     }
 
 
@@ -64,9 +66,24 @@ export class AddToListModal extends LitElement {
         return [
             buttonStyles,
             css`
+                .modal-title {
+                    padding: var(--spacing-normal);
+                    background-color: light-dark(var(--mint-300), var(--mint-800));
+                    margin: 0;
+                    text-align: center;
+                }
+                
                 .modal-contents {
                     display: grid;
                     gap: var(--spacing-normal);
+                    grid-template-columns: 1fr;
+                    padding: var(--spacing-normal);
+                }
+                
+                @media (min-width: 768px) {
+                    .modal-contents {
+                        grid-template-columns: 1fr;
+                    }
                 }
                 
                 .save-button {
@@ -111,6 +128,7 @@ export class AddToListModal extends LitElement {
             isPublic: this.isPublic,
             autoDelete: this.autoDelete,
             visibility: this.visibility,
+            lists: this.selectedListIds,
         };
 
         const options = {
@@ -138,10 +156,10 @@ export class AddToListModal extends LitElement {
 
     render() {
         return html`
-            <custom-modal triggerEvent="${ADD_MODAL_EVENT}">
-                <h2>Add To List</h2>
+            <custom-modal triggerEvent="${ADD_MODAL_EVENT}" noPadding="true">
+                <h2 class="modal-title">Add To List</h2>
                 <form @submit=${this._submitHandler} class="modal-contents">
-                    select list
+                    <select-my-lists @change="${this._handleSelectedListsChange}"></select-my-lists>
                     <div>
                         <custom-input .value="${this.itemName}" id="item-name-input" label="Item Name" fullWidth="true" placeholder="Item Name"
                         @value-changed="${(e) => this.itemName = e.detail.value}"></custom-input>
@@ -201,6 +219,11 @@ export class AddToListModal extends LitElement {
         this.amount = amount;
         this.minAmount = min;
         this.maxAmount = max;
+    }
+
+    _handleSelectedListsChange(e) {
+        const { selectedListIds } = e.detail;
+        this.selectedListIds = selectedListIds;
     }
 }
 customElements.define('add-to-list-modal', AddToListModal);

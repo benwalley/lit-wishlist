@@ -13,6 +13,7 @@ import './account-secondary-lists.js';
 import './logout-button.js'
 import '../../global/image-upload/image-uploader.js'
 import '../../global/custom-image.js'
+import '../../lists/my-lists.js'
 
 // TODO: Add logout link
 export class AccountContainer extends LitElement {
@@ -72,7 +73,7 @@ export class AccountContainer extends LitElement {
                 </section>
 
                 <section>
-                    <account-lists></account-lists>
+                    <my-lists></my-lists>
                 </section>
 
                 <section>

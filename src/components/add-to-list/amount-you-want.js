@@ -67,7 +67,7 @@ class AmountSelector extends LitElement {
         <custom-input
           type="text"
           name="amount"
-          placeholder="Amount you want"
+          placeholder="Amount you want (number or text)"
           .value="${this.amount}"
           @input="${this._handleInputChange}"
         ></custom-input>

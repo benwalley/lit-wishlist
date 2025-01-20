@@ -57,6 +57,21 @@ export default css`
             font-size: 1.25rem;
         }
         
+        &.icon-button {
+            --icon-color: var(--primary-button-background);
+            border-radius: 50px;
+            color: var(--icon-color);
+            padding: 5px;
+            background: none;
+
+            &:hover,
+            &:focus,
+            &:active {
+                background: color-mix(in srgb, var(--icon-color), transparent 80%);
+            }
+            
+        }
+        
 
         &:disabled {
             background-color: #e0e0e0;

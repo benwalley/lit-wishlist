@@ -54,3 +54,14 @@ export function generateTwoSimilarColorsFromString(str) {
 
     return [color1, color2];
 }
+
+export function currencyHelper(price) {
+    const number = parseFloat(price);
+    if (isNaN(number)) {
+        return price
+    }
+    return number.toLocaleString('en-US',
+        {style: 'currency', currency: 'USD'}
+    );
+
+}

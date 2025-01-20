@@ -1,5 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import '../../svg/bell.js'
+import '../global/custom-tooltip.js'
 
 export class NotificationsElement extends LitElement {
     static properties = {

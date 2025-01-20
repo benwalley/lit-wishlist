@@ -3,9 +3,10 @@ import { LitElement, html, css } from 'lit';
 class HeartIcon extends LitElement {
     static styles = css`
         :host {
+            --heart-size: 30px;
             display: inline-block;
-            width: 30px;
-            height: 30px;
+            width: var(--heart-size);
+            height: var(--heart-size);
             cursor: pointer;
         }
 
@@ -29,14 +30,17 @@ class HeartIcon extends LitElement {
 
     static properties = {
         state: { type: String }, // "empty", "half", "full"
+        active: {type: String}
     };
 
     constructor() {
         super();
         this.state = "empty";
+        this.active = true;
     }
 
     toggleState() {
+        if(this.active === "false") return;
         if (this.state === "empty") {
             this.state = "half";
         } else if (this.state === "half") {

@@ -20,5 +20,31 @@
         <main-content-container></main-content-container>
         <footer-container></footer-container>
     </auth-container>
+    <script>
+        function updateBodyClass() {
+            const width = window.innerWidth;
+            const body = document.body;
+
+            // Remove all size-related classes
+            body.classList.remove('small-screen', 'medium-screen', 'large-screen');
+
+            // Add the appropriate class based on the screen width
+            if (width > 450) {
+                body.classList.add('small-screen');
+            }
+            if (width > 768) {
+                body.classList.add('medium-screen');
+            }
+            if (width < 1024) {
+                body.classList.add('large-screen');
+            }
+        }
+
+        // Initial call to set the class based on the current screen size
+        updateBodyClass();
+
+        // Update the class whenever the window is resized
+        window.addEventListener('resize', updateBodyClass);
+    </script>
 </body>
 </html>

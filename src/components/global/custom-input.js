@@ -1,32 +1,34 @@
 import { LitElement, html, css } from 'lit';
 import '../../svg/eye.js';
-import '../global/custom-tooltip.js'
+import '../global/custom-tooltip.js';
 
 class MyTextInput extends LitElement {
-    static get properties() {
-        return {
-            label: { type: String },
-            size: {type: String},
-            placeholder: {type: String},
-            value: { type: String, reflect: true },
-            type: { type: String },
-            passwordVisible: { type: Boolean },
-            floatingLabel: { type: Boolean },
-            fullWidth: {type: Boolean}
-        };
-    }
+  static get properties() {
+    return {
+      label: { type: String },
+      size: { type: String },
+      placeholder: { type: String },
+      value: { type: String, reflect: true },
+      type: { type: String },
+      passwordVisible: { type: Boolean },
+      floatingLabel: { type: Boolean },
+      fullWidth: { type: Boolean },
+      required: { type: Boolean }  // New required property
+    };
+  }
 
-    constructor() {
-        super();
-        this.label = '';
-        this.size = 'normal'
-        this.value = '';
-        this.placeholder = '';
-        this.type = 'text';
-        this.passwordVisible = false; // Boolean for visibility
-        this.floatingLabel = false; // Default to non-floating labels
-        this.fullWidth = true;
-    }
+  constructor() {
+    super();
+    this.label = '';
+    this.size = 'normal';
+    this.value = '';
+    this.placeholder = '';
+    this.type = 'text';
+    this.passwordVisible = false;
+    this.floatingLabel = false;
+    this.fullWidth = true;
+    this.required = false;  // Default false
+  }
 
     static get styles() {
         return css`
@@ -122,7 +124,7 @@ class MyTextInput extends LitElement {
         `;
         }
         return html`
-        <label>${this.label}</label>
+        <strong>${this.label}</strong>
     `;
     }
 
@@ -149,29 +151,59 @@ class MyTextInput extends LitElement {
         this.type = this.passwordVisible ? 'text' : 'password';
     }
 
-    render() {
-        return html`
-            <div class="input-container">
-                ${this._renderLabel()}
-                <input
-                        .class="${this.size}"
-                        type="${this.type}"
-                        .value="${this.value}"
-                        placeholder="${this.placeholder}"
-                        @input="${this._handleInput}"
-                />
-                ${this._renderEyeIcon()}
-            </div>
+  render() {
+    return html`
+      <div class="input-container">
+        ${this._renderLabel()}
+        <input
+          class="${this.size}"
+          type="${this.type}"
+          .value="${this.value}"
+          placeholder="${this.placeholder}"
+          @input="${this._handleInput}"
+          ?required="${this.required}"  <!-- Bind required attribute -->
+        ${this._renderEyeIcon()}
+      </div>
+    `;
+  }
 
-        `;
+  _handleInput(e) {
+    this.value = e.target.value;
+    this.dispatchEvent(
+      new CustomEvent('value-changed', {
+        detail: { value: this.value }
+      })
+    );
+  }
+
+  /**
+   * Custom validation method for the component.
+   * Returns true if valid, false otherwise.
+   */
+  validate() {
+    const input = this.renderRoot.querySelector('input');
+    if (!input) return true; // No input found, consider valid.
+
+    // Use native validity check if available.
+    if (input.checkValidity) {
+      const valid = input.checkValidity();
+      if (!valid) {
+        input.reportValidity(); // Triggers browser UI for invalid state if available.
+      }
+      return valid;
     }
 
-    _handleInput(e) {
-        this.value = e.target.value;
-        this.dispatchEvent(new CustomEvent('value-changed', {
-          detail: { value: this.value }
-        }));
+    // Fallback custom validation
+    if (this.required && !this.value.trim()) {
+      // Simple custom error handling: add custom styles or show messages.
+      input.setCustomValidity('This field is required.');
+      input.reportValidity();
+      return false;
+    } else {
+      input.setCustomValidity('');
+      return true;
     }
+  }
 }
 
 customElements.define('custom-input', MyTextInput);

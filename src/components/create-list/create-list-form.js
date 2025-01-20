@@ -5,27 +5,90 @@ import '../global/custom-input.js'
 import '../groups/your-groups-list.js'
 import '../../svg/user.js'
 import '../../svg/group.js'
+import {messagesState} from "../../state/messagesStore.js";
+import {customFetch} from "../../helpers/fetchHelpers.js";
 
 
 export class CreateListForm extends LitElement {
     static properties = {
-        name: {type: String},
+        listName: {type: String},
         description: {type: String},
         groups: {type: Array},
     };
 
     constructor() {
         super();
-        this.name = '';
+        this.listName = '';
         this.description = '';
         this.groups = [];
     }
+
+    async _handleSubmit(e) {
+        e.preventDefault();
+        const validationSuccess = this._validateForm();
+        if (!validationSuccess) return;
+        const formData = {
+            listName: this.listName,
+            description: this.description,
+            visibleToGroups: this.groups
+        }
+
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData), // Send necessary data if any
+        }
+
+        console.log('Submitting Form Data:', formData);
+
+        const response = await customFetch('/lists/create', options, true);
+        console.log(response)
+
+        this._closeModal();
+    }
+
+    _closeModal() {
+        this.listName = '';
+        this.description = '';
+        this.groups = [];
+        const modal = this.closest('custom-modal');
+        if (modal && typeof modal.closeModal === 'function') {
+            modal.closeModal();
+        }
+    }
+
+    _validateForm() {
+        const inputs = this.shadowRoot.querySelectorAll('custom-input');
+        let allValid = true;
+
+        inputs.forEach((input) => {
+            if (!input.validate()) {
+                allValid = false;
+            }
+        });
+
+        if (!allValid) {
+            messagesState.addMessage('Please complete all required fields', 'error');
+            return false;
+        }
+
+        return true;
+    }
+
     static get styles() {
         return [
             buttonStyles,
             css`
                 form {
-
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-normal);
+                }
+                
+                h2 {
+                    margin-top: 0;
                 }
 
                 .top-section {
@@ -33,17 +96,28 @@ export class CreateListForm extends LitElement {
                     gap: var(--spacing-normal);
                     grid-template-columns: 100px 1fr;
                     align-items: flex-end;
-                    padding: var(--spacing-normal)
+                    padding: var(--spacing-normal);
+                    padding-top: 0;
                 }
 
-                .groups-section {
+               
+                
+                .groups-section,
+                .users-section {
                     padding: var(--spacing-normal);
-                    background: light-dark(var(--lavender-300), var(--lavender-900))
+                    --background-base: var(--primary-color);
+                    --dark-color: color-mix(in srgb, var(--background-base), #000000 70%);
+                    --light-color: color-mix(in srgb, var(--background-base), #ffffff 70%);
+                    background: light-dark(var(--light-color), var(--dark-color));
+                    box-sizing: border-box;
+                    margin: 0 auto;
+                    width: 100%;
+                    border-radius: var(--border-radius-normal);
+                    box-shadow: var(--large-box-shadow);
                 }
 
                 .users-section {
-                    padding: var(--spacing-normal);
-                    background: light-dark(var(--mint-200), var(--mint-900))
+                    --background-base: var(--secondary-color);
                 }
 
 
@@ -67,20 +141,27 @@ export class CreateListForm extends LitElement {
                     margin: 0;
                     font-size: 0.9em;
                 }
+                
+                .save-button-container {
+                    box-sizing: border-box;
+                    width: 100%;
+                    display: flex;
+                }
             `
         ];
     }
 
     render() {
         return html`
-            <form action="">
+            <form action="" @submit="${this._handleSubmit}">
                 <div class="top-section">
                     <h2  class="full-width">Create New List</h2>
-                    <custom-avatar size="100" .username="${this.name}"></custom-avatar>
+                    <custom-avatar size="100" .username="${this.listName}"></custom-avatar>
                     <custom-input placeholder="List Name" 
                                   label="List Name"
-                                  .value="${this.name}"
-                                  @value-changed="${(e) => this.name = e.detail.value}"
+                                  required="true"
+                                  .value="${this.listName}"
+                                  @value-changed="${(e) => this.listName = e.detail.value}"
                     ></custom-input>
                     <custom-input class="full-width" 
                                   label="Description"
@@ -116,8 +197,9 @@ export class CreateListForm extends LitElement {
                     <your-groups-list class="full-width"></your-groups-list>
                 </div>
 
-                
-                <button class="full-width">Save List</button>
+                <div class="save-button-container">
+                    <button class="fullWidth primary save-button">Save List</button>
+                </div>
             </form>
         `;
     }

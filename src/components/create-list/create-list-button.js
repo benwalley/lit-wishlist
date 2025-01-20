@@ -33,7 +33,7 @@ export class CreateListButton extends LitElement {
       <button @click="${this._openModal}">Create New List</button>
 
       <!-- Custom Modal with a Create List Form -->
-      <custom-modal triggerEvent="open-create-list-modal" noPadding="true">
+      <custom-modal class="list-modal" triggerEvent="open-create-list-modal" maxWidth="800px">
         <create-list-form size="100px"></create-list-form>
       </custom-modal>
     `;

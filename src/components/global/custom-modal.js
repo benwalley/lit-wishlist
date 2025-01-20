@@ -6,6 +6,7 @@ class CustomModal extends LitElement {
         triggerEvent: { type: String },
         isOpen: { type: Boolean, state: true },
         noPadding: { type: Boolean },
+        maxWidth: {type: String}
     };
 
     constructor() {
@@ -14,6 +15,7 @@ class CustomModal extends LitElement {
         this.isOpen = false;
         this.triggerElement = null;
         this.noPadding = false;
+        this.maxWidth = '1200px';
 
         // Bind methods
         this._openModal = this._openModal.bind(this);
@@ -45,9 +47,9 @@ class CustomModal extends LitElement {
         /* Modal (outer container) */
         .modal {
             background: var(--modal-background-color);
-            border-radius: 8px;
-            max-width: 1200px;
+            border-radius: var(--border-radius-normal);
             width: 90%;
+            max-width: var(--max-width, 1200px);
             box-shadow: var(--large-box-shadow);
             position: relative;
             outline: none;
@@ -63,7 +65,11 @@ class CustomModal extends LitElement {
 
         /* Handle padding on the content area */
         .modal.padding .modal-content {
-            padding: 1.5rem;
+            padding: var(--spacing-small);
+        }
+        
+        @media (min-width: 550px) {
+            padding: var(--spacing-normal);
         }
 
         /* Close button */
@@ -141,6 +147,7 @@ class CustomModal extends LitElement {
                         role="dialog"
                         aria-modal="true"
                         tabindex="-1"
+                        style="--max-width: ${this.maxWidth};"
                 >
                     <button
                             class="close-button"
