@@ -16,16 +16,18 @@ export class MainContentContainer extends observeState(LitElement) {
 
     static styles = css`
         :host {
+            grid-column: 2;
+            grid-row: 2;
             flex-grow: 1;
-            width: var(--max-content-width, 1400px);
             max-width: calc(100% - 20px);
+            width: 100%;
             margin: 0 auto;
             display: grid;
         }
         
         @media (min-width: 450px) {
             :host {
-                max-width: calc(100% - 40px);
+                //max-width: calc(100% - 40px);
             }
         }
     `;

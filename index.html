@@ -7,44 +7,21 @@
     <link rel="stylesheet" href="./src/index.css"/>
     <script type="module" src="./src/components/global/auth-container.js"></script>
     <script type="module" src="./src/components/header/header-container.js"></script>
+    <script type="module" src="./src/components/sidebar/sidebar-container.js"></script>
     <script type="module" src="./src/components/global/main-content-container.js"></script>
-    <script type="module" src="./src/components/footer/footer-container.js"></script>
+    <script type="module" src="./src/components/add-to-list/add-to-list-button.js"></script>
+    <script type="module" src="./src/components/add-to-list/add-to-list-modal.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
 </head>
 <body>
     <auth-container>
         <header-container></header-container>
+        <sidebar-container></sidebar-container>
         <main-content-container></main-content-container>
-        <footer-container></footer-container>
+        <add-to-list-button></add-to-list-button>
+        <add-to-list-modal></add-to-list-modal>
     </auth-container>
-    <script>
-        function updateBodyClass() {
-            const width = window.innerWidth;
-            const body = document.body;
-
-            // Remove all size-related classes
-            body.classList.remove('small-screen', 'medium-screen', 'large-screen');
-
-            // Add the appropriate class based on the screen width
-            if (width > 450) {
-                body.classList.add('small-screen');
-            }
-            if (width > 768) {
-                body.classList.add('medium-screen');
-            }
-            if (width < 1024) {
-                body.classList.add('large-screen');
-            }
-        }
-
-        // Initial call to set the class based on the current screen size
-        updateBodyClass();
-
-        // Update the class whenever the window is resized
-        window.addEventListener('resize', updateBodyClass);
-    </script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import '../../svg/bell.js'
 import '../global/custom-tooltip.js'
+import buttonStyles from "../../css/buttons.js";
 
 export class NotificationsElement extends LitElement {
     static properties = {
@@ -12,40 +13,37 @@ export class NotificationsElement extends LitElement {
         this.notifications = ['asdfas', 'asdfas']
     }
 
-    static styles = css`
-        :host {
+    static get styles() {
+        return [
+            buttonStyles,
+            css`
+                :host {
 
-        }
+                }
 
-        .notifications-button {
-            background: none;
-            border: none;
-            position: relative;
-        }
+                .button.notifications-button {
+                    font-size: var(--font-size-large);
+                    position: relative;
+                }
 
-        .number-notifications {
-            position: absolute;
-            top: 0;
-            right: 0;
-            background: var(--delete-red);
-            width: 16px;
-            width: 16px;
-            height: 16px;
-            font-size: 12px;
-            color: white;
-            font-weight: bold;
-            border-radius: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    `;
+                .number-notifications {
+                    position: absolute;
+                    top: 2px;
+                    right: 2px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+            `
+        ];
+    }
+
 
     render() {
         return html`
-                <button class="notifications-button" title="${this.notifications?.length} notifications">
-                    <bell-icon style="color: var(--header-text-color); width: 24px; height: 24px;"></bell-icon>
-                    <span class="number-notifications">${this.notifications.length}</span>
+                <button class="notifications-button button icon-button" title="${this.notifications?.length} notifications">
+                    <bell-icon></bell-icon>
+                    <span class="number-notifications"></span>
                 </button>
                 <custom-tooltip>You have ${this.notifications.length} notifications</custom-tooltip>
     `;

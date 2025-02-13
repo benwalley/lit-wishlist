@@ -50,6 +50,8 @@ class MyTextInput extends LitElement {
                 width: 100%;
                 border: 1px solid var(--border-color);
                 border-radius: var(--border-radius-small);
+                background: var(--input-background-color);
+                color: var(--text-color-dark);   
                 padding: 10px;
                 font-size: 1rem;
                 outline: none;

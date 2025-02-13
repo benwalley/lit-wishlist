@@ -1,11 +1,11 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../../css/buttons";
-import '../../global/custom-image.js'
+import '../../global/custom-image.js';
 
 export class CustomElement extends LitElement {
     static properties = {
-        itemData: {type: Object},
-        selectedImageIndex: {type: Number},
+        itemData: { type: Object },
+        selectedImageIndex: { type: Number },
     };
 
     constructor() {
@@ -22,38 +22,83 @@ export class CustomElement extends LitElement {
                     display: block;
                 }
 
+                /* 
+                 * We'll treat .gallery-container as our container for 
+                 * container queries. 
+                 */
+                .gallery-container {
+                    display: grid;
+                    gap: 1rem;
+                    container-type: inline-size;
+                    container-name: gallery;
+                }
+
+                /* Main image styling */
+                .main-image {
+                    border-radius: var(--border-radius-normal, 8px);
+                    overflow: hidden;
+                    box-shadow: var(--shadow-2-soft, 0 4px 8px rgba(0,0,0,0.1));
+                    display: flex;
+                }
+                /* Main image hover effect */
+                .main-image:hover custom-image {
+                    transform: scale(1.05);
+                }
+
+                /* The <custom-image> itself gets a transition. */
                 custom-image {
                     width: 100%;
+                    transition: var(--transition-normal, 0.3s ease);
                 }
 
-                .gallery-container {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 1rem;
-                }
-
+                /* Thumbnails container: responsive grid. 
+                 * repeat(auto-fill, minmax(70px, 1fr)) tries to fit 
+                 * as many 70px columns as possible.
+                 */
                 .thumbnail-container {
-                    display: flex;
+                    display: grid;
                     gap: 0.5rem;
-                    flex-wrap: wrap;
+                    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
                 }
 
+                /* Each thumbnail is a square box with a subtle shadow. */
                 .thumbnail {
                     cursor: pointer;
                     border: 2px solid transparent;
-                    transition: border-color 0.2s ease;
-                    width: 70px;
-                    height: 70px;
+                    transition:
+                            border-color 0.2s ease,
+                            transform 0.2s ease,
+                            box-shadow 0.2s ease;
+                    overflow: hidden;
+                    aspect-ratio: 1; /* keep thumbnails square */
+                    border-radius: var(--border-radius-normal, 8px);
+                    box-shadow: var(--shadow-1-soft, 0 2px 4px rgba(0,0,0,0.1));
                 }
 
+                /* The thumbnail's <custom-image> also gets a transition. */
+                .thumbnail custom-image {
+                    border-radius: inherit;
+                    transition: var(--transition-normal, 0.3s ease);
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+
+                /* Hover effect: subtle scale + stronger shadow. */
                 .thumbnail:hover {
-                    border-color: var(--border-color);
+                    border-color: var(--border-color, #ccc);
+                    transform: scale(1.02);
+                    box-shadow: var(--shadow-2-soft, 0 4px 8px rgba(0,0,0,0.1));
                 }
 
+                /* The selected thumbnail gets a highlight border and a slight scale. */
                 .thumbnail.selected {
-                    border-color: var(--primary-color);
+                    border-color: var(--primary-color, #0066cc);
                 }
-            `
+                .thumbnail.selected custom-image {
+                    transform: scale(1.02);
+                }
+            `,
         ];
     }
 
@@ -62,41 +107,46 @@ export class CustomElement extends LitElement {
     }
 
     render() {
-        if (!this.itemData?.imageIds?.length) {
+        const { imageIds = [], name = '' } = this.itemData;
+        if (!imageIds.length) {
             return html`<p>No images available</p>`;
         }
 
-        const currentImageId = this.itemData.imageIds[this.selectedImageIndex];
-        const hasMultipleImages = this.itemData.imageIds.length > 1;
+        const currentImageId = imageIds[this.selectedImageIndex];
+        const hasMultipleImages = imageIds.length > 1;
 
         return html`
             <div class="gallery-container">
+                <!-- Main image -->
                 <div class="main-image">
                     <custom-image
                             .imageId="${currentImageId}"
-                            alt="${this.itemData.name}"
+                            alt="${name}"
                             width="500"
                             height="500"
                     ></custom-image>
                 </div>
 
-                ${hasMultipleImages ? html`
-                    <div class="thumbnail-container">
-                        ${this.itemData.imageIds.map((imageId, index) => html`
-                            <div
-                                    class="thumbnail ${index === this.selectedImageIndex ? 'selected' : ''}"
-                                    @click="${() => this.selectImage(index)}"
-                            >
-                                <custom-image
-                                        .imageId="${imageId}"
-                                        alt="${this.itemData.name} thumbnail ${index + 1}"
-                                        width="70"
-                                        height="70"
-                                ></custom-image>
+                <!-- Thumbnails (if multiple images) -->
+                ${hasMultipleImages
+                        ? html`
+                            <div class="thumbnail-container">
+                                ${imageIds.map((imageId, index) => html`
+                                    <div
+                                            class="thumbnail ${index === this.selectedImageIndex ? 'selected' : ''}"
+                                            @click="${() => this.selectImage(index)}"
+                                    >
+                                        <custom-image
+                                                .imageId="${imageId}"
+                                                alt="${name} thumbnail ${index + 1}"
+                                                width="70"
+                                                height="70"
+                                        ></custom-image>
+                                    </div>
+                                `)}
                             </div>
-                        `)}
-                    </div>
-                ` : ''}
+                        `
+                        : ''}
             </div>
         `;
     }

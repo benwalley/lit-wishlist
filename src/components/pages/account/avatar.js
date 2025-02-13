@@ -21,7 +21,7 @@ export class Avatar extends LitElement {
             display: inline-block;
         }
         .avatar {
-            border-radius: 50%;
+            border-radius: 25%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -77,7 +77,7 @@ export class Avatar extends LitElement {
           width: ${this.size}px; 
           height: ${this.size}px;
           font-size: ${this.size * 0.5}px;
-          background: linear-gradient(to right, ${color1}, ${color2});
+          background: linear-gradient(135deg, ${color1}, ${color2});
         "
       >
         ${initials}

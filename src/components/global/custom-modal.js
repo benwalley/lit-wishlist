@@ -1,12 +1,12 @@
 // custom-modal.js
-import {LitElement, html, css} from 'lit';
+import { LitElement, html, css } from 'lit';
 
 class CustomModal extends LitElement {
     static properties = {
         triggerEvent: { type: String },
         isOpen: { type: Boolean, state: true },
         noPadding: { type: Boolean },
-        maxWidth: {type: String}
+        maxWidth: { type: String },
     };
 
     constructor() {
@@ -25,7 +25,7 @@ class CustomModal extends LitElement {
     }
 
     static styles = css`
-        /* Overlay */
+        /* Overlay with fade in/out transition */
         .overlay {
             position: fixed;
             top: 0;
@@ -37,42 +37,49 @@ class CustomModal extends LitElement {
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            /* Start hidden */
+            opacity: 0;
+            pointer-events: none;
             transition: opacity 0.3s ease;
         }
-
-        .overlay[hidden] {
-            display: none;
+        /* When open, make the overlay visible and interactive */
+        .overlay.open {
+            opacity: 1;
+            pointer-events: auto;
         }
 
-        /* Modal (outer container) */
+        /* Modal container with a pop-in effect */
         .modal {
-            background: var(--modal-background-color);
-            border-radius: var(--border-radius-normal);
+            background: var(--modal-background-color, #fff);
+            border-radius: var(--border-radius-large, 8px);
             width: 90%;
             max-width: var(--max-width, 1200px);
-            box-shadow: var(--large-box-shadow);
+            box-shadow: var(--shadow-2-soft, 0 2px 10px rgba(0, 0, 0, 0.1));
             position: relative;
             outline: none;
-            /* IMPORTANT: Hide overflow here so the scrollbar doesn't bleed outside the radius */
             overflow: hidden;
+            /* Initial state before transition */
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        /* When overlay is open, animate the modal into view */
+        .overlay.open .modal {
+            opacity: 1;
+            transform: translateY(0) scale(1);
         }
 
-        /* The scrollable content area inside the modal */
+        /* Scrollable content area */
         .modal-content {
             max-height: 80vh;
             overflow-y: auto;
         }
-
-        /* Handle padding on the content area */
+        /* Apply padding if not explicitly disabled */
         .modal.padding .modal-content {
-            padding: var(--spacing-small);
-        }
-        
-        @media (min-width: 550px) {
-            padding: var(--spacing-normal);
+            padding: var(--spacing-small, 1rem);
         }
 
-        /* Close button */
+        /* Close button styling */
         .close-button {
             position: absolute;
             top: 0.5rem;
@@ -97,6 +104,15 @@ class CustomModal extends LitElement {
         super.disconnectedCallback();
         window.removeEventListener(this.triggerEvent, this._openModal);
         window.removeEventListener('keydown', this._handleKeyDown);
+        // Ensure scrolling is enabled if the element is removed while open.
+        document.body.style.overflow = '';
+    }
+
+    // Disable background scrolling when modal is open.
+    updated(changedProperties) {
+        if (changedProperties.has('isOpen')) {
+            document.body.style.overflow = this.isOpen ? 'hidden' : '';
+        }
     }
 
     _openModal(event) {
@@ -137,9 +153,9 @@ class CustomModal extends LitElement {
     render() {
         return html`
             <div
-                    class="overlay"
-                    ?hidden=${!this.isOpen}
+                    class="overlay ${this.isOpen ? 'open' : ''}"
                     @click=${this._onOverlayClick}
+                    ?inert=${!this.isOpen}
                     aria-hidden=${!this.isOpen}
             >
                 <div
@@ -156,7 +172,7 @@ class CustomModal extends LitElement {
                     >
                         &times;
                     </button>
-                    <!-- Scrollable content goes in a dedicated container -->
+                    <!-- Scrollable content container -->
                     <div class="modal-content">
                         <slot></slot>
                     </div>

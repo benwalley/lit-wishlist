@@ -33,6 +33,12 @@ export class CustomElement extends LitElement {
                 p {
                     margin: 0;
                 }
+                
+                .normal-price {
+                    font-size: var(--font-size-normal);
+                    font-weight: bold;
+                    color: var(--primary-color);
+                }
 
             `
         ];
@@ -42,7 +48,7 @@ export class CustomElement extends LitElement {
         return html`
             ${this.showLabel ? html`<strong>Price:</strong>` : ''}
             ${this.itemData?.price
-                    ? html`<p> ${currencyHelper(this.itemData?.price)}</p>`
+                    ? html`<p class="price normal-price"> ${currencyHelper(this.itemData?.price)}</p>`
                     : ''}
             ${(this.itemData?.minPrice && this.itemData?.maxPrice)
                     ? html`

@@ -31,26 +31,23 @@ function hslToHex(h, s, l) {
 }
 
 /**
- * Generate two similar, darker colors from a string
- * so white text remains visible on top.
+ * Generate two colorful but dark-enough-for-white-text colors
+ * from a string, ensuring the gradient is subtle but distinct.
  */
 export function generateTwoSimilarColorsFromString(str) {
-    // Generate a deterministic hue from the string
+    // Deterministic hue from the string
     const hash = generateHashFromString(str);
     const hue = Math.abs(hash) % 360; // 0 <= hue < 360
 
-    // For darker backgrounds, keep lightness relatively low.
-    // We'll choose two close lightness values for the gradient
-    // so it's subtle but still distinct.
-    const saturation = 70;          // fairly vibrant
-    const lightnessBase = 30;       // darker base
-    const lightnessVariance = 25;   // how much we increase for second color
+    // Adjust these to shift darkness/brightness to taste
+    // - Too bright => white text can wash out.
+    // - Too dark => loses “fun” vibrancy.
+    const saturation = 80;        // Vibrant without being neon
+    const baseLightness = 45;     // Mid-dark; helps white text stand out
+    const secondLightness = 60;   // Slightly lighter for the second color
 
-    // If you want them even darker, reduce lightnessBase.
-    // If you want them a bit lighter, increase lightnessBase or saturation.
-
-    const color1 = hslToHex(hue, saturation, lightnessBase);
-    const color2 = hslToHex(hue, saturation, lightnessBase + lightnessVariance);
+    const color1 = hslToHex(hue, saturation, baseLightness);
+    const color2 = hslToHex(hue, saturation, secondLightness);
 
     return [color1, color2];
 }
@@ -58,10 +55,10 @@ export function generateTwoSimilarColorsFromString(str) {
 export function currencyHelper(price) {
     const number = parseFloat(price);
     if (isNaN(number)) {
-        return price
+        return price;
     }
-    return number.toLocaleString('en-US',
-        {style: 'currency', currency: 'USD'}
-    );
-
+    return number.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'USD'
+    });
 }

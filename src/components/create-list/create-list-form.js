@@ -44,9 +44,14 @@ export class CreateListForm extends LitElement {
         console.log('Submitting Form Data:', formData);
 
         const response = await customFetch('/lists/create', options, true);
-        console.log(response)
-
+        document.dispatchEvent(
+            new CustomEvent('fetch-lists', {
+                bubbles: true,
+                composed: true,
+            })
+        );
         this._closeModal();
+
     }
 
     _closeModal() {
@@ -105,15 +110,12 @@ export class CreateListForm extends LitElement {
                 .groups-section,
                 .users-section {
                     padding: var(--spacing-normal);
-                    --background-base: var(--primary-color);
-                    --dark-color: color-mix(in srgb, var(--background-base), #000000 70%);
-                    --light-color: color-mix(in srgb, var(--background-base), #ffffff 70%);
-                    background: light-dark(var(--light-color), var(--dark-color));
                     box-sizing: border-box;
                     margin: 0 auto;
                     width: 100%;
+                    background: var(--background-color);
                     border-radius: var(--border-radius-normal);
-                    box-shadow: var(--large-box-shadow);
+                    border: 1px solid var(--border-color);
                 }
 
                 .users-section {

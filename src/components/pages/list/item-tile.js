@@ -35,17 +35,22 @@ export class ItemTile extends LitElement {
                     margin: 0;
                 }
                 
+                custom-image {
+                    width: 100%;
+                    aspect-ratio: 1.25/1;
+                    display: flex;
+                    object-fit: cover;
+                }
+                
                 .small custom-image {
-                    width: 50px;
+                    width: 100%;
                 }
 
                 .item-name {
                     margin: 0;
-                    border-bottom: 1px solid var(--border-color);
                 }
                 
                 .small .item-name {
-                    border-bottom: none;
                     padding-right: 30px;
                     white-space: nowrap;
                     overflow: hidden;
@@ -56,6 +61,7 @@ export class ItemTile extends LitElement {
                     display: flex;
                     flex-direction: column;
                     gap: var(--spacing-small);
+                    padding: var(--spacing-small);
                 }
                 
                 .small .right-side-container {
@@ -84,21 +90,21 @@ export class ItemTile extends LitElement {
                 }
 
                 .item-link {
-                    transition: all 200ms;
+                    transition: var(--transition-normal);
                     cursor: pointer;
-                    box-shadow: var(--medium-box-shadow);
                     display: grid;
-                    grid-template-columns: 120px 1fr;
-                    padding: var(--spacing-small);
-                    gap: var(--spacing-small);
+                    height: 100%;
                     position: relative;
-                    border-radius: var(--border-radius-small);
+                    overflow: hidden;
+                    border: 1px solid var(--border-color);
+                    border-radius: var(--border-radius-normal);
                     color: var(--text-color-dark);
                     text-decoration: none;
                     
                     &:hover {
-                        box-shadow: var(--large-box-shadow);
+                        box-shadow: var(--shadow-1-soft);
                         transform: scale(1.01);
+                        border: 1px solid var(--primary-color);
                     }
                 }
                 
@@ -106,7 +112,6 @@ export class ItemTile extends LitElement {
                     padding: var(--spacing-x-small);
                     box-shadow: none;
                     border-bottom: 1px solid var(--border-color);
-                    grid-template-columns: 50px 1fr;
                     border-radius: 0;
                     transition: all 200ms;
                     

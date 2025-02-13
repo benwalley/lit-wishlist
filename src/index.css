@@ -1,6 +1,8 @@
 :root {
-    /* Base styling */
-    font-family: Lato, Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    /* ===========================================
+       1) Base Styling
+    =========================================== */
+    font-family: "Nunito Sans", Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     font-size: 16px;
     font-weight: 400;
@@ -9,170 +11,263 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
-    /* Support both light and dark color schemes */
+
+    /* ===========================================
+       2) Light/Dark Color Scheme Support
+    =========================================== */
     color-scheme: light dark;
 
-    /* ===========================================
-       1) Core Colors & Basic Variables
-       =========================================== */
-    /* Grayscale Design palette: https://grayscale.design/app?lums=97.40,92.33,83.88,70.37,49.35,28.33,14.82,6.37,1.30&palettes=%23000000,%23F6F5F9,%23FFF2CD,%23F8B8C5,%23ADE4C7,%239C8ADE&filters=0%7C0,0%7C0,0.2%7C-15.5,0%7C-6.1,0%7C-2,0.2%7C-7.7&names=,Neutral,sunny%20yellow,pink,mint,lavender&labels=,,,,, */
-/*// Grayscale Design palette: https://grayscale.design/app?lums=97.40,92.33,83.88,70.37,49.35,28.33,14.82,6.37,1.30&palettes=%23000000,%23FFF2CD,%23F8B8C5,%23ADE4C7,%239C8ADE&filters=0%7C0,0.2%7C-15.5,0%7C-6.1,0%7C-2,0.2%7C-7.7&names=Neutral,yellow,pink,mint,lavender&labels=,,,,*/
-
-    --grayscale-100: rgb(252, 252, 252);
-    --grayscale-200: rgb(246, 245, 249);
-    --grayscale-300: rgb(202, 216, 227);
-    --grayscale-400: rgb(236, 233, 241);
-    --grayscale-500: rgb(196, 196, 196);
-    --grayscale-600: rgb(145, 145, 145);
-    --grayscale-700: rgb(107, 107, 107);
-    --grayscale-800: rgb(42, 42, 52);
-    --grayscale-900: rgb(51, 51, 51);
-
-    --yellow-100: rgb(254, 252, 247);
-    --yellow-200: rgb(255, 246, 220);
-    --yellow-300: rgb(250, 235, 195);
-    --yellow-400: rgb(238, 217, 160);
-    --yellow-500: rgb(211, 184, 109);
-    --yellow-600: rgb(167, 143, 75);
-    --yellow-700: rgb(117, 107, 74);
-    --yellow-800: rgb(74, 71, 64);
-    --yellow-900: rgb(30, 30, 30);
-
-    --pink-100: rgb(254, 251, 252);
-    --pink-200: rgb(253, 244, 246);
-    --pink-300: rgb(251, 231, 235);
-    --pink-400: rgb(249, 208, 216);
-    --pink-500: rgb(246, 164, 180);
-    --pink-600: rgb(234, 101, 127);
-    --pink-700: rgb(206, 36, 70);
-    --pink-800: rgb(104, 60, 69);
-    --pink-900: rgb(58, 15, 24);
-
-    --mint-100: rgb(249, 253, 251);
-    --mint-200: rgb(238, 249, 243);
-    --mint-300: rgb(217, 242, 228);
-    --mint-400: rgb(178, 230, 202);
-    --mint-500: rgb(110, 205, 155);
-    --mint-600: rgb(60, 163, 108);
-    --mint-700: rgb(46, 121, 81);
-    --mint-800: rgb(32, 80, 55);
-    --mint-900: rgb(14, 34, 23);
-
-    --lavender-100: rgb(252, 252, 253);
-    --lavender-200: rgb(246, 246, 249);
-    --lavender-300: rgb(237, 235, 245);
-    --lavender-400: rgb(221, 215, 238);
-    --lavender-500: rgb(191, 180, 229);
-    --lavender-600: rgb(152, 132, 220);
-    --lavender-700: rgb(113, 90, 197);
-    --lavender-800: rgb(76, 58, 137);
-    --lavender-900: rgb(32, 26, 52);
-
-    --blue: rgb(40, 129, 174);
-
-    --light-background-color: var(--grayscale-200);
-    --dark-background-color: #1E1E24;
-    --modal-light-background-color: #ffffff;
-    --modal-dark-background-color: #2A2A34;
 
     /* ===========================================
-       2) Used Colors
-       =========================================== */
-    --primary-color: var(--lavender-600);
-    --secondary-color: var(--mint-500);
-    --accent-color-one: var(--yellow-200);
-    --accent-color-two: var(--pink-500);
-    --background-color: light-dark(var(--light-background-color), var(--dark-background-color));
-    --modal-background-color: light-dark(var(--modal-light-background-color), var(--modal-dark-background-color));
+       3) Color Variables
+         (Grayscale, Brand, Background)
+    =========================================== */
+    /* -- Grayscale */
+    --grayscale-100: rgb(255, 255, 255);
+    --grayscale-150: #f3f4f6;
+    --grayscale-200: #e5e7eb;
+    --grayscale-300: #d1d5db;
+    --grayscale-400: #9ca3af;
+    --grayscale-500: #6b7280;
+    --grayscale-700: #4b5563;
 
-    --option-select-background: light-dark(lightgrey, #000000);
-    --option-select-background-hover: light-dark(#f4f4f4, #4a4a4a);
+    /* -- Brand/Theme Colors */
+    --purple-normal: #4f46e5;
+    --purple-light: #eef2ff;
+    --purple-darker: #4338ca;
+    --green-normal: #059669;
+    --green-light: #ecfdf5;
+    --blue-normal: #2563eb;
+    --blue-light: #ecfdf5;
+
+    /* -- Background */
+    --background-light-light: #ffffff;
+    --background-light-dark: #f9fafb;
+    --background-dark-light: #1f2937;
+    --background-dark-dark: #111827;
+
+    --background-light: var(--background-light-light);
+    --background-dark: var(--background-light-dark);
 
 
-    --focus-color: var(--primary-color);
-    --border-color: var(--grayscale-300);
-    --delete-red: #fd5858;
-    --success-green: var(--mint-600);
-    --info-yellow: var(--yellow-500);
+
+    /* ===========================================
+       4) Used / Mapped Colors
+    =========================================== */
+    --primary-color: var(--purple-normal);
+    --secondary-color: var(--blue-normal);
+    --accent-color-one: var(--green-normal);
+
+
     --light-text-color: var(--grayscale-100);
-    --dark-text-color: var(--grayscale-900);
-    --text-color-light: light-dark(var(--light-text-color), var(--dark-text-color));
-    --text-color-dark: light-dark(var(--dark-text-color), var(--light-text-color));
-    --placeholder-color: var(--grayscale-600);
-    --header-background: light-dark(var(--grayscale-300), var(--grayscale-800));
+    --medium-text-color: var(--grayscale-400);
+    --dark-text-color: var(--grayscale-700);
+    --text-color-dark: var(--dark-text-color); /* Fallback reference */
+
+    /* Default to light-mode values here; overridden in dark mode */
+    --background-color: var(--background-light-dark);
+    --modal-background-color: var(--background-light-light);
+    --option-select-background: lightgrey;
+    --option-select-background-hover: #f4f4f4;
+    --header-background: var(--background-light-light);
+
+    --input-background-color: var(--background-color);
+
+    /* Other color variables */
+    --focus-color: var(--primary-color);
+    --border-color-extra-light: var(--grayscale-150);
+    --border-color-light: var(--grayscale-200);
+    --border-color-dark: #374151;
+    --border-color: var(--border-color-light);
+    --light-border-color: var(--border-color-extra-light);
+    --delete-red: #fd5858;
+    --delete-red-light: #ffeeee;
+    --success-green: green;
+    --info-yellow: yellow;
+    --placeholder-color: var(--grayscale-500);
+
+    /* Header/Footer/Links */
     --header-text-color: var(--text-color-dark);
-    --link-color: var(--lavender-800);
-
-
-
+    --link-color: var(--purple-normal);
     --tooltip-background-color: var(--modal-background-color);
     --tooltip-text-color: var(--text-color-dark);
+    --footer-background-color: var(--header-background);
 
-    --footer-background-color: light-dark(var(--grayscale-400) ,var(--grayscale-800));
 
     /* ===========================================
-        2) Buttons
-   =========================================== */
+       5) Transitions
+    =========================================== */
+    --transition-normal: all 300ms;
+    @media (prefers-reduced-motion) {
+        --transition-normal: none;
+    }
+
+
+    /* ===========================================
+       6) Buttons
+    =========================================== */
     --primary-button-background: var(--primary-color);
-    --primary-button-hover-background: var(--lavender-700);
-    --primary-button-text: var(--text-color-dark);
+    --primary-button-hover-background: var(--purple-darker);
+    --primary-button-text: var(--light-text-color);
     --primary-button-hover-border: none;
 
-
     --secondary-button-background: var(--secondary-color);
-    --secondary-button-hover-background: var(--mint-600);
-    --secondary-button-text: var(--dark-text-color);
+    --secondary-button-hover-background: var(--green-light);
+    --secondary-button-text: var(--light-text-color);
     --secondary-button-border: none;
 
+    --link-button-hover-background: transparent;
+    --link-button-hover-background: var(--purple-light);
+    --link-button-text: var(--grayscale-400);
+    --link-button-hover-text: var(--grayscale-500);
 
+
+    /* ===========================================
+       7) Typography & Layout
+    =========================================== */
     --font-family: 'Lato';
+    --heading-font-family: 'lato';
+    --body-font-family: 'lato';
 
-    --border-radius-small: 5px;
-    --border-radius-normal: 10px;
-    --border-radius-large: 20px;
-
-    --shadow-offset: 4px;
-    --shadow-blur: 8px;
-    --float-offset: -4px;
-
-
-
-    --small-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.12),
-    0px 1px 2px rgba(0, 0, 0, 0.24);
-
-    --medium-box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16),
-    0px 3px 6px rgba(0, 0, 0, 0.23);
-
-    --large-box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.19),
-    0px 6px 6px rgba(0, 0, 0, 0.23);
-
-    --tile-box-shadow: 1px 2px 8px -2px rgba(0, 0, 0, 0.3);
-
-    --fab-size: 60px;
-
-    --max-content-width: 1400px;
-    --small-breakpoint: 450px;
-    --medium-breakpoint: 768px;
-    --large-breakpoint: 1024px;
-
-    --spacing-large: 60px;
-    --spacing-normal: 20px;
-    --spacing-small: 10px;
-    --spacing-x-small: 5px;
-
+    --font-size-x-small: 0.8rem;
     --font-size-small: 0.9rem;
     --font-size-normal: 1rem;
     --font-size-large: 1.4rem;
     --font-size-x-large: 2rem;
     --font-size-xx-large: 3rem;
 
-    --heading-font-family: 'lato';
+    --border-radius-small: 3px;
+    --border-radius-normal: 8px;
+    --border-radius-large: 16px;
+
+    --spacing-large: 60px;
+    --spacing-normal: 20px;
+    --spacing-small: 10px;
+    --spacing-x-small: 5px;
+
+    --max-content-width: 1400px;
+    --small-breakpoint: 450px;
+    --medium-breakpoint: 768px;
+    --large-breakpoint: 1024px;
 
 
+    /* ===========================================
+       8) Shadows
+    =========================================== */
+    /*
+  LEVEL 1
+  Slight lift, minimal blur
+*/
+    /*
+   The main shadow colors for the "Umbra" and "Penumbra"
+   in Light Mode. The Umbra is darker and more opaque,
+   while the Penumbra is lighter and more diffuse.
+ */
+    --color-shadow-umbra: 0deg 0% 0% / 0.20;    /* Black @ 20% opacity */
+    --color-shadow-penumbra: 0deg 0% 0% / 0.06; /* Black @ 6% opacity */
+
+    /*
+     |-------------------------------------------------|
+     |  LEVEL 1 Shadows (lowest elevation)            |
+     |-------------------------------------------------|
+     |  - "Soft": more diffuse blur                   |
+     |  - "Crisp": less blur, a sharper edge          |
+     |-------------------------------------------------|
+    */
+    --shadow-1-soft:
+            0 1px 2px hsl(var(--color-shadow-umbra)),
+            0 3px 6px hsl(var(--color-shadow-penumbra));
+
+    --shadow-1-crisp:
+            0 1px 2px hsl(var(--color-shadow-umbra)),
+            0 2px 2px hsl(var(--color-shadow-penumbra));
+
+    /*
+     |-------------------------------------------------|
+     |  LEVEL 2 Shadows                                |
+     |-------------------------------------------------|
+    */
+    --shadow-2-soft:
+            0 2px 4px hsl(var(--color-shadow-umbra)),
+            0 6px 12px hsl(var(--color-shadow-penumbra));
+
+    --shadow-2-crisp:
+            0 2px 4px hsl(var(--color-shadow-umbra)),
+            0 4px 4px hsl(var(--color-shadow-penumbra));
+
+    /*
+     |-------------------------------------------------|
+     |  LEVEL 3 Shadows                                |
+     |-------------------------------------------------|
+    */
+    --shadow-3-soft:
+            0 4px 6px hsl(var(--color-shadow-umbra)),
+            0 10px 20px hsl(var(--color-shadow-penumbra));
+
+    --shadow-3-crisp:
+            0 4px 6px hsl(var(--color-shadow-umbra)),
+            0 8px 8px hsl(var(--color-shadow-penumbra));
+
+    /*
+     |-------------------------------------------------|
+     |  LEVEL 4 Shadows (highest elevation)           |
+     |-------------------------------------------------|
+    */
+    --shadow-4-soft:
+            0 8px 8px hsl(var(--color-shadow-umbra)),
+            0 16px 24px hsl(var(--color-shadow-penumbra));
+
+    --shadow-4-crisp:
+            0 8px 8px hsl(var(--color-shadow-umbra)),
+            0 12px 12px hsl(var(--color-shadow-penumbra));
+
+    --tile-box-shadow: var(--shadow-1-soft);
+
+    --fab-size: 60px;
 }
 
+/* ===========================================
+   9) Base Body Styles
+=========================================== */
 body {
     margin: 0;
     overflow-x: hidden;
     background: var(--background-color);
+    color: var(--text-color-dark);
+}
+
+/* ===========================================
+   10) Dark Mode Overrides
+=========================================== */
+body[data-mode="dark"] {
+    --background-color: var(--background-dark-dark);
+    --background-light: var(--background-dark-light);
+    --background-dark: var(--background-dark-dark);
+    --border-color: var(--border-color-dark);
+    --modal-background-color: var(--background-dark-light);
+
+    --option-select-background: #000000;
+    --option-select-background-hover: #4a4a4a;
+    --input-background-color: var(--background-color);
+
+
+    /* Flip text colors in dark mode */
+    --text-color-light: var(--dark-text-color);
+    --text-color-dark: var(--light-text-color);
+
+    --header-background: var(--background-dark-light);
+
+    /* ===========================================
+       6) Buttons
+    =========================================== */
+    --link-button-hover-background: transparent;
+    --link-button-hover-background: #374151;
+    --link-button-text: var(--grayscale-400);
+    --link-button-hover-text: var(--grayscale-300);
+
+    /* ===========================================
+           8) Shadows
+        =========================================== */
+    --color-shadow-umbra: 0deg 0% 0% / 0.40;     /* Black @ 40% opacity */
+    --color-shadow-penumbra: 0deg 0% 0% / 0.16;  /* Black @ 16% opacity */
 }

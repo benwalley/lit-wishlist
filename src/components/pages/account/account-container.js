@@ -20,9 +20,14 @@ export class AccountContainer extends LitElement {
     static styles = css`
         .account-container {
             display: grid;
-            grid-template-columns: 400px 1fr;
             gap: var(--spacing-normal);
             padding: var(--spacing-normal) 0;
+        }
+
+        @media (min-width: 768px) {
+            .account-container {
+                grid-template-columns: 400px 1fr;
+            }
         }
 
         .username-section {
@@ -32,9 +37,10 @@ export class AccountContainer extends LitElement {
         }
         
         section {
-            border: 1px solid #ccc;
             padding: 1rem;
-            border-radius: 4px;
+            box-shadow: var(--shadow-1-soft);
+            border-radius: var(--border-radius-large);
+            background: var(--background-light);
         }
     `;
 

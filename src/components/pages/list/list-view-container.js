@@ -37,6 +37,7 @@ export class ListViewContainer extends LitElement {
             }
             this.listData = response;
             this.loading = false;
+            console.log(response)
             this.requestUpdate();
 
         } catch (error) {

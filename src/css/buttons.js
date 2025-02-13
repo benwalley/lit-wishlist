@@ -24,12 +24,11 @@ export default css`
         &.primary {
             background-color: var(--primary-button-background);
             color: var(--primary-button-text);
+            border-radius: var(--border-radius-normal);
 
             &:hover,
             &:focus{
                 background-color: var(--primary-button-hover-background);
-                outline: var(--primary-button-hover-border);
-                outline-offset: -2px;
             }
         }
 
@@ -57,17 +56,21 @@ export default css`
             font-size: 1.25rem;
         }
         
-        &.icon-button {
-            --icon-color: var(--primary-button-background);
-            border-radius: 50px;
+        &.icon-button,
+        &.link-button {
+            --icon-color: var(--link-button-text);
+            --icon-color-hover: var(--link-button-hover-text);
+            --icon-hover-background: var(--link-button-hover-background);
+            border-radius: var(--border-radius-normal);
             color: var(--icon-color);
-            padding: 5px;
+            padding: 8px;
             background: none;
 
             &:hover,
             &:focus,
             &:active {
-                background: color-mix(in srgb, var(--icon-color), transparent 80%);
+                background: var(--icon-hover-background);
+                color: var(--icon-color-hover);
             }
             
         }
