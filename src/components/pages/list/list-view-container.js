@@ -2,6 +2,7 @@ import { LitElement, html, css } from 'lit';
 import {customFetch} from "../../../helpers/fetchHelpers.js";
 import '../../pages/account/avatar.js'
 import './item-tile.js'
+import {listenUpdateList} from "../../../events/eventListeners.js";
 
 export class ListViewContainer extends LitElement {
     static properties = {
@@ -26,6 +27,7 @@ export class ListViewContainer extends LitElement {
             return;
         }
         this.fetchListData();
+        listenUpdateList(this.fetchListData.bind(this))
     }
 
     async fetchListData() {
@@ -90,8 +92,6 @@ export class ListViewContainer extends LitElement {
         ];
     }
 
-
-    // Vaadin Router will call this automatically when navigating to this route
     onBeforeEnter(location, commands, router) {
         this.listId = location.params.listId;
     }

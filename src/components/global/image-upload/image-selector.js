@@ -1,8 +1,18 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from '../../../css/buttons.js';
 import '../../../svg/cloud-upload.js'
+import {listenImageCropConfirmed, triggerImageSelected} from "../../../events/eventListeners.js";
 
 export class ImageSelector extends LitElement {
+    static properties = {
+        uniqueId: {type: String},
+    };
+
+    constructor() {
+        super();
+        this.uniqueId = 0;
+    }
+
     static get styles() {
         return [
             buttonStyles,
@@ -159,9 +169,9 @@ export class ImageSelector extends LitElement {
         const reader = new FileReader();
         reader.onload = (ev) => {
             const rawImage = ev.target.result;
-            this._emitImageSelected(rawImage);
+            triggerImageSelected({rawImage, uniqueId: this.uniqueId});
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(file); // TODO: See if I can remove this
     }
 
     /**
@@ -191,7 +201,7 @@ export class ImageSelector extends LitElement {
             const reader = new FileReader();
             reader.onload = (ev) => {
                 const rawImage = ev.target.result;
-                this._emitImageSelected(rawImage);
+                triggerImageSelected(rawImage)
             };
             reader.readAsDataURL(blob);
         } catch (error) {
@@ -207,19 +217,6 @@ export class ImageSelector extends LitElement {
         } catch {
             return false;
         }
-    }
-
-    /**
-     * Fire a custom event with the raw image data (DataURL).
-     */
-    _emitImageSelected(rawImage) {
-        this.dispatchEvent(
-            new CustomEvent('image-selected', {
-                detail: { rawImage },
-                bubbles: true,
-                composed: true,
-            })
-        );
     }
 }
 

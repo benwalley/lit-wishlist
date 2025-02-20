@@ -2,6 +2,7 @@ import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../../css/buttons";
 import '../../global/custom-tooltip.js'
 import '../../../svg/new-tab.js'
+import '../../../svg/link.js'
 
 export class CustomElement extends LitElement {
     static properties = {
@@ -29,6 +30,14 @@ export class CustomElement extends LitElement {
                     text-decoration: none;
                     gap: 5px;
                     color: var(--link-color);
+                    
+                    link-icon {
+                        transition: var(--transition-normal);
+                    }
+                    
+                    &:hover link-icon {
+                        transform: rotate(45deg)
+                    }
                 }
 
                 .link-container a:hover {
@@ -47,7 +56,12 @@ export class CustomElement extends LitElement {
         return rawLinks.reduce((acc, linkString) => {
             try {
                 const linkObj = JSON.parse(linkString);
-                if (linkObj?.url && linkObj?.displayName) {
+                if (linkObj?.url) {
+                    if (!linkObj.displayName) {
+                        // Create a displayName based on the base URL (hostname)
+                        const urlInstance = new URL(linkObj.url);
+                        linkObj.displayName = urlInstance.hostname;
+                    }
                     acc.push(linkObj);
                 }
             } catch (e) {
@@ -56,6 +70,7 @@ export class CustomElement extends LitElement {
             return acc;
         }, []);
     }
+
 
     /**
      * Computes which links to display based on the onlyFirst property.
@@ -74,6 +89,7 @@ export class CustomElement extends LitElement {
                         <a href="${link.url.startsWith('http') ? link.url : `https://${link.url}`}"
                            target="_blank"
                            rel="noopener noreferrer">
+                            <link-icon></link-icon>
                             ${link.displayName}
                             <new-tab-icon></new-tab-icon>
                         </a>

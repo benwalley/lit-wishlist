@@ -19,8 +19,11 @@ export class CustomElement extends LitElement {
             css`
                 :host {
                     display: block;
-                    padding: var(--spacing-small);
-                    border: 1px solid var(--border-color)
+                    color: var(--text-color-dark);
+                }
+                
+                ul {
+                    padding-left: var(--spacing-normal);
                 }
             `
         ];
@@ -28,7 +31,7 @@ export class CustomElement extends LitElement {
 
     render() {
         return html`
-            ${unsafeHTML(this.itemData.note)}
+            ${unsafeHTML(this.itemData.note || '--')}
     `;
     }
 }

@@ -1,11 +1,11 @@
-import {LitElement, html, css} from 'lit';
+import { LitElement, html, css } from 'lit';
 import buttonStyles from "../../../css/buttons";
-import {currencyHelper} from "../../../helpers.js";
+import { currencyHelper } from "../../../helpers.js";
 
 export class CustomElement extends LitElement {
     static properties = {
-        itemData: {type: Object},
-        showLabel: {type: Boolean}
+        itemData: { type: Object },
+        showLabel: { type: Boolean }
     };
 
     constructor() {
@@ -19,46 +19,82 @@ export class CustomElement extends LitElement {
             buttonStyles,
             css`
                 :host {
-
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-small);
                 }
 
                 .min-max-price-container {
                     display: flex;
                     flex-direction: row;
-                    gap: 3px;
-                    font-size: 0.8em;
-                    color: color-mix(in hsl, var(--text-color-dark), #999 50%);
-                }
-                
-                p {
-                    margin: 0;
-                }
-                
-                .normal-price {
-                    font-size: var(--font-size-normal);
-                    font-weight: bold;
-                    color: var(--primary-color);
+                    gap: var(--spacing-x-small);
+                    align-items: flex-end;
                 }
 
+                .min-max-price-container p {
+                    font-size: var(--font-size-large);
+                    color: var(--primary-color);
+                    font-weight: bold;
+                    line-height: 1;
+                    margin: 0;
+                }
+
+                .min-max-price-container span {
+                    line-height: 1;
+                }
+
+                .normal-price {
+                    font-size: var(--font-size-large);
+                    color: var(--primary-color);
+                    font-weight: bold;
+                    line-height: 1;
+                    margin: 0;
+                }
+
+                h3 {
+                    font-size: var(--font-size-small);
+                    color: var(--text-color-medium-dark);
+                    font-weight: bold;
+                    margin: 0;
+                }
             `
         ];
     }
 
     render() {
+        // Check if there's a valid price range value (even if it's 0, we'll handle display later)
+        const hasPriceRange = parseFloat(this.itemData?.minPrice) || parseFloat(this.itemData?.maxPrice);
+
+        // Format the prices: if the value is zero, display '--'
+        const formattedPrice =
+            parseFloat(this.itemData?.price) === 0
+                ? '--'
+                : currencyHelper(this.itemData?.price);
+
+        const formattedMinPrice =
+            parseFloat(this.itemData?.minPrice) === 0
+                ? '--'
+                : currencyHelper(this.itemData?.minPrice);
+
+        const formattedMaxPrice =
+            parseFloat(this.itemData?.maxPrice) === 0
+                ? '--'
+                : currencyHelper(this.itemData?.maxPrice);
+
         return html`
-            ${this.showLabel ? html`<strong>Price:</strong>` : ''}
-            ${this.itemData?.price
-                    ? html`<p class="price normal-price"> ${currencyHelper(this.itemData?.price)}</p>`
-                    : ''}
-            ${(this.itemData?.minPrice && this.itemData?.maxPrice)
+            ${hasPriceRange
                     ? html`
+                        ${this.showLabel ? html`<h3>Price Range:</h3>` : ''}
                         <div class="min-max-price-container">
-                            <p>${currencyHelper(this.itemData?.minPrice)}</p>
-                            -
-                            <p>${currencyHelper(this.itemData?.maxPrice)}</p>
+                            <p>${formattedMinPrice}</p>
+                            <span>to</span>
+                            <p>${formattedMaxPrice}</p>
                         </div>
                     `
-                    : ''}
+                    : html`
+                        ${this.showLabel ? html`<h3>Price:</h3>` : ''}
+                        <p class="price normal-price">${formattedPrice}</p>
+                    `}
         `;
     }
 }

@@ -1,5 +1,7 @@
 import {customFetch} from "../fetchHelpers.js";
 import {getRefreshToken} from "../../localStorage/tokens.js";
+import {userState} from "../../state/userStore.js";
+import {triggerUpdateUser} from "../../events/eventListeners.js";
 
 export async function getCurrentUser() {
     try {
@@ -34,6 +36,25 @@ export async function login(email, password) {
         return userData;
     } catch(e) {
         return {error: e}
+    }
+}
+
+export async function updateUserData(data) {
+    try {
+        const options = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        };
+
+        const userData = await customFetch('/users/', options, true);
+        triggerUpdateUser()
+        return {success: true, userData: userData}
+
+    } catch (e) {
+        return {success: false, message: 'There was an error saving your user. Please try again.'}
     }
 }
 

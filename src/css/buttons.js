@@ -8,15 +8,25 @@ export default css`
         justify-content: center;
         padding: 0.5rem 1rem;
         border: none;
-        border-radius: 4px;
+        border-radius: var(--border-radius-normal);
         font-size: 1rem;
         text-decoration: none;
         font-weight: 500;
         cursor: pointer;
-        transition: all 0.3s;
         gap: 7px;
+        transition: var(--transition-normal);
         
-        
+        &.shadow {
+            box-shadow: var(--button-box-shadow);
+            &:hover,
+            &:active,
+            &:focus {
+                box-shadow: var(--button-box-shadow-hover);
+                transform: scale(1.01);
+            }
+        }
+
+
         &.fullWidth {
             width: 100%;
         }
@@ -27,8 +37,13 @@ export default css`
             border-radius: var(--border-radius-normal);
 
             &:hover,
-            &:focus{
+            &:focus {
                 background-color: var(--primary-button-hover-background);
+            }
+
+            &.fancy {
+                background-image: linear-gradient(to right, #4f46e5, #9333ea);
+
             }
         }
 
@@ -40,9 +55,17 @@ export default css`
             &:hover {
                 background-color: var(--secondary-button-hover-background);
             }
+        }
 
-            &:focus {
-                box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.2);
+        &.ghost {
+            border: 1px solid var(--ghost-button-border-color);
+            color: var(--ghost-button-text-color);
+            background: none;
+
+            &:hover,
+            &:focus,
+            &:active {
+                background: rgba(204, 204, 204, .1);
             }
         }
 
@@ -55,7 +78,7 @@ export default css`
             padding: 0.75rem 1.5rem;
             font-size: 1.25rem;
         }
-        
+
         &.icon-button,
         &.link-button {
             --icon-color: var(--link-button-text);
@@ -72,9 +95,9 @@ export default css`
                 background: var(--icon-hover-background);
                 color: var(--icon-color-hover);
             }
-            
+
         }
-        
+
 
         &:disabled {
             background-color: #e0e0e0;
@@ -82,12 +105,18 @@ export default css`
             cursor: not-allowed;
             pointer-events: none;
         }
-        
+
         &.button-as-link {
             border: none;
             padding: 0;
             background: none;
             border-radius: 0;
+        }
+        
+        &:hover,
+        &:active,
+        &:focus {
+            transform: scale(1.01);
         }
     }
 

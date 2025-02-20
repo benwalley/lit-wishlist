@@ -37,13 +37,21 @@ export async function cachedFetch(url, options = {}, auth = false, forceRefresh 
  *
  * @param {string} [url] - Optional URL to invalidate. If omitted, the entire cache is cleared.
  */
-export function invalidateCache(url) {
-    if (url) {
-        fetchCache.delete(url);
-    } else {
+export function invalidateCache(pattern) {
+    if (!pattern) {
         fetchCache.clear();
+        return;
+    }
+
+    const regex = new RegExp('^' + pattern.split('*').join('.*') + '$');
+
+    for (let key of fetchCache.keys()) {
+        if (regex.test(key)) {
+            fetchCache.delete(key);
+        }
     }
 }
+
 
 /**
  * Checks if a particular URL is already cached.

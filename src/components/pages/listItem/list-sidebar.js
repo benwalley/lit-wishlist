@@ -4,6 +4,7 @@ import {customFetch} from "../../../helpers/fetchHelpers.js";
 import './mini-item-tile.js';
 import {cachedFetch} from "../../../helpers/caching.js";
 import '../../../svg/chevron-left.js';
+import {listenUpdateList} from "../../../events/eventListeners.js";
 
 export class CustomElement extends LitElement {
     static properties = {
@@ -27,10 +28,13 @@ export class CustomElement extends LitElement {
             return;
         }
         this.fetchListData();
+        listenUpdateList(this.fetchListData.bind(this))
+
     }
 
     async fetchListData() {
         try {
+            console.log('asdf')
             const response = await cachedFetch(`/lists/${this.listId}`, {}, true);
             if (response?.responseData?.error) {
                 console.log('error');

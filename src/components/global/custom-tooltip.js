@@ -21,7 +21,7 @@ export class CustomTooltip extends LitElement {
             color: var(--tooltip-text-color);
             padding: 8px 12px;
             border-radius: 4px;
-            box-shadow: var(--shadow-1-crisp);
+            box-shadow: var(--shadow-1-soft);
             z-index: 9999;
             transition: opacity 0.2s ease-in-out;
             opacity: 0;

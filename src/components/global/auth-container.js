@@ -5,6 +5,9 @@ import './loading-screen.js';
 import {initRouter, navigate} from "../../router/main-router.js";
 import {getCurrentUser} from "../../helpers/api/users.js";
 import {globalState} from "../../state/globalStore.js";
+import {triggerCustomEvent} from "../../events/custom-events.js";
+import {listenUpdateUser} from "../../events/eventListeners.js";
+import '../global/messages-component.js'
 
 export class AuthContainer extends observeState(LitElement) {
     static styles = css`
@@ -25,6 +28,7 @@ export class AuthContainer extends observeState(LitElement) {
 
     async firstUpdated() {
         await this.fetchUserData();
+        listenUpdateUser(this.fetchUserData)
     }
 
     async fetchUserData() {
@@ -32,6 +36,7 @@ export class AuthContainer extends observeState(LitElement) {
             const userData = await getCurrentUser();
             userState.userData = userData;
             userState.loadingUser = false;
+            triggerCustomEvent('user-data-loaded');
             if (!userData?.id) {
                 navigate('/')
             }
@@ -44,6 +49,7 @@ export class AuthContainer extends observeState(LitElement) {
 
     render() {
         return html`
+            <messages-component></messages-component>
             ${userState.loadingUser
                     ? html`
                         <loading-screen></loading-screen>`

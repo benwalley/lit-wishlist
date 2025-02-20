@@ -35,6 +35,7 @@ export class HeaderContainer extends observeState(LitElement) {
                     gap: 8px;
                     border-bottom: 1px solid var(--border-color);
                     justify-content: flex-end;
+                    box-shadow: var(--shadow-1-soft);
                 }
 
                 .divider {

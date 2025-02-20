@@ -4,9 +4,11 @@ import { LitElement, html, css } from 'lit';
 class CustomModal extends LitElement {
     static properties = {
         triggerEvent: { type: String },
-        isOpen: { type: Boolean, state: true },
+        isOpen: { type: Boolean },
         noPadding: { type: Boolean },
         maxWidth: { type: String },
+        level: {type: Number},
+
     };
 
     constructor() {
@@ -16,9 +18,10 @@ class CustomModal extends LitElement {
         this.triggerElement = null;
         this.noPadding = false;
         this.maxWidth = '1200px';
+        this.level = 1;
 
         // Bind methods
-        this._openModal = this._openModal.bind(this);
+        this.openModal = this.openModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this._handleKeyDown = this._handleKeyDown.bind(this);
         this._onOverlayClick = this._onOverlayClick.bind(this);
@@ -32,6 +35,7 @@ class CustomModal extends LitElement {
             left: 0;
             width: 100%;
             height: 100%;
+            backdrop-filter: blur(4px);
             background: rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
@@ -88,6 +92,7 @@ class CustomModal extends LitElement {
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
+            color: var(--text-color-dark);
         }
         .close-button:focus {
             outline: 2px solid #000;
@@ -96,13 +101,13 @@ class CustomModal extends LitElement {
 
     connectedCallback() {
         super.connectedCallback();
-        window.addEventListener(this.triggerEvent, this._openModal);
+        window.addEventListener(this.triggerEvent, this.openModal);
         window.addEventListener('keydown', this._handleKeyDown);
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
-        window.removeEventListener(this.triggerEvent, this._openModal);
+        window.removeEventListener(this.triggerEvent, this.openModal);
         window.removeEventListener('keydown', this._handleKeyDown);
         // Ensure scrolling is enabled if the element is removed while open.
         document.body.style.overflow = '';
@@ -115,7 +120,7 @@ class CustomModal extends LitElement {
         }
     }
 
-    _openModal(event) {
+    openModal(event) {
         if (event instanceof CustomEvent && event.detail && event.detail.trigger) {
             this.triggerElement = event.detail.trigger;
         } else {
@@ -157,6 +162,7 @@ class CustomModal extends LitElement {
                     @click=${this._onOverlayClick}
                     ?inert=${!this.isOpen}
                     aria-hidden=${!this.isOpen}
+                    style="z-index: ${this.level + 100};"
             >
                 <div
                         class="modal ${this.noPadding ? '' : 'padding'}"

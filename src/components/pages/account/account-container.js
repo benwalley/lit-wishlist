@@ -14,35 +14,73 @@ import './logout-button.js'
 import '../../global/image-upload/image-uploader.js'
 import '../../global/custom-image.js'
 import '../../lists/my-lists.js'
+import '../../../svg/edit.js'
+import buttonStyles from '../../../css/buttons.js'
+import '../../users/edit-user-form.js';
 
 // TODO: Add logout link
 export class AccountContainer extends LitElement {
-    static styles = css`
-        .account-container {
-            display: grid;
-            gap: var(--spacing-normal);
-            padding: var(--spacing-normal) 0;
-        }
+    static get styles() {
+        return [
+            buttonStyles,
+            css`
+                :host {
+                    
+                }
+                .account-container {
+                    display: grid;
+                    gap: var(--spacing-normal);
+                    padding: var(--spacing-normal) 0;
+                }
 
-        @media (min-width: 768px) {
-            .account-container {
-                grid-template-columns: 400px 1fr;
-            }
-        }
+                @media (min-width: 768px) {
+                    .account-container {
+                        grid-template-columns: 400px 1fr;
+                    }
+                }
 
-        .username-section {
-            display: flex;
-            flex-direction: column;
-            border: none;
-        }
-        
-        section {
-            padding: 1rem;
-            box-shadow: var(--shadow-1-soft);
-            border-radius: var(--border-radius-large);
-            background: var(--background-light);
-        }
-    `;
+                .username-section {
+                    display: flex;
+                    flex-direction: column;
+                    border: none;
+                }
+
+                section {
+                    padding: 1rem;
+                    box-shadow: var(--shadow-1-soft);
+                    border-radius: var(--border-radius-large);
+                    background: var(--background-light);
+                    position: relative;
+                }
+
+                .username-edit-button.icon-button {
+                    position: absolute;
+                    top: var(--spacing-small);
+                    right: var(--spacing-small);
+                    font-size: var(--font-size-large);
+                    transition: var(--transition-normal);
+                    border-radius: 50%;
+                    --icon-color: var(--blue-normal);
+                    --icon-color-hover: var(--blue-normal);
+                    --icon-hover-background: var(--purple-light);
+                    
+                    &:hover {
+                        transform: rotate(-45deg) scale(1.1);
+                    }
+                }
+            `
+        ];
+    }
+
+    _handleEditUser() {
+        const editModal = this.shadowRoot.querySelector('#edit-user-modal');
+        editModal.openModal();
+    }
+
+    _closeEditUserModal() {
+        const editModal = this.shadowRoot.querySelector('#edit-user-modal');
+        editModal.closeModal();
+    }
 
     render() {
         return html`
@@ -51,6 +89,15 @@ export class AccountContainer extends LitElement {
                     <custom-avatar size="150" username="Ben"></custom-avatar>
                     <account-username></account-username>
                     <account-public-description></account-public-description>
+                    <button aria-label="edit-button" 
+                            class="icon-button button username-edit-button"
+                            @click="${this._handleEditUser}"
+                    >
+                        <edit-icon></edit-icon>
+                    </button>
+                    <custom-modal id="edit-user-modal" maxWidth="500px" noPadding>
+                        <edit-user-form @close-edit-user-modal="${this._closeEditUserModal}"></edit-user-form>
+                    </custom-modal>
                 </section>
                 
                 <section>

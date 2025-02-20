@@ -13,6 +13,8 @@ import './delete-automatically-selector.js'
 import './visibility-selector/visibility-selector-container.js'
 import '../lists/select-my-lists.js'
 import {customFetch} from "../../helpers/fetchHelpers.js";
+import {triggerUpdateList} from "../../events/eventListeners.js";
+import {invalidateCache} from "../../helpers/caching.js";
 
 export class AddToListModal extends LitElement {
     static properties = {
@@ -117,7 +119,9 @@ export class AddToListModal extends LitElement {
         e.preventDefault();
         const formData = {
             name: this.itemName,
-            price: this.price,
+            price: this.singlePrice,
+            minPrice: this.minPrice,
+            maxPrice: this.maxPrice,
             links: this.links,
             note: this.notes,
             imageIds: this.images,
@@ -142,12 +146,32 @@ export class AddToListModal extends LitElement {
         console.log('Submitting Form Data:', formData);
 
         const response = await customFetch('/listItems/create', options, true)
-        console.log(response)
-
+        invalidateCache('/lists/*')
+        triggerUpdateList()
         this.closeModal();
     }
 
+    clearData() {
+        this.itemName = '';
+        this.isPriceRange = false;
+        this.singlePrice = 0;
+        this.minPrice = 0;
+        this.maxPrice = 0;
+        this.links = [{ url: '', displayName: '' }];
+        this.notes = '';
+        this.images = [];
+        this.amount = '';
+        this.minAmount = 0;
+        this.maxAmount = 0;
+        this.priority = 1;
+        this.isPublic = false;
+        this.autoDelete = false;
+        this.visibility = '';
+        this.selectedListIds = [];
+    }
+
     closeModal() {
+        this.clearData()
         const modal = this.shadowRoot.querySelector('custom-modal');
         if (modal && typeof modal.closeModal === 'function') {
             modal.closeModal();

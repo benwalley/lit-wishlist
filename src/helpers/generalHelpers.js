@@ -1,3 +1,5 @@
+let counter = 0
+
 export function formatDate(dateString) {
     if (!dateString) return 'Unknown date';
     const date = new Date(dateString);
@@ -6,4 +8,9 @@ export function formatDate(dateString) {
         day: 'numeric',  // Day of the month (e.g., 15)
         year: 'numeric'  // Full year (e.g., 2024)
     });
+}
+
+export function getUniqueId () {
+    counter++;
+    return `uid-${counter}`;
 }

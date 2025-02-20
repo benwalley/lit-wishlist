@@ -1,19 +1,20 @@
 import { LitElement, html, css } from 'lit';
 import { generateTwoSimilarColorsFromString } from '../../../helpers.js';
+import '../../global/custom-image.js';
 // ^ adjust import path as necessary
 
 export class Avatar extends LitElement {
     static properties = {
         username: { type: String },
-        imageUrl: { type: String },
+        imageId: { type: String },
         size: { type: Number },
     };
 
     constructor() {
         super();
         this.username = '';
-        this.imageUrl = '';
-        this.size = 50; // default size in pixels
+        this.imageId = '';
+        this.size = 50;
     }
 
     static styles = css`
@@ -51,7 +52,7 @@ export class Avatar extends LitElement {
 
     render() {
         // If there's an image URL, show the image.
-        if (this.imageUrl) {
+        if (this.imageId > 0) {
             return html`
                 <div
                         class="avatar"
@@ -61,7 +62,9 @@ export class Avatar extends LitElement {
             font-size: ${this.size * 0.5}px;
           "
                 >
-                    <img src="${this.imageUrl}" alt="${this.username || 'avatar'}" />
+                    <custom-image
+                        imageId="${this.imageId}"
+                    ></custom-image>
                 </div>
             `;
         }

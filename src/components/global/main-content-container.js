@@ -2,6 +2,7 @@ import {css, html, LitElement} from 'lit';
 import {initRouter} from "../../router/main-router.js";
 import {observeState} from 'lit-element-state';
 import {userState} from "../../state/userStore.js";
+import '../global/image-upload/image-cropper.js'
 
 export class MainContentContainer extends observeState(LitElement) {
     static properties = {
@@ -19,7 +20,6 @@ export class MainContentContainer extends observeState(LitElement) {
             grid-column: 2;
             grid-row: 2;
             flex-grow: 1;
-            max-width: calc(100% - 20px);
             width: 100%;
             margin: 0 auto;
             display: grid;
@@ -37,7 +37,12 @@ export class MainContentContainer extends observeState(LitElement) {
     }
 
     render() {
-        return html``;
+        return html`
+            
+                <image-cropper
+                        .imageSrc=${this.rawSelectedImage}
+                        .size=${this.size}
+                ></image-cropper>`;
     }
 }
 customElements.define('main-content-container',MainContentContainer);

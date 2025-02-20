@@ -1,118 +1,136 @@
 import { LitElement, html, css } from 'lit';
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.min.css';
+import { listenImageSelected, triggerImageCropConfirmed } from '../../../events/eventListeners.js';
+import { uploadImageToDB } from '../../../helpers/imageHelpers.js';
+import {cropperState} from "../../../state/cropperStore.js";
+import {observeState} from 'lit-element-state';
 
-class ImageCropper extends LitElement {
+
+class ImageCropper extends observeState(LitElement) {
   static properties = {
-    imageSrc: { type: String }, // the raw data (DataURL) from the selector
-    size:    { type: Number }, // final crop width
+    size: { type: Number },
+    rawImage: { type: String },
+    modalOpen: { type: Boolean },
+    imageId: { type: String },
+    uniqueId: {type: String},
   };
 
   static styles = css`
     :host {
       display: block;
-      width: 100%;
-      max-width: 600px;
-      margin: 0 auto;
+      font-family: Arial, sans-serif;
+    }
+    
+    .modal-header {
       text-align: center;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: #333;
     }
-    #image-container {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      position: relative;
-      margin: 1rem auto;
+
+    .image-container {
+      max-width: 640px;
     }
-    #image-container img {
+
+    img {
       max-width: 100%;
-      display: block;
-    }
-    .controls {
-      margin-top: 1rem;
-    }
-    button {
-      margin: 0 10px;
-      padding: 8px 16px;
-      cursor: pointer;
     }
   `;
 
   constructor() {
     super();
-    this.imageSrc = '';
-    this.size = 400;  // default
+    this.size = 400; // Final cropped image will be 400x400 (1:1)
+    this.rawImage = null;
+    this.modalOpen = false;
+    this.imageId = null;
     this.cropper = null;
+    this.uniqueId = null;
   }
 
   render() {
     return html`
-      <div>
-        <h2>Crop Your Image</h2>
-        <div id="image-container">
-          <img id="image" src="${this.imageSrc || ''}" alt="Image to crop" />
+      <custom-modal level="2" .isOpen="${this.modalOpen}">
+        <div class="modal-content">
+          <div class="modal-header">Crop Your Image</div>
+          <div class="image-container">
+            <img id="image" src="${this.rawImage || ''}" alt="Image to crop" />
+          </div>
+          <div class="controls">
+            <button class="cancel" @click="${this._handleCancel}">Cancel</button>
+            <button @click="${this._handleChoose}">Confirm</button>
+          </div>
         </div>
-        <div class="controls">
-          <button @click=${this._handleCancel}>Cancel</button>
-          <button @click=${this._handleChoose}>Choose</button>
-        </div>
-      </div>
+      </custom-modal>
     `;
   }
 
   firstUpdated() {
-    const img = this.shadowRoot.getElementById('image');
-
     // If you're not already globally including cropper.min.css, you can append it here:
     const cropperStyles = document.createElement('link');
     cropperStyles.rel = 'stylesheet';
     cropperStyles.href = '/node_modules/cropperjs/dist/cropper.min.css';
     this.shadowRoot.appendChild(cropperStyles);
 
-    if (img && this.imageSrc) {
-      this._initializeCropper(img);
-    }
+    // Listen for an image-selected event (expects an object with rawImage)
+    listenImageSelected((e) => {
+      const { rawImage, uniqueId } = e.detail;
+      this.rawImage = rawImage;
+      this.modalOpen = true;
+      this.uniqueId = uniqueId
+      this.requestUpdate();
+    });
   }
 
   updated(changedProps) {
-    // If imageSrc changes, re-init
-    if (changedProps.has('imageSrc') && this.imageSrc) {
+    if (changedProps.has('rawImage') && this.rawImage) {
       const img = this.shadowRoot.getElementById('image');
-      this._initializeCropper(img);
+      if (img) {
+        // Destroy any existing Cropper instance
+        if (this.cropper) {
+          this.cropper.destroy();
+          this.cropper = null;
+        }
+        // Initialize Cropper when the image loads (or immediately if already loaded)
+        if (!img.complete) {
+          img.onload = () => {
+            img.onload = null;
+            this._initializeCropper(img);
+          };
+        } else {
+          this._initializeCropper(img);
+        }
+      }
     }
   }
 
   _initializeCropper(img) {
-    // destroy existing Cropper if any
     if (this.cropper) {
       this.cropper.destroy();
-      this.cropper = null;
     }
 
     this.cropper = new Cropper(img, {
-      aspectRatio: 1 / 1,
-      viewMode: 0,
-      autoCropArea: 1,
-      responsive: true,
-      background: true,
-      movable: true,
-      zoomable: true,
-      zoomOnTouch: true,
-      zoomOnWheel: true,
-      scalable: false,
-      cropBoxResizable: false,
-      cropBoxMovable: false,
-      toggleDragModeOnDblclick: false,
-      checkOrientation: true,
-      guides: false,
-      center: true,
+      aspectRatio: 1, // Enforce a square crop area
+      viewMode: 3,
       dragMode: 'move',
+      autoCropArea: 1,
+      restore: false,
+      modal: false,
+      guides: false,
+      highlight: false,
+      cropBoxMovable: false,
+      cropBoxResizable: false,
+      toggleDragModeOnDblclick: false,
     });
   }
 
   _handleCancel() {
-    this.dispatchEvent(new CustomEvent('crop-cancelled', {
-      bubbles: true,
-      composed: true
-    }));
+    this.modalOpen = false;
+    this.rawImage = null;
+    if (this.cropper) {
+      this.cropper.destroy();
+      this.cropper = null;
+    }
   }
 
   _handleChoose() {
@@ -120,32 +138,33 @@ class ImageCropper extends LitElement {
       alert('Please upload and crop an image first.');
       return;
     }
-
-    const croppedCanvas = this.cropper.getCroppedCanvas({
+    const canvas = this.cropper.getCroppedCanvas({
       width: this.size,
       height: this.size,
-      imageSmoothingQuality: 'high'
+      imageSmoothingQuality: 'high',
     });
-
-    croppedCanvas.toBlob((blob) => {
+    canvas.toBlob((blob) => {
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onloadend = async () => {
         const croppedDataUrl = reader.result;
-        this.dispatchEvent(new CustomEvent('crop-confirmed', {
-          detail: { croppedDataUrl },
-          bubbles: true,
-          composed: true
-        }));
+        try {
+          const response = await uploadImageToDB(croppedDataUrl);
+          this.imageId = response.imageId;
+          triggerImageCropConfirmed({imageId: this.imageId, uniqueId: this.uniqueId});
+        } catch (error) {
+          console.error('Image upload failed:', error);
+          alert('Failed to upload image.');
+        } finally {
+          this.modalOpen = false;
+          this.rawImage = null;
+          if (this.cropper) {
+            this.cropper.destroy();
+            this.cropper = null;
+          }
+        }
       };
       reader.readAsDataURL(blob);
     }, 'image/jpeg', 0.7);
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    if (this.cropper) {
-      this.cropper.destroy();
-    }
   }
 }
 
