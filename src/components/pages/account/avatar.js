@@ -1,13 +1,18 @@
-import { LitElement, html, css } from 'lit';
-import { generateTwoSimilarColorsFromString } from '../../../helpers.js';
+import {LitElement, html, css} from 'lit';
+import {generateTwoSimilarColorsFromString} from '../../../helpers.js';
 import '../../global/custom-image.js';
+
 // ^ adjust import path as necessary
 
 export class Avatar extends LitElement {
     static properties = {
-        username: { type: String },
-        imageId: { type: String },
-        size: { type: Number },
+        username: {type: String},
+        imageId: {type: String},
+        size: {type: Number},
+        hasPopup: {type: Boolean},
+        round: {type: Boolean},
+        border: {type: Boolean},
+        stackLeft: {type: Boolean},
     };
 
     constructor() {
@@ -15,12 +20,17 @@ export class Avatar extends LitElement {
         this.username = '';
         this.imageId = '';
         this.size = 50;
+        this.stackLeft = false;
+        this.hasPopup = false;
+        this.round = false;
+        this.border = false;
     }
 
     static styles = css`
         :host {
             display: inline-block;
         }
+
         .avatar {
             border-radius: 25%;
             display: flex;
@@ -28,7 +38,20 @@ export class Avatar extends LitElement {
             justify-content: center;
             color: #fff; /* for initials */
             overflow: hidden;
+
+            &.round {
+                border-radius: 50%;
+            }
+
+            &.border {
+                border: 2px solid white;
+            }
+            
+            &.stack-left {
+                margin-left: -10px;
+            }
         }
+
         .avatar img {
             width: 100%;
             height: 100%;
@@ -55,7 +78,7 @@ export class Avatar extends LitElement {
         if (this.imageId > 0) {
             return html`
                 <div
-                        class="avatar"
+                        class="avatar ${this.round ? 'round' : ''} ${this.border ? 'border' : ''} ${this.stackLeft ? 'stack-left' : ''}"
                         style="
             width: ${this.size}px; 
             height: ${this.size}px; 
@@ -63,9 +86,14 @@ export class Avatar extends LitElement {
           "
                 >
                     <custom-image
-                        imageId="${this.imageId}"
+                            imageId="${this.imageId}"
                     ></custom-image>
                 </div>
+                ${this.hasPopup ? html`
+                    <custom-tooltip>
+                        <slot></slot>
+                    </custom-tooltip>
+                ` : ''}
             `;
         }
 
@@ -74,18 +102,23 @@ export class Avatar extends LitElement {
         const [color1, color2] = generateTwoSimilarColorsFromString(this.username || 'No Data');
         const initials = this.getInitials(this.username);
         return html`
-      <div 
-        class="avatar"
-        style="
+            <div
+                    class="avatar ${this.round ? 'round' : ''} ${this.border ? 'border' : ''} ${this.stackLeft ? 'stack-left' : ''}"
+                    style="
           width: ${this.size}px; 
           height: ${this.size}px;
           font-size: ${this.size * 0.5}px;
           background: linear-gradient(135deg, ${color1}, ${color2});
         "
-      >
-        ${initials}
-      </div>
-    `;
+            >
+                ${initials}
+            </div>
+            ${this.hasPopup ? html`
+                <custom-tooltip>
+                    <slot></slot>
+                </custom-tooltip>
+            ` : ''}
+        `;
     }
 }
 

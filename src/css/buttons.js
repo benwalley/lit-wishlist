@@ -59,13 +59,46 @@ export default css`
 
         &.ghost {
             border: 1px solid var(--ghost-button-border-color);
-            color: var(--ghost-button-text-color);
+            color: var(--text-color-dark);
             background: none;
 
             &:hover,
             &:focus,
             &:active {
                 background: rgba(204, 204, 204, .1);
+            }
+        }
+        
+        &.danger {
+            background-color: var(--danger-button-background);
+            color: var(--danger-button-text);
+            border-radius: var(--border-radius-normal);
+
+            &:hover,
+            &:focus {
+                background-color: var(--danger-button-hover-background);
+            }
+        }
+
+        &.blue {
+            background-color: var(--blue-normal);
+            color: var(--light-text-color);
+            border-radius: var(--border-radius-normal);
+
+            &:hover,
+            &:focus {
+                background-color: var(--blue-normal);
+            }
+        }
+
+        &.green {
+            background-color: var(--green-normal);
+            color: var(--light-text-color);
+            border-radius: var(--border-radius-normal);
+
+            &:hover,
+            &:focus {
+                background-color: var(--green-normal);
             }
         }
 

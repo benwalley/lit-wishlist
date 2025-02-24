@@ -64,7 +64,7 @@ export class LoginAccountLink extends observeState(LitElement) {
             <a class="name" href="/account">
                 <custom-avatar 
                         .username="${userState?.userData?.name}"
-                        imageUrl=""
+                        imageId="${userState?.userData?.image}"
                         size="32"
                 ></custom-avatar>
                 <div class="right-side">

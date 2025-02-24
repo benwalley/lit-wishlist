@@ -49,17 +49,6 @@ export class CustomElement extends LitElement {
         }
     }
 
-    _toggleSidebar() {
-        this.expanded = !this.expanded;
-        this.dispatchEvent(
-            new CustomEvent('sidebar-toggle', {
-                detail: { expanded: this.expanded },
-                bubbles: true,
-                composed: true,
-            })
-        );
-    }
-
     static get styles() {
         return [
             buttonStyles,
@@ -75,49 +64,17 @@ export class CustomElement extends LitElement {
                     flex-direction: column;
                     gap: var(--spacing-small);
                 }
-                
-                .button.toggle-button {
-                    position: absolute;
-                    top: 300px;
-                    left: -10px;
-                    border-radius: 50%;
-                    width: 20px;
-                    height: 20px;
-                    padding: 0;
-                    font-size: 1em;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: var(--transition-normal);
-                    transform-origin: center center;
-                    transform: rotate(180deg);
-                }
-
-                .button.toggle-button.collapsed {
-                    transform: rotate(0);
-                }
-
-                .button.toggle-button:hover {
-                    scale: 2;
-                }
             `
         ];
     }
 
     render() {
         return html`
-            <button
-                    class="toggle-button primary button ${this.expanded ? 'expanded' : 'collapsed'}"
-                    aria-label="${this.expanded ? 'Collapse' : 'Expand'}"
-                    @click="${this._toggleSidebar}"
-            >
-                <chevron-left-icon></chevron-left-icon>
-            </button>
             <!-- Wrap the mini-item-tiles in a container that becomes inert when collapsed -->
             <div
                     id="mini-items"
                     class="items-container"
-                    ?inert="${!this.expanded}"
+                    @mouseenter="${this._handleMouseEnter}"
                     aria-hidden="${!this.expanded ? 'true' : 'false'}"
             >
                 ${this.listData?.listItems?.map(

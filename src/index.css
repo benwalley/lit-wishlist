@@ -37,8 +37,9 @@
     --purple-darker: #4338ca;
     --green-normal: #059669;
     --green-light: #ecfdf5;
-    --blue-normal: #2563eb;
-    --blue-light: #ecfdf5;
+    --blue-normal: #3b82f6;   /* a vibrant blue */
+    --blue-light:  #eff6ff;   /* a very light blue that complements both dark and light backgrounds */
+    --blue-darker: #2563eb;
 
     /* -- Background */
     --background-light-light: #ffffff;
@@ -83,6 +84,7 @@
     --border-color: var(--border-color-light);
     --light-border-color: var(--border-color-extra-light);
     --delete-red: #fd5858;
+    --delete-red-darker: #d64444;
     --delete-red-light: #ffeeee;
     --success-green: green;
     --info-yellow: yellow;
@@ -91,15 +93,15 @@
     /* Header/Footer/Links */
     --header-text-color: var(--text-color-dark);
     --link-color: var(--purple-normal);
-    --tooltip-background-color: var(--modal-background-color);
-    --tooltip-text-color: var(--text-color-dark);
+    --tooltip-background-color: var(--background-light-light);
+    --tooltip-text-color: var(--dark-text-color);
     --footer-background-color: var(--header-background);
 
 
     /* ===========================================
        5) Transitions
     =========================================== */
-    --transition-normal: all 300ms;
+    --transition-normal: all 300ms ease-in-out;
     @media (prefers-reduced-motion) {
         --transition-normal: none;
     }
@@ -119,7 +121,12 @@
     --secondary-button-border: none;
 
     --ghost-button-border-color: var(--border-color-light);
-    --ghost-button-text-color: var(--dark-text-color);
+    --ghost-button-text-color: var(--text-color-dark);
+
+    --danger-button-background: var(--delete-red);
+    --danger-button-hover-background: var(--delete-red-darker);
+    --danger-button-text: var(--light-text-color);
+    --danger-button-hover-border: none;
 
     --link-button-hover-background: transparent;
     --link-button-hover-background: var(--purple-light);
@@ -245,6 +252,9 @@ body[data-mode="dark"] {
     --option-select-background: #000000;
     --option-select-background-hover: #4a4a4a;
     --input-background-color: var(--background-color);
+
+    --tooltip-background-color: var(--background-dark-light);
+    --tooltip-text-color: var(--light-text-color);
 
 
     /* Flip text colors in dark mode */

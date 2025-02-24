@@ -61,11 +61,11 @@ class CustomModal extends LitElement {
             box-shadow: var(--shadow-2-soft, 0 2px 10px rgba(0, 0, 0, 0.1));
             position: relative;
             outline: none;
-            overflow: hidden;
             /* Initial state before transition */
             opacity: 0;
             transform: translateY(20px) scale(0.95);
             transition: opacity 0.3s ease, transform 0.3s ease;
+            overflow: auto;
         }
         /* When overlay is open, animate the modal into view */
         .overlay.open .modal {
@@ -76,7 +76,7 @@ class CustomModal extends LitElement {
         /* Scrollable content area */
         .modal-content {
             max-height: 80vh;
-            overflow-y: auto;
+            overflow: visible;
         }
         /* Apply padding if not explicitly disabled */
         .modal.padding .modal-content {

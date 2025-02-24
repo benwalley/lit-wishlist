@@ -1,19 +1,20 @@
-import { LitElement, html, css } from 'lit';
-import './group-list-item.js';
-import { customFetch } from "../../helpers/fetchHelpers.js";
-import { createGroup } from "../../helpers/api/users.js";
-
+import {LitElement, html, css} from 'lit';
+import {customFetch} from "../../helpers/fetchHelpers.js";
+import './user-list-item.js'
+import '../global/multi-select-dropdown.js'
+import '../global/single-select-dropdown.js'
+import '../../svg/check.js'
 class UserListComponent extends LitElement {
     static properties = {
-        users: { type: Array },
-        apiEndpoint: { type: String },
-        selectedUsers: { type: Object },
+        users: {type: Array},
+        apiEndpoint: {type: String},
+        selectedUsers: {type: Object},
     };
 
     constructor() {
         super();
         this.users = [];
-        this.apiEndpoint = '/users/current';
+        this.apiEndpoint = '/users/yours';
         this.selectedUsers = new Set();
     }
 
@@ -39,10 +40,10 @@ class UserListComponent extends LitElement {
     async fetchUsers() {
         try {
             const response = await customFetch(this.apiEndpoint, {}, true);
-            if (false) {
-                throw new Error(`Failed to fetch users: ${response.statusText}`);
-            }
-            this.users = await response;
+            const users = await response;
+            console.log(users)
+            this.users = users;
+
         } catch (error) {
             console.error('Error fetching users:', error);
         }
@@ -58,19 +59,15 @@ class UserListComponent extends LitElement {
     }
 
     render() {
-        return this.users?.length ? html`
-            <div>
-                ${this.users && this.users.map(
-                       user => html`
-                            <user-list-item
-                                    .user=${user}
-                                    .isSelected=${this.selectedUsers.has(user.id)}
-                                    @click=${() => this.toggleUsersSelection(user.id)}>
-                            </user-list-item>
-                        `
-                )}
-            </div>
-        ` : html`<div>No users found.</div>`;
+        return html`
+            <single-select-dropdown
+            .items="${this.users}"
+                itemKey="id"
+                labelField="name"
+                .renderer="${(item, isSelected) => html`
+                    <user-list-item .userData="${item}" .isSelected="${isSelected}"></user-list-item>
+                `}"
+          ></single-select-dropdown>`;
     }
 }
 

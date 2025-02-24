@@ -37,12 +37,7 @@ export class MainContentContainer extends observeState(LitElement) {
     }
 
     render() {
-        return html`
-            
-                <image-cropper
-                        .imageSrc=${this.rawSelectedImage}
-                        .size=${this.size}
-                ></image-cropper>`;
+        return html``;
     }
 }
 customElements.define('main-content-container',MainContentContainer);

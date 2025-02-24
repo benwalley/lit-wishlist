@@ -6,6 +6,7 @@ import '../../../svg/success.js';
 import '../../../svg/share.js';
 import '../../../svg/dots.js';
 import {currencyHelper} from "../../../helpers.js";
+import '../../pages/account/avatar.js'
 
 export class ContributorsTopBar extends LitElement {
     static properties = {
@@ -44,7 +45,7 @@ export class ContributorsTopBar extends LitElement {
                     overflow: hidden;
                     height: min-content;
                 }
-                
+
                 @media (min-width: 800px) {
                     :host {
                         padding: var(--spacing-normal);
@@ -59,7 +60,7 @@ export class ContributorsTopBar extends LitElement {
                     gap: var(--spacing-small);
                     transition: opacity 0.3s ease-in-out;
                 }
-                
+
                 @media (min-width: 1000px) {
                     .top-row {
                         display: flex;
@@ -89,43 +90,38 @@ export class ContributorsTopBar extends LitElement {
                 a.back-arrow.button:active arrow-long-left-icon {
                     animation: bounce 1s;
                 }
-                
-                
+
+
                 @media (max-width: 799px) {
                     .desktop-only {
                         display: none;
                     }
                 }
-                
-                
+
 
                 .contributor-details {
                     grid-row: 2;
                     display: flex;
+                    padding-left: 10px;
                     flex-direction: column;
-                    align-items: flex-start;
+                    align-items: center;
                     gap: var(--spacing-small);
                     margin-right: auto;
                 }
-                
+
                 @media (min-width: 800px) {
                     .contributor-details {
                         flex-direction: row;
                     }
-                    
+
+                }
+
+                .avatar {
+                    margin-left: -5px;
                 }
 
                 .avatar-stack {
                     display: flex;
-                    gap: 4px;
-                }
-
-                .avatar-stack img {
-                    width: 24px;
-                    height: 24px;
-                    border-radius: 50%;
-                    border: 2px solid white;
-                    transition: opacity 0.3s ease;
                 }
 
                 .contributor-count {
@@ -141,19 +137,19 @@ export class ContributorsTopBar extends LitElement {
                     align-items: center;
                     gap: 4px;
                     font-weight: bold;
-                    background: var(--green-light);
-                    color: var(--green-normal);
+                    background: var(--blue-light);
+                    color: var(--blue-normal);
                     font-size: var(--font-size-small);
                     padding: var(--spacing-x-small) var(--spacing-small);
                     border-radius: 50px;
                     transition: opacity 0.3s ease;
-                    
+
                     &.none-gotten {
                         background: var(--text-color-light);
                         color: var(--text-color-dark);
                     }
                 }
-
+                
                 success-icon {
                     font-size: 1.2em;
                 }
@@ -175,7 +171,7 @@ export class ContributorsTopBar extends LitElement {
                     font-size: 0.8em;
                     line-height: 1;
                 }
-                
+
                 .actions-container {
                     display: flex;
                     flex-direction: row;
@@ -186,35 +182,91 @@ export class ContributorsTopBar extends LitElement {
                     font-size: 1.3em;
                     transition: transform 0.3s ease;
                 }
+
                 .action-button:hover {
                     transform: scale(1.1);
                 }
 
                 /* Bounce Animation for Back Arrow Icon */
                 @keyframes bounce {
-                    0% { transform: translateX(0); }
-                    30% { transform: translateX(-5px); }
-                    50% { transform: translateX(0); }
-                    70% { transform: translateX(-2px); }
-                    100% { transform: translateX(0); }
+                    0% {
+                        transform: translateX(0);
+                    }
+                    30% {
+                        transform: translateX(-5px);
+                    }
+                    50% {
+                        transform: translateX(0);
+                    }
+                    70% {
+                        transform: translateX(-2px);
+                    }
+                    100% {
+                        transform: translateX(0);
+                    }
                 }
 
                 /* Fade In Transition */
+
                 .fade-in {
                     animation: fadeIn 0.4s ease forwards;
                 }
+
                 @keyframes fadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
+                    from {
+                        opacity: 0;
+                    }
+                    to {
+                        opacity: 1;
+                    }
+                }
+
+                .popup-contents {
+                    max-width: 200px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-normal);
+                    padding: var(--spacing-small);
+
+
+                    .qty {
+                        margin-left: auto;
+                    }
+
+                    .popup-username {
+                        border-bottom: 1px solid var(--border-color);
+                    }
+                    
+                    .amount-contributed {
+                        font-size: var(--font-size-small);
+                        align-items: center;
+                        display: flex;
+                        background: var(--green-light);
+                        border-radius: var(--border-radius-normal);
+                        color: var(--green-normal);
+                        padding: 5px;
+                        gap: 4px;
+                        font-weight: bold;
+
+                    }
+                    
+                    dollar-icon {
+                        font-size: var(--font-size-small);
+                        color: var(--green-normal);
+                        display: flex;
+                    }
+
                 }
 
                 /* Skeleton Loading Styles for general areas */
+
                 .skeleton {
                     background: #e0e0e0;
                     border-radius: 4px;
                     position: relative;
                     overflow: hidden;
                 }
+
                 .skeleton::after {
                     content: "";
                     position: absolute;
@@ -230,25 +282,36 @@ export class ContributorsTopBar extends LitElement {
                     );
                     animation: loading 1.5s infinite;
                 }
+
                 @keyframes loading {
-                    0% { left: -150%; }
-                    50% { left: 100%; }
-                    100% { left: 100%; }
+                    0% {
+                        left: -150%;
+                    }
+                    50% {
+                        left: 100%;
+                    }
+                    100% {
+                        left: 100%;
+                    }
                 }
+
                 .skeleton-circle {
                     width: 24px;
                     height: 24px;
                     border-radius: 50%;
                 }
+
                 .skeleton-text {
                     height: 14px;
                     border-radius: 4px;
                 }
 
                 /* Skeleton variant for green background sections */
+
                 .skeleton--on-green {
                     background: rgba(255, 255, 255, 0.6);
                 }
+
                 .skeleton--on-green::after {
                     background: linear-gradient(
                             90deg,
@@ -281,12 +344,14 @@ export class ContributorsTopBar extends LitElement {
                 this.loading = false;
                 return;
             }
-            const contributors = response;
-            this.contributors = contributors;
-            this.amountPledged = 0;
-            for (const user of contributors) {
-                this.amountPledged += parseFloat(user.contributeAmount || 0);
-            }
+            this.contributors = response;
+
+            // Recalculate the total amount pledged based on merged contributors
+            this.amountPledged = this.contributors.reduce(
+                (total, user) => total + parseFloat(user.contributeAmount || 0),
+                0
+            );
+
         } catch (error) {
             console.error('Error fetching contributors:', error);
         } finally {
@@ -294,6 +359,7 @@ export class ContributorsTopBar extends LitElement {
             this.requestUpdate();
         }
     }
+
 
     // Getter to sum the numberGetting from all contributors
     get totalNumberGotten() {
@@ -331,12 +397,30 @@ export class ContributorsTopBar extends LitElement {
                             `
                             : html`
                                 <div class="avatar-stack fade-in">
-                                    ${this.contributors.slice(0, 2).map(
+                                    ${this.contributors.map(
                                             contributor => html`
-                                                <img
-                                                        src="${contributor.user.image || ''}"
-                                                        alt="Avatar of ${contributor.user.name}"
-                                                />
+                                                <custom-avatar size="24"
+                                                               username="${contributor.user?.name}"
+                                                               imageId="${contributor.user?.image}"
+                                                               round="true"
+                                                               border="true"
+                                                               hasPopup="true"
+                                                               stackLeft="true"
+                                                >
+                                                    <div class="popup-contents ">
+                                                        <div class="popup-username"><strong>${contributor.user?.name}</strong></div>
+                                                        ${contributor.getting ? html`<div class="qty amount-gotten">
+                                                                <success-icon></success-icon>
+                                                                Getting ${contributor.numberGetting}
+                                                            </div>` : ''}
+
+                                                        ${contributor.contributing ? html`<div class="amount-contributed">
+                                                                <dollar-icon></dollar-icon>
+                                                                Contributing ${parseInt(contributor.contributeAmount) ? currencyHelper(contributor.contributeAmount) : ''}
+                                                            </div>` : ''}
+
+                                                    </div>
+                                                </custom-avatar>
                                             `
                                     )}
                                 </div>
@@ -359,9 +443,11 @@ export class ContributorsTopBar extends LitElement {
                 <div class="amount-gotten fade-in ${this.totalNumberGotten === 0 ? 'none-gotten' : ''}">
                     ${this.loading
                             ? html`
-                                <div class="skeleton skeleton--on-green skeleton-text" style="width: 40px; height: 20px;"></div>
+                                <div class="skeleton skeleton--on-green skeleton-text"
+                                     style="width: 40px; height: 20px;"></div>
                                 <span>of</span>
-                                <div class="skeleton skeleton--on-green skeleton-text" style="width: 40px; height: 20px;"></div>
+                                <div class="skeleton skeleton--on-green skeleton-text"
+                                     style="width: 40px; height: 20px;"></div>
                                 <span>gotten</span>
                             `
                             : html`

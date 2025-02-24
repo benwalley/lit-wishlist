@@ -17,6 +17,8 @@ import {cachedFetch, invalidateCache} from "../../../helpers/caching.js";
 import {formatDate} from "../../../helpers/generalHelpers.js";
 import {triggerUpdateItem} from "../../../events/eventListeners.js";
 import './get-this-button.js';
+import './contribute-button.js';
+
 
 export class CustomElement extends LitElement {
     static properties = {
@@ -34,7 +36,7 @@ export class CustomElement extends LitElement {
         this.listId = '';
         this.itemData = {};
         this.loading = true;
-        this.sidebarExpanded = true;
+        this.sidebarExpanded = false;
         this.hasLinks = false;
     }
 
@@ -50,45 +52,41 @@ export class CustomElement extends LitElement {
                 :host {
                     display: block;
                 }
-                
+
                 .item-title {
                     line-height: 1;
                     padding-top: 10px;
                 }
 
                 /* Use a grid layout for the overall container */
-
                 .containing-element {
                     display: grid;
-                    gap: 0 var(--spacing-normal);
                     height: 100%;
+                    width: 100%;
                     position: relative;
+                    grid-template-rows: auto 1fr;
                     grid-template-columns: 1fr;
                     transition: var(--transition-normal);
                 }
-
-                @media (min-width: 800px) {
-                    grid-template-columns: 1fr 350px;
-                }
-
-                /* When sidebar is collapsed, hide its column */
-
-                .containing-element.collapsed {
-                    grid-template-columns: 1fr 20px;
-                }
-
-                /* Main content styled as a landmark region */
-
+                
                 main.main-content {
                     display: grid;
-                    padding-top: var(--spacing-normal);
-                    padding-left: var(--spacing-normal);
-                    grid-template-columns: 1fr 1fr;
+                    padding: var(--spacing-normal);
+                    padding-top: 0;
+                    box-sizing: border-box;
+                    width: 100%;
+                    grid-template-columns: 1fr 1fr 0;
                     grid-template-rows: auto 1fr;
                     gap: var(--spacing-normal) calc(var(--spacing-normal) * 2);
                     color: var(--text-color-dark);
-                    padding-bottom: var(--spacing-large);
-                    transition: var(--transition-normal);
+                    /* Transition the grid-template-columns property without delay */
+                    transition: grid-template-columns 0.3s ease;
+                }
+
+                /* When hovering over the sidebar, delay the grid expansion by 300ms */
+                main.main-content:has(aside.right-column:hover) {
+                    grid-template-columns: 1fr 1fr 320px;
+                    transition-delay: 300ms;
                 }
 
                 contributors-top-bar {
@@ -112,19 +110,30 @@ export class CustomElement extends LitElement {
                     display: grid;
                     gap: var(--spacing-small);
                     margin-bottom: auto;
+                    padding-top: var(--spacing-normal);
+                }
+                
+                all-images-display {
+                    padding-top: var(--spacing-normal);
                 }
 
-                /* Sidebar styles; using <aside> below improves accessibility */
-
+                /* Sidebar styles */
                 aside.right-column {
                     width: 300px;
                     position: relative;
-                    overflow: visible;
                     display: none;
-                    transition: var(--transition-normal);
                     border-left: 1px solid var(--border-color);
                     background: var(--background-light);
                     padding: var(--spacing-normal);
+                    /* Transition border-color immediately and let other properties use the standard transition */
+                    transition: border-color 0.1s ease, var(--transition-normal);
+                }
+
+                /* When hovering over the sidebar, immediately darken the border */
+                aside.right-column:hover {
+                    //box-shadow: var(--shadow-2-soft);
+                    border-color: var(--grayscale-300);
+                    border-width: 3px;
                 }
 
                 @media (min-width: 800px) {
@@ -132,11 +141,11 @@ export class CustomElement extends LitElement {
                         display: block;
                     }
                 }
-                
+
                 .added-date {
                     margin: 0;
                 }
-                
+
                 .tile {
                     border-radius: var(--border-radius-normal);
                     border: 1px solid var(--border-color);
@@ -144,25 +153,26 @@ export class CustomElement extends LitElement {
                     padding: 16px;
                     box-shadow: var(--shadow-0-soft);
                     margin-top: var(--spacing-normal);
-                    
-                    h3 {
-                        font-weight: bold;
-                        font-size: var(--font-size-small);
-                        color: var(--text-color-medium-dark);
-                        padding-bottom: var(--spacing-small);
-                    }
                 }
-                
+
+                .tile h3 {
+                    font-weight: bold;
+                    font-size: var(--font-size-small);
+                    color: var(--text-color-medium-dark);
+                    padding-bottom: var(--spacing-small);
+                }
+
                 .action-buttons {
                     display: flex;
                     gap: var(--spacing-normal);
                     flex-wrap: wrap;
                     padding-top: var(--spacing-normal);
-                    
-                    button {
-                        flex-grow: 1;
-                    }
                 }
+
+                .action-buttons button {
+                    flex-grow: 1;
+                }
+
             `,
         ];
     }
@@ -206,12 +216,12 @@ export class CustomElement extends LitElement {
 
     render() {
         return html`
-            <div class="containing-element ${this.sidebarExpanded ? 'expanded' : 'collapsed'}">
+            <div class="containing-element">
                 <contributors-top-bar 
                         .itemId="${this.itemId}" 
                         .listId="${this.listId}"
                         .itemData="${this.itemData}"></contributors-top-bar>
-                <main class="main-content" aria-busy="${this.loading ? 'true' : 'false'}">
+                <main class="main-content ${this.sidebarExpanded ? 'expanded' : 'collapsed'}" aria-busy="${this.loading ? 'true' : 'false'}">
                     ${this.loading
                             ? html`<p>Loading item data…</p>`
                             : html`
@@ -246,26 +256,28 @@ export class CustomElement extends LitElement {
                                     
                                     
                                     <div class="action-buttons">
-                                        <get-this-button .itemId="${this.itemId}"></get-this-button>
-                                        <button class="button shadow ghost large">Contribute</button>
+                                        <get-this-button .itemId="${this.itemId}" .itemData="${this.itemData}"></get-this-button>
+                                        <contribute-button .itemId="${this.itemId}" .itemData="${this.itemData}"></contribute-button>
                                     </div>
                                 </div>
                             `}
+
+                    <aside
+                            class="right-column ${this.sidebarExpanded ? 'expanded' : 'collapsed'}"
+                            id="sidebar"
+                            aria-label="Other Items in This List"
+                    >
+                        <h2>Other Items in This List</h2>
+                        <list-sidebar
+                                .listId="${this.listId}"
+                                .expanded="${this.sidebarExpanded}"
+                                @sidebar-toggle="${this.handleSidebarToggle}"
+                        ></list-sidebar>
+                    </aside>
                 </main>
 
                 <!-- Sidebar wrapped in an <aside> with an accessible name -->
-                <aside
-                        class="right-column ${this.sidebarExpanded ? 'expanded' : 'collapsed'}"
-                        id="sidebar"
-                        aria-label="Other Items in This List"
-                >
-                    <h2>Other Items in This List</h2>
-                    <list-sidebar
-                            .listId="${this.listId}"
-                            .expanded="${this.sidebarExpanded}"
-                            @sidebar-toggle="${this.handleSidebarToggle}"
-                    ></list-sidebar>
-                </aside>
+                
             </div>
         `;
     }

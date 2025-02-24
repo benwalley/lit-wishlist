@@ -3,6 +3,8 @@ import buttonStyles from '../../css/buttons.js';
 import { customFetch } from '../../helpers/fetchHelpers.js';
 import { cropperState } from '../../state/cropperStore.js';
 import {uploadImageToDB} from "../../helpers/imageHelpers.js";
+import {listenImageCropConfirmed, triggerImageSelected} from "../../events/eventListeners.js";
+import {getUniqueId} from "../../helpers/generalHelpers.js";
 
 class ImageChanger extends LitElement {
     static properties = {
@@ -38,6 +40,7 @@ class ImageChanger extends LitElement {
         super();
         this.imageId = 0;
         this.size = 300; // default crop size
+        this.uniqueId = getUniqueId();
     }
 
     render() {
@@ -61,6 +64,28 @@ class ImageChanger extends LitElement {
         this.shadowRoot.getElementById('fileInput').click();
     }
 
+    connectedCallback() {
+        super.connectedCallback();
+        listenImageCropConfirmed(this._handleCropConfirmed.bind(this))
+    }
+
+    _handleCropConfirmed(e) {
+        const {imageId, uniqueId} = e.detail;
+        if (uniqueId !== this.uniqueId) return;
+        this.imageId = parseInt(imageId);
+        this._dispatchImageUpdatedEvent(this.imageId);
+    }
+
+    _dispatchImageUpdatedEvent(imageId) {
+        this.dispatchEvent(
+            new CustomEvent('image-updated', {
+                detail: {imageId: imageId},
+                bubbles: true,
+                composed: true,
+            })
+        );
+    }
+
     _handleFileChange(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -71,32 +96,9 @@ class ImageChanger extends LitElement {
         const reader = new FileReader();
         reader.onload = (ev) => {
             const rawImage = ev.target.result;
+            triggerImageSelected({rawImage, uniqueId: this.uniqueId});
         };
         reader.readAsDataURL(file);
-    }
-
-    async _handleCropConfirmed(croppedDataUrl) {
-        try {
-            const response = await uploadImageToDB(croppedDataUrl);
-            this.imageId = response.imageId;
-            this.dispatchEvent(
-                new CustomEvent('image-changed', {
-                    detail: { imageId: this.imageId },
-                    bubbles: true,
-                    composed: true,
-                })
-            );
-        } catch (error) {
-            console.error(error);
-            alert('Failed to upload image.');
-        } finally {
-            this._resetFileInput();
-            // Reset global cropper state
-            cropperState.modalOpen = false;
-            cropperState.imageSrc = null;
-            cropperState.onCropConfirmed = null;
-            cropperState.onCropCancelled = null;
-        }
     }
 
     _handleCropCancelled() {

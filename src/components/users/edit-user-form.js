@@ -65,6 +65,7 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     _onImageChanged(e) {
+        console.log(e.detail);
         this.imageId = e.detail.imageId;
         console.log(e.detail.imageId);
         this.errorMessage = '';
@@ -82,7 +83,7 @@ export class CustomElement extends observeState(LitElement) {
     async _handleSave() {
         if (!userState.userData.id) return;
         const data = {
-            imageId: this.imageId,
+            image: this.imageId,
             name: this.username,
             publicDescription: this.description,
             userId: userState.userData.id,
@@ -166,7 +167,7 @@ export class CustomElement extends observeState(LitElement) {
                     <custom-avatar size="120" username="${this.username}" imageId="${this.imageId}"></custom-avatar>
                     <image-changer  
                                     imageId="${this.imageId}"
-                                    @image-changed="${this._onImageChanged}"></image-changer>
+                                    @image-updated="${this._onImageChanged}"></image-changer>
                 </div>
                 <span>Click the camera to change your profile picture</span>
 

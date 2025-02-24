@@ -1,34 +1,37 @@
-import { LitElement, html, css } from 'lit';
+import {LitElement, html, css} from 'lit';
 import '../../svg/eye.js';
+import '../../svg/dollar.js';
 import '../global/custom-tooltip.js';
 
 class MyTextInput extends LitElement {
-  static get properties() {
-    return {
-      label: { type: String },
-      size: { type: String },
-      placeholder: { type: String },
-      value: { type: String, reflect: true },
-      type: { type: String },
-      passwordVisible: { type: Boolean },
-      floatingLabel: { type: Boolean },
-      fullWidth: { type: Boolean },
-      required: { type: Boolean }  // New required property
-    };
-  }
+    static get properties() {
+        return {
+            label: {type: String},
+            size: {type: String},
+            placeholder: {type: String},
+            value: {type: String, reflect: true},
+            type: {type: String},
+            passwordVisible: {type: Boolean},
+            floatingLabel: {type: Boolean},
+            fullWidth: {type: Boolean},
+            required: {type: Boolean},  // New required property
+            dollarIcon: {type: Boolean},
+        };
+    }
 
-  constructor() {
-    super();
-    this.label = '';
-    this.size = 'normal';
-    this.value = '';
-    this.placeholder = '';
-    this.type = 'text';
-    this.passwordVisible = false;
-    this.floatingLabel = false;
-    this.fullWidth = true;
-    this.required = false;  // Default false
-  }
+    constructor() {
+        super();
+        this.label = '';
+        this.size = 'normal';
+        this.value = '';
+        this.placeholder = '';
+        this.type = 'text';
+        this.passwordVisible = false;
+        this.floatingLabel = false;
+        this.fullWidth = true;
+        this.required = false;  // Default false
+        this.dollarIcon = false;
+    }
 
     static get styles() {
         return css`
@@ -46,29 +49,49 @@ class MyTextInput extends LitElement {
                 flex-direction: column;
             }
 
-            input {
+            .input-wrapper {
+                display: flex;
+                align-items: center;
+                position: relative;
                 width: 100%;
                 border: 1px solid var(--border-color);
                 border-radius: var(--border-radius-small);
                 background: var(--input-background-color);
-                color: var(--text-color-dark);   
+                transition: border-color 0.2s ease;
+            }
+
+            .input-wrapper:focus-within {
+                border-color: var(--focus-color);
+                box-shadow: 0 0 2px 1px var(--focus-color);
+            }
+
+            .start-icon {
+                margin: 0 8px;
+                display: flex;
+                align-items: center;
+            }
+
+            input {
+                flex: 1;
+                border: none;
+                background: transparent;
+                color: var(--text-color-dark);
                 padding: 10px;
                 font-size: 1rem;
                 outline: none;
                 box-sizing: border-box;
-                transition: border-color 0.2s ease;
             }
-            
+
             input.small {
                 padding: 6px;
             }
 
             input.large {
-                padding: 16px 10px;            }
+                padding: 16px 10px;
+            }
 
-            input:focus {
-                border-color: var(--focus-color);
-                box-shadow: 0 0 2px 1px var(--focus-color);
+            input::placeholder {
+                color: var(--placeholder-color, gray);
             }
 
             label {
@@ -105,9 +128,7 @@ class MyTextInput extends LitElement {
                 padding: 0 8px;
                 display: flex;
                 align-items: center;
-                position: absolute;
-                right: 10px;
-                bottom: 14px;
+                position: relative;
             }
 
             eye-icon {
@@ -122,90 +143,101 @@ class MyTextInput extends LitElement {
         if (!this.label) return '';
         if (this.floatingLabel) {
             return html`
-            <label class="floating-label">${this.label}</label>
-        `;
+                <label class="floating-label">${this.label}</label>
+            `;
         }
         return html`
-        <strong>${this.label}</strong>
-    `;
+            <strong>${this.label}</strong>
+        `;
     }
 
     _renderEyeIcon() {
         return this.type === 'password' || this.passwordVisible
             ? html`
-            <button
-                class="toggle-button"
-                @click="${this._togglePasswordVisibility}"
-                aria-label="Toggle password visibility"
-            >
-                <eye-icon .open="${this.passwordVisible}"></eye-icon>
-            </button>
-            <custom-tooltip>
-                ${this.passwordVisible ? 'Hide Password' : 'Show Password'}
-            </custom-tooltip>
+          <button
+            class="toggle-button"
+            @click="${this._togglePasswordVisibility}"
+            aria-label="Toggle password visibility"
+          >
+            <eye-icon .open="${this.passwordVisible}"></eye-icon>
+          </button>
+          <custom-tooltip>
+            ${this.passwordVisible ? 'Hide Password' : 'Show Password'}
+          </custom-tooltip>
         `
             : '';
     }
-
 
     _togglePasswordVisibility() {
         this.passwordVisible = !this.passwordVisible;
         this.type = this.passwordVisible ? 'text' : 'password';
     }
 
-  render() {
-    return html`
+    render() {
+        return html`
       <div class="input-container">
         ${this._renderLabel()}
-        <input
-          class="${this.size}"
-          type="${this.type}"
-          .value="${this.value}"
-          placeholder="${this.placeholder}"
-          @input="${this._handleInput}"
-          ?required="${this.required}"  <!-- Bind required attribute -->
-        ${this._renderEyeIcon()}
+        <div class="input-wrapper">
+            ${this.dollarIcon ? html`
+                <div class="start-icon">
+                    <dollar-icon></dollar-icon>
+                </div>
+            ` : ''}
+          <input
+            class="${this.size}"
+            type="${this.type}"
+            .value="${this.value}"
+            placeholder="${this.placeholder}"
+            @input="${this._handleInput}"
+            ?required="${this.required}"
+          />
+          ${this._renderEyeIcon()}
+        </div>
       </div>
     `;
-  }
-
-  _handleInput(e) {
-    this.value = e.target.value;
-    this.dispatchEvent(
-      new CustomEvent('value-changed', {
-        detail: { value: this.value }
-      })
-    );
-  }
-
-  /**
-   * Custom validation method for the component.
-   * Returns true if valid, false otherwise.
-   */
-  validate() {
-    const input = this.renderRoot.querySelector('input');
-    if (!input) return true; // No input found, consider valid.
-
-    // Use native validity check if available.
-    if (input.checkValidity) {
-      const valid = input.checkValidity();
-      if (!valid) {
-        input.reportValidity(); // Triggers browser UI for invalid state if available.
-      }
-      return valid;
     }
 
-    // Fallback custom validation
-    if (this.required && !this.value.trim()) {
-      // Simple custom error handling: add custom styles or show messages.
-      input.setCustomValidity('This field is required.');
-      input.reportValidity();
-      return false;
-    } else {
-      input.setCustomValidity('');
-      return true;
+    focus() {
+        const input = this.shadowRoot.querySelector('input');
+        input.focus();
     }
-  }
+
+    _handleInput(e) {
+        this.value = e.target.value;
+        this.dispatchEvent(
+            new CustomEvent('value-changed', {
+                detail: {value: this.value},
+            })
+        );
+    }
+
+    /**
+     * Custom validation method for the component.
+     * Returns true if valid, false otherwise.
+     */
+    validate() {
+        const input = this.renderRoot.querySelector('input');
+        if (!input) return true; // No input found, consider valid.
+
+        // Use native validity check if available.
+        if (input.checkValidity) {
+            const valid = input.checkValidity();
+            if (!valid) {
+                input.reportValidity(); // Triggers browser UI for invalid state if available.
+            }
+            return valid;
+        }
+
+        // Fallback custom validation
+        if (this.required && !this.value.trim()) {
+            input.setCustomValidity('This field is required.');
+            input.reportValidity();
+            return false;
+        } else {
+            input.setCustomValidity('');
+            return true;
+        }
+    }
 }
 
 customElements.define('custom-input', MyTextInput);
