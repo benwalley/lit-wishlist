@@ -115,10 +115,11 @@
     --primary-button-text: var(--light-text-color);
     --primary-button-hover-border: none;
 
-    --secondary-button-background: var(--secondary-color);
-    --secondary-button-hover-background: var(--green-light);
-    --secondary-button-text: var(--light-text-color);
-    --secondary-button-border: none;
+    /* Secondary button styles are defined directly in buttons.js */
+    --secondary-button-background: transparent;
+    --secondary-button-hover-background: var(--blue-light);
+    --secondary-button-text: var(--secondary-color);
+    --secondary-button-border: 1px solid var(--secondary-color);
 
     --ghost-button-border-color: var(--border-color-light);
     --ghost-button-text-color: var(--text-color-dark);

@@ -30,7 +30,7 @@ export class AccountContainer extends LitElement {
                 .account-container {
                     display: grid;
                     gap: var(--spacing-normal);
-                    padding: var(--spacing-normal) 0;
+                    padding: var(--spacing-normal);
                 }
 
                 @media (min-width: 768px) {
@@ -95,14 +95,10 @@ export class AccountContainer extends LitElement {
                     >
                         <edit-icon></edit-icon>
                     </button>
+                    <logout-button></logout-button>
                     <custom-modal id="edit-user-modal" maxWidth="500px" noPadding>
                         <edit-user-form @close-edit-user-modal="${this._closeEditUserModal}"></edit-user-form>
                     </custom-modal>
-                </section>
-                
-                <section>
-                    <logout-button></logout-button>
-                    <image-uploader size="200"></image-uploader>
                 </section>
 
                 <section>

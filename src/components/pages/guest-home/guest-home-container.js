@@ -4,6 +4,8 @@ import {userState} from "../../../state/userStore.js";
 import './login-account.js';
 import '../../global/custom-input.js'
 import {navigate} from "../../../router/main-router.js";
+import posthog from 'posthog-js'
+
 
 export class GuestHomeContainer extends observeState(LitElement) {
     static styles = css`
@@ -86,6 +88,15 @@ export class GuestHomeContainer extends observeState(LitElement) {
 
     firstUpdated() {
         this._checkAuthentication();
+
+        console.log('running')
+        posthog.init('phc_aEi6XYV0q46bbooESvEozRA2sU59b3STJDlui1McYt4',
+            {
+                api_host: 'https://us.i.posthog.com',
+                person_profiles: 'identified_only' // or 'always' to create profiles for anonymous users as well
+            }
+        )
+        posthog.capture('my event', { property: 'value' })
     }
 
     // Lifecycle method called whenever the component updates

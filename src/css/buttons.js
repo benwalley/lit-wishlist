@@ -48,12 +48,15 @@ export default css`
         }
 
         &.secondary {
-            background-color: var(--secondary-button-background);
-            color: var(--secondary-button-text);
-            border: var(--secondary-button-border);
+            background-color: transparent;
+            color: var(--secondary-color);
+            border: 1px solid var(--secondary-color);
+            font-weight: 500;
 
             &:hover {
-                background-color: var(--secondary-button-hover-background);
+                background-color: var(--blue-light);
+                color: var(--blue-darker);
+                border-color: var(--blue-darker);
             }
         }
 
