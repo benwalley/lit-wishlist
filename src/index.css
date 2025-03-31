@@ -86,8 +86,9 @@
     --delete-red: #fd5858;
     --delete-red-darker: #d64444;
     --delete-red-light: #ffeeee;
-    --success-green: green;
-    --info-yellow: yellow;
+    --success-green: #22c55e;
+    --info-yellow: #f59e0b;
+    --info-yellow-light: #fef3c7;
     --placeholder-color: var(--grayscale-500);
 
     /* Header/Footer/Links */

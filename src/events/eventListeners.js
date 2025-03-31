@@ -2,6 +2,7 @@ import {listenToCustomEvent, triggerCustomEvent} from "./custom-events.js";
 
 const UPDATE_LIST_EVENT = 'update-list';
 const UPDATE_ITEM_EVENT = 'update-list';
+const UPDATE_QA_EVENT = 'update-qa';
 const UPDATE_USER_EVENT = 'update-user';
 const USER_UPDATED_EVENT = 'user-updated';
 const imageUploadEvents = {
@@ -57,3 +58,12 @@ export function listenImageCropConfirmed(callback) {
     return listenToCustomEvent(imageUploadEvents.cropConfirmed, callback);
 }
 
+
+export function triggerUpdateQa() {
+    console.log('triggered')
+    triggerCustomEvent(UPDATE_QA_EVENT);
+}
+
+export function listenUpdateQa(callback) {
+    return listenToCustomEvent(UPDATE_QA_EVENT, callback);
+}

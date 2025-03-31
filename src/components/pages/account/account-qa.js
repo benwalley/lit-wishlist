@@ -8,19 +8,23 @@ import '../../global/custom-modal.js';
 import './qa-item.js'
 import buttonStyles from "../../../css/buttons";
 import {getUniqueId} from "../../../helpers/generalHelpers.js";
+import {messagesState} from "../../../state/messagesStore.js";
+import {cachedFetch} from "../../../helpers/caching.js";
+import {customFetch} from "../../../helpers/fetchHelpers.js";
+import {createQA, deleteQA, getQAItems, saveQA, updateAnswer, updateQuestion} from "./qa/qa-helpers.js";
+import {listenUpdateQa, triggerUpdateQa} from "../../../events/eventListeners.js";
 
 
 export class AccountQA extends LitElement {
     static properties = {
-        qaItems: { type: Array }
+        qaItems: { type: Array },
+        isLoading: {type: Boolean}
     };
 
     constructor() {
         super();
-        this.qaItems = [
-            { id: 1, question: 'What are your favorite colors?', answer: 'Blue and green' },
-            { id: 2, question: 'What is your favorite hobby?', answer: 'Hiking and reading' }
-        ];
+        this.qaItems = [];
+        this.isLoading = false;
     }
 
     static get styles() {
@@ -40,7 +44,7 @@ export class AccountQA extends LitElement {
                     flex-direction: row;
                     justify-content: space-between;
                     align-items: center;
-                    
+
                     h2 {
                         margin: 0;
                         font-family: var(--heading-font-family);
@@ -52,7 +56,7 @@ export class AccountQA extends LitElement {
                     flex-direction: column;
                     gap: var(--spacing-small)
                 }
-                
+
                 .empty-state {
                     text-align: center;
                     padding: var(--spacing-large);
@@ -64,38 +68,102 @@ export class AccountQA extends LitElement {
         ];
     }
 
+    async _fetchQAItems() {
+        console.log('fetching')
+        this.isLoading = true;
+        try {
+            const userId = 1;
+            const response = await getQAItems(userId)
+            if(response.success) {
+                this.qaItems = response.qaItems;
+            }
+
+        } catch (error) {
+            messagesState.addMessage(error.message, 'error');
+            console.error(error);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
     // Add a new Q&A item with default values in edit mode
     _addNewItem() {
         const newId = getUniqueId();
+
+        for(const item of this.qaItems) {
+            if (item.isNew) {
+                messagesState.addMessage('Please save the new item before adding another.', 'error');
+                return;
+            }
+        }
 
         this.qaItems = [
             ...this.qaItems,
             {
                 id: newId,
-                question: 'New Question',
-                answer: 'New Answer',
+                questionText: '',
+                answers: [],
                 isNew: true
             }
         ];
     }
 
-    // Handle the qa-item-updated event
-    _handleItemUpdated(e) {
-        const updatedItem = e.detail.item;
-        this.qaItems = this.qaItems.map(item =>
-            item.id === updatedItem.id ? updatedItem : item
+    setItemValue(itemId, key, value) {
+        this.qaItems = this.qaItems.map(item => {
+                if(item.id === itemId) {
+                    item[key] = value;
+                }
+                return item;
+            }
         );
     }
 
-    _handleItemDeleted(e) {
-        const itemId = e.detail.itemId;
-        this.qaItems = this.qaItems.filter(item => item.id !== itemId);
+    // Handle the qa-item-updated event
+    async _handleItemUpdated(e) {
+        const updatedItem = e.detail.item;
+        const itemId = updatedItem.id;
+        this.setItemValue(itemId, 'loading', true)
+
+
+        if(updatedItem.isNew) {
+            // set loading state on editing item.
+            // TODO: Make this seprate func
+
+            const updatedData = await createQA(updatedItem.questionText, updatedItem.answers[0].answerText, 1);
+            if(!updatedData.success) return;
+            this.qaItems = this.qaItems.map(item =>
+                item.id === itemId ? updatedData.qaData : item
+            );
+            messagesState.addMessage('Question added successfully', 'success');
+            return;
+        }
+
+        const updatedQuestion = await updateQuestion(updatedItem);
+        const returnValue = updatedQuestion.updatedValue;
+        returnValue.answers = [];
+        if(updatedItem.answers?.length) {
+            const updatedAnswer = await updateAnswer(updatedItem.answers[0]);
+            returnValue.answers.push(updatedAnswer.updatedValue)
+        }
+        this.qaItems = this.qaItems.map(item =>
+            item.id === itemId ? returnValue : item
+        );
+        messagesState.addMessage('Saved question and answer', 'success');
+    }
+
+    async _handleItemDeleted(e) {
+        const itemData = e.detail.item;
+        this.qaItems = this.qaItems.filter(item => item.id !== itemData.id);
+        const response = await deleteQA(itemData);
+
     }
 
     connectedCallback() {
         super.connectedCallback();
+        this._fetchQAItems();
         this.addEventListener('qa-item-updated', this._handleItemUpdated);
         this.addEventListener('qa-item-deleted', this._handleItemDeleted);
+        listenUpdateQa(this._fetchQAItems);
     }
 
     disconnectedCallback() {
@@ -114,16 +182,15 @@ export class AccountQA extends LitElement {
                     Add Question
                 </button>
             </div>
-            
+
             <div class="qa-list">
-                ${this.qaItems.length === 0 
-                    ? html`<div class="empty-state">No Q&A items yet. Add your first question!</div>` 
-                    : this.qaItems.map(item => html`
-                        <qa-item 
-                            .item="${item}" 
-                            ?isNew="${item.isNew === true}"
-                        ></qa-item>
-                    `)
+                ${this.qaItems.length === 0
+                        ? html`<div class="empty-state">No Q&A items yet. Add your first question!</div>`
+                        : this.qaItems.map(item => html`
+                            <qa-item
+                                    .item="${item}"
+                            ></qa-item>
+                        `)
                 }
             </div>
         `;
