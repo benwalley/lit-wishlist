@@ -5,6 +5,7 @@ import '../components/pages/account/account-container.js'
 import '../components/pages/list/list-view-container.js'
 import '../components/pages/listItem/item-view-container.js'
 import '../components/pages/not-found.js';
+import '../components/pages/account/qa/qa-page-container.js';
 
 
 const routes = [
@@ -23,6 +24,10 @@ const routes = [
     {
         path: '/list/:listId/item/:itemId',
         component: 'item-view-container',
+    },
+    {
+        path: '/qa',
+        component: 'qa-page-container',
     },
     {
         path: '(.*)',

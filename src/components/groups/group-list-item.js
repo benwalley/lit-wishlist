@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
-import '../pages/account/avatar.js'
+import '../pages/account/avatar.js';
+import '../../svg/check.js';
 
 class GroupItemComponent extends LitElement {
     static properties = {
@@ -10,54 +11,102 @@ class GroupItemComponent extends LitElement {
     static styles = css`
         :host {
             display: block;
+            color: var(--text-color-dark);
         }
-        .group-container {
+
+        button.group-container {
             display: flex;
-            gap: var(--spacing-small);
             align-items: center;
-            padding: 5px;
-            filter: opacity(0.4);
-            background: var(--option-select-background);
-            border: none;
-            border-bottom: 1px solid var(--border-color);
-            border-radius: 0;
             width: 100%;
+            padding: var(--spacing-x-small);
+            border: none;
+            background: none;
             cursor: pointer;
+            text-align: left;
+            gap: 8px;
+            transition: var(--transition-normal);
+            border-radius: var(--border-radius-small);
         }
 
-        .group-container:hover {
-            filter: opacity(0.7);
-            background: var(--options-select-background-hover);
+        button.group-container:hover {
+            background-color: var(--background-light);
+        }
+        
+        button.group-container.selected {
+            background-color: var(--background-light);
+        }
+        
+        .checkbox {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 2px solid var(--grayscale-300);
+            transition: var(--transition-normal);
+        }
+        
+        .checkbox.selected {
+            border-color: var(--blue-normal);
+            background-color: var(--blue-normal);
+            color: white;
+        }
+        
+        check-icon {
+            width: 16px;
+            height: 16px;
+            color: white;
         }
 
-        .group-container.selected {
-            filter: opacity(1);
-            background: var(--background-color);
+        .group-info {
+            flex: 1;
+            display: flex;
+            gap: 2px;
+            flex-direction: column;
         }
 
         .group-name {
-            font-size: var(--font-size-normal);
+            font-size: var(--font-size-small);
             font-weight: bold;
             color: var(--text-color-dark);
         }
 
-        .checkbox {
-            cursor: pointer;
-            margin-left: auto;
-            /* Scale up the checkbox */
-            transform: scale(1.5);
-            /* Adjust for spacing when scaling */
-            margin-right: 10px;
+        .group-desc {
+            font-size: var(--font-size-x-small);
+            color: var(--text-color-medium-dark);
         }
     `;
 
+    _handleClick() {
+        this.dispatchEvent(new CustomEvent('group-selected', {
+            detail: { group: this.group },
+            bubbles: true,
+            composed: true
+        }));
+    }
+
     render() {
         return html`
-            <button class="group-container ${this.isSelected ? 'selected' : ''}">
-                <custom-avatar size="24" username="${this.group.groupName}"></custom-avatar>
-                <div class="group-name">${this.group.groupName}</div>
-                <!-- The checkbox reflects the current isSelected state -->
-                <input class="checkbox" type="checkbox" .checked="${this.isSelected}" />
+            <button
+                class="group-container ${this.isSelected ? 'selected' : ''}"
+                @click="${this._handleClick}"
+            >
+                <div class="checkbox ${this.isSelected ? 'selected' : ''}">
+                    ${this.isSelected ? html`<check-icon></check-icon>` : null}
+                </div>
+                <custom-avatar size="24" 
+                    username="${this.group?.groupName}" 
+                    imageId="${this.group?.image}"
+                ></custom-avatar>
+
+                <div class="group-info">
+                    <div class="group-name">${this.group?.groupName}</div>
+                    ${this.group?.description
+                        ? html`<div class="group-desc">${this.group?.description}</div>`
+                        : null
+                    }
+                </div>
             </button>
         `;
     }

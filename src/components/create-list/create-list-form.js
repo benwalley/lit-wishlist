@@ -182,7 +182,7 @@ export class CreateListForm extends LitElement {
 
                     <your-groups-list
                             class="full-width"
-                            @selected-groups-changed="${this._handleGroupChange}"
+                            @selection-changed="${this._handleGroupChange}"
                     ></your-groups-list>
                 </div>
                 <div class="users-section">

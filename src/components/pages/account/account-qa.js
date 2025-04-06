@@ -193,6 +193,7 @@ export class AccountQA extends LitElement {
                         `)
                 }
             </div>
+            <a href="/qa">Ask Questions of other users</a>
         `;
     }
 }
