@@ -39,13 +39,11 @@ class MultiInput extends LitElement {
                 .container {
                     display: flex;
                     flex-direction: column;
-                    gap: 10px;
                 }
 
                 .header {
-                    font-size: 1.2rem;
+                    font-size: var(--font-size-normal);
                     font-weight: bold;
-                    margin-bottom: 10px;
                 }
 
                 .row {
@@ -75,14 +73,9 @@ class MultiInput extends LitElement {
                     }
                 }
 
-                button {
-                    padding: 5px 10px;
-                    font-size: 1rem;
-                    cursor: pointer;
-                }
-
-                .add-button {
+                .add-row-button {
                     align-self: flex-start;
+                    margin-right: auto;
                 }
             `
         ];
@@ -171,8 +164,10 @@ class MultiInput extends LitElement {
                             />
                         `)}
                         <button 
-                                aria-label="Delete Row" 
-                                style="--icon-color: var(--delete-red);"
+                                aria-label="Delete Row"
+                                style="--icon-color: var(--delete-red);
+                                 --icon-color-hover: var(--delete-red-darker);
+                                 --icon-hover-background: var(--delete-red-light);"
                                 class="icon-button delete-button"
                                 @click=${() => this._removeRow(rowIndex)}
                         >
@@ -181,9 +176,9 @@ class MultiInput extends LitElement {
                     </div>
                 `)}
 
-                <button class="secondary add-button" @click=${this._addRow}>
-                    <span>Add Row</span>
+                <button class="small-link-button add-row-button" @click=${this._addRow}>
                     <plus-icon></plus-icon>
+                    <span>Add Another Link</span>
                 </button>
             </div>
         `;

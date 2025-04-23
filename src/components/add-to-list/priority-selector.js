@@ -12,12 +12,12 @@ class PrioritySelector extends LitElement {
                 .contents {
                     display: flex;
                     align-items: center;
-                    gap: 15px;
+                    gap: 10px;
                 }
                 button {
                     border-radius: 50px !important;
-                    width: 30px;
-                    height: 30px;
+                    width: 22px;
+                    height: 22px;
                     padding: 0 !important;
                     display: flex;
                     align-items: center;
@@ -26,7 +26,12 @@ class PrioritySelector extends LitElement {
                 .hearts {
                     display: flex;
                     align-items: center;
-                    gap: 5px;
+                }
+                
+                h3 {
+                    margin: 0;
+                    font-size: var(--font-size-normal);
+                    padding-bottom: var(--spacing-x-small);
                 }
             `
         ];
@@ -99,14 +104,14 @@ class PrioritySelector extends LitElement {
           @click="${() => (this.value = Math.max(0, this.value - 0.5))}"
           ?disabled="${this.value <= 0}"
         >
-          <minus-icon style="width: 15px; height: 15px"></minus-icon>
+          <minus-icon style="width: 12px; height: 12px"></minus-icon>
         </button>
         <div class="hearts">${this.renderHearts()}</div>
         <button
           @click="${() => (this.value = Math.min(5, this.value + 0.5))}"
           ?disabled="${this.value >= 5}"
         >
-          <plus-icon style="width: 15px; height: 15px"></plus-icon>
+          <plus-icon style="width: 12px; height: 12px"></plus-icon>
         </button>
       </div>
     `;

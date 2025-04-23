@@ -1,6 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from '../../css/buttons.js'
-import '../../svg/double-round-arrows.js'
+import '../../svg/chevron-left.js'
 
 class PriceInput extends LitElement {
     static properties = {
@@ -22,14 +22,28 @@ class PriceInput extends LitElement {
         return [
             buttonStyles,
             css`
-                .price-input-container {
-                    display: grid;
-                    grid-template-columns: repeat(2, 1fr) auto;
-                    gap: 10px;
+                .header {
+                    display: flex;
+                    justify-content: space-between;
                 }
                 
-                .single-input {
-                    grid-column: 1 / span 2;
+                .price-input-container {
+                    display: flex;
+                    flex-direction: column;
+                    
+                    .button {
+                        margin-left: auto;
+                    }
+
+                    chevron-left-icon {
+                        transform: rotate(-90deg);
+                    }
+                }
+                
+                .two-input-container {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: var(--spacing-small);
                 }
                 
                 .button-text {
@@ -97,22 +111,36 @@ class PriceInput extends LitElement {
 
     render() {
         return html`
-            <strong>Price</strong>
             <div class="price-input-container">
+                <div class="header">
+                    <strong>Price</strong>
+                    <button @click=${this._toggleMode} class="button small-link-button">
+                    <span class="button-text">
+                        ${this.isRange ? 'Switch to Single Price' : 'Switch to Range'}
+                    </span>
+                        <chevron-left-icon></chevron-left-icon>
+                    </button>
+                </div>
+                
                 ${this.isRange
                         ? html`
-                            <custom-input
-                                    type="number"
-                                    placeholder="Min Price"
-                                    .value=${this.minPrice ?? ''}
-                                    @input=${this._onMinPriceChange}
-                            ></custom-input>
-                            <custom-input
-                                    type="number"
-                                    placeholder="Max Price"
-                                    .value=${this.maxPrice ?? ''}
-                                    @input=${this._onMaxPriceChange}
-                            ></custom-input>
+                            <div class="two-input-container">
+                                <custom-input
+                                        class="small-input"
+                                        type="number"
+                                        placeholder="Min Price"
+                                        .value=${this.minPrice ?? ''}
+                                        @input=${this._onMinPriceChange}
+                                ></custom-input>
+                                <custom-input
+                                        class="small-input"
+                                        type="number"
+                                        placeholder="Max Price"
+                                        .value=${this.maxPrice ?? ''}
+                                        @input=${this._onMaxPriceChange}
+                                ></custom-input>
+                            </div>
+                            
                         `
                         : html`
                             <custom-input
@@ -123,12 +151,6 @@ class PriceInput extends LitElement {
                                     @input=${this._onSinglePriceChange}
                             ></custom-input>
                         `}
-                <button @click=${this._toggleMode} class="button primary">
-                    <span class="button-text">
-                        ${this.isRange ? 'Switch to Single Price' : 'Switch to Range'}
-                    </span>
-                    <double-round-arrows-icon></double-round-arrows-icon>
-                </button>
             </div>
         `;
     }

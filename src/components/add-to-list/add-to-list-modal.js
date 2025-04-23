@@ -18,26 +18,25 @@ import {invalidateCache} from "../../helpers/caching.js";
 
 export class AddToListModal extends LitElement {
     static properties = {
-        advancedOpen: { type: Boolean },
-        selectedListIds: { type: Array },
+        advancedOpen: {type: Boolean},
+        selectedListIds: {type: Array},
         // Form state variables
-        itemName: { type: String },
+        itemName: {type: String},
         isPriceRange: {type: Boolean},
         singlePrice: {type: Number},
         minPrice: {type: Number},
         maxPrice: {type: Number},
-        links: { type: Array },
-        notes: { type: String },
-        images: { type: Array },
-        amount: { type: String },
-        minAmount: { type: Number },
-        maxAmount: { type: Number },
-        priority: { type: Number },
-        isPublic: { type: Boolean },
-        autoDelete: { type: Boolean },
-        visibility: { type: String },
+        links: {type: Array},
+        notes: {type: String},
+        images: {type: Array},
+        amount: {type: String},
+        minAmount: {type: Number},
+        maxAmount: {type: Number},
+        priority: {type: Number},
+        isPublic: {type: Boolean},
+        autoDelete: {type: Boolean},
+        visibility: {type: String},
     };
-
 
 
     constructor() {
@@ -50,7 +49,7 @@ export class AddToListModal extends LitElement {
         this.singlePrice = 0;
         this.minPrice = 0;
         this.maxPrice = 0;
-        this.links = [{ url: '', displayName: '' }];
+        this.links = [{url: '', displayName: ''}];
         this.notes = '';
         this.images = [];
         this.amount = '';
@@ -68,32 +67,50 @@ export class AddToListModal extends LitElement {
         return [
             buttonStyles,
             css`
+                .modal-header {
+                }
+
+                .modal-footer {
+                }
+
                 .modal-title {
                     padding: var(--spacing-normal);
                     background-color: light-dark(var(--mint-300), var(--mint-800));
                     margin: 0;
                     text-align: center;
                 }
-                
-                .modal-contents {
+
+                .left-column {
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-normal);
+                }
+
+                .right-column {
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-normal);
+                }
+
+                .scrolling-contents {
                     display: grid;
                     gap: var(--spacing-normal);
                     grid-template-columns: 1fr;
                     padding: var(--spacing-normal);
                 }
-                
+
                 @media (min-width: 768px) {
-                    .modal-contents {
-                        grid-template-columns: 1fr;
+                    .scrolling-contents {
+                        grid-template-columns: 1fr 1fr;
                     }
                 }
-                
+
                 .save-button {
                     position: sticky;
                     bottom: 0;
                     left: 0;
                     width: 100%;
-                    
+
                     box-shadow: 0 83px 20px 100px var(--modal-background-color);
                 }
             `
@@ -157,7 +174,7 @@ export class AddToListModal extends LitElement {
         this.singlePrice = 0;
         this.minPrice = 0;
         this.maxPrice = 0;
-        this.links = [{ url: '', displayName: '' }];
+        this.links = [{url: '', displayName: ''}];
         this.notes = '';
         this.images = [];
         this.amount = '';
@@ -181,57 +198,79 @@ export class AddToListModal extends LitElement {
     render() {
         return html`
             <custom-modal triggerEvent="${ADD_MODAL_EVENT}" noPadding="true">
-                <h2 class="modal-title">Add To List</h2>
+
                 <form @submit=${this._submitHandler} class="modal-contents">
-                    <select-my-lists @change="${this._handleSelectedListsChange}"></select-my-lists>
-                    <div>
-                        <custom-input .value="${this.itemName}" id="item-name-input" label="Item Name" fullWidth="true" placeholder="Item Name"
-                        @value-changed="${(e) => this.itemName = e.detail.value}"></custom-input>
+                    <div class="modal-header">
+                        <h2 class="modal-title">Add To List</h2>
                     </div>
-                    <div>
-                        <price-input
-                                .isRange="${this.isPriceRange}"
-                                .singlePrice="${this.singlePrice}"
-                                .minPrice="${this.minPrice}"
-                                .maxPrice="${this.maxPrice}"
-                                @price-change="${this._handlePriceChange}"
-                        ></price-input>
+                    <div class="scrolling-contents">
+                        <div class="left-column">
+                            <div>
+                                <custom-input .value="${this.itemName}"
+                                              label="Item Name"
+                                              id="item-name-input"
+                                              fullWidth="true"
+                                              placeholder="Item Name"
+                                              @value-changed="${(e) => this.itemName = e.detail.value}"></custom-input>
+                            </div>
+                            <div>
+                                <price-input
+                                        .isRange="${this.isPriceRange}"
+                                        .singlePrice="${this.singlePrice}"
+                                        .minPrice="${this.minPrice}"
+                                        .maxPrice="${this.maxPrice}"
+                                        @price-change="${this._handlePriceChange}"
+                                ></price-input>
+                            </div>
+                            <div>
+                                <multi-input .values="${this.links}"
+                                             sectionName="Link(s)"
+                                             placeholder= ${'https://..., Display Name'}
+                                             @values-change="${(e) => this.links = e.detail.values}">
+                                </multi-input>
+                            </div>
+                            <priority-selector
+                                    .value="${this.priority}"
+                                    @priority-changed="${(e) => this.priority = e.detail.value}"
+                            ></priority-selector>
+                            <images-selector .images="${this.images}"
+                                             @images-changed="${(e) => this.images = e.detail.images}"></images-selector>
+                            <amount-you-want
+                                    .amount="${this.amount}"
+                                    .min="${this.minAmount}"
+                                    .max="${this.maxAmount}"
+                                    @amount-changed="${this._handleAmountChange}"
+                            ></amount-you-want>
+                         
+                        </div>
+
+                        <div class="right-column">
+                            <select-my-lists @change="${this._handleSelectedListsChange}"></select-my-lists>
+                            <wysiwyg-editor
+                                    @content-changed=${(e) => this.notes = e.detail.content}
+                                    content="${this.notes}"
+                            ></wysiwyg-editor>
+                        </div>
+
+
+                        <button type="button" class="button primary" @click=${this._handleToggleAdvancedOptions}>
+                            ${this.advancedOpen ? "Hide Advanced Options" : "Show Advanced Options"}
+                        </button>
+                        ${this.advancedOpen ? this.renderAdvancedOptions() : ''}
+
                     </div>
-                    <div>
-                        <multi-input .values="${this.links}" 
-                                     sectionName="Link(s)" 
-                                     placeholder=${'url, displayName'}
-                                     @values-change="${(e) => this.links = e.detail.values}">
-                        </multi-input>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="button primary save-button">Save Item</button>
                     </div>
-                    <wysiwyg-editor
-                            @content-changed=${(e) => this.notes = e.detail.content}
-                            content="${this.notes}"
-                    ></wysiwyg-editor>
-                    <images-selector .images="${this.images}"
-                        @images-changed="${(e) => this.images = e.detail.images}"></images-selector>
-                    <amount-you-want
-                            .amount="${this.amount}"
-                            .min="${this.minAmount}"
-                            .max="${this.maxAmount}"
-                            @amount-changed="${this._handleAmountChange}"
-                    ></amount-you-want>
-                    <priority-selector
-                            .value="${this.priority}"
-                            @priority-changed="${(e) => this.priority = e.detail.value}"
-                    ></priority-selector>
-                    <button type="button" class="button primary" @click=${this._handleToggleAdvancedOptions}>${this.advancedOpen ? "Hide Advanced Options" : "Show Advanced Options"}</button>
-                    ${this.advancedOpen ? this.renderAdvancedOptions() : ''}
-                    
-                    <button type="submit" class="button primary save-button">Save Item</button>
                 </form>
-                
+
             </custom-modal>
-    `;
+        `;
     }
 
     _handlePriceChange(e) {
-        const { isRange, singlePrice, minPrice, maxPrice } = e.detail;
+        const {isRange, singlePrice, minPrice, maxPrice} = e.detail;
         this.isPriceRange = isRange;
         this.singlePrice = singlePrice;
         this.minPrice = minPrice;
@@ -239,15 +278,16 @@ export class AddToListModal extends LitElement {
     }
 
     _handleAmountChange(e) {
-        const { amount, min, max } = e.detail;
+        const {amount, min, max} = e.detail;
         this.amount = amount;
         this.minAmount = min;
         this.maxAmount = max;
     }
 
     _handleSelectedListsChange(e) {
-        const { selectedListIds } = e.detail;
+        const {selectedListIds} = e.detail;
         this.selectedListIds = selectedListIds;
     }
 }
+
 customElements.define('add-to-list-modal', AddToListModal);

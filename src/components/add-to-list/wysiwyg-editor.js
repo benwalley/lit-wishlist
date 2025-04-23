@@ -1,104 +1,157 @@
 import { LitElement, html, css } from 'lit';
 
-class WysiwygEditor extends LitElement {
+/**
+ * <wysiwyg-editor>
+ * Lightweight, dependency-free rich-text editor with a minimalist toolbar
+ * that matches the mock-up provided by the Product team (bold, italic, list).
+ *
+ * Usage:
+ *   <wysiwyg-editor
+ *       placeholder="Add notes about this item…"
+ *       @content-changed=${e => console.log(e.detail.content)}>
+ *   </wysiwyg-editor>
+ */
+export class WysiwygEditor extends LitElement {
+    // ——————————————————————————————————————————————————————————  STYLES
     static styles = css`
-        .editor-toolbar {
-            border: 1px solid #ccc;
-            padding: 5px;
-            display: flex;
-            gap: 5px;
+        :host {
+            display: block;
+            font-family: "Inter", Arial, sans-serif;
         }
 
-        .editor {
-            border: 1px solid #ccc;
-            min-height: 200px;
-            padding: 10px;
-            margin-top: 5px;
-            font-family: Arial, sans-serif;
-            outline: none;
+        /* Outer wrapper gives us the rounded border visible in the mock-up */
+        .wrapper {
+            border: 1px solid var(--wysiwyg-border, #E0E3E6);
+            border-radius: 8px;
+            background: var(--wysiwyg-bg, #ffffff);
+            overflow: hidden; /* keep toolbar radius */
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            padding: 8px 12px;
+            background: var(--wysiwyg-toolbar-bg, #F7F8FA);
+            border-bottom: 1px solid var(--wysiwyg-border, #E0E3E6);
+            user-select: none;
         }
 
         button {
-            padding: 5px 10px;
+            all: unset; /* reset default styles */
             cursor: pointer;
-            border: 1px solid transparent;
+            font-size: 16px;
+            line-height: 1;
+            font-weight: 400;
+            color: var(--wysiwyg-icon, #111827);
         }
 
         button.active {
-            border: 1px solid #000;
-            background-color: #ddd;
+            font-weight: 700;
+        }
+
+        /* Editor area */
+        .editor {
+            padding: 12px 16px;
+            min-height: 144px; /* ≈ 200px mock-up */
+            font-size: 14px;
+            line-height: 1.55;
+            outline: none;
+        }
+
+        /* Placeholder – shown when editor is empty */
+        .editor:empty::before {
+            content: attr(data-placeholder);
+            color: var(--wysiwyg-placeholder, #9CA3AF);
         }
     `;
 
+    // ———————————————————————————————————————————————————————  PROPS
     static properties = {
+        /** Current HTML content */
         content: { type: String },
+        /** Placeholder text */
+        placeholder: { type: String },
     };
 
     constructor() {
         super();
-        this.content = '<p>Start editing here...</p>';
+        this.content = '';
+        this.placeholder = 'Start typing…';
     }
 
     firstUpdated() {
-        // Set the initial content after the component is added to the DOM
-        const editor = this.renderRoot.querySelector('.editor');
-        editor.innerHTML = this.content;
+        // Inject initial content once the component is in the DOM
+        const editor = this.#editor;
+        if (this.content) editor.innerHTML = this.content;
     }
 
-    updateContent() {
-        const editor = this.renderRoot.querySelector('.editor');
-        this.content = editor.innerHTML;
-
-        // Dispatch the content-changed event to notify the parent
-        this.dispatchEvent(
-            new CustomEvent('content-changed', {
-                detail: { content: this.content },
-            })
-        );
-        this.updateToolbarState();
+    // —————————————————————————————————————————————————————  GETTERS
+    get #editor() {
+        return this.renderRoot.querySelector('.editor');
     }
 
-    handleCommand(command, value = null) {
-        const editor = this.renderRoot.querySelector('.editor');
-        editor.focus();
-        document.execCommand(command, false, value);
-        this.updateContent();
+    // ——————————————————————————————————————————————  EVENT HANDLERS
+    #handleInput() {
+        this.content = this.#editor.innerHTML;
+        this.#emitChange();
     }
 
-    updateToolbarState() {
-        const boldActive = document.queryCommandState('bold');
-        const italicActive = document.queryCommandState('italic');
-        const bulletListActive = document.queryCommandState('insertUnorderedList');
-        const numberedListActive = document.queryCommandState('insertOrderedList');
-
-        this.updateButtonState('bold', boldActive);
-        this.updateButtonState('italic', italicActive);
-        this.updateButtonState('insertUnorderedList', bulletListActive);
-        this.updateButtonState('insertOrderedList', numberedListActive);
+    #handleCommand(command) {
+        this.#editor.focus();
+        document.execCommand(command);
+        this.#updateToolbarState();
+        this.#handleInput();
     }
 
-    updateButtonState(command, isActive) {
-        const button = this.renderRoot.querySelector(`button[data-command="${command}"]`);
-        if (button) {
-            button.classList.toggle('active', isActive);
-        }
+    // ———————————————————————————————————————————————  HELPERS
+    #emitChange() {
+        this.dispatchEvent(new CustomEvent('content-changed', {
+            detail: { content: this.content },
+            bubbles: true,
+            composed: true,
+        }));
     }
 
+    #updateToolbarState() {
+        const states = {
+            bold: document.queryCommandState('bold'),
+            italic: document.queryCommandState('italic'),
+            insertUnorderedList: document.queryCommandState('insertUnorderedList'),
+        };
+        Object.entries(states).forEach(([cmd, active]) => {
+            const btn = this.renderRoot.querySelector(`button[data-cmd="${cmd}"]`);
+            if (btn) btn.classList.toggle('active', active);
+        });
+    }
+
+    // —————————————————————————————————————————————————————————  RENDER
     render() {
         return html`
-      <div class="editor-toolbar">
-        <button data-command="bold" @click="${() => this.handleCommand('bold')}">Bold</button>
-        <button data-command="italic" @click="${() => this.handleCommand('italic')}">Italic</button>
-        <button data-command="insertUnorderedList" @click="${() => this.handleCommand('insertUnorderedList')}">Bullet List</button>
-        <button data-command="insertOrderedList" @click="${() => this.handleCommand('insertOrderedList')}">Numbered List</button>
+      <div class="wrapper">
+        <div class="toolbar">
+          <!-- Bold -->
+          <button data-cmd="bold" title="Bold (Ctrl+B)"
+            @click=${() => this.#handleCommand('bold')}><strong>B</strong></button>
+
+          <!-- Italic -->
+          <button data-cmd="italic" title="Italic (Ctrl+I)"
+            @click=${() => this.#handleCommand('italic')}>/</button>
+
+          <!-- Bullet List -->
+          <button data-cmd="insertUnorderedList" title="Bullet list"
+            @click=${() => this.#handleCommand('insertUnorderedList')}>≡</button>
+        </div>
+
+        <!-- Editable area -->
+        <div class="editor"
+             contenteditable="true"
+             data-placeholder=${this.placeholder}
+             @input=${this.#handleInput}
+             @keyup=${this.#updateToolbarState}
+             @mouseup=${this.#updateToolbarState}></div>
       </div>
-      <div
-        class="editor"
-        contenteditable="true"
-        @input="${this.updateContent}"
-        @keyup="${this.updateToolbarState}"
-        @mouseup="${this.updateToolbarState}"
-      ></div>
     `;
     }
 }

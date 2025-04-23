@@ -1,29 +1,12 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from '../../css/buttons.js';
 import '../global/custom-input.js';
+import '../../svg/chevron-left.js';
 
 class AmountSelector extends LitElement {
-    static styles = [
-        buttonStyles,
-        css`
-      .amount-input {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 1em;
-      }
-      .advanced-options {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-top: 10px;
-      }
-    `
-    ];
-
     static properties = {
+        isRange: {type: Boolean, reflect: true},
         amount: {type: String, reflect: true},
-        showAdvanced: {type: Boolean},
         min: {type: Number, reflect: true},
         max: {type: Number, reflect: true}
     };
@@ -31,13 +14,58 @@ class AmountSelector extends LitElement {
     constructor() {
         super();
         this.amount = "";
-        this.showAdvanced = false;
+        this.isRange = false;
         this.min = null;
         this.max = null;
     }
 
-    toggleAdvancedOptions() {
-        this.showAdvanced = !this.showAdvanced;
+    static get styles() {
+        return [
+            buttonStyles,
+            css`
+                .header {
+                    display: flex;
+                    justify-content: space-between;
+                }
+                
+                .amount-input-container {
+                    display: flex;
+                    flex-direction: column;
+                    
+                    .button {
+                        margin-left: auto;
+                    }
+
+                    chevron-left-icon {
+                        transform: rotate(-90deg);
+                    }
+                }
+                
+                .two-input-container {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: var(--spacing-small);
+                }
+                
+                .button-text {
+                    display: none;
+                }
+                
+                @media (min-width: 768px) {
+                    .button-text {
+                        display: block;
+                    }
+                }
+            `
+        ];
+    }
+
+    _toggleMode() {
+        this.isRange = !this.isRange;
+        this.amount = "";
+        this.min = null;
+        this.max = null;
+        this._emitChange();
     }
 
     _handleInputChange(e) {
@@ -47,9 +75,20 @@ class AmountSelector extends LitElement {
         this._emitChange();
     }
 
+    _onMinChange(e) {
+        this.min = parseFloat(e.target.value) || null;
+        this._emitChange();
+    }
+
+    _onMaxChange(e) {
+        this.max = parseFloat(e.target.value) || null;
+        this._emitChange();
+    }
+
     _emitChange() {
         this.dispatchEvent(new CustomEvent('amount-changed', {
             detail: {
+                isRange: this.isRange,
                 amount: this.amount,
                 min: this.min,
                 max: this.max
@@ -61,42 +100,50 @@ class AmountSelector extends LitElement {
 
     render() {
         return html`
-      <h3>Amount You Want</h3>
-
-      <div class="amount-input">
-        <custom-input
-          type="text"
-          name="amount"
-          placeholder="Amount you want (number or text)"
-          .value="${this.amount}"
-          @input="${this._handleInputChange}"
-        ></custom-input>
-        <button class="button primary" @click="${this.toggleAdvancedOptions}">
-          Set Min/Max
-        </button>
-      </div>
-
-      ${this.showAdvanced
-            ? html`
-            <div class="advanced-options">
-              <custom-input
-                type="number"
-                name="min"
-                .value="${this.min}"
-                @input="${this._handleInputChange}"
-                placeholder="Min"
-              ></custom-input>
-              <custom-input
-                type="number"
-                name="max"
-                .value="${this.max}"
-                @input="${this._handleInputChange}"
-                placeholder="Max"
-              ></custom-input>
-            </div>`
-            : ''
-        }
-    `;
+            <div class="amount-input-container">
+                <div class="header">
+                    <strong>Amount You Want</strong>
+                    <button @click=${this._toggleMode} class="button small-link-button">
+                        <span class="button-text">
+                            ${this.isRange ? 'Switch to Single Amount' : 'Switch to Range'}
+                        </span>
+                        <chevron-left-icon></chevron-left-icon>
+                    </button>
+                </div>
+                
+                ${this.isRange
+                    ? html`
+                        <div class="two-input-container">
+                            <custom-input
+                                class="small-input"
+                                type="number"
+                                name="min"
+                                placeholder="Min Amount"
+                                .value=${this.min ?? ''}
+                                @input=${this._onMinChange}
+                            ></custom-input>
+                            <custom-input
+                                class="small-input"
+                                type="number"
+                                name="max"
+                                placeholder="Max Amount"
+                                .value=${this.max ?? ''}
+                                @input=${this._onMaxChange}
+                            ></custom-input>
+                        </div>
+                    `
+                    : html`
+                        <custom-input
+                            class="single-input"
+                            type="text"
+                            name="amount"
+                            placeholder="Amount"
+                            .value=${this.amount}
+                            @input=${this._handleInputChange}
+                        ></custom-input>
+                    `}
+            </div>
+        `;
     }
 }
 

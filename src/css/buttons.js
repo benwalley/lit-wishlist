@@ -133,6 +133,21 @@ export default css`
             }
 
         }
+        
+        &.small-link-button {
+            color: var(--purple-normal);
+            background: none;
+            padding: 2px;
+            border: none;
+            font-size: var(--font-size-x-small);
+            gap: 2px;
+
+
+            &:hover {
+                transform: none;
+                color: var(--purple-darker);
+            }
+        }
 
 
         &:disabled {
