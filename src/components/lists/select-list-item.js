@@ -1,13 +1,6 @@
 import {LitElement, html, css} from 'lit';
-import buttonStyles from "../../css/buttons";
 import '../pages/account/avatar.js';
-import '../../svg/delete.js'
-import '../../svg/edit.js'
-import '../../svg/arrow-long.js'
-import '../../svg/eye.js'
-import '../global/custom-tooltip.js'
-import '../../svg/checkbox-empty.js'
-import '../../svg/checkbox-checked.js'
+import '../../svg/check.js'
 
 export class CustomElement extends LitElement {
     static properties = {
@@ -22,46 +15,75 @@ export class CustomElement extends LitElement {
     }
 
     static get styles() {
-        return [
-            buttonStyles,
-            css`
-                :host {
-                    display: flex;
-                    flex-direction: row;
-                    align-items: center;
-                    gap: var(--spacing-small);
-                    border-bottom: 1px solid var(--border-color);
-                    margin: 0;
-                }
-                
-                h3 {
-                    margin: 0;
-                    margin-right: auto;
-                }
-                
-                .containing-button {
-                    display: flex;
-                    gap: var(--spacing-small);
-                    align-items: center;
-                    padding: 5px;
-                    border: none;
-                    border-radius: 0;
-                    width: 100%;
-                    cursor: pointer;
-                    background: none;
-                }
-                
-                .containing-button.selected {
-                    background-color: color-mix(in srgb, var(--primary-color), light-dark(#ffffff, #000000) 80%);;
-                }
+        return css`
+            :host {
+                display: block;
+                color: var(--text-color-dark);
+            }
 
-                .checkbox {
-                    color: var(--blue);
-                    display: flex;
-                }
-                
-            `
-        ];
+            button.list-container {
+                display: flex;
+                align-items: center;
+                width: 100%;
+                padding: var(--spacing-x-small);
+                border: none;
+                background: none;
+                cursor: pointer;
+                text-align: left;
+                gap: 8px;
+                transition: var(--transition-normal);
+                border-radius: var(--border-radius-small);
+            }
+
+            button.list-container:hover {
+                background-color: var(--background-light);
+            }
+            
+            button.list-container.selected {
+                background-color: var(--background-light);
+            }
+            
+            .checkbox {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 16px;
+                height: 16px;
+                border-radius: 4px;
+                border: 2px solid var(--grayscale-300);
+                transition: var(--transition-normal);
+            }
+            
+            .checkbox.selected {
+                border-color: var(--blue-normal);
+                background-color: var(--blue-normal);
+                color: white;
+            }
+            
+            check-icon {
+                width: 16px;
+                height: 16px;
+                color: white;
+            }
+            
+            .list-info {
+                flex: 1;
+                display: flex;
+                gap: 2px;
+                flex-direction: column;
+            }
+
+            .list-name {
+                font-size: var(--font-size-small);
+                font-weight: bold;
+                color: var(--text-color-dark);
+            }
+
+            .list-desc {
+                font-size: var(--font-size-x-small);
+                color: var(--text-color-medium-dark);
+            }
+        `;
     }
 
     _handleItemClick() {
@@ -73,18 +95,24 @@ export class CustomElement extends LitElement {
     render() {
         return html`
             <button 
-                    class="containing-button ${this.isSelected ? 'selected' : ''}" 
-                    @click="${this._handleItemClick}"
+                class="list-container ${this.isSelected ? 'selected' : ''}" 
+                @click="${this._handleItemClick}"
             >
-                <span class="checkbox">
-                    ${this.isSelected ?
-                            html`<checkbox-checked-icon></checkbox-checked-icon>` :
-                            html`<checkbox-empty-icon></checkbox-empty-icon>`}
-                </span>
-                <custom-avatar size="24" username="${this.itemData.listName}"></custom-avatar>
-                <h3>${this.itemData.listName}</h3>
-                
-                
+                <div class="checkbox ${this.isSelected ? 'selected' : ''}">
+                    ${this.isSelected ? html`<check-icon></check-icon>` : null}
+                </div>
+                <custom-avatar 
+                    size="24" 
+                    username="${this.itemData.listName}" 
+                    imageId="${this.itemData.image}"
+                ></custom-avatar>
+                <div class="list-info">
+                    <div class="list-name">${this.itemData.listName}</div>
+                    ${this.itemData.description 
+                        ? html`<div class="list-desc">${this.itemData.description}</div>` 
+                        : null
+                    }
+                </div>
             </button>
         `;
     }
