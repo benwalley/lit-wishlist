@@ -147,6 +147,7 @@ export default css`
             padding: 0;
             background: none;
             border-radius: 0;
+            color: var(--link-color);
         }
         
         &:hover,

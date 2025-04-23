@@ -4,17 +4,23 @@ import './login-account-link.js'
 import './notifications.js'
 import './dark-mode-toggle.js'
 import '../../svg/hamburger.js'
+import '../../svg/arrow-long-left.js'
 import buttonStyles from '../../css/buttons.js'
 import {observeState} from 'lit-element-state';
 import {globalState} from "../../state/globalStore.js";
 
 export class HeaderContainer extends observeState(LitElement) {
     static properties = {
-
+        showBackButton: { type: Boolean }
     };
 
     constructor() {
         super();
+        this.showBackButton = true;
+    }
+
+    goBack() {
+        window.history.back();
     }
 
     static get styles() {
@@ -46,8 +52,24 @@ export class HeaderContainer extends observeState(LitElement) {
                 
                 .mobile-sidebar-toggle {
                     display: flex;
-                    margin-right: auto;
+                    margin-right: 16px;
                     font-size: var(--font-size-large);
+                }
+                
+                .back-button {
+                    display: flex;
+                    font-size: var(--font-size-large);
+                    margin-right: auto;
+                }
+                
+                .back-button:hover {
+                    color: var(--primary-color);
+                }
+                
+                .header-left {
+                    display: flex;
+                    align-items: center;
+                    margin-right: auto;
                 }
                 
                 @media (min-width: 768px) {
@@ -58,7 +80,10 @@ export class HeaderContainer extends observeState(LitElement) {
                         gap: 16px;
                     }
                     .mobile-sidebar-toggle {
-                        display: none
+                        display: none;
+                    }
+                    .back-button {
+                        margin-right: 0;
                     }
                 }
             `
@@ -73,14 +98,26 @@ export class HeaderContainer extends observeState(LitElement) {
     render() {
         return html`
             <header class="header">
-                <button @click="${this._handleToggleMobile}" class="mobile-sidebar-toggle button icon-button">
-                    <hamburger-icon></hamburger-icon>
-                </button>
+                <div class="header-left">
+                    <button @click="${this._handleToggleMobile}" class="mobile-sidebar-toggle button icon-button">
+                        <hamburger-icon></hamburger-icon>
+                    </button>
+                    ${this.showBackButton ? html`
+                        <button @click="${this.goBack}" 
+                            class="back-button button icon-button" 
+                            title="Go back"
+                                style="--icon-color: var(--blue-normal); 
+                                --icon-color-hover: var(--blue-darker); 
+                                --icon-hover-background: var(--blue-light)"
+                        >
+                            <arrow-long-left-icon></arrow-long-left-icon>
+                        </button>
+                    ` : ''}
+                </div>
                 <dark-mode-toggle></dark-mode-toggle>
                 <notifications-element></notifications-element>
                 <div class="divider"></div>
                 <login-account-link></login-account-link>
-
             </header>
         `;
     }

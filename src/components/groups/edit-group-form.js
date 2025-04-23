@@ -3,59 +3,50 @@ import buttonStyles from "../../css/buttons";
 import '../../svg/x.js';
 import '../../svg/camera.js';
 import '../global/custom-input.js';
-import {observeState} from 'lit-element-state';
-import {userState} from "../../state/userStore.js";
-import {listenToCustomEvent} from "../../events/custom-events.js";
-import {customFetch} from "../../helpers/fetchHelpers.js";
-import {updateUserData} from "../../helpers/api/users.js";
-import {messagesState} from "../../state/messagesStore.js";
 import '../global/image-changer.js';
-import {listenUserUpdated} from "../../events/eventListeners.js";
+import {updateGroup} from "../../helpers/api/groups.js";
+import {messagesState} from "../../state/messagesStore.js";
+import {triggerGroupUpdated} from "../../events/eventListeners.js";
+import '../pages/account/avatar.js';
 
-export class CustomElement extends observeState(LitElement) {
+export class EditGroupForm extends LitElement {
     static properties = {
-        value: { type: String },
-        imageId: {type: Number},
-        username: { type: String },
-        description: { type: String },
-        errorMessage: { type: String } // New property to hold error messages
+        groupData: { type: Object },
+        imageId: { type: Number },
+        groupName: { type: String },
+        groupDescription: { type: String },
+        errorMessage: { type: String }
     };
 
     constructor() {
         super();
+        this.groupData = {};
         this.imageId = 0;
-        this.value = '';
-        this.username = '';
-        this.description = '';
+        this.groupName = '';
+        this.groupDescription = '';
         this.errorMessage = '';
     }
 
     connectedCallback() {
         super.connectedCallback();
-        this.setUserData();
-        listenUserUpdated(this.setUserData)
+        this.setGroupData();
     }
 
-    disconnectedCallback() {
-        super.disconnectedCallback();
-    }
-
-    setUserData = () => {
-        if (userState?.userData) {
-            this.imageId = userState.userData.image || 0;
-            this.username = userState.userData.name || '';
-            this.description = userState.userData.publicDescription || '';
+    setGroupData() {
+        if (this.groupData) {
+            this.imageId = this.groupData.groupImage || 0;
+            this.groupName = this.groupData.groupName || '';
+            this.groupDescription = this.groupData.groupDescription || '';
         }
-        console.log(userState?.userData)
     }
 
-    _onUsernameChanged(e) {
-        this.username = e.detail.value;
+    _onGroupNameChanged(e) {
+        this.groupName = e.detail.value;
         this.errorMessage = '';
     }
 
     _onDescriptionChanged(e) {
-        this.description = e.detail.value;
+        this.groupDescription = e.detail.value;
         this.errorMessage = '';
     }
 
@@ -66,34 +57,40 @@ export class CustomElement extends observeState(LitElement) {
 
     _close(clear) {
         if (clear) {
-            this.description = userState.userData.publicDescription || '';
-            this.username = userState.userData.name || '';
-            this.imageId = userState.userData?.imageId || 0;
+           this._clearForm();
         }
-        this.dispatchEvent(new CustomEvent('close-edit-user-modal'));
+        this.dispatchEvent(new CustomEvent('close-edit-group-modal'));
+    }
+
+    _clearForm() {
+        this.groupDescription = this.groupData.groupDescription || '';
+        this.groupName = this.groupData.groupName || '';
+        this.imageId = this.groupData.groupImage || 0;
     }
 
     async _handleSave() {
-        if (!userState.userData.id) return;
+        if (!this.groupData.id) return;
+
+        if (!this.groupName.trim()) {
+            this._showError('Group name is required');
+            return;
+        }
+
         const data = {
-            image: this.imageId,
-            name: this.username,
-            publicDescription: this.description,
-            userId: userState.userData.id,
+            id: this.groupData.id,
+            groupImage: this.imageId,
+            groupName: this.groupName,
+            groupDescription: this.groupDescription,
         };
-        const response = await updateUserData(data);
+
+        const response = await updateGroup(data);
         if (response.success) {
-            messagesState.addMessage('User info successfully updated');
+            messagesState.addMessage('Group successfully updated');
+            triggerGroupUpdated();
             this._close();
         } else {
-            this._showError(
-                response.message || 'There was an error saving your user. Please try again.'
-            );
+            messagesState.addMessage( response.error?.message || 'There was an error updating the group. Please try again.', 'error')
         }
-    }
-
-    _showError(message) {
-        this.errorMessage = message;
     }
 
     static get styles() {
@@ -101,7 +98,7 @@ export class CustomElement extends observeState(LitElement) {
             buttonStyles,
             css`
                 :host {
-                    /* host styles if needed */
+                    display: block;
                 }
 
                 .header {
@@ -111,6 +108,7 @@ export class CustomElement extends observeState(LitElement) {
                     justify-content: space-between;
                     border-bottom: 1px solid var(--border-color);
                 }
+                
                 .header h2 {
                     margin: 0;
                 }
@@ -123,7 +121,8 @@ export class CustomElement extends observeState(LitElement) {
                     padding: var(--spacing-normal);
                     gap: var(--spacing-normal);
                 }
-                .content .user-image {
+                
+                .content .group-image {
                     position: relative;
                     display: flex;
                 }
@@ -137,9 +136,8 @@ export class CustomElement extends observeState(LitElement) {
                     justify-content: flex-end;
                 }
 
-                /* Error message styles */
                 .error {
-                    color: red;
+                    color: var(--delete-red);
                     font-size: 0.9em;
                     margin: 10px 0;
                     text-align: center;
@@ -151,38 +149,33 @@ export class CustomElement extends observeState(LitElement) {
     render() {
         return html`
             <div class="header">
-                <h2>Edit Profile</h2>
+                <h2>Edit Group</h2>
             </div>
             <div class="content">
-                
-                <div class="user-image">
-                    <!-- Use the component's username property -->
+                <div class="group-image">
                     <custom-avatar size="120" 
                                    shadow 
-                                   username="${this.username}" 
-                                   imageId="${this.imageId}">
+                                   username="${this.groupName}" 
+                                   imageid="${this.imageId}">
                     </custom-avatar>
-                    <image-changer  
-                                    imageId="${this.imageId}"
-                                    @image-updated="${this._onImageChanged}"></image-changer>
+                    <image-changer imageId="${this.imageId}"
+                                  @image-updated="${this._onImageChanged}"></image-changer>
                 </div>
-                <span>Click the camera to change your profile picture</span>
+                <span>Click the camera to change your group picture</span>
 
-                <!-- Listen for value-changed events to update properties -->
                 <custom-input
-                        placeholder="Username"
+                        placeholder="Group Name"
                         showLabel
-                        value="${this.username}"
-                        @value-changed="${this._onUsernameChanged}"
+                        value="${this.groupName}"
+                        @value-changed="${this._onGroupNameChanged}"
                 ></custom-input>
                 <custom-input
-                        placeholder="Description"
+                        placeholder="Group Description"
                         showLabel
-                        value="${this.description}"
+                        value="${this.groupDescription}"
                         @value-changed="${this._onDescriptionChanged}"
                 ></custom-input>
 
-                <!-- Error message -->
                 ${this.errorMessage ? html`<div class="error">${this.errorMessage}</div>` : ''}
             </div>
             <div class="footer">
@@ -197,4 +190,4 @@ export class CustomElement extends observeState(LitElement) {
     }
 }
 
-customElements.define('edit-user-form', CustomElement);
+customElements.define('edit-group-form', EditGroupForm);

@@ -1,8 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../../../css/buttons";
+import '../../../../svg/restore.js';
 import '../../../../svg/delete.js';
-import '../../../../svg/edit.js';
-import '../../../../svg/share.js';
 import '../../../global/custom-tooltip.js';
 import {observeState} from 'lit-element-state';
 import {getUsernameById} from '../../../../helpers/generalHelpers.js';
@@ -98,30 +97,31 @@ export class CustomElement extends observeState(LitElement) {
         ];
     }
 
-    _handleEditQuestion() {
-        this.dispatchEvent(new CustomEvent('edit-question', {
+    _handleRestoreQuestion() {
+        this.dispatchEvent(new CustomEvent('restore-question', {
             detail: {question: this.question},
             bubbles: true,
             composed: true
         }));
     }
 
-    async _handleDeleteQuestion() {
+    async _handleForceDeleteQuestion() {
         const confirmed = await showConfirmation({
-            message: 'Are you sure you want to delete this question?',
-            submessage: 'The users who answerd this question will still see it with a message telling them it was deleted',
+            message: 'Are you sure you want to permanently delete this question and all of its answers?',
+            submessage: 'This action cannot be undone, and it will remove the question from all users.',
             heading: 'Delete Item?',
             confirmLabel: 'Yes, Delete',
             cancelLabel: 'No, Keep it'
         });
 
         if (confirmed) {
-            this.dispatchEvent(new CustomEvent('delete-question', {
+            this.dispatchEvent(new CustomEvent('force-delete-question', {
                 detail: {question: this.question},
                 bubbles: true,
                 composed: true
             }));
         }
+
     }
 
     render() {
@@ -129,54 +129,22 @@ export class CustomElement extends observeState(LitElement) {
             <div class="question-card">
                 <div class="question-header">
                     <h2 class="question-text">${this.question.questionText}</h2>
-                    <button class="shared-button icon-button" aria-label="Shared With"
-                            style="--icon-color: var(--primary-color); 
-                                            --icon-color-hover: var(--primary-color-darker); 
-                                            --icon-hover-background: var(--primary-color-light); 
-                                            font-size: var(--font-size-large)">
-                        <share-icon></share-icon>
-                    </button>
-                    <custom-tooltip style="min-width: 200px;" class="shared-with-list">
-                        ${this.question.sharedWithGroups && this.question.sharedWithGroups.length > 0 ? html`
-                            <h4>Groups</h4>
-                            <ul>
-                                ${this.question.sharedWithGroups.map(group => html`
-                                    <li>
-                                        <span>${group.groupName}</span>
-                                        <custom-avatar size="20"
-                                                       username="${group.groupName}"></custom-avatar>
-                                    </li>
-                                `)}
-                            </ul>
-                        ` : ''}
-
-                        ${this.question.sharedWithUsers && this.question.sharedWithUsers.length > 0 ? html`
-                            <h4>Users</h4>
-                            <ul>
-                                ${this.question.sharedWithUsers.map(user => html`
-                                    <li>
-                                        <span>${user.name}</span>
-                                        <custom-avatar size="20"
-                                                       username="${user.name}"></custom-avatar>
-                                    </li>
-                                `)}
-                            </ul>
-                        ` : ''}
-                    </custom-tooltip>
-
-                    <button class="edit-button icon-button"
-                            aria-label="Edit Question"
-                            @click="${this._handleEditQuestion}"
+                 
+                    <button class="restore-button icon-button"
+                            aria-label="Restore Question"
+                            @click="${this._handleRestoreQuestion}"
                             style="--icon-color: var(--blue-normal); 
                                             --icon-color-hover: var(--blue-darker); 
                                             --icon-hover-background: var(--blue-light); 
                                             font-size: var(--font-size-large)">
-                        <edit-icon></edit-icon>
+                        <restore-icon></restore-icon>
                     </button>
-
-                    <button class="delete-button icon-button"
-                            aria-label="Delete Question"
-                            @click="${this._handleDeleteQuestion}"
+                    <custom-tooltip style="min-width: 200px;" class="restore-item-tooltip">
+                        Restore item?
+                    </custom-tooltip>
+                    <button class="restore-button icon-button"
+                            aria-label="Restore Question"
+                            @click="${this._handleForceDeleteQuestion}"
                             style="--icon-color: var(--delete-red); 
                                             --icon-color-hover: var(--delete-red-darker); 
                                             --icon-hover-background: var(--delete-red-light); 
@@ -186,9 +154,9 @@ export class CustomElement extends observeState(LitElement) {
                 </div>
                 <div class="answers-list">
                     ${this.question.answers.length === 0
-                            ? html`
+            ? html`
                                 <div class="no-answers">No answers yet.</div>`
-                            : this.question.answers.map(answer => html`
+            : this.question.answers.map(answer => html`
                                 <div class="answer-item">
                                     <div class="answer-text">${answer.answerText}</div>
                                     <a href="/user/${answer.answererId}" class="user-info">
@@ -199,11 +167,11 @@ export class CustomElement extends observeState(LitElement) {
                                     </a>
                                 </div>
                             `)
-                    }
+        }
                 </div>
             </div>
         `;
     }
 }
 
-customElements.define('qa-page-question', CustomElement);
+customElements.define('qa-page-deleted-item', CustomElement);

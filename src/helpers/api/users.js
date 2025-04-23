@@ -2,6 +2,7 @@ import {customFetch} from "../fetchHelpers.js";
 import {getRefreshToken} from "../../localStorage/tokens.js";
 import {userState} from "../../state/userStore.js";
 import {triggerUpdateUser} from "../../events/eventListeners.js";
+import {userListState} from "../../state/userListStore.js";
 
 export async function getCurrentUser() {
     try {
@@ -76,4 +77,12 @@ export async function logout() {
     }
 }
 
+export async function getAccessibleUsers() {
+    try {
+        const users = await customFetch('/users/accessible', {}, true);
+        return users;
 
+    } catch (error) {
+        console.error('Error fetching users:', error);
+    }
+}

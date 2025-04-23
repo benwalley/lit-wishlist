@@ -48,7 +48,7 @@ export class CustomElement extends LitElement {
                     &:hover {
                         border: 1px solid var(--primary-color);
                         box-shadow: var(--shadow-1-soft);
-                        transform: scale(1.01);
+                        transform: translateY(-1px);
                     }
                 }
                 
@@ -115,10 +115,25 @@ export class CustomElement extends LitElement {
         }
     }
 
+    _handleEdit(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Import and use the openEditListModal function
+        import('./edit-list-modal.js').then(module => {
+            const { openEditListModal } = module;
+            openEditListModal(this.itemData);
+        });
+    }
+
     render() {
         return html`
             <a class="container" href="${`/list/${this.itemData.id}`}">
-               <custom-avatar size="35" username="${this.itemData.listName}"></custom-avatar>
+               <custom-avatar 
+                    size="35" 
+                    username="${this.itemData.listName}"
+                    imageId="${this.itemData.imageId}"
+               ></custom-avatar>
                 <div class="name-section">
                     <h3>${this.itemData.listName }</h3>
                     <div class="name-bottom-section">
@@ -142,8 +157,12 @@ export class CustomElement extends LitElement {
                     </div>
                     
                 </div>
-                <button class="edit-button icon-button" aria-label="Edit List Details"
-                        style="--icon-color: var(--blue)">
+                <button class="edit-button icon-button" 
+                        aria-label="Edit List Details"
+                        @click="${this._handleEdit}"
+                        style="--icon-color: var(--blue-normal); 
+                        --icon-color-hover: var(--blue-darker); 
+                        --icon-hover-background: var(--blue-light)">
                     <edit-icon style="width: 1em; height: 1em"></edit-icon>
                 </button>
                 <custom-tooltip>Edit this list</custom-tooltip>
@@ -152,7 +171,7 @@ export class CustomElement extends LitElement {
                         style="--icon-color: var(--delete-red); --icon-color-hover: var(--delete-red); --icon-hover-background: var(--delete-red-light)">
                     <delete-icon style="width: 1em; height: 1em"></delete-icon>
                 </button>
-                <custom-tooltip>Delete this list</custom-tooltip>
+                <custom-tooltip style="min-width: 150px;">Delete this list</custom-tooltip>
             </a>
         `;
     }

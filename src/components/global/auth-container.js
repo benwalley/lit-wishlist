@@ -1,12 +1,18 @@
 import {LitElement, html, css} from 'lit';
 import {observeState} from 'lit-element-state';
 import {userState} from '../../state/userStore.js';
+import {userListState} from "../../state/userListStore.js";
 import './loading-screen.js';
 import {initRouter, navigate} from "../../router/main-router.js";
-import {getCurrentUser} from "../../helpers/api/users.js";
+import {getAccessibleUsers, getCurrentUser} from "../../helpers/api/users.js";
 import {globalState} from "../../state/globalStore.js";
 import {triggerCustomEvent} from "../../events/custom-events.js";
-import {listenUpdateUser} from "../../events/eventListeners.js";
+import {
+    listenUpdateUser,
+    triggerInitialUserLoaded,
+    triggerUpdateUser,
+    triggerUserListLoaded
+} from "../../events/eventListeners.js";
 import '../global/messages-component.js'
 
 export class AuthContainer extends observeState(LitElement) {
@@ -28,6 +34,7 @@ export class AuthContainer extends observeState(LitElement) {
 
     async firstUpdated() {
         await this.fetchUserData();
+        await this.fetchAccessibleUsers();
         listenUpdateUser(this.fetchUserData)
     }
 
@@ -36,7 +43,7 @@ export class AuthContainer extends observeState(LitElement) {
             const userData = await getCurrentUser();
             userState.userData = userData;
             userState.loadingUser = false;
-            triggerCustomEvent('user-data-loaded');
+            triggerInitialUserLoaded()
             if (!userData?.id) {
                 navigate('/')
             }
@@ -44,7 +51,17 @@ export class AuthContainer extends observeState(LitElement) {
             console.log('user is not logged in')
             userState.loadingUser = false;
         }
+    }
 
+    async fetchAccessibleUsers() {
+        try {
+            const usersData = await getAccessibleUsers()
+            userListState.users = usersData;
+            userListState.loadingUsers = false;
+            triggerUserListLoaded()
+        } catch (e) {
+            userState.loadingUser = false;
+        }
     }
 
     render() {

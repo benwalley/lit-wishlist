@@ -2,26 +2,20 @@ import { LitElement, css, html, svg } from 'lit';
 
 export class CheckIcon extends LitElement {
     static styles = css`
-    :host {
-      /* Ensures the icon’s container is inline-block so it can be sized. */
-      display: inline-block;
+        :host {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            color: currentColor;
+        }
 
-      /* Default width/height (fallback) */
-      width: 1em;
-      height: 1em;
-
-      /* Default color (fallback) */
-      color: currentColor;
-    }
-
-    /* The SVG takes the full size of the host, and fill uses currentColor. */
-    svg {
-      width: 100%;
-      height: 100%;
-      fill: currentColor; 
-      display: block; /* remove inline SVG extra spacing */
-    }
-  `;
+        svg {
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
+            display: block;
+        }
+    `;
 
     render() {
         return svg`

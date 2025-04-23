@@ -33,12 +33,15 @@
 
     /* -- Brand/Theme Colors */
     --purple-normal: #4f46e5;
-    --purple-light: #eef2ff;
+    --purple-light: #4f46e514;
     --purple-darker: #4338ca;
+
     --green-normal: #059669;
-    --green-light: #ecfdf5;
-    --blue-normal: #3b82f6;   /* a vibrant blue */
-    --blue-light:  #eff6ff;   /* a very light blue that complements both dark and light backgrounds */
+    --green-light: #05966914;  /* Updated: ~8% opacity green */
+    --green-darker: #047857;
+
+    --blue-normal: #3b82f6;
+    --blue-light:  #3b82f614;  /* Updated: ~8% opacity blue */
     --blue-darker: #2563eb;
 
     /* -- Background */
@@ -85,7 +88,7 @@
     --light-border-color: var(--border-color-extra-light);
     --delete-red: #fd5858;
     --delete-red-darker: #d64444;
-    --delete-red-light: #ffeeee;
+    --delete-red-light: #fd585814;
     --success-green: #22c55e;
     --info-yellow: #f59e0b;
     --info-yellow-light: #fef3c7;
@@ -103,8 +106,14 @@
        5) Transitions
     =========================================== */
     --transition-normal: all 300ms ease-in-out;
+    --transition-200: all 200ms ease-in-out;
+    --transition-150: all 150ms ease-in-out;
+    --transition-100: all 100ms ease-in-out;
     @media (prefers-reduced-motion) {
         --transition-normal: none;
+        --transition-200: none;
+        --transition-150: none;
+        --transition-100: none;
     }
 
 
@@ -268,8 +277,6 @@ body[data-mode="dark"] {
     /* ===========================================
        6) Buttons
     =========================================== */
-    --link-button-hover-background: transparent;
-    --link-button-hover-background: #374151;
     --link-button-text: var(--grayscale-400);
     --link-button-hover-text: var(--grayscale-300);
 

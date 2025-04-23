@@ -2,7 +2,11 @@ import { LitElement, html, css } from 'lit';
 import {customFetch} from "../../../helpers/fetchHelpers.js";
 import '../../pages/account/avatar.js'
 import './item-tile.js'
+import '../../lists/edit-list-modal.js'
+import '../../../svg/edit.js'
+import {openEditListModal} from '../../lists/edit-list-modal.js'
 import {listenUpdateList} from "../../../events/eventListeners.js";
+import buttonStyles from '../../../css/buttons.js';
 
 export class ListViewContainer extends LitElement {
     static properties = {
@@ -50,6 +54,7 @@ export class ListViewContainer extends LitElement {
 
     static get styles() {
         return [
+            buttonStyles,
             css`
                 :host {
                     padding-bottom: var(--spacing-large);
@@ -64,11 +69,28 @@ export class ListViewContainer extends LitElement {
                         margin: 0;
                     }
                 }
+                
+                .header-content {
+                    flex-grow: 1;
+                }
+                
+                .header-actions {
+                    display: flex;
+                    gap: var(--spacing-small);
+                    margin-top: var(--spacing-x-small);
+                }
+                
+                .edit-button {
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                }
 
                 .list-items {
                     display: grid;
                     grid-template-columns: repeat(1, 1fr);
                     gap: var(--spacing-normal);
+                    padding: 0 var(--spacing-normal);
                 }
 
                 @media (min-width: 450px) {
@@ -100,6 +122,10 @@ export class ListViewContainer extends LitElement {
         const { itemId } = event.detail;
     }
 
+    _handleEditList() {
+        openEditListModal(this.listData);
+    }
+
     render() {
         // If this.loading is true, show a loading message
         if (this.loading) {
@@ -110,9 +136,14 @@ export class ListViewContainer extends LitElement {
         return html`
             <div class="list-header">
                 <custom-avatar size="100" username="${this.listData?.listName}"></custom-avatar>
-                <div>
+                <div class="header-content">
                     <h1>${this.listData?.listName}</h1>
                     <div>${this.listData?.description}</div>
+                    <div class="header-actions">
+                        <button class="secondary edit-button" @click="${this._handleEditList}">
+                            <edit-icon></edit-icon> Edit List
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="list-items">
@@ -120,6 +151,8 @@ export class ListViewContainer extends LitElement {
                 <item-tile .itemData="${item}" .listId="${this.listId}" @navigate="${this._navigateToItem}"></item-tile>
             `)}
             </div>
+            
+            <edit-list-modal></edit-list-modal>
         `;
     }
 }

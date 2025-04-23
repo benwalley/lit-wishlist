@@ -38,3 +38,28 @@
 - Use CSS variables for theming
 - Look in src/index.css for variables.
 - Follow existing design patterns in components
+
+### API fetching
+ - When fetching data from an API, return an object that includes:
+   - success: (true or false)
+   - data (response data if successful)
+   - error (error data if an error)
+
+### re-fetching data
+ - There is a list of event listeners in src/events/eventListeners.js such as:
+   - triggerUserUpdated
+   - listenUserUpdated
+ - Any data that uses user data, should listen for user updated with "listenUserUpdated"
+ - When the user is updated, call triggerUseUpdated to update any usages of the user data.
+ - The same approach should be done for other types of data
+
+### Current User data
+ - When the user is loaded, the user data is stored in the user store.
+ - when element use user data, they should subscribe to the user store for the user data. 
+ - See example in src/components/pages/account/account-username.js
+
+### messages
+ - Messages can be added using the messageState add method like
+   - `messagesState.addMessage('User info successfully updated');`
+
+

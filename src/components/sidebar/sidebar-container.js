@@ -167,9 +167,10 @@ export class CustomElement extends observeState(LitElement) {
                 <nav>
                     <h2 class="menu-section-heading">Main Menu</h2>
                     <ul class="menu-section-list">
-                        <li><a href="#" class="menu-item-link">Dashboard</a></li>
+                        <li><a href="/" class="menu-item-link">Dashboard</a></li>
                         <li><a href="#" class="menu-item-link">My Lists</a></li>
                         <li><a href="#" class="menu-item-link">Recent</a></li>
+                        <li><a href="/qa" class="menu-item-link">Questions & Answers</a></li>
                     </ul>
 
                     <h2 class="menu-section-heading">Other Links</h2>

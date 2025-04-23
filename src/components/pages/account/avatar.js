@@ -12,7 +12,9 @@ export class Avatar extends LitElement {
         hasPopup: {type: Boolean},
         round: {type: Boolean},
         border: {type: Boolean},
+        borderradius: {type: String},
         stackLeft: {type: Boolean},
+        shadow: {type: Boolean}
     };
 
     constructor() {
@@ -24,6 +26,8 @@ export class Avatar extends LitElement {
         this.hasPopup = false;
         this.round = false;
         this.border = false;
+        this.borderradius = '25%';
+        this.shadow = false;
     }
 
     static styles = css`
@@ -32,7 +36,6 @@ export class Avatar extends LitElement {
         }
 
         .avatar {
-            border-radius: 25%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -40,7 +43,7 @@ export class Avatar extends LitElement {
             overflow: hidden;
 
             &.round {
-                border-radius: 50%;
+                border-radius: 50% !important;
             }
 
             &.border {
@@ -49,6 +52,10 @@ export class Avatar extends LitElement {
             
             &.stack-left {
                 margin-left: -10px;
+            }
+            
+            &.shadow {
+                box-shadow: var(--shadow-1-soft);
             }
         }
 
@@ -65,7 +72,7 @@ export class Avatar extends LitElement {
      * e.g., "Jane Doe" => "JD"
      */
     getInitials(username) {
-        if (!username) return '';
+        if (!username?.length) return '';
         return username
             .split(/\s+/)
             .map((part) => part.charAt(0).toUpperCase())
@@ -78,12 +85,13 @@ export class Avatar extends LitElement {
         if (this.imageId > 0) {
             return html`
                 <div
-                        class="avatar ${this.round ? 'round' : ''} ${this.border ? 'border' : ''} ${this.stackLeft ? 'stack-left' : ''}"
+                        class="avatar ${this.round ? 'round' : ''} ${this.shadow ? 'shadow' : ''} ${this.border ? 'border' : ''} ${this.stackLeft ? 'stack-left' : ''}"
                         style="
-            width: ${this.size}px; 
-            height: ${this.size}px; 
-            font-size: ${this.size * 0.5}px;
-          "
+                            width: ${this.size}px; 
+                            height: ${this.size}px; 
+                            border-radius: ${this.borderradius};
+                            font-size: ${this.size * 0.5}px;
+                          "
                 >
                     <custom-image
                             imageId="${this.imageId}"
@@ -107,6 +115,7 @@ export class Avatar extends LitElement {
                     style="
           width: ${this.size}px; 
           height: ${this.size}px;
+          border-radius: ${this.borderradius};
           font-size: ${this.size * 0.5}px;
           background: linear-gradient(135deg, ${color1}, ${color2});
         "

@@ -1,6 +1,8 @@
 import {LitElement, html, css} from 'lit';
+import {observeState} from "lit-element-state";
+import {userState} from "../../../state/userStore.js";
 
-export class AccountUsername extends LitElement {
+export class AccountUsername extends observeState(LitElement) {
     static styles = css`
         :host {
             display: inline-block;
@@ -10,8 +12,7 @@ export class AccountUsername extends LitElement {
     `;
 
     render() {
-        // Replace this with real username data
-        return html`<span>Username</span>`;
+        return html`<span>${userState?.userData?.name}</span>`;
     }
 }
 

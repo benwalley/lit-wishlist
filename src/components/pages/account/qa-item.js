@@ -5,9 +5,14 @@ import '../../../svg/delete.js';
 import '../../../svg/check.js';
 import '../../global/custom-input.js';
 import {messagesState} from "../../../state/messagesStore.js";
-import '../../loading/skeleton-loader.js'
+import '../../loading/skeleton-loader.js';
+import { observeState } from 'lit-element-state';
+import { userState } from "../../../state/userStore.js";
+import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
+import '../../pages/account/avatar.js'
+import {getUserImageIdByUserId, getUsernameById} from "../../../helpers/generalHelpers.js";
 
-export class QAItem extends LitElement {
+export class QAItem extends observeState(LitElement) {
     static properties = {
         item: { type: Object },
         isEditing: { type: Boolean },
@@ -95,6 +100,10 @@ export class QAItem extends LitElement {
                     color: var(--text-color-dark);
                     font-weight: bold;
                 }
+                
+                .question.display-only {
+                    padding-bottom: var(--spacing-normal);
+                }
 
                 .answer {
                     margin: var(--spacing-tiny) 0;
@@ -120,6 +129,18 @@ export class QAItem extends LitElement {
                     display: flex;
                     flex-direction: column;
                     gap: var(--spacing-small);
+                }
+                
+                .answer-container {
+                    width: 100%;
+                    cursor: pointer;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                }
+                
+                .qa-item-asker {
+                    font-size: var(--font-size-x-small);
                 }
             `
         ];
@@ -165,11 +186,19 @@ export class QAItem extends LitElement {
         this.isEditing = true;
     }
 
+    // Check if the current user is the question creator
+    _isQuestionCreator() {
+        if (this.item.isNew) return true;
+        return userState.userData && this.item.askedById === userState.userData.id;
+    }
+
     // Toggle edit mode
     _toggleEdit() {
         if(this.item.isNew) {
             this._deleteItem();
+            return;
         }
+
         if (this.isEditing) {
             this.isEditing = false;
         } else {
@@ -179,12 +208,22 @@ export class QAItem extends LitElement {
 
     // Save edits
     _saveEdit() {
-        if(!this.editedQuestion?.length) {
+        // Validate question text only if user is the question creator
+        if (this._isQuestionCreator() && !this.editedQuestion?.length) {
             messagesState.addMessage('Please add a question.', 'error');
             return;
         }
-        const updatedItem = {...this.item}
-        updatedItem.questionText = this.editedQuestion;
+
+        const updatedItem = {...this.item};
+
+        // Only update the question text if the user is the question creator
+        if (this._isQuestionCreator()) {
+            updatedItem.questionText = this.editedQuestion;
+        }
+
+        updatedItem.questionId = this.item.id;
+
+        // Always update the answer
         if(updatedItem.answers?.length) {
             updatedItem.answers[0].answerText = this.editedAnswer;
         } else {
@@ -201,20 +240,33 @@ export class QAItem extends LitElement {
     }
 
     // Delete item
-    _deleteItem() {
+    async _deleteItem() {
         if (this.item.isNew) {
             this.dispatchEvent(new CustomEvent('qa-item-deleted', {
-                detail: { item: this.item },
+                detail: {item: this.item},
                 bubbles: true,
                 composed: true
             }));
             return;
         }
 
-        // For existing items, confirm deletion
-        if (confirm('Are you sure you want to delete this Q&A item?')) {
+        // Only the question creator can delete the entire QA item
+        if (!this._isQuestionCreator()) {
+            messagesState.addMessage('You can only delete questions you created.', 'error');
+            return;
+        }
+
+        const confirmed = await showConfirmation({
+            message: 'Are you sure you want to delete this question?',
+            submessage: 'The users who answerd this question will still see it with a message telling them it was deleted',
+            heading: 'Delete Item?',
+            confirmLabel: 'Yes, Delete',
+            cancelLabel: 'No, Keep it'
+        });
+
+        if (confirmed) {
             this.dispatchEvent(new CustomEvent('qa-item-deleted', {
-                detail: { item: this.item },
+                detail: {item: this.item},
                 bubbles: true,
                 composed: true
             }));
@@ -234,11 +286,26 @@ export class QAItem extends LitElement {
 
         return html`
             <h3 class="question">${this.item.questionText}</h3>
-            ${hasEmptyAnswer
-                    ? html`<span class="missing-info">Needs an answer</span>`
-                    : html`<p class="answer">${this.item.answers[0]?.answerText}</p>`
-            }
+            <div class="answer-container" @click="${this._toggleEdit}">
+                ${hasEmptyAnswer
+                        ? html`<span class="missing-info">Needs an answer</span>`
+                        : html`<p class="answer">${this.item.answers[0]?.answerText}</p>`
+                }
+                ${userState.userData?.id !== this.item.askedById ? html`<div class="qa-item-asker">
+                    
+                    <span>Asked by</span>
+                    <custom-avatar
+                            .username="${getUsernameById(this.item.askedById)}"
+                            imageId="${getUserImageIdByUserId(this.item.askedById)}"
+                            size="16"
+                    >
+                    </custom-avatar>
+                    <span>${getUsernameById(this.item.askedById)}</span>
+
+                </div>` : ''}
+            </div>
             <div class="actions">
+                
                 <button
                         aria-label="edit"
                         class="icon-button"
@@ -249,7 +316,7 @@ export class QAItem extends LitElement {
                 >
                     <edit-icon></edit-icon>
                 </button>
-                <button
+                ${this._isQuestionCreator() ? html`<button
                         aria-label="delete"
                         class="icon-button"
                         style="--icon-color: var(--delete-red);
@@ -258,24 +325,29 @@ export class QAItem extends LitElement {
                         @click="${this._deleteItem}"
                 >
                     <delete-icon></delete-icon>
-                </button>
+                </button>` : ''}
             </div>
         `;
     }
 
-    /** Renders the component in edit mode. */
     _renderEditMode() {
         return html`
-            <custom-input
-                    label="Question"
-                    .value="${this.editedQuestion}"
-                    @value-changed="${this._onQuestionChange}"
-            ></custom-input>
+            ${this._isQuestionCreator() ? html`
+                <custom-input
+                        label="Question"
+                        .value="${this.editedQuestion}"
+                        @value-changed="${this._onQuestionChange}"
+                ></custom-input>
+            ` : html`
+                <h3 class="question display-only">${this.item.questionText}</h3>
+            `}
+            
             <custom-input
                     label="Answer"
                     .value="${this.editedAnswer}"
                     @value-changed="${this._onAnswerChange}"
             ></custom-input>
+            
             <div class="edit-actions">
                 <button class="secondary" @click="${this._toggleEdit}">Cancel</button>
                 <button class="primary" @click="${this._saveEdit}">Save</button>
@@ -292,13 +364,10 @@ export class QAItem extends LitElement {
 
     _renderContent() {
         if (this.item.loading) {
-            // Assumes you have _renderLoading() defined
             return this._renderLoading();
         } else if (this.isEditing) {
-            // Assumes you have _renderEditMode() defined
             return this._renderEditMode();
         } else {
-            // Assumes you have _renderViewMode() defined
             return this._renderViewMode();
         }
     }

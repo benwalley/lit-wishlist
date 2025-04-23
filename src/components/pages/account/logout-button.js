@@ -1,15 +1,25 @@
-import {LitElement, html} from 'lit';
+import {LitElement, html, css} from 'lit';
 import {observeState} from 'lit-element-state';
 import {userState} from "../../../state/userStore.js";
 import {logout} from "../../../helpers/api/users.js";
 import {setJwt, setRefreshToken} from "../../../localStorage/tokens.js";
 import {navigate} from "../../../router/main-router.js";
 import {messagesState} from "../../../state/messagesStore.js";
+import buttonStyles from "../../../css/buttons.js";
 
 export class LogoutButton extends observeState(LitElement) {
     static properties = {
 
     };
+
+    static get styles() {
+        return [
+            buttonStyles,
+            css`
+       
+            `
+        ];
+    }
 
     constructor() {
         super();
@@ -44,7 +54,7 @@ export class LogoutButton extends observeState(LitElement) {
 
     render() {
         return html`
-            <button @click=${this._handleClick}>Log Out</button>
+            <button @click=${this._handleClick} class="button secondary">Log Out</button>
         `;
     }
 }

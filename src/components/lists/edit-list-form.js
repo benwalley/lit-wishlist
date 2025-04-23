@@ -7,15 +7,14 @@ import '../users/your-users-list.js'
 import '../global/image-changer.js'
 import '../../svg/user.js'
 import '../../svg/group.js'
-import '../../svg/plus.js'
 import '../../svg/camera.js'
 import {messagesState} from "../../state/messagesStore.js";
 import {triggerUpdateList} from "../../events/eventListeners.js";
-import {createList} from "../../helpers/api/lists.js";
+import {updateList} from "../../helpers/api/lists.js";
 
-
-export class CreateListForm extends LitElement {
+export class EditListForm extends LitElement {
     static properties = {
+        listData: {type: Object},
         listName: {type: String},
         description: {type: String},
         groups: {type: Array},
@@ -25,6 +24,7 @@ export class CreateListForm extends LitElement {
 
     constructor() {
         super();
+        this.listData = {};
         this.listName = '';
         this.description = '';
         this.groups = [];
@@ -32,11 +32,34 @@ export class CreateListForm extends LitElement {
         this.imageId = 0;
     }
 
+    updated(changedProperties) {
+        if (changedProperties.has('listData') && this.listData) {
+            this._initializeForm();
+        }
+    }
+
+    _initializeForm() {
+        this.listName = this.listData.listName || '';
+        this.description = this.listData.description || '';
+        this.imageId = this.listData.imageId || 0;
+
+        // Convert the visible groups and users to IDs if they're full objects
+        this.groups = Array.isArray(this.listData.visibleToGroups)
+            ? this.listData.visibleToGroups.map(group => typeof group === 'object' ? group.id : group)
+            : [];
+
+        this.users = Array.isArray(this.listData.visibleToUsers)
+            ? this.listData.visibleToUsers.map(user => typeof user === 'object' ? user.id : user)
+            : [];
+    }
+
     async _handleSubmit(e) {
         e.preventDefault();
         const validationSuccess = this._validateForm();
         if (!validationSuccess) return;
+
         const formData = {
+            id: this.listData.id,
             listName: this.listName,
             description: this.description,
             visibleToGroups: this.groups,
@@ -44,29 +67,28 @@ export class CreateListForm extends LitElement {
             imageId: this.imageId
         }
 
-        console.log('Submitting Form Data:', formData);
-
-        const response = await createList(formData);
+        const response = await updateList(formData);
 
         if (response.success) {
-            messagesState.addMessage('List successfully created');
+            messagesState.addMessage('List successfully updated');
             triggerUpdateList();
             this._closeModal();
         } else {
-            messagesState.addMessage('Failed to create list', 'error');
+            messagesState.addMessage('Failed to update list', 'error');
         }
-
     }
 
     _closeModal(e) {
         if(e) {
             e.preventDefault();
         }
+        // Reset form state
         this.listName = '';
         this.description = '';
         this.groups = [];
         this.users = [];
         this.imageId = 0;
+
         const modal = this.closest('custom-modal');
         if (modal && typeof modal.closeModal === 'function') {
             modal.closeModal();
@@ -95,7 +117,7 @@ export class CreateListForm extends LitElement {
         return [
             buttonStyles,
             css`
-                form {
+                .container {
                     display: grid;
                     grid-template-columns: 1fr 1fr;
                     gap: var(--spacing-normal);
@@ -178,7 +200,7 @@ export class CreateListForm extends LitElement {
                     line-height: 1;
                 }
                 
-                .save-button-container {
+                .button-container {
                     box-sizing: border-box;
                     width: 100%;
                     gap: var(--spacing-small);
@@ -197,8 +219,8 @@ export class CreateListForm extends LitElement {
 
     render() {
         return html`
-            <form class="container-form" action="" @submit="${this._handleSubmit}">
-                <h2  class="full-width">Create New List</h2>
+            <form class="container" @submit="${this._handleSubmit}">
+                <h2 class="full-width">Edit List Details</h2>
                 <div class="left-column">
                     <div class="image-container">
                         <div class="user-image">
@@ -219,7 +241,7 @@ export class CreateListForm extends LitElement {
                     ></custom-input>
                     <custom-input class="full-width" 
                                   .value="${this.description}"
-                                    placeholder="Group Description (optional)"
+                                    placeholder="List Description (optional)"
                                   @value-changed="${(e) => this.description = e.detail.value}"
                     ></custom-input>
                 </div>
@@ -232,6 +254,7 @@ export class CreateListForm extends LitElement {
                         <div class="select-section">
                             <your-groups-list
                                     class="full-width"
+                                    .selectedGroups="${this.groups}"
                                     @selection-changed="${this._handleGroupChange}"
                             ></your-groups-list>
                         </div>
@@ -255,11 +278,10 @@ export class CreateListForm extends LitElement {
                 </div>
                 
 
-                <div class="save-button-container fullWidth">
-                    <button @click="${this._closeModal}" class="secondary cancel-button">Cancel</button>
-                    <button class="primary save-button">
-                        <plus-icon></plus-icon>
-                        Save List
+                <div class="button-container fullWidth">
+                    <button type="button" @click="${this._closeModal}" class="secondary cancel-button">Cancel</button>
+                    <button type="submit" class="primary save-button">
+                        Save Changes
                     </button>
                 </div>
             </form>
@@ -267,7 +289,6 @@ export class CreateListForm extends LitElement {
     }
 
     _handleGroupChange(e) {
-        console.log(e.detail.selectedGroups)
         // Store group IDs rather than full group objects for API submission
         this.groups = e.detail.selectedGroups.map(group => group.id);
     }
@@ -277,10 +298,9 @@ export class CreateListForm extends LitElement {
     }
 
     _handleUserSelectionChanged(e) {
-        console.log('User selection changed:', e.detail.selectedUsers);
         // Store user IDs rather than full user objects for API submission
         this.users = e.detail.selectedUsers.map(user => user.id);
     }
 }
 
-customElements.define('create-list-form', CreateListForm);
+customElements.define('edit-list-form', EditListForm);

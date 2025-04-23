@@ -111,4 +111,12 @@ export default css`
         opacity: 0.7;
     }
 
+    a {
+        text-decoration: none;
+        color: var(--link-color);
+        
+        &:hover {
+            text-decoration: underline;
+        }
+    }
 `;

@@ -43,9 +43,7 @@ export class CreateListButton extends LitElement {
         e.preventDefault();
         const formData = new FormData(e.target);
         const listName = formData.get('listName');
-        // Handle form submission: e.g., send listName to server or update state
 
-        // Optionally, close the modal after submission if needed
         const modal = this.shadowRoot.querySelector('custom-modal');
         if(modal && typeof modal.closeModal === 'function') {
             modal.closeModal();

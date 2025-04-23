@@ -1,6 +1,7 @@
 import {customFetch} from "../../../../helpers/fetchHelpers.js";
 import {triggerUpdateQa, triggerUpdateUser} from "../../../../events/eventListeners.js";
 import {messagesState} from "../../../../state/messagesStore.js";
+import {cachedFetch} from "../../../../helpers/caching.js";
 
 export async function saveQA(qaId, question, answer) {
     try {
@@ -25,17 +26,21 @@ export async function saveQA(qaId, question, answer) {
     }
 }
 
-export async function createQA(question, answer, userId) {
+export async function createQA(qaData) {
     try {
-        if(!question.length) {
+        if(!qaData.questionText?.length) {
             return {success: false, message: 'You must enter a question.'}
         };
         const data = {
-            questionText: question,
-            userId,
+            questionText: qaData.questionText,
+            userId: qaData.userId,
+            isAnonymous: qaData.isAnonymous || false,
+            sharedWithUserIds: qaData.shareWithUsers || [],
+            sharedWithGroupIds: qaData.shareWithGroups || [],
+            dueDate: qaData.dueDate ? qaData.dueDate : null,
         }
-        if(answer) {
-            data.answerText = answer;
+        if(qaData.answerText) {
+            data.answerText = qaData.answerText;
         }
         const options = {
             method: 'POST',
@@ -45,17 +50,23 @@ export async function createQA(question, answer, userId) {
             body: JSON.stringify(data),
         };
 
-        const qaData = await customFetch('/qa/create', options, true);
-        return {success: true, qaData: qaData}
+        const responseData = await customFetch('/qa/create', options, true);
+        return {success: true, qaData: responseData}
 
     } catch (e) {
+        console.log(e)
         handleQAError('There was an error saving your question. Please try again.')
         return {success: false, message: 'There was an error saving your question. Please try again.'}
     }
 }
 
+
 export async function updateQuestion(questionData) {
     try {
+        if(!questionData.questionId) {
+            handleQAError('You must have question id')
+            return {success: false, message: 'You must have a question id.'}
+        }
         if(!questionData.questionText?.length) {
             handleQAError('You must have question text')
             return {success: false, message: 'You must enter a question.'}
@@ -69,7 +80,7 @@ export async function updateQuestion(questionData) {
             body: JSON.stringify(questionData),
         };
 
-        const updatedValue = await customFetch('/qa/question', options, true);
+        const updatedValue = await customFetch(`/qa/question/${questionData.questionId}`, options, true);
         return {success: true, updatedValue}
 
     } catch (e) {
@@ -87,7 +98,7 @@ export async function updateAnswer(answerData) {
         };
 
         const options = {
-            method: 'PUT',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -106,7 +117,17 @@ export async function updateAnswer(answerData) {
 
 export async function getQAItems(userId) {
     try {
-        const response = await customFetch(`/qa/user/${userId}`, {}, true);
+        const response = await cachedFetch(`/qa/user/${userId}`, {}, true);
+        return {success: true, qaItems: response}
+    } catch (e) {
+        handleQAError('There was an error fetching the Q&A items. Please try again.')
+        return {success: false, message: 'There was an error fetching the Q&A items. Please try again.'}
+    }
+}
+
+export async function getAskedQAItems(userId) {
+    try {
+        const response = await cachedFetch(`/qa/userAsked/${userId}`, {}, true);
         return {success: true, qaItems: response}
     } catch (e) {
         handleQAError('There was an error fetching the Q&A items. Please try again.')
@@ -117,24 +138,40 @@ export async function getQAItems(userId) {
 export async function deleteQA(questionData) {
     try {
         const questionId = questionData.id;
-        const answerId = questionData.answers[0]?.id;
+        if(!questionId) return {success: false, message: 'Message ID not provided'}
         const options = {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
             },
         };
-        if(questionId) {
-            const deletedQuestion = await customFetch(`/qa/question/${questionId}`, options, true);
-        }
-        if(answerId) {
-            const deletedAnswer = await customFetch(`/qa/answer/${answerId}`, options, true);
-        }
-        return {success: true}
+
+        const deletedQuestion = await customFetch(`/qa/question/${questionId}`, options, true);
+        return deletedQuestion;
 
     } catch (e) {
-        handleQAError('There was an error saving your question. Please try again.')
-        return {success: false, message: 'There was an error saving your question. Please try again.'}
+        handleQAError('There was an error deleting your question. Please try again.')
+        return {success: false, message: 'There was an error deleting your question. Please try again.'}
+    }
+}
+
+export async function forceDeleteQA(questionData) {
+    try {
+        const questionId = questionData.id;
+        if(!questionId) return {success: false, message: 'Message ID not provided'}
+        const options = {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        };
+
+        const deletedQuestion = await customFetch(`/qa/question/force/${questionId}`, options, true);
+        return deletedQuestion;
+
+    } catch (e) {
+        handleQAError('There was an error deleting your question. Please try again.')
+        return {success: false, message: 'There was an error deleting your question. Please try again.'}
     }
 }
 

@@ -1,24 +1,25 @@
 import {LitElement, html, css} from 'lit';
 
 import './avatar.js';
-import './account-username.js';
 import './account-public-description.js';
 import './account-qa.js';
 import './account-notifications.js';
 import './account-navigation.js';
 import './account-private-notes.js';
 import './account-comments.js';
+import './user-details.js';
 import './account-lists.js';
 import './account-secondary-lists.js';
 import './logout-button.js'
+import './invited-groups.js'
 import '../../global/image-upload/image-uploader.js'
 import '../../global/custom-image.js'
 import '../../lists/my-lists.js'
+import '../../lists/edit-list-modal.js'
+import './my-groups-list.js'
 import '../../../svg/edit.js'
 import buttonStyles from '../../../css/buttons.js'
 import '../../users/edit-user-form.js';
-
-// TODO: Add logout link
 export class AccountContainer extends LitElement {
     static get styles() {
         return [
@@ -39,12 +40,6 @@ export class AccountContainer extends LitElement {
                     }
                 }
 
-                .username-section {
-                    display: flex;
-                    flex-direction: column;
-                    border: none;
-                }
-
                 section {
                     padding: 1rem;
                     box-shadow: var(--shadow-1-soft);
@@ -53,52 +48,17 @@ export class AccountContainer extends LitElement {
                     position: relative;
                 }
 
-                .username-edit-button.icon-button {
-                    position: absolute;
-                    top: var(--spacing-small);
-                    right: var(--spacing-small);
-                    font-size: var(--font-size-large);
-                    transition: var(--transition-normal);
-                    border-radius: 50%;
-                    --icon-color: var(--blue-normal);
-                    --icon-color-hover: var(--blue-normal);
-                    --icon-hover-background: var(--purple-light);
-                    
-                    &:hover {
-                        transform: rotate(-45deg) scale(1.1);
-                    }
-                }
+                
             `
         ];
     }
 
-    _handleEditUser() {
-        const editModal = this.shadowRoot.querySelector('#edit-user-modal');
-        editModal.openModal();
-    }
-
-    _closeEditUserModal() {
-        const editModal = this.shadowRoot.querySelector('#edit-user-modal');
-        editModal.closeModal();
-    }
 
     render() {
         return html`
             <main class="account-container">
-                <section class="username-section">
-                    <custom-avatar size="150" username="Ben"></custom-avatar>
-                    <account-username></account-username>
-                    <account-public-description></account-public-description>
-                    <button aria-label="edit-button" 
-                            class="icon-button button username-edit-button"
-                            @click="${this._handleEditUser}"
-                    >
-                        <edit-icon></edit-icon>
-                    </button>
-                    <logout-button></logout-button>
-                    <custom-modal id="edit-user-modal" maxWidth="500px" noPadding>
-                        <edit-user-form @close-edit-user-modal="${this._closeEditUserModal}"></edit-user-form>
-                    </custom-modal>
+                <section>
+                    <user-details></user-details>
                 </section>
 
                 <section>
@@ -106,9 +66,21 @@ export class AccountContainer extends LitElement {
                 </section>
 
                 <section>
+                    <invited-groups></invited-groups>
+                </section>
+
+                <section>
+                    <my-groups-list></my-groups-list>
+                </section>
+
+                <section>
                     <account-notifications></account-notifications>
                 </section>
 
+                <section>
+                    <my-lists></my-lists>
+                </section>
+                
                 <section>
                     <account-navigation></account-navigation>
                 </section>
@@ -122,12 +94,10 @@ export class AccountContainer extends LitElement {
                 </section>
 
                 <section>
-                    <my-lists></my-lists>
-                </section>
-
-                <section>
                     <account-secondary-lists></account-secondary-lists>
                 </section>
+                
+                <edit-list-modal></edit-list-modal>
             </main>
         `;
     }

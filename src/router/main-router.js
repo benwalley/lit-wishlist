@@ -6,6 +6,7 @@ import '../components/pages/list/list-view-container.js'
 import '../components/pages/listItem/item-view-container.js'
 import '../components/pages/not-found.js';
 import '../components/pages/account/qa/qa-page-container.js';
+import '../components/pages/groups/group-view-container.js';
 
 
 const routes = [
@@ -16,6 +17,10 @@ const routes = [
     {
         path: '/account',
         component: 'account-container',
+    },
+    {
+        path: '/group/:groupId',
+        component: 'group-view-container',
     },
     {
         path: '/list/:listId',
