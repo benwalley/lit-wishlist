@@ -291,12 +291,6 @@ export class AddToListModal extends LitElement {
                             ></priority-selector>
                             <images-selector .images="${this.images}"
                                              @images-changed="${(e) => this.images = e.detail.images}"></images-selector>
-                            <amount-you-want
-                                    .amount="${this.amount}"
-                                    .min="${this.minAmount}"
-                                    .max="${this.maxAmount}"
-                                    @amount-changed="${this._handleAmountChange}"
-                            ></amount-you-want>
                          
                         </div>
 
@@ -306,6 +300,12 @@ export class AddToListModal extends LitElement {
                                     @content-changed=${(e) => this.notes = e.detail.content}
                                     content="${this.notes}"
                             ></wysiwyg-editor>
+                            <amount-you-want
+                                    .amount="${this.amount}"
+                                    .min="${this.minAmount}"
+                                    .max="${this.maxAmount}"
+                                    @amount-changed="${this._handleAmountChange}"
+                            ></amount-you-want>
                         </div>
 
                         <div class="advanced-options-container">

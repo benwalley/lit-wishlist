@@ -1,7 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from '../../../css/buttons.js';
 import '../../../svg/cloud-upload.js'
-import {listenImageCropConfirmed, triggerImageSelected} from "../../../events/eventListeners.js";
+import {triggerImageSelected} from "../../../events/eventListeners.js";
 
 export class ImageSelector extends LitElement {
     static properties = {
@@ -23,10 +23,16 @@ export class ImageSelector extends LitElement {
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
-                    gap: 10px;
                     padding: 8px;
                     box-sizing: border-box;
                     position: relative;
+                    border-radius: var(--border-radius-normal);
+                    transition: var(--transition-200);
+                }
+                
+                :host(:hover) {
+                    border-color: var(--primary-color);
+                    background-color: var(--background-dark);
                 }
 
                 /* Hidden native file input */
@@ -37,21 +43,27 @@ export class ImageSelector extends LitElement {
                 /* Drag-and-drop area */
                 .drop-zone {
                     width: 100%;
-                    flex: 1;
+                    height: 100%;
                     display: grid;
-                    grid-template-columns: 40px 1fr;
-                    gap: 10px;
+                    gap: 4px;
                     align-items: center;
                     justify-content: center;
                     cursor: pointer;
                     text-align: left;
                     box-sizing: border-box;
+                    margin-top: auto;
+                    margin-bottom: auto;
+                    
+                    cloud-upload-icon {
+                        margin-top: auto;
+                    }
                 }
 
                 .drop-zone p {
                     margin: 0;
                     font-size: 0.95rem;
                     color: #666;
+                    margin-bottom: auto;
                 }
 
                 /* Give a visual highlight on drag over */
@@ -59,26 +71,9 @@ export class ImageSelector extends LitElement {
                     border-color: #007bff;
                     background-color: #f0f8ff;
                 }
-
-                input[type='url'] {
-                    display: block;
-                    width: 100%;
-                    box-sizing: border-box;
-                    padding: 5px;
-                }
-
-                button {
-                    margin: 5px 0;
-                    cursor: pointer;
-                }
             `,
         ];
     }
-
-    /**
-     * Temporary storage of the user-entered URL
-     */
-    _urlValue = '';
 
     render() {
         return html`
@@ -98,22 +93,9 @@ export class ImageSelector extends LitElement {
                     @dragleave=${this._handleDragLeave}
                     @drop=${this._handleDrop}
             >
-                <cloud-upload-icon style="width: 100%; color: white;"></cloud-upload-icon>
-                <p>Drag & Drop an image here or click to choose a file</p>
+                <cloud-upload-icon style="width: 100%;"></cloud-upload-icon>
+                <p>Upload</p>
             </div>
-
-            <!-- URL input & button -->
-            <input
-                    type="url"
-                    placeholder="Enter image URL"
-                    @input=${(e) => (this._urlValue = e.target.value.trim())}
-            />
-            <button
-                    class="button primary small"
-                    @click=${this._submitUrl}
-            >
-                Use URL
-            </button>
         `;
     }
 
@@ -171,53 +153,9 @@ export class ImageSelector extends LitElement {
             const rawImage = ev.target.result;
             triggerImageSelected({rawImage, uniqueId: this.uniqueId});
         };
-        reader.readAsDataURL(file); // TODO: See if I can remove this
+        reader.readAsDataURL(file);
     }
 
-    /**
-     * Called when the "Use URL" button is clicked.
-     */
-    async _submitUrl() {
-        const url = this._urlValue;
-        if (!url) {
-            alert('Please enter a URL before clicking "Use URL".');
-            return;
-        }
-
-        // Validate URL
-        if (!this._isValidUrl(url)) {
-            alert('Please enter a valid URL.');
-            return;
-        }
-
-        // Try fetching the image and converting to DataURL
-        try {
-            const response = await fetch(url);
-            const blob = await response.blob();
-            if (!blob.type.startsWith('image/')) {
-                alert('URL does not point to a valid image.');
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                const rawImage = ev.target.result;
-                triggerImageSelected(rawImage)
-            };
-            reader.readAsDataURL(blob);
-        } catch (error) {
-            console.error(error);
-            alert('Failed to fetch the image from the URL.');
-        }
-    }
-
-    _isValidUrl(str) {
-        try {
-            new URL(str);
-            return true;
-        } catch {
-            return false;
-        }
-    }
 }
 
 customElements.define('image-selector', ImageSelector);

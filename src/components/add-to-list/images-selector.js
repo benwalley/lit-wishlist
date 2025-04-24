@@ -1,10 +1,8 @@
 import {LitElement, html, css} from 'lit';
 import '../global/image-upload/image-uploader.js';
+import './upload-by-url.js';
 import {arrayConverter} from "../../helpers/arrayHelpers.js";
-
-/**
- * Custom converter to serialize/deserialize an array of numbers to/from an attribute.
- */
+import buttonStyles from '../../css/buttons.js';
 
 export class ImagesSelector extends LitElement {
     static properties = {
@@ -32,47 +30,94 @@ export class ImagesSelector extends LitElement {
         }
     }
 
-    static styles = css`
-    .images-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      align-items: flex-start;
-    }
-    .item {
-      display: inline-block;
-    }
-    button.plus {
-      border: 2px dashed #ccc;
-      background: transparent;
-      font-size: 1.5rem;
-      width: 200px;
-      height: 200px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-    button.plus:hover {
-      background-color: #f0f0f0;
-    }
-  `;
+    static styles = [
+        buttonStyles,
+        css`
+            :host {
+                display: block;
+                padding: var(--spacing-small);
+                border: 1px solid var(--border-color);
+                border-radius: var(--border-radius-normal);
+            }
+
+            .section-wrapper {
+                margin-bottom: 30px;
+            }
+
+            .images-section {
+            }
+
+            .images-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 16px;
+                align-items: flex-start;
+                margin-top: 16px;
+            }
+
+            .item {
+                display: inline-block;
+            }
+
+            .add-button {
+                width: 120px;
+                height: 120px;
+                border: 2px dashed var(--border-color, #ccc);
+                background: transparent;
+                font-size: 1.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s ease;
+                color: var(--secondary-color, #666);
+            }
+
+            .add-button:hover {
+                background-color: rgba(0, 0, 0, 0.03);
+                border-color: var(--primary-button-background, #4CAF50);
+                color: var(--primary-button-background, #4CAF50);
+            }
+
+            .section-title {
+                font-size: var(--font-size-normal);
+                font-weight: 600;
+                color: var(--text-color-dark, #333);
+            }
+
+            .section-description {
+                font-size: var(--font-size-x-small);
+                color: var(--text-color-medium-dark);
+
+            }
+        `
+    ];
 
     render() {
         return html`
-      <div class="images-container">
-        ${this.images.map((id, idx) => html`
-          <div class="item">
-            <image-uploader
-              .imageId=${id}
-              @image-updated=${(e) => this._onImageUpdated(e, idx)}
-            ></image-uploader>
-          </div>
-        `)}
+            <div class="section-wrapper">
+                <div class="section-title">Add Images</div>
 
-        <button class="plus" @click=${this._addImage}>+</button>
-      </div>
-    `;
+                <div class="section-description">
+                    Add an image by URL or upload an image from your device. Supported formats: JPG, PNG, GIF.
+                </div>
+                <upload-by-url @image-added=${this._handleImageAdded}></upload-by-url>
+
+                <div class="images-section">
+                    <div class="images-container">
+                        ${this.images.map((id, idx) => html`
+                            <div class="item">
+                                <image-uploader
+                                        .imageId=${id}
+                                        @image-updated=${(e) => this._onImageUpdated(e, idx)}
+                                ></image-uploader>
+                            </div>
+                        `)}
+
+                        <button class="add-button" @click=${this._addImage}>+</button>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
     /**
@@ -80,8 +125,8 @@ export class ImagesSelector extends LitElement {
      * We store the new ID in our `images` array at the correct index.
      */
     _onImageUpdated(e, idx) {
-        const { imageId } = e.detail;
-        this.images[idx] = imageId;
+        const {imageId} = e.detail;
+        this.images[idx] = parseInt(imageId);
         this.images = [...this.images];
         this._emitImagesChanged();
     }
@@ -99,10 +144,27 @@ export class ImagesSelector extends LitElement {
      */
     _emitImagesChanged() {
         this.dispatchEvent(new CustomEvent('images-changed', {
-            detail: { images: this.images },
+            detail: {images: this.images},
             bubbles: true,
             composed: true,
         }));
+    }
+
+    /**
+     * Handle image-added event from upload-by-url component
+     */
+    _handleImageAdded(e) {
+        const {imageId} = e.detail;
+
+        // If the first image is placeholder (0), replace it
+        if (this.images.length === 1 && this.images[0] === 0) {
+            this.images = [imageId];
+        } else {
+            // Otherwise add it to the end
+            this.images = [...this.images, imageId];
+        }
+
+        this._emitImagesChanged();
     }
 }
 

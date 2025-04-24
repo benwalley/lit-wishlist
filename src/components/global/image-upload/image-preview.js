@@ -1,11 +1,10 @@
 import {LitElement, html, css} from 'lit';
 import '../custom-image.js'
-import '../../../svg/delete.js'
 import '../../../svg/x.js'
 
 export class ImagePreview extends LitElement {
     static properties = {
-        imageId: { type: String },
+        imageId: { type: Number },
     };
 
     static styles = css`
@@ -21,15 +20,17 @@ export class ImagePreview extends LitElement {
         .preview-container {
             position: relative;
             width: 100%;
+            height: 100%;
             margin: 0 auto;
             padding: 0;
             box-sizing: border-box;
             border: 2px solid #ccc;
+            overflow: hidden;
         }
 
         custom-image {
             width: 100%;
-            height: auto;
+            height: 100%;
             display: block;
         }
 
@@ -49,6 +50,11 @@ export class ImagePreview extends LitElement {
             align-items: center;
             justify-content: center;
             border-radius: 20px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .remove-btn:hover {
+            background: rgba(255, 0, 0, 0.9);
         }
     `;
 
@@ -60,7 +66,7 @@ export class ImagePreview extends LitElement {
     render() {
         return html`
             <div class="preview-container">
-                <custom-image imageId="${this.imageId}"></custom-image>
+                <custom-image .imageId=${this.imageId}></custom-image>
                 <button class="remove-btn" @click=${this._handleRemove}>
                     <x-icon style="width:15px; height:15px;"></x-icon>
                 </button>

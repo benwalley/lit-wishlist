@@ -3,47 +3,57 @@ import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.min.css';
 import { listenImageSelected, triggerImageCropConfirmed } from '../../../events/eventListeners.js';
 import { uploadImageToDB } from '../../../helpers/imageHelpers.js';
-import {cropperState} from "../../../state/cropperStore.js";
 import {observeState} from 'lit-element-state';
-
+import buttonStyles from '../../../css/buttons.js';
 
 class ImageCropper extends observeState(LitElement) {
   static properties = {
     size: { type: Number },
     rawImage: { type: String },
     modalOpen: { type: Boolean },
-    imageId: { type: String },
-    uniqueId: {type: String},
+    imageId: { type: Number },
+    uniqueId: { type: String },
   };
 
-  static styles = css`
-    :host {
-      display: block;
-      font-family: Arial, sans-serif;
-    }
-    
-    .modal-header {
-      text-align: center;
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      color: #333;
-    }
-
-    .image-container {
-      max-width: 640px;
-    }
-
-    img {
-      max-width: 100%;
-    }
-  `;
+  static styles = [
+    buttonStyles,
+    css`
+      :host {
+        display: block;
+        font-family: Arial, sans-serif;
+      }
+      
+      .modal-header {
+        text-align: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: #333;
+      }
+  
+      .image-container {
+        max-width: 640px;
+        margin: 0 auto 1rem;
+      }
+  
+      img {
+        max-width: 100%;
+      }
+      
+      .controls {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1rem;
+        gap: 1rem;
+      }
+    `
+  ];
 
   constructor() {
     super();
     this.size = 400; // Final cropped image will be 400x400 (1:1)
     this.rawImage = null;
     this.modalOpen = false;
-    this.imageId = null;
+    this.imageId = 0;
     this.cropper = null;
     this.uniqueId = null;
   }
@@ -57,8 +67,8 @@ class ImageCropper extends observeState(LitElement) {
             <img id="image" src="${this.rawImage || ''}" alt="Image to crop" />
           </div>
           <div class="controls">
-            <button class="cancel" @click="${this._handleCancel}">Cancel</button>
-            <button @click="${this._handleChoose}">Confirm</button>
+            <button class="button ghost" @click="${this._handleCancel}">Cancel</button>
+            <button class="button primary" @click="${this._handleChoose}">Confirm</button>
           </div>
         </div>
       </custom-modal>
@@ -73,13 +83,17 @@ class ImageCropper extends observeState(LitElement) {
     this.shadowRoot.appendChild(cropperStyles);
 
     // Listen for an image-selected event (expects an object with rawImage)
-    listenImageSelected((e) => {
-      const { rawImage, uniqueId } = e.detail;
-      this.rawImage = rawImage;
-      this.modalOpen = true;
-      this.uniqueId = uniqueId
-      this.requestUpdate();
-    });
+    listenImageSelected(this._handleImageSelected.bind(this));
+  }
+  
+  _handleImageSelected(e) {
+    const { rawImage, uniqueId } = e.detail;
+    if (!rawImage) return;
+    
+    this.rawImage = rawImage;
+    this.modalOpen = true;
+    this.uniqueId = uniqueId;
+    this.requestUpdate();
   }
 
   updated(changedProps) {
@@ -143,13 +157,17 @@ class ImageCropper extends observeState(LitElement) {
       height: this.size,
       imageSmoothingQuality: 'high',
     });
-    canvas.toBlob((blob) => {
+    
+    canvas.toBlob(async (blob) => {
       const reader = new FileReader();
       reader.onloadend = async () => {
         const croppedDataUrl = reader.result;
         try {
           const response = await uploadImageToDB(croppedDataUrl);
-          this.imageId = response.imageId;
+          if (!response.success) {
+            throw new Error('Upload failed');
+          }
+          this.imageId = parseInt(response.imageId);
           triggerImageCropConfirmed({imageId: this.imageId, uniqueId: this.uniqueId});
         } catch (error) {
           console.error('Image upload failed:', error);
@@ -164,7 +182,16 @@ class ImageCropper extends observeState(LitElement) {
         }
       };
       reader.readAsDataURL(blob);
-    }, 'image/jpeg', 0.7);
+    }, 'image/jpeg', 0.85); // Slightly increased quality
+  }
+  
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    // Clean up cropper instance if it exists
+    if (this.cropper) {
+      this.cropper.destroy();
+      this.cropper = null;
+    }
   }
 }
 

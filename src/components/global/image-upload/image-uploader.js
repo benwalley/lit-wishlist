@@ -1,12 +1,6 @@
 import {LitElement, html, css} from 'lit';
-import {customFetch} from '../../../helpers/fetchHelpers.js';
 import './image-selector.js';
 import './image-preview.js';
-import '../../../svg/cloud-upload.js';
-// Note: image-cropper is now global and should be placed once in your app (e.g. in your app shell)
-// import './image-cropper.js';
-import {cropperState} from '../../../state/cropperStore.js';
-import {uploadImageToDB} from "../../../helpers/imageHelpers.js";
 import {listenImageCropConfirmed} from "../../../events/eventListeners.js";
 import {getUniqueId} from "../../../helpers/generalHelpers.js";
 
@@ -19,8 +13,8 @@ class ImageUploader extends LitElement {
     static styles = css`
         .upload-container {
             text-align: center;
-            width: 200px;
-            height: 200px;
+            width: 120px;
+            height: 120px;
             position: relative;
             box-sizing: border-box;
         }
@@ -52,7 +46,14 @@ class ImageUploader extends LitElement {
 
     connectedCallback() {
         super.connectedCallback();
-        listenImageCropConfirmed(this._handleCropConfirmed.bind(this))
+        this._cropConfirmedListener = listenImageCropConfirmed(this._handleCropConfirmed.bind(this));
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        if (this._cropConfirmedListener) {
+            this._cropConfirmedListener();
+        }
     }
 
     _handleCropConfirmed(e) {

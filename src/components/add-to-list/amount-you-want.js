@@ -15,8 +15,8 @@ class AmountSelector extends LitElement {
         super();
         this.amount = "";
         this.isRange = true; // Always true since we're showing both
-        this.min = null;
-        this.max = null;
+        this.min = '';
+        this.max = '';
     }
 
     static get styles() {
@@ -77,16 +77,14 @@ class AmountSelector extends LitElement {
     render() {
         return html`
             <div class="amount-input-container">
-                <div class="header">
-                    <strong>Amount You Want</strong>
-                </div>
                 
                 <div class="inputs-row">
                     <custom-input
                     class="single-input"
                     type="text"
+                    label="Amount you want"
                     name="amount"
-                    placeholder="Single Amount"
+                    placeholder="Amount you want."
                     .value=${this.amount}
                     @input=${this._handleInputChange}
                 ></custom-input>
@@ -95,15 +93,17 @@ class AmountSelector extends LitElement {
                     class="small-input"
                     type="number"
                     name="min"
-                    placeholder="Min Amount"
+                    Label="Min"
+                    placeholder="Min"
                     .value=${this.min ?? ''}
                     @input=${this._onMinChange}
                 ></custom-input>
                 <custom-input
                     class="small-input"
                     type="number"
+                    label="Max"
                     name="max"
-                    placeholder="Max Amount"
+                    placeholder="Max"
                     .value=${this.max ?? ''}
                     @input=${this._onMaxChange}
                 ></custom-input>
