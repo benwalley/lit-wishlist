@@ -65,6 +65,7 @@ class CustomModal extends LitElement {
             opacity: 0;
             transform: translateY(20px) scale(0.95);
             transition: opacity 0.3s ease, transform 0.3s ease;
+            height: auto;
             max-height: 90vh;
             display: flex;
             flex-direction: column;
@@ -78,29 +79,45 @@ class CustomModal extends LitElement {
         /* Scrollable content area */
         .modal-content {
             max-height: 80vh;
-            overflow: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             /* Custom scrollbar styling */
             scrollbar-width: thin;
             scrollbar-color: var(--grayscale-400) transparent;
         }
+        
+        /* The actual content that gets slotted will scroll */
+        ::slotted(*) {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
         /* Webkit scrollbar styles */
-        .modal-content::-webkit-scrollbar {
+        .modal-content::-webkit-scrollbar,
+        ::slotted(*)::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
-        .modal-content::-webkit-scrollbar-track {
+        .modal-content::-webkit-scrollbar-track,
+        ::slotted(*)::-webkit-scrollbar-track {
             background: transparent;
             border-radius: 4px;
         }
-        .modal-content::-webkit-scrollbar-thumb {
+        .modal-content::-webkit-scrollbar-thumb,
+        ::slotted(*)::-webkit-scrollbar-thumb {
             background-color: var(--grayscale-400);
             border-radius: 4px;
             border: 2px solid transparent;
             background-clip: content-box;
         }
-        .modal-content::-webkit-scrollbar-thumb:hover {
+        .modal-content::-webkit-scrollbar-thumb:hover,
+        ::slotted(*)::-webkit-scrollbar-thumb:hover {
             background-color: var(--grayscale-500);
         }
+        
         /* Apply padding if not explicitly disabled */
         .modal.padding .modal-content {
             padding: var(--spacing-small, 1rem);

@@ -2,6 +2,7 @@ import {LitElement, html, css} from 'lit';
 import {customFetch} from "../../helpers/fetchHelpers.js";
 import './select-list-item.js'
 import '../../svg/check.js'
+import {cachedFetch} from "../../helpers/caching.js";
 
 export class CustomElement extends LitElement {
     static properties = {
@@ -138,7 +139,7 @@ export class CustomElement extends LitElement {
     async fetchLists() {
         try {
             this.loading = true;
-            const response = await customFetch('/lists/mine', {}, true);
+            const response = await cachedFetch('/lists/mine', {}, true);
 
             if (response?.responseData?.error) {
                 throw new Error(response?.responseData?.error);

@@ -14,7 +14,7 @@ class AmountSelector extends LitElement {
     constructor() {
         super();
         this.amount = "";
-        this.isRange = false;
+        this.isRange = true; // Always true since we're showing both
         this.min = null;
         this.max = null;
     }
@@ -26,46 +26,22 @@ class AmountSelector extends LitElement {
                 .header {
                     display: flex;
                     justify-content: space-between;
+                    margin-bottom: var(--spacing-small);
                 }
                 
                 .amount-input-container {
                     display: flex;
                     flex-direction: column;
-                    
-                    .button {
-                        margin-left: auto;
-                    }
-
-                    chevron-left-icon {
-                        transform: rotate(-90deg);
-                    }
-                }
-                
-                .two-input-container {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
                     gap: var(--spacing-small);
                 }
                 
-                .button-text {
-                    display: none;
-                }
-                
-                @media (min-width: 768px) {
-                    .button-text {
-                        display: block;
-                    }
+                .inputs-row {
+                    display: grid;
+                    grid-template-columns: 1fr 100px 100px;
+                    gap: var(--spacing-small);
                 }
             `
         ];
-    }
-
-    _toggleMode() {
-        this.isRange = !this.isRange;
-        this.amount = "";
-        this.min = null;
-        this.max = null;
-        this._emitChange();
     }
 
     _handleInputChange(e) {
@@ -88,7 +64,7 @@ class AmountSelector extends LitElement {
     _emitChange() {
         this.dispatchEvent(new CustomEvent('amount-changed', {
             detail: {
-                isRange: this.isRange,
+                isRange: true, // Always include both single and range values
                 amount: this.amount,
                 min: this.min,
                 max: this.max
@@ -103,45 +79,36 @@ class AmountSelector extends LitElement {
             <div class="amount-input-container">
                 <div class="header">
                     <strong>Amount You Want</strong>
-                    <button @click=${this._toggleMode} class="button small-link-button">
-                        <span class="button-text">
-                            ${this.isRange ? 'Switch to Single Amount' : 'Switch to Range'}
-                        </span>
-                        <chevron-left-icon></chevron-left-icon>
-                    </button>
                 </div>
                 
-                ${this.isRange
-                    ? html`
-                        <div class="two-input-container">
-                            <custom-input
-                                class="small-input"
-                                type="number"
-                                name="min"
-                                placeholder="Min Amount"
-                                .value=${this.min ?? ''}
-                                @input=${this._onMinChange}
-                            ></custom-input>
-                            <custom-input
-                                class="small-input"
-                                type="number"
-                                name="max"
-                                placeholder="Max Amount"
-                                .value=${this.max ?? ''}
-                                @input=${this._onMaxChange}
-                            ></custom-input>
-                        </div>
-                    `
-                    : html`
-                        <custom-input
-                            class="single-input"
-                            type="text"
-                            name="amount"
-                            placeholder="Amount"
-                            .value=${this.amount}
-                            @input=${this._handleInputChange}
-                        ></custom-input>
-                    `}
+                <div class="inputs-row">
+                    <custom-input
+                    class="single-input"
+                    type="text"
+                    name="amount"
+                    placeholder="Single Amount"
+                    .value=${this.amount}
+                    @input=${this._handleInputChange}
+                ></custom-input>
+                
+                <custom-input
+                    class="small-input"
+                    type="number"
+                    name="min"
+                    placeholder="Min Amount"
+                    .value=${this.min ?? ''}
+                    @input=${this._onMinChange}
+                ></custom-input>
+                <custom-input
+                    class="small-input"
+                    type="number"
+                    name="max"
+                    placeholder="Max Amount"
+                    .value=${this.max ?? ''}
+                    @input=${this._onMaxChange}
+                ></custom-input>
+                </div>
+                
             </div>
         `;
     }

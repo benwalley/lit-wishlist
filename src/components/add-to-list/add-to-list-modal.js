@@ -12,6 +12,7 @@ import './images-selector.js'
 import './delete-automatically-selector.js'
 import './visibility-selector/visibility-selector-container.js'
 import '../lists/select-my-lists.js'
+import '../../svg/gear.js'
 import {customFetch} from "../../helpers/fetchHelpers.js";
 import {triggerUpdateList} from "../../events/eventListeners.js";
 import {invalidateCache} from "../../helpers/caching.js";
@@ -68,9 +69,27 @@ export class AddToListModal extends LitElement {
             buttonStyles,
             css`
                 .modal-header {
+                    position: sticky;
+                    top: 0;
+                    z-index: 10;
+                    background-color: var(--background-dark);
+                    border-bottom: 1px solid var(--border-color);
                 }
 
                 .modal-footer {
+                    position: sticky;
+                    bottom: 0;
+                    z-index: 10;
+                    background-color: var(--modal-background-color);
+                    padding: var(--spacing-normal);
+                    border-top: 1px solid var(--border-color);
+                }
+                
+                .modal-contents {
+                    display: flex;
+                    flex-direction: column;
+                    height: 100%;
+                    max-height: 90vh;
                 }
 
                 .modal-title {
@@ -97,6 +116,8 @@ export class AddToListModal extends LitElement {
                     gap: var(--spacing-normal);
                     grid-template-columns: 1fr;
                     padding: var(--spacing-normal);
+                    overflow-y: auto;
+                    flex: 1;
                 }
 
                 @media (min-width: 768px) {
@@ -106,12 +127,44 @@ export class AddToListModal extends LitElement {
                 }
 
                 .save-button {
-                    position: sticky;
-                    bottom: 0;
-                    left: 0;
                     width: 100%;
-
-                    box-shadow: 0 83px 20px 100px var(--modal-background-color);
+                }
+                
+                .advanced-options-container {
+                    grid-column: 1 / -1;
+                    margin-top: var(--spacing-normal);
+                    text-align: right;
+                }
+                
+                .advanced-options-content {
+                    margin-top: var(--spacing-normal);
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-normal);
+                    border-top: 1px solid var(--border-color);
+                    padding-top: var(--spacing-normal);
+                }
+                
+                .show-advanced-button {
+                    background-color: transparent;
+                    border: none;
+                    color: var(--primary-color);
+                    font-size: var(--font-size-small);
+                    cursor: pointer;
+                    transition: var(--transition-200);
+                    
+                    gear-icon {
+                        transition: var(--transition-normal);
+                    }
+                    
+                    &:hover {
+                        color: var(--purple-darker);
+                        transform: none;
+                        
+                        gear-icon {
+                            transform: rotate(90deg);
+                        }
+                    }
                 }
             `
         ];
@@ -119,11 +172,14 @@ export class AddToListModal extends LitElement {
 
     renderAdvancedOptions() {
         return html`
-            is public
-            advanced visibility
-            <delete-automatically-selector></delete-automatically-selector>
-            <visibility-selector-container></visibility-selector-container>
-            linked items
+            <div class="advanced-options-content">
+                <delete-automatically-selector
+                    @change="${(e) => this.autoDelete = e.detail.value}"
+                ></delete-automatically-selector>
+                <visibility-selector-container
+                    @visibility-changed="${(e) => this.visibility = e.detail.value}"
+                ></visibility-selector-container>
+            </div>
         `
     }
 
@@ -252,12 +308,13 @@ export class AddToListModal extends LitElement {
                             ></wysiwyg-editor>
                         </div>
 
-
-                        <button type="button" class="button primary" @click=${this._handleToggleAdvancedOptions}>
-                            ${this.advancedOpen ? "Hide Advanced Options" : "Show Advanced Options"}
-                        </button>
-                        ${this.advancedOpen ? this.renderAdvancedOptions() : ''}
-
+                        <div class="advanced-options-container">
+                            <button type="button" class="show-advanced-button" @click=${this._handleToggleAdvancedOptions}>
+                                ${this.advancedOpen ? "Hide Advanced Options" : "Show Advanced Options"}
+                                <gear-icon></gear-icon>
+                            </button>
+                            ${this.advancedOpen ? this.renderAdvancedOptions() : ''}
+                        </div>
                     </div>
 
                     <div class="modal-footer">

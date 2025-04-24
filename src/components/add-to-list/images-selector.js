@@ -82,12 +82,7 @@ export class ImagesSelector extends LitElement {
     _onImageUpdated(e, idx) {
         const { imageId } = e.detail;
         this.images[idx] = imageId;
-
-        // Force a re-render. Since we replaced the array element in-place,
-        // Lit might not see it as a property change, so let's reassign:
         this.images = [...this.images];
-
-        // Let the outside world know that the array changed.
         this._emitImagesChanged();
     }
 
