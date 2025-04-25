@@ -25,6 +25,8 @@ export class WysiwygEditor extends LitElement {
             border-radius: 8px;
             background: var(--wysiwyg-bg, #ffffff);
             overflow: hidden; /* keep toolbar radius */
+            width: 100%;
+            box-sizing: border-box;
         }
 
         /* Toolbar */

@@ -97,8 +97,8 @@
     /* Header/Footer/Links */
     --header-text-color: var(--text-color-dark);
     --link-color: var(--purple-normal);
-    --tooltip-background-color: var(--background-light-light);
-    --tooltip-text-color: var(--dark-text-color);
+    --tooltip-background-color: #3d3d3d;
+    --tooltip-text-color: var(--light-text-color);
     --footer-background-color: var(--header-background);
 
 
@@ -264,8 +264,7 @@ body[data-mode="dark"] {
     --option-select-background-hover: #4a4a4a;
     --input-background-color: var(--background-color);
 
-    --tooltip-background-color: var(--background-dark-light);
-    --tooltip-text-color: var(--light-text-color);
+
 
 
     /* Flip text colors in dark mode */

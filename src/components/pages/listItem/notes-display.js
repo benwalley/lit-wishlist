@@ -31,7 +31,7 @@ export class CustomElement extends LitElement {
 
     render() {
         return html`
-            ${unsafeHTML(this.itemData.note || '--')}
+            ${unsafeHTML(this.itemData.notes || this.itemData.note || '--')}
     `;
     }
 }

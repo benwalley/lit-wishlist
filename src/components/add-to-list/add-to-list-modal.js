@@ -2,6 +2,7 @@ import {LitElement, html, css} from 'lit';
 import {ADD_MODAL_EVENT} from "../../events/custom-events.js";
 import '../global/custom-modal.js'
 import '../global/custom-input.js'
+import '../global/custom-toggle.js'
 import './price-input.js'
 import buttonStyles from "../../css/buttons.js";
 import './multi-input.js'
@@ -21,7 +22,6 @@ export class AddToListModal extends LitElement {
     static properties = {
         advancedOpen: {type: Boolean},
         selectedListIds: {type: Array},
-        // Form state variables
         itemName: {type: String},
         isPriceRange: {type: Boolean},
         singlePrice: {type: Number},
@@ -29,14 +29,18 @@ export class AddToListModal extends LitElement {
         maxPrice: {type: Number},
         links: {type: Array},
         notes: {type: String},
-        images: {type: Array},
+        imageIds: {type: Array},
         amount: {type: String},
         minAmount: {type: Number},
         maxAmount: {type: Number},
         priority: {type: Number},
         isPublic: {type: Boolean},
         autoDelete: {type: Boolean},
+        visibleToUsers: {type: Array},
+        visibleToGroups: {type: Array},
+        deleteOnData: {type: String},
         visibility: {type: String},
+        matchListVisibility: {type: Boolean},
     };
 
 
@@ -53,13 +57,16 @@ export class AddToListModal extends LitElement {
         this.links = [{url: '', displayName: ''}];
         this.notes = '';
         this.images = [];
+        this.imageIds = []; // Add this to ensure property is initialized
         this.amount = '';
         this.minAmount = 0;
         this.maxAmount = 0;
         this.priority = 1;
         this.isPublic = false;
         this.autoDelete = false;
-        this.visibility = '';
+        this.matchListVisibility = true;
+        this.visibleToUsers = [];
+        this.visibleToGroups = [];
         this.selectedListIds = [];
     }
 
@@ -90,6 +97,7 @@ export class AddToListModal extends LitElement {
                     flex-direction: column;
                     height: 100%;
                     max-height: 90vh;
+                    border-radius: var(--border-radius-large);
                 }
 
                 .modal-title {
@@ -117,12 +125,15 @@ export class AddToListModal extends LitElement {
                     grid-template-columns: 1fr;
                     padding: var(--spacing-normal);
                     overflow-y: auto;
+                    overflow-x: hidden; /* Prevent horizontal scrolling */
                     flex: 1;
+                    width: 100%;
+                    box-sizing: border-box; /* Ensure padding is included in width */
                 }
 
                 @media (min-width: 768px) {
                     .scrolling-contents {
-                        grid-template-columns: 1fr 1fr;
+                        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
                     }
                 }
 
@@ -166,6 +177,33 @@ export class AddToListModal extends LitElement {
                         }
                     }
                 }
+                
+                .public-toggle-section {
+                    margin-top: var(--spacing-normal);
+                    padding: var(--spacing-small);
+                    background-color: var(--background-dark);
+                    border-radius: var(--border-radius-normal);
+                    border: 1px solid var(--border-color);
+                }
+                
+                .public-toggle-section h3 {
+                    margin: 0 0 var(--spacing-small) 0;
+                    font-size: var(--font-size-small);
+                    font-weight: 600;
+                    color: var(--text-color-dark);
+                }
+                
+                .toggle-wrapper {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: var(--spacing-small);
+                }
+                
+                .public-toggle-description {
+                    font-size: var(--font-size-x-small);
+                    color: var(--text-color-medium-dark);
+                    line-height: 1.4;
+                }
             `
         ];
     }
@@ -177,7 +215,7 @@ export class AddToListModal extends LitElement {
                     @change="${(e) => this.autoDelete = e.detail.value}"
                 ></delete-automatically-selector>
                 <visibility-selector-container
-                    @visibility-changed="${(e) => this.visibility = e.detail.value}"
+                    @visibility-changed="${this._handleVisibilityChanged}"
                 ></visibility-selector-container>
             </div>
         `
@@ -196,15 +234,18 @@ export class AddToListModal extends LitElement {
             minPrice: this.minPrice,
             maxPrice: this.maxPrice,
             links: this.links,
-            note: this.notes,
-            imageIds: this.images,
+            notes: this.notes,
+            note: this.notes, // Include both for backward compatibility
+            imageIds: this.imageIds.filter(id => id !== 0),
             amountWanted: this.amount,
             minAmountWanted: this.minAmount,
             maxAmountWanted: this.maxAmount,
             priority: this.priority,
             isPublic: this.isPublic,
             autoDelete: this.autoDelete,
-            visibility: this.visibility,
+            visibleToUsers: this.visibleToUsers,
+            visibleToGroups: this.visibleToGroups,
+            matchListVisibility: this.matchListVisibility,
             lists: this.selectedListIds,
         };
 
@@ -219,7 +260,7 @@ export class AddToListModal extends LitElement {
         console.log('Submitting Form Data:', formData);
 
         const response = await customFetch('/listItems/create', options, true)
-        invalidateCache('/lists/*')
+
         triggerUpdateList()
         this.closeModal();
     }
@@ -232,14 +273,16 @@ export class AddToListModal extends LitElement {
         this.maxPrice = 0;
         this.links = [{url: '', displayName: ''}];
         this.notes = '';
-        this.images = [];
+        this.imageIds = [];
         this.amount = '';
         this.minAmount = 0;
         this.maxAmount = 0;
         this.priority = 1;
         this.isPublic = false;
         this.autoDelete = false;
-        this.visibility = '';
+        this.matchListVisibility = true;
+        this.visibleToUsers = [];
+        this.visibleToGroups = [];
         this.selectedListIds = [];
     }
 
@@ -289,8 +332,8 @@ export class AddToListModal extends LitElement {
                                     .value="${this.priority}"
                                     @priority-changed="${(e) => this.priority = e.detail.value}"
                             ></priority-selector>
-                            <images-selector .images="${this.images}"
-                                             @images-changed="${(e) => this.images = e.detail.images}"></images-selector>
+                            <images-selector .images="${this.imageIds}"
+                                             @images-changed="${(e) => this.imageIds = e.detail.images}"></images-selector>
                          
                         </div>
 
@@ -306,6 +349,20 @@ export class AddToListModal extends LitElement {
                                     .max="${this.maxAmount}"
                                     @amount-changed="${this._handleAmountChange}"
                             ></amount-you-want>
+                            
+                            <div class="public-toggle-section">
+                                <h3>Public Visibility</h3>
+                                <div class="toggle-wrapper">
+                                    <custom-toggle
+                                        id="is-public-toggle"
+                                        @change="${(e) => this.isPublic = e.detail.checked}"
+                                        .checked="${this.isPublic}"
+                                    ></custom-toggle>
+                                    <label for="is-public-toggle" class="public-toggle-description">
+                                        Set whether a non logged in user can see this item. Item will only be publicly visible if the user is viewing it from a publicly visible list.
+                                    </label>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="advanced-options-container">
@@ -344,6 +401,13 @@ export class AddToListModal extends LitElement {
     _handleSelectedListsChange(e) {
         const {selectedListIds} = e.detail;
         this.selectedListIds = selectedListIds;
+    }
+
+    _handleVisibilityChanged(e) {
+        const { isPublic, selectedGroups, selectedUsers, matchListVisibility } = e.detail;
+        this.matchListVisibility = matchListVisibility;
+        this.visibleToGroups = selectedGroups || [];
+        this.visibleToUsers = selectedUsers || [];
     }
 }
 

@@ -6,7 +6,12 @@ import '../../../svg/success.js';
 import '../../../svg/share.js';
 import '../../../svg/dots.js';
 import {currencyHelper} from "../../../helpers.js";
-import '../../pages/account/avatar.js'
+import '../../pages/account/avatar.js';
+import '../../global/action-dropdown.js';
+import {messagesState} from "../../../state/messagesStore.js";
+import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
+import '../../../svg/edit.js';
+import '../../../svg/delete.js';
 
 export class ContributorsTopBar extends LitElement {
     static properties = {
@@ -16,6 +21,7 @@ export class ContributorsTopBar extends LitElement {
         itemId: {type: String},
         loading: {type: Boolean},
         amountPledged: {type: Number},
+        actionItems: {type: Array},
     };
 
     constructor() {
@@ -26,6 +32,67 @@ export class ContributorsTopBar extends LitElement {
         this.itemId = '';
         this.loading = true; // Initial loading state
         this.amountPledged = 0;
+        this.actionItems = [
+            {
+                id: 'edit',
+                label: 'Edit Item',
+                icon: html`<edit-icon></edit-icon>`,
+                classes: 'blue-text',
+                action: () => this.handleEditItem()
+            },
+            {
+                id: 'share',
+                label: 'Copy Link',
+                icon: html`<share-icon></share-icon>`,
+                classes: 'purple-text',
+                action: () => this.handleCopyLink()
+            },
+            {
+                id: 'delete',
+                label: 'Delete Item',
+                icon: html`<delete-icon></delete-icon>`,
+                classes: 'danger-text',
+                action: () => this.handleDeleteItem()
+            }
+        ];
+    }
+    
+    handleEditItem() {
+        this.dispatchEvent(new CustomEvent('edit-item', {
+            detail: { itemId: this.itemId }
+        }));
+    }
+    
+    handleCopyLink() {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url)
+            .then(() => {
+                messagesState.addMessage('Link copied to clipboard!');
+            })
+            .catch(err => {
+                console.error('Could not copy text: ', err);
+                messagesState.addMessage('Failed to copy link', 'error');
+            });
+    }
+    
+    async handleDeleteItem() {
+        try {
+            const confirmed = await showConfirmation({
+                heading: 'Delete Item',
+                message: 'Are you sure you want to delete this item?',
+                submessage: 'This action cannot be undone.',
+                confirmLabel: 'Delete',
+                cancelLabel: 'Cancel'
+            });
+            
+            if (confirmed) {
+                this.dispatchEvent(new CustomEvent('delete-item', {
+                    detail: { itemId: this.itemId }
+                }));
+            }
+        } catch (error) {
+            console.error('Error in delete confirmation:', error);
+        }
     }
 
     static get styles() {
@@ -469,15 +536,19 @@ export class ContributorsTopBar extends LitElement {
                     <button
                             class="button icon-button action-button fade-in"
                             aria-label="share"
+                            @click=${this.handleCopyLink}
                     >
                         <share-icon></share-icon>
                     </button>
-                    <button
+                    <action-dropdown .items=${this.actionItems} placement="bottom-start">
+                        <button
                             class="button icon-button action-button fade-in"
                             aria-label="Actions"
-                    >
-                        <dots-icon></dots-icon>
-                    </button>
+                            slot="toggle"
+                        >
+                            <dots-icon></dots-icon>
+                        </button>
+                    </action-dropdown>
                 </div>
             </div>
         `;

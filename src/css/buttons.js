@@ -83,6 +83,39 @@ export default css`
             }
         }
 
+        /* Dropdown item styles */
+        &.danger-text {
+            color: var(--delete-red);
+            &:hover,
+            &:focus {
+                background-color: var(--delete-red-light);
+            }
+        }
+        
+        &.blue-text {
+            color: var(--blue-normal);
+            &:hover,
+            &:focus {
+                background-color: var(--blue-light);
+            }
+        }
+
+        &.green-text {
+            color: var(--green-normal);
+            &:hover,
+            &:focus {
+                background-color: var(--green-light);
+            }
+        }
+
+        &.purple-text {
+            color: var(--purple-normal);
+            &:hover,
+            &:focus {
+                background-color: var(--purple-light);
+            }
+        }
+
         &.blue {
             background-color: var(--blue-normal);
             color: var(--light-text-color);

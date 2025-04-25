@@ -62,4 +62,9 @@
  - Messages can be added using the messageState add method like
    - `messagesState.addMessage('User info successfully updated');`
 
+### Documentation
+ - Any components or functionality we use needs to get documented in /documentation. 
+ - There shold be a file for each type of component or practice we're using.
+ - The documentation should be very simple and straight forward such as an example of usage and a few sentences of description
+ - 
 

@@ -15,6 +15,7 @@ const imageUploadEvents = {
 }
 
 export function triggerUpdateList() {
+    invalidateCache('/lists/*')
     triggerCustomEvent(UPDATE_LIST_EVENT);
 }
 
