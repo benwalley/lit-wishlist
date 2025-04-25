@@ -135,21 +135,54 @@ export class CustomElement extends LitElement {
         this.selectAll = this.selectAll.bind(this);
         this.clearSelection = this.clearSelection.bind(this);
     }
+    
+    // Actual disconnectedCallback implementation is in fetchLists
+    // to ensure proper cleanup of async operations
 
     async fetchLists() {
+        // Flag to track if component was unmounted during fetch
+        let isMounted = true;
+        
+        // Store a reference to the component instance for cleanup
+        const cleanup = () => {
+            isMounted = false;
+        };
+        
+        // Set up cleanup if component is unmounted
+        this.disconnectedCallback = () => {
+            super.disconnectedCallback();
+            cleanup();
+        };
+        
         try {
             this.loading = true;
             const response = await cachedFetch('/lists/mine', {}, true);
+
+            // Check if component was unmounted during the fetch
+            if (!isMounted) return;
 
             if (response?.responseData?.error) {
                 throw new Error(response?.responseData?.error);
             }
 
-            this.lists = response; // Update the `lists` property with the fetched data
+            // Ensure response is properly formatted and contains data
+            if (response?.success) {
+                this.lists = Array.isArray(response.data) ? response.data : [];
+            } else {
+                // Handle legacy response format or direct array response
+                this.lists = Array.isArray(response) ? response : [];
+            }
         } catch (error) {
-            console.error('Error fetching lists:', error);
+            // Only log error if component is still mounted
+            if (isMounted) {
+                console.error('Error fetching lists:', error);
+                this.lists = []; // Reset to empty array on error
+            }
         } finally {
-            this.loading = false;
+            // Only update loading state if component is still mounted
+            if (isMounted) {
+                this.loading = false;
+            }
         }
     }
 
@@ -166,8 +199,9 @@ export class CustomElement extends LitElement {
     }
 
     selectAll() {
-        // Set selectedListIds to include all list IDs
-        this.selectedListIds = this.lists
+        // Set selectedListIds to include all list IDs, ensuring lists is an array
+        const listsArray = Array.isArray(this.lists) ? this.lists : [];
+        this.selectedListIds = listsArray
             .filter(list => list && list.id)
             .map(list => list.id);
         this._emitChangeEvent();
@@ -181,8 +215,11 @@ export class CustomElement extends LitElement {
     }
 
     _emitChangeEvent() {
+        // Ensure lists is an array before using find method
+        const listsArray = Array.isArray(this.lists) ? this.lists : [];
+        
         const selectedLists = this.selectedListIds
-            .map(id => this.lists.find(list => list && list.id === id))
+            .map(id => listsArray.find(list => list && list.id === id))
             .filter(Boolean);
 
         this.dispatchEvent(new CustomEvent('change', {
@@ -203,7 +240,7 @@ export class CustomElement extends LitElement {
             `;
         }
 
-        if (!this.lists || this.lists.length === 0) {
+        if (!this.lists || !Array.isArray(this.lists) || this.lists.length === 0) {
             return html`
                 <div class="empty-message">No lists available.</div>
             `;
@@ -230,15 +267,18 @@ export class CustomElement extends LitElement {
             </div>
 
             <div class="lists-container">
-                ${this.lists.map(
-                    list => html`
-                        <select-list-item
-                            .itemData=${list}
-                            .isSelected="${this.selectedListIds.includes(list.id)}"
-                            @item-clicked="${this._handleItemClick}"
-                        ></select-list-item>
-                    `
-                )}
+                ${Array.isArray(this.lists) 
+                    ? this.lists.map(
+                        list => list ? html`
+                            <select-list-item
+                                .itemData=${list}
+                                .isSelected="${this.selectedListIds.includes(list?.id)}"
+                                @item-clicked="${this._handleItemClick}"
+                            ></select-list-item>
+                        ` : ''
+                    )
+                    : html`<div class="empty-message">No lists available.</div>`
+                }
             </div>
         `;
     }

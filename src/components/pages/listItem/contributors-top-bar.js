@@ -12,6 +12,7 @@ import {messagesState} from "../../../state/messagesStore.js";
 import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
 import '../../../svg/edit.js';
 import '../../../svg/delete.js';
+import {openEditItemModal} from "../../add-to-list/edit-item-modal.js";
 
 export class ContributorsTopBar extends LitElement {
     static properties = {
@@ -56,13 +57,15 @@ export class ContributorsTopBar extends LitElement {
             }
         ];
     }
-    
+
     handleEditItem() {
-        this.dispatchEvent(new CustomEvent('edit-item', {
-            detail: { itemId: this.itemId }
-        }));
+        if(!this.itemData) {
+            messagesState.addMessage('Error editing item. Please reload page and try again.', 'error');
+            return;
+        }
+        openEditItemModal(this.itemData)
     }
-    
+
     handleCopyLink() {
         const url = window.location.href;
         navigator.clipboard.writeText(url)
@@ -74,7 +77,7 @@ export class ContributorsTopBar extends LitElement {
                 messagesState.addMessage('Failed to copy link', 'error');
             });
     }
-    
+
     async handleDeleteItem() {
         try {
             const confirmed = await showConfirmation({
@@ -84,7 +87,7 @@ export class ContributorsTopBar extends LitElement {
                 confirmLabel: 'Delete',
                 cancelLabel: 'Cancel'
             });
-            
+
             if (confirmed) {
                 this.dispatchEvent(new CustomEvent('delete-item', {
                     detail: { itemId: this.itemId }

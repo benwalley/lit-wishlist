@@ -43,7 +43,8 @@ export class CustomElement extends LitElement {
                     display: inline-block;
                     flex-grow: 1;
                 }
-                .get-this-button {
+                .get-this-button,
+                .contribute-button {
                     width: 100%;
                 }
 
@@ -140,7 +141,7 @@ export class CustomElement extends LitElement {
         const maxAmount = Math.max(parseInt(this.itemData?.amountWanted) || 1, this.itemData?.maxAmountWanted);
         const progressPercent = Math.min((this.total / maxAmount) * 100, 100);
         return html`
-            <button class="button shadow ghost large fancy" @click="${this._openModal}">
+            <button class="button shadow contribute-button ghost large fancy" @click="${this._openModal}">
                 <contribute-icon></contribute-icon>
                 <span>Contribute</span>
             </button>

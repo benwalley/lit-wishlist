@@ -1,6 +1,7 @@
 
 export const ADD_MODAL_EVENT = 'open-add-modal';
 export const EDIT_LIST_EVENT = 'open-edit-list-modal';
+export const EDIT_ITEM_EVENT = 'open-edit-item-modal';
 
 
 export function triggerCustomEvent(eventName, detail = {}, target = document, options = { bubbles: true, composed: true }) {
@@ -50,5 +51,13 @@ export function triggerEditListEvent(listData) {
 
 export function listenEditListEvent(callback) {
     return listenToCustomEvent(EDIT_LIST_EVENT, callback);
+}
+
+export function triggerEditItemEvent(itemData) {
+    triggerCustomEvent(EDIT_ITEM_EVENT, { itemData });
+}
+
+export function listenEditItemEvent(callback) {
+    return listenToCustomEvent(EDIT_ITEM_EVENT, callback);
 }
 

@@ -13,7 +13,8 @@ import {
     triggerUpdateUser,
     triggerUserListLoaded
 } from "../../events/eventListeners.js";
-import '../global/messages-component.js'
+import '../global/messages-component.js';
+import '../add-to-list/edit-item-modal.js';
 
 export class AuthContainer extends observeState(LitElement) {
     static styles = css`
@@ -67,6 +68,7 @@ export class AuthContainer extends observeState(LitElement) {
     render() {
         return html`
             <messages-component></messages-component>
+            <edit-item-modal></edit-item-modal>
             ${userState.loadingUser
                     ? html`
                         <loading-screen></loading-screen>`

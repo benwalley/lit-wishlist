@@ -12,12 +12,16 @@ import './contributors-top-bar.js';
 import '../../../svg/arrow-long-left.js';
 import '../../../svg/calendar.js';
 import '../../../svg/cart.js';
+import '../../../svg/edit.js';
 import './list-sidebar.js';
 import {cachedFetch, invalidateCache} from "../../../helpers/caching.js";
 import {formatDate} from "../../../helpers/generalHelpers.js";
 import {triggerUpdateItem} from "../../../events/eventListeners.js";
 import './get-this-button.js';
 import './contribute-button.js';
+import '../../global/action-dropdown.js';
+import {openEditItemModal} from '../../add-to-list/edit-item-modal.js';
+import {messagesState} from "../../../state/messagesStore.js";
 
 
 export class CustomElement extends LitElement {
@@ -189,12 +193,16 @@ export class CustomElement extends LitElement {
     async fetchListData() {
         try {
             const response = await cachedFetch(`/listItems/${this.itemId}`, {}, true);
-            if (response?.responseData?.error) {
-                console.log('error');
+            if(response.error || !response.success || !response.data) {
+                if(response.message) {
+                    messagesState.addMessage(response.message, 'error');
+                    return;
+                }
+                messagesState.addMessage('there was an error fetching the item', 'error');
                 return;
             }
-            this.itemData = response;
-            for(const item of this.itemData.links) {
+            this.itemData = response.data;
+            for(const item of this.itemData.links || []) {
                 const parsed = JSON.parse(item);
                 if (parsed.url) {
                     this.hasLinks = true;

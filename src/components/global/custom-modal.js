@@ -69,6 +69,7 @@ class CustomModal extends LitElement {
             max-height: 90vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden; /* Prevent double scrollbars */
         }
         /* When overlay is open, animate the modal into view */
         .overlay.open .modal {
@@ -78,21 +79,21 @@ class CustomModal extends LitElement {
 
         /* Scrollable content area */
         .modal-content {
-            max-height: 80vh;
             flex: 1;
             display: flex;
             flex-direction: column;
             /* Custom scrollbar styling */
             scrollbar-width: thin;
             scrollbar-color: var(--grayscale-400) transparent;
+            overflow: hidden;
         }
         
         /* The actual content that gets slotted will scroll */
         ::slotted(*) {
             flex: 1;
-            overflow: auto;
             display: flex;
             flex-direction: column;
+            overflow: hidden; /* Let internal elements handle their own scrolling */
         }
         
         /* Webkit scrollbar styles */

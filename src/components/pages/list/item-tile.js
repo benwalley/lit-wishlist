@@ -4,9 +4,11 @@ import '../../global/custom-image.js';
 import {currencyHelper} from "../../../helpers.js";
 import './priority-display.js';
 import '../../../svg/new-tab.js';
+import '../../../svg/edit.js';
 import '../../global/custom-tooltip.js'
 import '../listItem/price-display.js'
 import { navigate} from "../../../router/main-router.js";
+import {openEditItemModal} from '../../add-to-list/edit-item-modal.js';
 
 
 export class ItemTile extends LitElement {
@@ -69,15 +71,22 @@ export class ItemTile extends LitElement {
                     min-width: 100px;
                 }
 
-                .open-button {
+                .item-actions {
+                    display: flex;
+                    gap: var(--spacing-small);
                     position: absolute;
-                    bottom: 0;
-                    right: 0;
+                    bottom: var(--spacing-small);
+                    right: var(--spacing-small);
                 }
                 
-                .small .open-button {
+                .small .item-actions {
                     top: 50%;
                     transform: translateY(-50%);
+                    right: var(--spacing-small);
+                }
+                
+                .edit-button {
+                    z-index: 10;
                 }
                 
                 priority-display {
@@ -130,7 +139,6 @@ export class ItemTile extends LitElement {
      * @returns {string|null} The URL of the first link, or null if no valid link is found.
      */
     getLink() {
-
         try {
             const links = this.itemData.links;
             if (links?.length === 0) return;
@@ -139,6 +147,15 @@ export class ItemTile extends LitElement {
             return firstLinkJson;
         } catch (error) {
             return false;
+        }
+    }
+    
+    _handleEditClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (this.itemData) {
+            openEditItemModal(this.itemData);
         }
     }
 
@@ -162,18 +179,30 @@ export class ItemTile extends LitElement {
                         .value="${this.itemData.priority}"
                         heartSize="20px"
                 ></priority-display>` : ''}
-                ${link ? html`<a
-                                class="button open-button icon-button"
-                                aria-label="Open link to product"
-                                style="--icon-color: var(--blue)"
-                                href="${link.url}"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                        >
-                            <new-tab-icon></new-tab-icon>
-                        </a>
-                        <custom-tooltip>Link to ${link.displayName ?? link.url} (opens in new tab)</custom-tooltip>
-                        ` : ''}
+                
+                <div class="item-actions">
+                    ${link ? html`<a
+                                  class="button icon-button"
+                                  aria-label="Open link to product"
+                                  style="--icon-color: var(--blue)"
+                                  href="${link.url}"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                          >
+                              <new-tab-icon></new-tab-icon>
+                          </a>
+                          <custom-tooltip>Link to ${link.displayName ?? link.url} (opens in new tab)</custom-tooltip>
+                          ` : ''}
+                    
+                    <button 
+                        class="button icon-button edit-button" 
+                        aria-label="Edit item"
+                        style="--icon-color: var(--mint-700)"
+                        @click="${this._handleEditClick}"
+                    >
+                        <edit-icon></edit-icon>
+                    </button>
+                </div>
             </div>
         </a>
         `;
