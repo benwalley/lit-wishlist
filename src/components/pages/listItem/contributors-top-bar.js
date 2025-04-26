@@ -13,6 +13,7 @@ import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
 import '../../../svg/edit.js';
 import '../../../svg/delete.js';
 import {openEditItemModal} from "../../add-to-list/edit-item-modal.js";
+import {deleteItem} from "../../../helpers/api/listItems.js";
 
 export class ContributorsTopBar extends LitElement {
     static properties = {
@@ -83,18 +84,19 @@ export class ContributorsTopBar extends LitElement {
             const confirmed = await showConfirmation({
                 heading: 'Delete Item',
                 message: 'Are you sure you want to delete this item?',
-                submessage: 'This action cannot be undone.',
                 confirmLabel: 'Delete',
                 cancelLabel: 'Cancel'
             });
 
-            if (confirmed) {
-                this.dispatchEvent(new CustomEvent('delete-item', {
-                    detail: { itemId: this.itemId }
-                }));
+            const response = await deleteItem(this.itemId);
+            if(response.success) {
+                messagesState.addMessage('Item deleted successfully');
+                window.location.href = `/list/${this.listId}`;
+            } else {
+                messagesState.addMessage('Error deleting item. Please try again.', 'error');
             }
         } catch (error) {
-            console.error('Error in delete confirmation:', error);
+            messagesState.addMessage('Error deleting item. Please try again.', 'error');
         }
     }
 

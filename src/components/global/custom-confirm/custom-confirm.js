@@ -103,6 +103,7 @@ export class ConfirmModal extends LitElement {
 
                 .modal-footer {
                     display: flex;
+                    flex-direction: row;
                     justify-content: flex-end;
                     gap: var(--spacing-small);
                     padding-top: var(--spacing-small);

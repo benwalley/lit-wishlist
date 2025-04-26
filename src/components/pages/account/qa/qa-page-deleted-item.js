@@ -4,7 +4,7 @@ import '../../../../svg/restore.js';
 import '../../../../svg/delete.js';
 import '../../../global/custom-tooltip.js';
 import {observeState} from 'lit-element-state';
-import {getUsernameById} from '../../../../helpers/generalHelpers.js';
+import {getUserImageIdByUserId, getUsernameById} from '../../../../helpers/generalHelpers.js';
 import {showConfirmation} from "../../../global/custom-confirm/confirm-helper.js";
 
 export class CustomElement extends observeState(LitElement) {
@@ -92,6 +92,8 @@ export class CustomElement extends observeState(LitElement) {
                 .user-info {
                     color: var(--text-color-dark);
                     text-decoration: none;
+                    display: flex;
+                    gap: var(--spacing-x-small);
                 }
             `
         ];
@@ -162,6 +164,7 @@ export class CustomElement extends observeState(LitElement) {
                                     <a href="/user/${answer.answererId}" class="user-info">
                                         <custom-avatar size="24"
                                                        username="${getUsernameById(answer.answererId)}"
+                                                       imageId="${getUserImageIdByUserId(answer.answererId)}"
                                         ></custom-avatar>
                                         <span class="user-name">${getUsernameById(answer.answererId)}</span>
                                     </a>

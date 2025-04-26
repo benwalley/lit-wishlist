@@ -4,6 +4,8 @@ import { customFetch } from "../../helpers/fetchHelpers.js";
 import './list-item.js';
 import '../create-list/create-list-button.js';
 import { cachedFetch, invalidateCache } from "../../helpers/caching.js";
+import {messagesState} from "../../state/messagesStore.js";
+import {listenUpdateList} from "../../events/eventListeners.js";
 
 export class CustomElement extends LitElement {
     static properties = {
@@ -37,31 +39,17 @@ export class CustomElement extends LitElement {
         super.connectedCallback();
         // Fetch lists when the component is added to the DOM.
         this.fetchLists();
-
-        // Listen for the custom event to re-fetch lists.
-        document.addEventListener('fetch-lists', () => {
-            invalidateCache('/lists/mine');
-            this.fetchLists();
-        });
+        listenUpdateList(this.fetchLists.bind(this));
     }
 
     async fetchLists() {
         try {
             const response = await cachedFetch('/lists/mine', {}, true);
-
-            if (response?.responseData?.error) {
-                throw new Error(response?.responseData?.error);
-            }
-
-            // Use the View Transition API if available to animate the DOM changes.
-            if (document.startViewTransition) {
-                document.startViewTransition(() => {
-                    this.lists = response;
-                });
+            if(response.success) {
+                this.lists = response.data;
             } else {
-                this.lists = response;
+                messagesState.addMessage('error fetching lists', 'error');
             }
-            console.log(response);
         } catch (error) {
             console.error('Error fetching lists:', error);
         }

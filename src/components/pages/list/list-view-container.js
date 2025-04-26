@@ -7,6 +7,7 @@ import '../../../svg/edit.js'
 import {openEditListModal} from '../../lists/edit-list-modal.js'
 import {listenUpdateList} from "../../../events/eventListeners.js";
 import buttonStyles from '../../../css/buttons.js';
+import {messagesState} from "../../../state/messagesStore.js";
 
 export class ListViewContainer extends LitElement {
     static properties = {
@@ -37,18 +38,15 @@ export class ListViewContainer extends LitElement {
     async fetchListData() {
         try {
             const response = await customFetch(`/lists/${this.listId}`, {}, true);
-            if(response?.responseData?.error) {
-                console.log('error');
-                return;
+            if(response?.success) {
+                this.listData = response.data;
+            } else {
+                messagesState.addMessage(response.message || 'Error fetching list', 'error');
             }
-            this.listData = response;
-            this.loading = false;
-            console.log(response)
-            this.requestUpdate();
-
         } catch (error) {
-            console.error('Error fetching groups:', error);
-            this.loading = false
+            messagesState.addMessage('error fetching list', 'error');
+        } finally {
+            this.loading = false;
         }
     }
 
@@ -147,9 +145,12 @@ export class ListViewContainer extends LitElement {
                 </div>
             </div>
             <div class="list-items">
-                ${this.listData.listItems.map(item => html`
-                <item-tile .itemData="${item}" .listId="${this.listId}" @navigate="${this._navigateToItem}"></item-tile>
-            `)}
+                ${this.listData.listItems?.length 
+                    ? this.listData.listItems.map(item => html`
+                        <item-tile .itemData="${item}" .listId="${this.listId}" @navigate="${this._navigateToItem}"></item-tile>
+                    `)
+                    : html`<p>No items in this list yet.</p>`
+                }
             </div>
             
             <edit-list-modal></edit-list-modal>

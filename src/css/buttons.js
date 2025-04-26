@@ -165,6 +165,25 @@ export default css`
                 color: var(--icon-color-hover);
             }
 
+            &.danger-text {
+                --icon-color: var(--delete-red);
+                --icon-hover-background: var(--delete-red-light);
+            }
+            
+            &.blue-text {
+                --icon-color: var(--blue-normal);
+                --icon-hover-background: var(--blue-light);
+            }
+            
+            &.green-text {
+                --icon-color: var(--green-normal);
+                --icon-hover-background: var(--green-light);
+            }
+            
+            &.purple-text {
+                --icon-color: var(--purple-normal);
+                --icon-hover-background: var(--purple-light);
+            }
         }
         
         &.small-link-button {

@@ -193,26 +193,23 @@ export class CustomElement extends LitElement {
     async fetchListData() {
         try {
             const response = await cachedFetch(`/listItems/${this.itemId}`, {}, true);
-            if(response.error || !response.success || !response.data) {
-                if(response.message) {
-                    messagesState.addMessage(response.message, 'error');
-                    return;
+            if (response.success) {
+                this.itemData = response.data;
+                for(const item of this.itemData.links || []) {
+                    const parsed = JSON.parse(item);
+                    if (parsed.url) {
+                        this.hasLinks = true;
+                        break;
+                    }
                 }
-                messagesState.addMessage('there was an error fetching the item', 'error');
-                return;
+            } else {
+                messagesState.addMessage(response.message || 'there was an error fetching the item', 'error');
             }
-            this.itemData = response.data;
-            for(const item of this.itemData.links || []) {
-                const parsed = JSON.parse(item);
-                if (parsed.url) {
-                    this.hasLinks = true;
-                    break;
-                }
-            }
-            this.loading = false;
-            this.requestUpdate();
+
         } catch (error) {
             console.error('Error fetching groups:', error);
+            this.loading = false;
+        } finally {
             this.loading = false;
         }
     }

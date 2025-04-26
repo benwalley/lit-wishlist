@@ -135,25 +135,25 @@ export class CustomElement extends LitElement {
         this.selectAll = this.selectAll.bind(this);
         this.clearSelection = this.clearSelection.bind(this);
     }
-    
+
     // Actual disconnectedCallback implementation is in fetchLists
     // to ensure proper cleanup of async operations
 
     async fetchLists() {
         // Flag to track if component was unmounted during fetch
         let isMounted = true;
-        
+
         // Store a reference to the component instance for cleanup
         const cleanup = () => {
             isMounted = false;
         };
-        
+
         // Set up cleanup if component is unmounted
         this.disconnectedCallback = () => {
             super.disconnectedCallback();
             cleanup();
         };
-        
+
         try {
             this.loading = true;
             const response = await cachedFetch('/lists/mine', {}, true);
@@ -167,10 +167,8 @@ export class CustomElement extends LitElement {
 
             // Ensure response is properly formatted and contains data
             if (response?.success) {
-                this.lists = Array.isArray(response.data) ? response.data : [];
-            } else {
-                // Handle legacy response format or direct array response
-                this.lists = Array.isArray(response) ? response : [];
+                const lists = Array.isArray(response.data) ? response.data : [];
+                this.lists = lists.filter(list => list?.id > 0);
             }
         } catch (error) {
             // Only log error if component is still mounted
@@ -217,7 +215,7 @@ export class CustomElement extends LitElement {
     _emitChangeEvent() {
         // Ensure lists is an array before using find method
         const listsArray = Array.isArray(this.lists) ? this.lists : [];
-        
+
         const selectedLists = this.selectedListIds
             .map(id => listsArray.find(list => list && list.id === id))
             .filter(Boolean);

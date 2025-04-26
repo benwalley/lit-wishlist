@@ -5,17 +5,23 @@ import {currencyHelper} from "../../../helpers.js";
 import './priority-display.js';
 import '../../../svg/new-tab.js';
 import '../../../svg/edit.js';
+import '../../../svg/delete.js';
 import '../../global/custom-tooltip.js'
 import '../listItem/price-display.js'
 import { navigate} from "../../../router/main-router.js";
 import {openEditItemModal} from '../../add-to-list/edit-item-modal.js';
+import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
+import {deleteItem} from "../../../helpers/api/listItems.js";
+import {messagesState} from "../../../state/messagesStore.js";
+import {userState} from "../../../state/userStore.js";
+import {observeState} from "lit-element-state";
 
 
-export class ItemTile extends LitElement {
+export class ItemTile extends observeState(LitElement) {
     static properties = {
         itemData: {type: Object},
         listId: {type: String},
-        small: {type: Boolean}
+        small: {type: Boolean},
     };
 
     constructor() {
@@ -23,6 +29,17 @@ export class ItemTile extends LitElement {
         this.itemData = {};
         this.listId = '';
         this.small = false;
+    }
+
+    /**
+     * Checks if the current user is the owner of the list
+     * @returns {boolean} True if current user is list owner, false otherwise
+     */
+    isListOwner() {
+        const currentUser = userState.userData;
+        if(!currentUser) return false;
+        if(!this.itemData?.createdById) return false
+        return currentUser.id === this.itemData?.createdById;
     }
 
     static get styles() {
@@ -149,13 +166,39 @@ export class ItemTile extends LitElement {
             return false;
         }
     }
-    
+
     _handleEditClick(e) {
         e.preventDefault();
         e.stopPropagation();
-        
+
         if (this.itemData) {
             openEditItemModal(this.itemData);
+        }
+    }
+
+    async _handleDeleteClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        try {
+            const confirmed = await showConfirmation({
+                heading: 'Delete Item',
+                message: 'Are you sure you want to delete this item?',
+                confirmLabel: 'Delete',
+                cancelLabel: 'Cancel'
+            });
+
+            if (confirmed) {
+                const response = await deleteItem(this.itemData.id);
+                if (response.success) {
+                    messagesState.addMessage('Item deleted successfully');
+                    window.location.href = `/list/${this.listId}`;
+                } else {
+                    messagesState.addMessage('Error deleting item. Please try again.', 'error');
+                }
+            }
+        } catch (error) {
+            messagesState.addMessage('Error deleting item. Please try again.', 'error');
         }
     }
 
@@ -182,9 +225,8 @@ export class ItemTile extends LitElement {
                 
                 <div class="item-actions">
                     ${link ? html`<a
-                                  class="button icon-button"
+                                  class="button icon-button blue-text"
                                   aria-label="Open link to product"
-                                  style="--icon-color: var(--blue)"
                                   href="${link.url}"
                                   target="_blank"
                                   rel="noopener noreferrer"
@@ -194,14 +236,22 @@ export class ItemTile extends LitElement {
                           <custom-tooltip>Link to ${link.displayName ?? link.url} (opens in new tab)</custom-tooltip>
                           ` : ''}
                     
-                    <button 
-                        class="button icon-button edit-button" 
-                        aria-label="Edit item"
-                        style="--icon-color: var(--mint-700)"
-                        @click="${this._handleEditClick}"
-                    >
-                        <edit-icon></edit-icon>
-                    </button>
+                    ${this.isListOwner() ? html`
+                        <button
+                                class="button icon-button delete-button danger-text"
+                                aria-label="Delete item"
+                                @click="${this._handleDeleteClick}"
+                        >
+                            <delete-icon></delete-icon>
+                        </button>
+                        <button 
+                            class="button icon-button edit-button blue-text" 
+                            aria-label="Edit item"
+                            @click="${this._handleEditClick}"
+                        >
+                            <edit-icon></edit-icon>
+                        </button>
+                    ` : ''}
                 </div>
             </div>
         </a>

@@ -118,7 +118,7 @@ export class CustomElement extends LitElement {
     _handleEdit(e) {
         e.preventDefault();
         e.stopPropagation();
-        
+
         // Import and use the openEditListModal function
         import('./edit-list-modal.js').then(module => {
             const { openEditListModal } = module;
@@ -157,21 +157,23 @@ export class CustomElement extends LitElement {
                     </div>
                     
                 </div>
-                <button class="edit-button icon-button" 
-                        aria-label="Edit List Details"
-                        @click="${this._handleEdit}"
-                        style="--icon-color: var(--blue-normal); 
-                        --icon-color-hover: var(--blue-darker); 
-                        --icon-hover-background: var(--blue-light)">
-                    <edit-icon style="width: 1em; height: 1em"></edit-icon>
-                </button>
-                <custom-tooltip>Edit this list</custom-tooltip>
-                <button class="delete-button icon-button" aria-label="Delete List"
-                        @click="${this._handleDelete}"
-                        style="--icon-color: var(--delete-red); --icon-color-hover: var(--delete-red); --icon-hover-background: var(--delete-red-light)">
-                    <delete-icon style="width: 1em; height: 1em"></delete-icon>
-                </button>
-                <custom-tooltip style="min-width: 150px;">Delete this list</custom-tooltip>
+                ${this.itemData.id === 0 ? '' : html`
+                    <button class="edit-button icon-button" 
+                            aria-label="Edit List Details"
+                            @click="${this._handleEdit}"
+                            style="--icon-color: var(--blue-normal); 
+                            --icon-color-hover: var(--blue-darker); 
+                            --icon-hover-background: var(--blue-light)">
+                        <edit-icon style="width: 1em; height: 1em"></edit-icon>
+                    </button>
+                    <custom-tooltip>Edit this list</custom-tooltip>
+                    <button class="delete-button icon-button" aria-label="Delete List"
+                            @click="${this._handleDelete}"
+                            style="--icon-color: var(--delete-red); --icon-color-hover: var(--delete-red); --icon-hover-background: var(--delete-red-light)">
+                        <delete-icon style="width: 1em; height: 1em"></delete-icon>
+                    </button>
+                    <custom-tooltip style="min-width: 150px;">Delete this list</custom-tooltip>
+                `}
             </a>
         `;
     }
