@@ -68,13 +68,14 @@ export class AuthContainer extends observeState(LitElement) {
     render() {
         return html`
             <messages-component></messages-component>
-            <edit-item-modal></edit-item-modal>
             ${userState.loadingUser
                     ? html`
                         <loading-screen></loading-screen>`
                     : html`
                         <slot></slot>`
             }
+            <edit-item-modal></edit-item-modal>
+
         `;
     }
 }
