@@ -41,7 +41,7 @@ export class AddQuestionModal extends LitElement {
         qaForm.sharedWithUserIds = editData?.sharedWithUserIds || []
         qaForm.sharedWithGroupIds = editData?.sharedWithGroupIds || []
         qaForm.isAnonymous = editData?.isAnonymous || false
-        qaForm.isEditMode = editData?.editMode ? true : false
+        qaForm.isEditMode = editData?.isEditMode ? true : false
         qaForm.questionId = editData?.questionId || null
         this.isOpen = true;
     }

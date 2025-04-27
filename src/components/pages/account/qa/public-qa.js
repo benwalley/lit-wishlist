@@ -62,9 +62,7 @@ export class PublicQA extends observeState(LitElement) {
                 padding: var(--spacing-large);
             }
             
-            .qa-list qa-item {
-                pointer-events: none;
-            }
+            /* No longer disabling pointer events on qa-items to allow edit/delete */
         `,
     ];
 
@@ -73,12 +71,27 @@ export class PublicQA extends observeState(LitElement) {
         this.userId = '';
         this.qaItems = [];
         this.isLoading = false;
+        
+        // Bind event handlers
+        this._handleEditQuestion = this._handleEditQuestion.bind(this);
+        this._handleDeleteQuestion = this._handleDeleteQuestion.bind(this);
+        this._fetchQAItems = this._fetchQAItems.bind(this);
     }
 
     connectedCallback() {
         super.connectedCallback();
         this._fetchQAItems();
-        listenUpdateQa(this._fetchQAItems.bind(this));
+        listenUpdateQa(this._fetchQAItems);
+        
+        // Add event listener for edit-question
+        this.addEventListener('edit-question', this._handleEditQuestion);
+        this.addEventListener('qa-item-deleted', this._handleDeleteQuestion);
+    }
+    
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        this.removeEventListener('edit-question', this._handleEditQuestion);
+        this.removeEventListener('qa-item-deleted', this._handleDeleteQuestion);
     }
 
     updated(changedProperties) {
@@ -115,6 +128,18 @@ export class PublicQA extends observeState(LitElement) {
     _handleAskQuestion() {
         triggerAddQuestionEvent({sharedWithUserIds: [parseInt(this.userId)] });
     }
+    
+    _handleEditQuestion(event) {
+        triggerAddQuestionEvent(event.detail.question);
+    }
+    
+    _handleDeleteQuestion(event) {
+        this.dispatchEvent(new CustomEvent('delete-question', {
+            detail: event.detail,
+            bubbles: true,
+            composed: true
+        }));
+    }
 
     render() {
         return html`
@@ -129,7 +154,12 @@ export class PublicQA extends observeState(LitElement) {
             <div class="qa-list">
                 ${!this.isLoading && this.qaItems.length === 0
                     ? html`<div class="empty-state">No public Q&A items available.</div>`
-                    : this.qaItems.map(item => html`<qa-item .item=${item}></qa-item>`)}
+                    : this.qaItems.map(item => html`
+                        <qa-item 
+                            .item=${item}
+                            @edit-question="${this._handleEditQuestion}"
+                            @qa-item-deleted="${this._handleDeleteQuestion}"
+                        ></qa-item>`)}
             </div>
             <button class="primary" @click=${this._handleAskQuestion}>Ask a question</button>
         `;

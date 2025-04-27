@@ -8,9 +8,10 @@ import {messagesState} from "../../../state/messagesStore.js";
 import '../../loading/skeleton-loader.js';
 import { observeState } from 'lit-element-state';
 import { userState } from "../../../state/userStore.js";
-import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
 import '../../pages/account/avatar.js'
 import {getUserImageIdByUserId, getUsernameById} from "../../../helpers/generalHelpers.js";
+import {triggerAddQuestionEvent} from "../../../events/custom-events.js";
+import {handleDeleteQuestion} from "./qa/qa-helpers.js";
 
 export class QAItem extends observeState(LitElement) {
     static properties = {
@@ -133,10 +134,13 @@ export class QAItem extends observeState(LitElement) {
                 
                 .answer-container {
                     width: 100%;
-                    cursor: pointer;
                     display: flex;
                     flex-direction: row;
                     justify-content: space-between;
+                }
+                
+                .answer-container.editable {
+                    cursor: pointer;
                 }
                 
                 .qa-item-asker {
@@ -190,6 +194,22 @@ export class QAItem extends observeState(LitElement) {
     _isQuestionCreator() {
         if (this.item.isNew) return true;
         return userState.userData && this.item.askedById === userState.userData.id;
+    }
+
+    // Open the edit popup for this question
+    _openEditPopup() {
+        const editData = {
+            questionText: this.item.questionText,
+            dueDate: this.item.dueDate,
+            sharedWithUserIds: this.item.sharedWithUserIds || this.item.sharedWithUsers?.map(user => user.id) || [],
+            sharedWithGroupIds: this.item.sharedWithGroupIds || this.item.sharedWithGroups?.map(group => group.id) || [],
+            isAnonymous: this.item.isAnonymous,
+            questionId: this.item.id,
+            isEditMode: true,
+        };
+
+        triggerAddQuestionEvent(editData);
+
     }
 
     // Toggle edit mode
@@ -256,21 +276,8 @@ export class QAItem extends observeState(LitElement) {
             return;
         }
 
-        const confirmed = await showConfirmation({
-            message: 'Are you sure you want to delete this question?',
-            submessage: 'The users who answerd this question will still see it with a message telling them it was deleted',
-            heading: 'Delete Item?',
-            confirmLabel: 'Yes, Delete',
-            cancelLabel: 'No, Keep it'
-        });
-
-        if (confirmed) {
-            this.dispatchEvent(new CustomEvent('qa-item-deleted', {
-                detail: {item: this.item},
-                bubbles: true,
-                composed: true
-            }));
-        }
+        // Use the shared helper function
+        await handleDeleteQuestion(this.item);
     }
 
     _onQuestionChange(e) {
@@ -286,37 +293,41 @@ export class QAItem extends observeState(LitElement) {
 
         return html`
             <h3 class="question">${this.item.questionText}</h3>
-            <div class="answer-container" @click="${this._toggleEdit}">
+            <div class="answer-container ${this._isQuestionCreator() ? 'editable' : ''}" 
+                 @click="${this._isQuestionCreator() ? this._openEditPopup : null}">
                 ${hasEmptyAnswer
                         ? html`<span class="missing-info">Needs an answer</span>`
                         : html`<p class="answer">${this.item.answers[0]?.answerText}</p>`
                 }
                <div class="qa-item-asker">
                     
-                    <span>Asked by</span>
+                    
                     ${userState.userData?.id !== this.item.askedById ? html`
-                    <custom-avatar
-                            .username="${getUsernameById(this.item.askedById)}"
-                            imageId="${getUserImageIdByUserId(this.item.askedById)}"
-                            size="16"
-                    >
-                    </custom-avatar>
-                    <span>${getUsernameById(this.item.askedById)}</span>
-                    `: html`<span class="you">You</span>`}
+                        <span>Asked by</span>
+                        <custom-avatar
+                                .username="${getUsernameById(this.item.askedById)}"
+                                imageId="${getUserImageIdByUserId(this.item.askedById)}"
+                                size="16"
+                        >
+                        </custom-avatar>
+                        <span>${getUsernameById(this.item.askedById)}</span>
+                    `: html`<span class="you">You asked this</span>`}
                 </div>
             </div>
             <div class="actions">
                 
+                ${this._isQuestionCreator() ? html`
                 <button
                         aria-label="edit"
                         class="icon-button"
                         style="--icon-color: var(--blue-normal);
                          --icon-color-hover: var(--blue-darker);
                          --icon-hover-background: var(--blue-light);"
-                        @click="${this._toggleEdit}"
+                        @click="${this._openEditPopup}"
                 >
                     <edit-icon></edit-icon>
                 </button>
+                ` : ''}
                 ${this._isQuestionCreator() ? html`<button
                         aria-label="delete"
                         class="icon-button"

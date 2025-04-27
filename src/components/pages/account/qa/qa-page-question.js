@@ -6,8 +6,8 @@ import '../../../../svg/share.js';
 import '../../../global/custom-tooltip.js';
 import {observeState} from 'lit-element-state';
 import {getUserImageIdByUserId, getUsernameById} from '../../../../helpers/generalHelpers.js';
-import {showConfirmation} from "../../../global/custom-confirm/confirm-helper.js";
 import {triggerAddQuestionEvent} from "../../../../events/custom-events.js";
+import {handleDeleteQuestion} from "./qa-helpers.js";
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
@@ -109,26 +109,13 @@ export class CustomElement extends observeState(LitElement) {
             sharedWithGroupIds: this.question.sharedWithGroupIds,
             isAnonymous: this.question.isAnonymous,
             questionId: this.question.id,
+            isEditMode: true,
         }
         triggerAddQuestionEvent(editData);
     }
 
     async _handleDeleteQuestion() {
-        const confirmed = await showConfirmation({
-            message: 'Are you sure you want to delete this question?',
-            submessage: 'The users who answerd this question will still see it with a message telling them it was deleted',
-            heading: 'Delete Item?',
-            confirmLabel: 'Yes, Delete',
-            cancelLabel: 'No, Keep it'
-        });
-
-        if (confirmed) {
-            this.dispatchEvent(new CustomEvent('delete-question', {
-                detail: {question: this.question},
-                bubbles: true,
-                composed: true
-            }));
-        }
+        await handleDeleteQuestion(this.question);
     }
 
     render() {

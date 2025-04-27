@@ -2,6 +2,7 @@ import {customFetch} from "../../../../helpers/fetchHelpers.js";
 import {triggerUpdateQa, triggerUpdateUser} from "../../../../events/eventListeners.js";
 import {messagesState} from "../../../../state/messagesStore.js";
 import {cachedFetch} from "../../../../helpers/caching.js";
+import {showConfirmation} from "../../../global/custom-confirm/confirm-helper.js";
 
 export async function saveQA(qaId, question, answer) {
     try {
@@ -172,6 +173,66 @@ export async function forceDeleteQA(questionData) {
     } catch (e) {
         handleQAError('There was an error deleting your question. Please try again.')
         return {success: false, message: 'There was an error deleting your question. Please try again.'}
+    }
+}
+
+/**
+ * Helper function to show delete confirmation and handle question deletion
+ * @param {Object} question - The question object to delete
+ * @returns {Promise<boolean>} - True if deletion was successful
+ */
+export async function handleDeleteQuestion(question) {
+    try {
+        // Check if we should show shared users/groups in the confirmation
+        const sharedWithUsers = question.sharedWithUsers || [];
+        const sharedWithGroups = question.sharedWithGroups || [];
+        const totalSharedEntities = sharedWithUsers.length + sharedWithGroups.length;
+        
+        // Create submessage with shared info if applicable
+        let submessage = 'The users who answered this question will still see it with a message telling them it was deleted';
+        
+        if (totalSharedEntities > 1) {
+            submessage += '<br><br><strong>This question is shared with:</strong><br>';
+            
+            if (sharedWithGroups.length > 0) {
+                submessage += '<strong>Groups:</strong> ';
+                submessage += sharedWithGroups.map(group => group.groupName).join(', ');
+                submessage += '<br>';
+            }
+            
+            if (sharedWithUsers.length > 0) {
+                submessage += '<strong>Users:</strong> ';
+                submessage += sharedWithUsers.map(user => user.name).join(', ');
+            }
+        }
+
+        // Show confirmation dialog
+        const confirmed = await showConfirmation({
+            message: 'Are you sure you want to delete this question?',
+            submessage: submessage,
+            heading: 'Delete Item?',
+            confirmLabel: 'Yes, Delete',
+            cancelLabel: 'No, Keep it'
+        });
+
+        if (!confirmed) {
+            return false;
+        }
+
+        // Proceed with deletion
+        const response = await deleteQA(question);
+        if (response.success) {
+            messagesState.addMessage('Question deleted successfully', 'success');
+            triggerUpdateQa();
+            return true;
+        } else {
+            messagesState.addMessage('Failed to delete question', 'error');
+            return false;
+        }
+    } catch (error) {
+        console.error('Error deleting question:', error);
+        messagesState.addMessage('An error occurred while deleting the question', 'error');
+        return false;
     }
 }
 

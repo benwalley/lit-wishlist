@@ -4,7 +4,7 @@ import '../../../global/custom-tooltip.js'
 import '../../../global/custom-modal.js'
 import './qa-page-question.js';
 import './qa-page-deleted-item.js';
-import {deleteQA, forceDeleteQA, getAskedQAItems} from "./qa-helpers.js";
+import {forceDeleteQA, getAskedQAItems, handleDeleteQuestion} from "./qa-helpers.js";
 import {messagesState} from "../../../../state/messagesStore.js";
 import {userState} from "../../../../state/userStore.js";
 import {listenInitialUserLoaded, listenUpdateQa, triggerUpdateQa} from "../../../../events/eventListeners.js";
@@ -118,22 +118,9 @@ export class CustomElement extends observeState(LitElement) {
     _handleAddQuestion() {
         triggerAddQuestionEvent({ });
     }
-
+    
     async _handleDeleteQuestion(event) {
-        const question = event.detail.question;
-        try {
-            const response = await deleteQA(question);
-            if (response.success) {
-                messagesState.addMessage('Question deleted successfully', 'success');
-            } else {
-                messagesState.addMessage('Failed to delete question', 'error');
-            }
-        } catch (error) {
-            console.error('Error deleting question:', error);
-            messagesState.addMessage('An error occurred while deleting the question', 'error');
-        } finally {
-            triggerUpdateQa()
-        }
+        await handleDeleteQuestion(event.detail.question);
     }
 
     async _handleForceDeleteQuestion(event) {
