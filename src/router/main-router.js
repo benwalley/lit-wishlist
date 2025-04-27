@@ -7,6 +7,7 @@ import '../components/pages/listItem/item-view-container.js'
 import '../components/pages/not-found.js';
 import '../components/pages/account/qa/qa-page-container.js';
 import '../components/pages/groups/group-view-container.js';
+import '../components/pages/user/user-view-container.js';
 
 
 const routes = [
@@ -17,6 +18,10 @@ const routes = [
     {
         path: '/account',
         component: 'account-container',
+    },
+    {
+        path: '/user/:userId',
+        component: 'user-view-container',
     },
     {
         path: '/group/:groupId',

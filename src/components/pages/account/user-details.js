@@ -12,11 +12,15 @@ import '../../users/edit-user-form.js';
 export class UserDetails extends observeState(LitElement) {
     static properties = {
         showEditButton: {type: Boolean},
+        isUser: {type: Boolean},
+        userData: {type: Object},
     };
 
     constructor() {
         super();
         this.showEditButton = true;
+        this.isUser = true;
+        this.userData = {};
     }
 
     static get styles() {
@@ -70,6 +74,42 @@ export class UserDetails extends observeState(LitElement) {
         ];
     }
 
+    _getUsername() {
+        if(this.isUser) {
+            return userState?.userData?.name;
+        }
+        return this.userData?.name || '';
+    }
+
+    _getEmail() {
+        if(this.isUser) {
+            return userState?.userData?.email;
+        }
+        return this.userData?.email || '';
+    }
+
+    _getImageId() {
+        if(this.isUser) {
+            return userState?.userData?.image;
+        }
+        return this.userData?.image || '';
+    }
+
+    _getPublicDescription() {
+        if(this.isUser) {
+            return userState?.userData?.publicDescription;
+        }
+        return this.userData?.publicDescription || '';
+    }
+
+    _showLogoutButton() {
+        return this.isUser;
+    }
+
+    _showEditButton() {
+        return this.isUser && this.showEditButton;
+    }
+
     _handleEditUser() {
         const editModal = this.shadowRoot.querySelector('#edit-user-modal');
         editModal.openModal();
@@ -83,20 +123,22 @@ export class UserDetails extends observeState(LitElement) {
     render() {
         return html`
             <custom-avatar size="150"
-                           username="${userState?.userData?.name}"
-                           imageid="${userState?.userData?.image}"
+                           username="${this._getUsername()}"
+                           imageid="${this._getImageId()}"
                            shadow="true"
             ></custom-avatar>
-            <account-username></account-username>
-            <em>${userState?.userData?.email}</em>
-            <account-public-description></account-public-description>
-            <button aria-label="edit-button"
-                    class="icon-button button username-edit-button"
-                    @click="${this._handleEditUser}"
-            >
-                <edit-icon></edit-icon>
-            </button>
-            <logout-button></logout-button>
+            <account-username .username="${this._getUsername()}"></account-username>
+            <em>${this._getEmail()}</em>
+            <p>${this._getPublicDescription()}</p>
+            ${this._showEditButton() ? html`
+                <button aria-label="edit-button"
+                        class="icon-button button username-edit-button"
+                        @click="${this._handleEditUser}"
+                >
+                    <edit-icon></edit-icon>
+                </button>
+            ` : ''}
+            ${this._showLogoutButton() ? html`<logout-button></logout-button>` : ''}
             <custom-modal id="edit-user-modal" maxWidth="500px" noPadding>
                 <edit-user-form @close-edit-user-modal="${this._closeEditUserModal}"></edit-user-form>
             </custom-modal>

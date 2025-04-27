@@ -17,11 +17,13 @@ export class CustomElement extends LitElement {
     static properties = {
         itemData: {type: Object},
         isSelectList: {type: Boolean},
+        viewOnly: {type: Boolean},
     };
 
     constructor() {
         super();
         this.itemData = {};
+        this.viewOnly = false;
     }
 
     static get styles() {
@@ -157,7 +159,7 @@ export class CustomElement extends LitElement {
                     </div>
                     
                 </div>
-                ${this.itemData.id === 0 ? '' : html`
+                ${!this.viewOnly && this.itemData.id !== 0 ? html`
                     <button class="edit-button icon-button" 
                             aria-label="Edit List Details"
                             @click="${this._handleEdit}"
@@ -173,7 +175,7 @@ export class CustomElement extends LitElement {
                         <delete-icon style="width: 1em; height: 1em"></delete-icon>
                     </button>
                     <custom-tooltip style="min-width: 150px;">Delete this list</custom-tooltip>
-                `}
+                ` : ''}
             </a>
         `;
     }

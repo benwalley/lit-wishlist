@@ -3,6 +3,7 @@ import {getRefreshToken} from "../../localStorage/tokens.js";
 import {userState} from "../../state/userStore.js";
 import {triggerUpdateUser} from "../../events/eventListeners.js";
 import {userListState} from "../../state/userListStore.js";
+import {cachedFetch} from "../caching.js";
 
 export async function getCurrentUser() {
     try {
@@ -84,5 +85,24 @@ export async function getAccessibleUsers() {
 
     } catch (error) {
         console.error('Error fetching users:', error);
+    }
+}
+
+/**
+ * Get a user by their ID
+ * @param {string} userId - The ID of the user to fetch
+ * @returns {Promise<{success: boolean, data: Object}|{success: boolean, error: Error}>}
+ */
+export async function getUserById(userId) {
+    try {
+        if (!userId) {
+            throw new Error('User ID is required');
+        }
+
+        const userData = await cachedFetch(`/users/${userId}`, {}, true);
+        return userData
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        return { success: false, error };
     }
 }
