@@ -11,6 +11,7 @@ import formStyles from "../../../../css/forms.js";
 import { messagesState } from "../../../../state/messagesStore.js";
 import { getQAItems } from "./qa-helpers.js";
 import { listenUpdateQa } from "../../../../events/eventListeners.js";
+import { triggerAddQuestionEvent } from "../../../../events/custom-events.js";
 
 export class PublicQA extends observeState(LitElement) {
     static properties = {
@@ -89,7 +90,7 @@ export class PublicQA extends observeState(LitElement) {
 
     async _fetchQAItems() {
         if (!this.userId) {
-            console.warn('User ID not available yet for fetching public QA items.');
+            messagesState.addMessage('Error fetching Questions. Please reload page and try again.', 'error');
             return;
         }
 
@@ -100,7 +101,6 @@ export class PublicQA extends observeState(LitElement) {
                 // Filter for only public QA items that have answers
                 this.qaItems = (response.qaItems || [])
                     .filter(item => !item.deleted) // Not deleted
-                    .filter(item => item.answers && item.answers.length > 0 && item.answers[0].answerText?.trim()); // Has answer
             } else {
                 messagesState.addMessage(response.message || 'Failed to fetch public Q&A items.', 'error');
             }
@@ -110,6 +110,10 @@ export class PublicQA extends observeState(LitElement) {
         } finally {
             this.isLoading = false;
         }
+    }
+
+    _handleAskQuestion() {
+        triggerAddQuestionEvent({sharedWithUserIds: [parseInt(this.userId)] });
     }
 
     render() {
@@ -127,7 +131,7 @@ export class PublicQA extends observeState(LitElement) {
                     ? html`<div class="empty-state">No public Q&A items available.</div>`
                     : this.qaItems.map(item => html`<qa-item .item=${item}></qa-item>`)}
             </div>
-            <button class="primary">Ask this user a question</button>
+            <button class="primary" @click=${this._handleAskQuestion}>Ask a question</button>
         `;
     }
 }

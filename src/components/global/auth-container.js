@@ -15,6 +15,7 @@ import {
 } from "../../events/eventListeners.js";
 import '../global/messages-component.js';
 import '../add-to-list/edit-item-modal.js';
+import './add-question-modal.js';
 
 export class AuthContainer extends observeState(LitElement) {
     static styles = css`
@@ -75,7 +76,7 @@ export class AuthContainer extends observeState(LitElement) {
                         <slot></slot>`
             }
             <edit-item-modal></edit-item-modal>
-
+            <add-question-modal></add-question-modal>
         `;
     }
 }

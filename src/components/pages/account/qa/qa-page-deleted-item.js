@@ -6,6 +6,7 @@ import '../../../global/custom-tooltip.js';
 import {observeState} from 'lit-element-state';
 import {getUserImageIdByUserId, getUsernameById} from '../../../../helpers/generalHelpers.js';
 import {showConfirmation} from "../../../global/custom-confirm/confirm-helper.js";
+import {triggerAddQuestionEvent} from "../../../../events/custom-events.js";
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
@@ -100,11 +101,15 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     _handleRestoreQuestion() {
-        this.dispatchEvent(new CustomEvent('restore-question', {
-            detail: {question: this.question},
-            bubbles: true,
-            composed: true
-        }));
+        const editData = {
+            questionText: this.question.questionText,
+            dueDate: this.question.dueDate,
+            sharedWithUserIds: this.question.sharedWithUserIds || this.question.sharedWithUsers?.map(user => user.id) || [],
+            sharedWithGroupIds: this.question.sharedWithGroupIds || this.question.sharedWithGroups?.map(group => group.id) || [],
+            isAnonymous: this.question.isAnonymous,
+            questionId: this.question.id,
+        }
+        triggerAddQuestionEvent(editData);
     }
 
     async _handleForceDeleteQuestion() {

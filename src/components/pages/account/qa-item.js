@@ -291,9 +291,10 @@ export class QAItem extends observeState(LitElement) {
                         ? html`<span class="missing-info">Needs an answer</span>`
                         : html`<p class="answer">${this.item.answers[0]?.answerText}</p>`
                 }
-                ${userState.userData?.id !== this.item.askedById ? html`<div class="qa-item-asker">
+               <div class="qa-item-asker">
                     
                     <span>Asked by</span>
+                    ${userState.userData?.id !== this.item.askedById ? html`
                     <custom-avatar
                             .username="${getUsernameById(this.item.askedById)}"
                             imageId="${getUserImageIdByUserId(this.item.askedById)}"
@@ -301,8 +302,8 @@ export class QAItem extends observeState(LitElement) {
                     >
                     </custom-avatar>
                     <span>${getUsernameById(this.item.askedById)}</span>
-
-                </div>` : ''}
+                    `: html`<span class="you">You</span>`}
+                </div>
             </div>
             <div class="actions">
                 

@@ -8,28 +8,32 @@ import '../../../../svg/message.js';
 import {messagesState} from "../../../../state/messagesStore.js";
 import '../../../global/due-date-picker.js';
 import { observeState } from 'lit-element-state';
+import {createQA, updateQuestion} from "./qa-helpers.js";
+import {triggerUpdateQa} from "../../../../events/eventListeners.js";
 
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
         questionText: {type: String},
         dueDate: {type: String},
-        shareWithUsers: {type: Array},
-        shareWithGroups: {type: Array},
+        sharedWithUserIds: {type: Array},
+        sharedWithGroupIds: {type: Array},
         isAnonymous: {type: Boolean},
         isEditMode: {type: Boolean},
         questionId: {type: Number},
+        preSelectedUsers: {type: Array},
     };
 
     constructor() {
         super();
         this.questionText = '';
-        this.shareWithUsers = [];
-        this.shareWithGroups = [];
+        this.sharedWithUserIds = [];
+        this.sharedWithGroupIds = [];
         this.dueDate = '';
         this.isAnonymous = false;
         this.isEditMode = false;
         this.questionId = null;
+        this.preSelectedUsers = [];
     }
 
     static get styles() {
@@ -98,6 +102,14 @@ export class CustomElement extends observeState(LitElement) {
         ];
     }
 
+    updated(changedProperties) {
+        if (changedProperties.has('preSelectedUsers')) {
+            if (this.preSelectedUsers.length > 0 && !this.sharedWithUserIds.length) {
+                this.sharedWithUserIds = [...this.preSelectedUsers];
+            }
+        }
+    }
+
     editQuestion(data) {
         this.isEditMode = true;
         this.questionText = data.questionText || '';
@@ -105,8 +117,8 @@ export class CustomElement extends observeState(LitElement) {
         this.dueDate = data.dueDate
             ? new Date(data.dueDate).toISOString().split('T')[0]
             : '';
-        this.shareWithUsers = data.sharedWithUsers || [];
-        this.shareWithGroups = data.sharedWithGroups || [];
+        this.sharedWithUserIds = data.sharedWithUserIds || [];
+        this.sharedWithGroupIds = data.sharedWithGroupIds || [];
         this.isAnonymous = data.isAnonymous || false;
         this.questionId = data.questionId || null;
     }
@@ -126,32 +138,40 @@ export class CustomElement extends observeState(LitElement) {
             messagesState.addMessage('Please enter a question.', 'error');
             return false;
         }
-        if (this.shareWithUsers.length === 0 && this.shareWithGroups.length === 0) {
+        if (this.sharedWithUserIds.length === 0 && this.sharedWithGroupIds.length === 0) {
             messagesState.addMessage('Please select at least one user or group to share with.', 'error');
             return false;
         }
         return true;
     }
 
-    _handleSubmit() {
+    async _handleSubmit() {
         // Gather the data
-        if(!this._validateInput()) return;
+        if (!this._validateInput()) return;
         const questionData = {
             questionText: this.questionText,
             dueDate: this.dueDate,
-            shareWithUsers: this.shareWithUsers,
-            shareWithGroups: this.shareWithGroups,
+            sharedWithUserIds: this.sharedWithUserIds,
+            sharedWithGroupIds: this.sharedWithGroupIds,
             isAnonymous: this.isAnonymous,
             isEditMode: this.isEditMode,
             questionId: this.questionId,
         };
+        let response
+        if (questionData.isEditMode) {
+            response = await updateQuestion(questionData);
+        } else {
+            response = await createQA(questionData);
+        }
 
-        // Dispatch an event so the parent component knows data is ready
-        this.dispatchEvent(new CustomEvent('submit-question', {
-            detail: questionData,
-            bubbles: true, // Allow event to bubble up
-            composed: true // Allow event to cross shadow DOM boundaries
-        }));
+        if (response.success) {
+            messagesState.addMessage(questionData.isEditMode ? 'Question updated successfully!' : 'Question sent successfully!');
+            this._handleCancel()
+            triggerUpdateQa();
+        } else {
+            messagesState.addMessage(response.message || 'Failed to save question', 'error');
+        }
+
         this.clearForm();
     }
 
@@ -172,13 +192,13 @@ export class CustomElement extends observeState(LitElement) {
     _handleUserSelectionChanged(event) {
         const selectedUsers = event.detail.selectedUsers;
         const userIds = selectedUsers.map(user => user.id);
-        this.shareWithUsers = userIds;
+        this.sharedWithUserIds = userIds;
     }
 
     _handleGroupSelectionChanged(event) {
         const selectedUsers = event.detail.selectedGroups;
         const groupIds = selectedUsers.map(user => user.id);
-        this.shareWithGroups = groupIds;
+        this.sharedWithGroupIds = groupIds;
     }
 
     _handleDueDateChanged(event) {
@@ -230,7 +250,7 @@ export class CustomElement extends observeState(LitElement) {
                     <div class="container">
                         <your-groups-list 
                                 class="full-width"
-                                .selectedGroups ="${this.shareWithGroups}"
+                                .selectedGroups ="${this.sharedWithGroupIds}"
                                 @selection-changed="${this._handleGroupSelectionChanged}"
                         ></your-groups-list>
                     </div>
@@ -241,7 +261,7 @@ export class CustomElement extends observeState(LitElement) {
                     <div class="container">
                         <your-users-list 
                                 apiEndpoint="/users/accessible"
-                                .selectedUsers="${this.shareWithUsers}"
+                                .selectedUsers="${this.sharedWithUserIds}"
                                 @selection-changed="${this._handleUserSelectionChanged}"
                         ></your-users-list>
                     </div>

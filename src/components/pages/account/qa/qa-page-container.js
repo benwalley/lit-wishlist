@@ -4,26 +4,24 @@ import '../../../global/custom-tooltip.js'
 import '../../../global/custom-modal.js'
 import './qa-page-question.js';
 import './qa-page-deleted-item.js';
-import './add-qa-popup.js'
-import {createQA, deleteQA, forceDeleteQA, getAskedQAItems, getQAItems, updateQuestion} from "./qa-helpers.js";
+import {deleteQA, forceDeleteQA, getAskedQAItems} from "./qa-helpers.js";
 import {messagesState} from "../../../../state/messagesStore.js";
 import {userState} from "../../../../state/userStore.js";
 import {listenInitialUserLoaded, listenUpdateQa, triggerUpdateQa} from "../../../../events/eventListeners.js";
 import { observeState } from 'lit-element-state';
+import { triggerAddQuestionEvent } from "../../../../events/custom-events.js";
 
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
         questions: {type: Array},
         deletedQuestions: {type: Array},
-        modalOpen: {type: Boolean},
         isLoading: {type: Boolean},
         deletedQuestionsVisible: {type: Boolean},
     };
 
     constructor() {
         super();
-        this.modalOpen = false;
         this.questions = [];
         this.deletedQuestions = [];
         this.isLoading = false;
@@ -118,66 +116,7 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     _handleAddQuestion() {
-        this.modalOpen = true;
-    }
-
-    _handleRestoreQuestion(event) {
-        const question = event.detail.question;
-        console.log(question)
-        const form = this.shadowRoot.querySelector('add-qa-popup');
-        const editData = {
-            questionText: question.questionText,
-            dueDate: question.dueDate,
-            sharedWithUsers: question.sharedWithUserIds,
-            sharedWithGroups: question.sharedWithGroupIds,
-            isAnonymous: question.isAnonymous,
-            questionId: question.id,
-        }
-        form.editQuestion(editData);
-        this.modalOpen = true;
-    }
-
-    async _handleSaveQuestion(event) {
-        const data = event.detail;
-        data.deleted = false;
-        if(data.isEditMode) {
-            const response = await updateQuestion(data);
-            if(response.success) {
-                messagesState.addMessage('Question added successfully', 'success');
-            }
-        } else {
-            if (!userState.userData || !userState.userData.id) {
-                messagesState.addMessage('User data not available', 'error');
-                return;
-            }
-
-            // Add user ID to the data
-            data.userId = userState.userData.id;
-
-            const response = await createQA(data);
-            if(response.success) {
-                messagesState.addMessage('Question added successfully', 'success');
-            }
-        }
-        triggerUpdateQa()
-        this.modalOpen = false;
-
-    }
-
-    _handleEditQuestion(event) {
-        const question = event.detail.question;
-        console.log(question)
-        const form = this.shadowRoot.querySelector('add-qa-popup');
-        const editData = {
-            questionText: question.questionText,
-            dueDate: question.dueDate,
-            sharedWithUsers: question.sharedWithUserIds,
-            sharedWithGroups: question.sharedWithGroupIds,
-            isAnonymous: question.isAnonymous,
-            questionId: question.id,
-        }
-        form.editQuestion(editData);
-        this.modalOpen = true;
+        triggerAddQuestionEvent({ });
     }
 
     async _handleDeleteQuestion(event) {
@@ -214,12 +153,6 @@ export class CustomElement extends observeState(LitElement) {
         }
     }
 
-    handleModalChanged(e) {
-        this.modalOpen = e.detail.isOpen;
-        if(!e.detail.isOpen) {
-            this.shadowRoot.querySelector('add-qa-popup').clearForm();
-        }
-    }
 
     _toggleDeletedQuestions() {
         this.deletedQuestionsVisible = !this.deletedQuestionsVisible;
@@ -245,7 +178,6 @@ export class CustomElement extends observeState(LitElement) {
                         : this.questions.map(question => html`
                             <qa-page-question 
                                     .question="${question}"
-                                    @edit-question="${this._handleEditQuestion}"
                                     @delete-question="${this._handleDeleteQuestion}"
                             ></qa-page-question>
                         `)
@@ -262,22 +194,12 @@ export class CustomElement extends observeState(LitElement) {
                         ${this.deletedQuestions.map(question => html`
                         <qa-page-deleted-item
                                 .question="${question}"
-                                @restore-question="${this._handleRestoreQuestion}"
                                 @force-delete-question="${this._handleForceDeleteQuestion}"
                         ></qa-page-deleted-item>
                     `)}
                     </div>` : ''}
                 </div>
             ` : ''}
-            <custom-modal .isOpen="${this.modalOpen}" 
-                          noPadding 
-                          maxWidth="700px"
-                          @cancel-popup="${() => this.modalOpen = false}"
-                          @submit-question="${this._handleSaveQuestion}"
-                          @modal-changed="${this.handleModalChanged}"
-            >
-                <add-qa-popup></add-qa-popup>
-            </custom-modal>
         `;
     }
 }

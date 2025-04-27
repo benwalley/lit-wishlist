@@ -35,8 +35,8 @@ export async function createQA(qaData) {
             questionText: qaData.questionText,
             userId: qaData.userId,
             isAnonymous: qaData.isAnonymous || false,
-            sharedWithUserIds: qaData.shareWithUsers || [],
-            sharedWithGroupIds: qaData.shareWithGroups || [],
+            sharedWithUserIds: qaData.sharedWithUserIds || [],
+            sharedWithGroupIds: qaData.sharedWithGroupIds || [],
             dueDate: qaData.dueDate ? qaData.dueDate : null,
         }
         if(qaData.answerText) {
