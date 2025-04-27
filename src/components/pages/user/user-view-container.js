@@ -2,7 +2,7 @@ import {LitElement, html, css} from 'lit';
 
 import '../account/avatar.js';
 import '../account/account-public-description.js';
-import '../account/account-qa.js';
+import '../account/qa/public-qa.js';
 import '../account/account-notifications.js';
 import '../account/account-navigation.js';
 import '../account/account-private-notes.js';
@@ -108,7 +108,7 @@ export class UserViewContainer extends LitElement {
                 </section>
 
                 <section>
-                    <account-qa .userId="${this.userId}" .isUser="${false}"></account-qa>
+                    <public-qa .userId="${this.userId}"></public-qa>
                 </section>
 
                 <section>
