@@ -8,4 +8,5 @@
  - add list of non-assigned items
  - add deleted items page on my account page
  - add ispublic selector on add to list selector
+ - remove ability to edit unassigned items
  - ✅ implement Popover API for dropdowns and edit popups (see documentation/popover-api.md)

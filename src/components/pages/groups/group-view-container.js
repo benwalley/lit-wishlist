@@ -4,6 +4,7 @@ import {getGroupById} from "../../../helpers/api/groups.js";
 import './group-details.js';
 import './group-users-list.js';
 import './invites-section.js';
+import '../../groups/group-lists-list.js';
 import {listenGroupUpdated} from "../../../events/eventListeners.js";
 import {isGroupAdmin} from "../../../helpers/groupHelpers.js";
 import {userState} from "../../../state/userStore.js";
@@ -113,6 +114,11 @@ export class GroupViewContainer extends observeState(LitElement) {
                         @user-selected="${this._handleUserSelected}"
                         @invite-user="${this._handleInviteUser}"
                     ></group-users-list>
+                </section>
+                <section>
+                    <group-lists-list
+                            .groupData="${this.groupData}"
+                    ></group-lists-list>
                 </section>
                 ${isGroupAdmin(this.groupData, userState.userData?.id) ? html`<section>
                     <invites-section 

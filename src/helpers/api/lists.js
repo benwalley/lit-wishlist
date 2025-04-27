@@ -2,6 +2,25 @@ import {customFetch} from "../fetchHelpers.js";
 import {cachedFetch} from "../caching.js";
 
 /**
+ * Get all lists for a specific group
+ * @param {string} groupId - The ID of the group
+ * @returns {Promise<{success: boolean, data: Array}|{success: boolean, error: Error}>}
+ */
+export async function getGroupLists(groupId) {
+    try {
+        if (!groupId) {
+            throw new Error('Group ID is required');
+        }
+
+        const lists = await cachedFetch(`/lists/group/${groupId}`, {}, true);
+        return lists;
+    } catch (error) {
+        console.error('Error fetching group lists:', error);
+        return { success: false, error };
+    }
+}
+
+/**
  * Create a new list
  * @param {Object} listData - Data for creating a new list
  * @returns {Promise<{success: boolean, data: Object}|{success: boolean, error: Error}>}

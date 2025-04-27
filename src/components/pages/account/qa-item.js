@@ -184,11 +184,23 @@ export class QAItem extends observeState(LitElement) {
             detail: { sourceItemId: this.item.id }
         }));
 
-        // Initialize edited values
-        this.editedQuestion = this.item.questionText;
-        this.editedAnswer = this.item.answers[0]?.answerText || '';
-        this.isEditing = true;
+        if(this._isUsersPage()) {
+            this.editedQuestion = this.item.questionText;
+            this.editedAnswer = this.item.answers[0]?.answerText || '';
+            this.isEditing = true;
+            return;
+        }
+        triggerAddQuestionEvent(this.item);
+
     }
+
+    _isUsersPage() {
+        if(window.location.pathname === '/account') {
+            return true;
+        }
+        return false;
+    }
+
 
     // Check if the current user is the question creator
     _isQuestionCreator() {
@@ -323,7 +335,7 @@ export class QAItem extends observeState(LitElement) {
                         style="--icon-color: var(--blue-normal);
                          --icon-color-hover: var(--blue-darker);
                          --icon-hover-background: var(--blue-light);"
-                        @click="${this._openEditPopup}"
+                        @click="${this._toggleEdit}"
                 >
                     <edit-icon></edit-icon>
                 </button>

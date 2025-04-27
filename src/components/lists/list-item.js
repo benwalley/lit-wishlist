@@ -9,21 +9,25 @@ import '../../svg/world.js'
 import '../../svg/lock.js'
 import '../../svg/gift.js';
 import '../../svg/dot.js';
+import '../../svg/user.js';
 import '../global/custom-tooltip.js'
 import {cachedFetch} from "../../helpers/caching.js";
 import {customFetch} from "../../helpers/fetchHelpers.js";
+import {getUserImageIdByUserId, getUsernameById} from "../../helpers/generalHelpers.js";
 
 export class CustomElement extends LitElement {
     static properties = {
         itemData: {type: Object},
         isSelectList: {type: Boolean},
         viewOnly: {type: Boolean},
+        showOwner: {type: Boolean},
     };
 
     constructor() {
         super();
         this.itemData = {};
         this.viewOnly = false;
+        this.showOwner = false;
     }
 
     static get styles() {
@@ -68,16 +72,25 @@ export class CustomElement extends LitElement {
                     align-items: center;
                     font-size: var(--font-size-x-small);
                     color: var(--medium-text-color);
+                    justify-content: space-between;
+                    width: 100%;
                     
                     .section-item {
                         display: flex;
                         align-items: center;
                         gap: 2px;
                     }
+                    
+                    .list-info {
+                        display: flex;
+                        gap: var(--spacing-small);
+                        align-items: center;
+                    }
                 }
                 
                 .number-items {
                     color: var(--green-normal);
+                    white-space: nowrap;
                 }
 
                 h3 {
@@ -86,8 +99,30 @@ export class CustomElement extends LitElement {
                     width: 100%;
                 }
 
-                .icon-button {
+                .icon-button.icon-button {
                     font-size: 1.2em;
+                    padding: 5px;
+                }
+                
+                .item-right-side {
+                    display: flex;
+                    flex-direction: column;
+                    flex-wrap: wrap;
+                    justify-content: flex-end;
+                    color: var(--text-color-dark);
+                    
+                    .top-row {
+                        display: flex;
+                        justify-content: flex-end;
+                    }
+
+                    .owner-info {
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                        font-size: var(--font-size-x-small);
+                        color: var(--text-color-medium-dark);
+                    }
                 }
 
             `
@@ -139,43 +174,63 @@ export class CustomElement extends LitElement {
                 <div class="name-section">
                     <h3>${this.itemData.listName }</h3>
                     <div class="name-bottom-section">
-                        ${this.itemData.public ? html`
-                            <span class="section-item public">
-                                <world-icon style="color: var(--primary-color)"></world-icon>
-                                <span>Public</span>
+                        <div class="list-info">
+                            ${this.itemData.public ? html`
+                                <span class="section-item public">
+                                    <world-icon style="color: var(--primary-color)"></world-icon>
+                                    <span>Public</span>
+                                </span>
+                            ` : html`
+                                <span class="section-item private">
+                                    <lock-icon style="color: var(--text-color-dark)"></lock-icon>
+                                    <span>Private</span>
+                                </span>
+                            `}
+                            
+                            <dot-icon style="font-size: 4px;"></dot-icon>
+                            <span class="section-item number-items">
+                                <gift-icon style="color: var(--green-normal);"></gift-icon>
+                                <span>${`${this.itemData.numberItems ?? 0} items`}</span>
                             </span>
-                        ` : html`
-                            <span class="section-item private">
-                                <lock-icon style="color: var(--text-color-dark)"></lock-icon>
-                                <span>Private</span>
-                            </span>
-                        `}
-                        
-                        <dot-icon style="font-size: 4px;"></dot-icon>
-                        <span class="section-item number-items">
-                            <gift-icon style="color: var(--green-normal);"></gift-icon>
-                            <span>${`${this.itemData.numberItems ?? 0} items`}</span>
-                        </span>
+                        </div>
                     </div>
                     
                 </div>
-                ${!this.viewOnly && this.itemData.id !== 0 ? html`
-                    <button class="edit-button icon-button" 
-                            aria-label="Edit List Details"
-                            @click="${this._handleEdit}"
-                            style="--icon-color: var(--blue-normal); 
+                <div class="item-right-side">
+                    <div class="top-row">
+                        ${!this.viewOnly && this.itemData.id !== 0 ? html`
+                            <button class="edit-button icon-button"
+                                    aria-label="Edit List Details"
+                                    @click="${this._handleEdit}"
+                                    style="--icon-color: var(--blue-normal); 
                             --icon-color-hover: var(--blue-darker); 
                             --icon-hover-background: var(--blue-light)">
-                        <edit-icon style="width: 1em; height: 1em"></edit-icon>
-                    </button>
-                    <custom-tooltip>Edit this list</custom-tooltip>
-                    <button class="delete-button icon-button" aria-label="Delete List"
-                            @click="${this._handleDelete}"
-                            style="--icon-color: var(--delete-red); --icon-color-hover: var(--delete-red); --icon-hover-background: var(--delete-red-light)">
-                        <delete-icon style="width: 1em; height: 1em"></delete-icon>
-                    </button>
-                    <custom-tooltip style="min-width: 150px;">Delete this list</custom-tooltip>
-                ` : ''}
+                                <edit-icon style="width: 1em; height: 1em"></edit-icon>
+                            </button>
+                            <custom-tooltip>Edit this list</custom-tooltip>
+                            <button class="delete-button icon-button" aria-label="Delete List"
+                                    @click="${this._handleDelete}"
+                                    style="--icon-color: var(--delete-red); --icon-color-hover: var(--delete-red); --icon-hover-background: var(--delete-red-light)">
+                                <delete-icon style="width: 1em; height: 1em"></delete-icon>
+                            </button>
+                            <custom-tooltip style="min-width: 150px;">Delete this list</custom-tooltip>
+                        ` : ''}
+                    </div>
+                    
+                    ${this.itemData.ownerId && this.showOwner ? html`
+                        <div class="owner-info bottom-row">
+                            <custom-avatar
+                                    .username="${getUsernameById(this.itemData?.ownerId)}"
+                                    imageId="${getUserImageIdByUserId(this.itemData?.ownerId)}"
+                                    size="16"
+                            >
+                            </custom-avatar>
+                            <span>${getUsernameById(this.itemData?.ownerId)}</span>
+                        </div>
+                    ` : ''}
+                    
+                </div>
+                
             </a>
         `;
     }
