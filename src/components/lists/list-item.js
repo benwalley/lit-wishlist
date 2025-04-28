@@ -14,8 +14,9 @@ import '../global/custom-tooltip.js'
 import {cachedFetch} from "../../helpers/caching.js";
 import {customFetch} from "../../helpers/fetchHelpers.js";
 import {getUserImageIdByUserId, getUsernameById} from "../../helpers/generalHelpers.js";
+import {observeState} from "lit-element-state";
 
-export class CustomElement extends LitElement {
+export class CustomElement extends observeState(LitElement) {
     static properties = {
         itemData: {type: Object},
         isSelectList: {type: Boolean},
@@ -122,6 +123,13 @@ export class CustomElement extends LitElement {
                         gap: 4px;
                         font-size: var(--font-size-x-small);
                         color: var(--text-color-medium-dark);
+
+                        span {
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            max-width: 100px;
+                        }
                     }
                 }
 
@@ -207,7 +215,7 @@ export class CustomElement extends LitElement {
                             --icon-hover-background: var(--blue-light)">
                                 <edit-icon style="width: 1em; height: 1em"></edit-icon>
                             </button>
-                            <custom-tooltip>Edit this list</custom-tooltip>
+                            <custom-tooltip style="min-width: 100px;">Edit this list</custom-tooltip>
                             <button class="delete-button icon-button" aria-label="Delete List"
                                     @click="${this._handleDelete}"
                                     style="--icon-color: var(--delete-red); --icon-color-hover: var(--delete-red); --icon-hover-background: var(--delete-red-light)">

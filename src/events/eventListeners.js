@@ -2,7 +2,7 @@ import {listenToCustomEvent, triggerCustomEvent} from "./custom-events.js";
 import {invalidateCache} from "../helpers/caching.js";
 
 const UPDATE_LIST_EVENT = 'update-list';
-const UPDATE_ITEM_EVENT = 'update-list';
+const UPDATE_ITEM_EVENT = 'update-item';
 const UPDATE_QA_EVENT = 'update-qa';
 const UPDATE_USER_EVENT = 'update-user';
 const USER_UPDATED_EVENT = 'user-updated';

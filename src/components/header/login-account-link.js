@@ -39,6 +39,10 @@ export class LoginAccountLink extends observeState(LitElement) {
                 .name-text {
                     font-weight: bold;
                     font-size: var(--font-size-small);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    max-width: 120px;
 
                 }
                 

@@ -58,6 +58,20 @@ export async function getUserLists() {
 }
 
 /**
+ * Get all lists the current user has access to
+ * @returns {Promise<{success: boolean, data: Array}|{success: boolean, error: Error}>}
+ */
+export async function getAllAccessibleLists() {
+    try {
+        const lists = await cachedFetch('/lists/accessible', {}, true);
+        return lists
+    } catch (error) {
+        console.error('Error fetching accessible lists:', error);
+        return { success: false, error };
+    }
+}
+
+/**
  * Get a specific list by its ID
  * @param {string} listId - The ID of the list to fetch
  * @returns {Promise<{success: boolean, data: Object}|{success: boolean, error: Error}>}

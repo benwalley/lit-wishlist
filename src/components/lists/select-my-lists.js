@@ -169,6 +169,9 @@ export class CustomElement extends LitElement {
             if (response?.success) {
                 const lists = Array.isArray(response.data) ? response.data : [];
                 this.lists = lists.filter(list => list?.id > 0);
+                if(this.lists.length === 1) {
+                    this.selectedListIds = [this.lists[0].id];
+                }
             }
         } catch (error) {
             // Only log error if component is still mounted

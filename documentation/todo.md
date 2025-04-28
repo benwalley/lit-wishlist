@@ -9,4 +9,6 @@
  - add deleted items page on my account page
  - add ispublic selector on add to list selector
  - remove ability to edit unassigned items
+ - when a user joins a group, add lists
  - ✅ implement Popover API for dropdowns and edit popups (see documentation/popover-api.md)
+ - Create a method of bulk managing the users and groups things are visible to
