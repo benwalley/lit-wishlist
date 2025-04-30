@@ -5,8 +5,6 @@ import {userListState} from "../../state/userListStore.js";
 import './loading-screen.js';
 import {initRouter, navigate} from "../../router/main-router.js";
 import {getAccessibleUsers, getCurrentUser} from "../../helpers/api/users.js";
-import {globalState} from "../../state/globalStore.js";
-import {triggerCustomEvent} from "../../events/custom-events.js";
 import {
     listenUpdateUser,
     triggerInitialUserLoaded,
@@ -16,6 +14,7 @@ import {
 import '../global/messages-component.js';
 import '../add-to-list/edit-item-modal.js';
 import './add-question-modal.js';
+import '../groups/bulk-add-to-group-modal.js'
 
 export class AuthContainer extends observeState(LitElement) {
     static styles = css`
@@ -77,6 +76,7 @@ export class AuthContainer extends observeState(LitElement) {
             }
             <edit-item-modal></edit-item-modal>
             <add-question-modal></add-question-modal>
+            <bulk-add-to-group-modal></bulk-add-to-group-modal>
         `;
     }
 }

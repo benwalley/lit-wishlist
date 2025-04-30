@@ -4,7 +4,7 @@ import formStyles from "../../css/forms.js";
 import { createGroup } from '../../helpers/api/groups.js';
 import { messagesState } from '../../state/messagesStore.js';
 import '../global/custom-input.js';
-import {triggerGroupUpdated} from "../../events/eventListeners.js";
+import {triggerBulkAddToGroupModal, triggerGroupUpdated} from "../../events/eventListeners.js";
 import '../pages/account/avatar.js';
 import '../global/image-changer.js';
 import '../../svg/camera.js';
@@ -125,7 +125,7 @@ export class CreateGroupForm extends LitElement {
             if (result.success) {
                 // Notify parent that group was created
                 this.dispatchEvent(new CustomEvent('group-created', {
-                    detail: { group: result.groupData },
+                    detail: { group: result.data },
                     bubbles: true,
                     composed: true
                 }));
@@ -133,10 +133,7 @@ export class CreateGroupForm extends LitElement {
                 // Show success message
                 messagesState.addMessage('Group created successfully', 'success');
 
-                // Reset form
-                this.groupName = '';
-                this.groupDescription = '';
-                this.groupImage = 0;
+                this._resetForm();
 
                 // Close modal (handled by parent)
                 this.dispatchEvent(new CustomEvent('close-modal', {
@@ -144,6 +141,8 @@ export class CreateGroupForm extends LitElement {
                     composed: true
                 }));
                 triggerGroupUpdated()
+                // Pass the newly created group data to the bulk add modal
+                triggerBulkAddToGroupModal(result.data)
             } else {
                 this.createError = result.error?.message || 'Failed to create group. Please try again.';
                 messagesState.addMessage('Failed to create group', 'error');
@@ -155,6 +154,12 @@ export class CreateGroupForm extends LitElement {
         } finally {
             this.isCreatingGroup = false;
         }
+    }
+
+    _resetForm() {
+        this.groupName = '';
+        this.groupDescription = '';
+        this.groupImage = 0;
     }
 
     _handleCancel() {

@@ -9,6 +9,7 @@ const USER_UPDATED_EVENT = 'user-updated';
 const USER_LOADED_EVENT = 'user-loaded';
 const USER_LIST_LOADED_EVENT = 'user-list-loaded';
 const GROUP_UPDATED_EVENT = 'group-updated';
+const BULK_ADD_TO_GROUP_MODAL_EVENT = 'open-bulk-add-to-group-modal';
 const imageUploadEvents = {
     imageSelected: 'image-selected',
     cropConfirmed: 'crop-confirmed'
@@ -71,6 +72,14 @@ export function triggerGroupUpdated() {
 
 export function listenGroupUpdated(callback) {
     return listenToCustomEvent(GROUP_UPDATED_EVENT, callback);
+}
+
+export function triggerBulkAddToGroupModal(group) {
+    triggerCustomEvent(BULK_ADD_TO_GROUP_MODAL_EVENT, { group });
+}
+
+export function listenBulkAddToGroupModal(callback) {
+    return listenToCustomEvent(BULK_ADD_TO_GROUP_MODAL_EVENT, callback);
 }
 
 export function triggerImageSelected(details) {

@@ -10,5 +10,8 @@
  - add ispublic selector on add to list selector
  - remove ability to edit unassigned items
  - when a user joins a group, add lists
- - ✅ implement Popover API for dropdowns and edit popups (see documentation/popover-api.md)
  - Create a method of bulk managing the users and groups things are visible to
+ - move unassigned items to a separate place
+ - add account configuration
+ - fix list display when editing items
+ - 

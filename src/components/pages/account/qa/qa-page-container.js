@@ -84,9 +84,10 @@ export class CustomElement extends observeState(LitElement) {
             const userId = userState.userData.id;
             console.log(`Fetching questions for user ID: ${userId}`);
             const response = await getAskedQAItems(userId);
+            const qaItems = response?.data || [];
             if(response.success) {
-                const filteredQuestions = response.qaItems.filter(item => item.deleted !== true);
-                const deletedQuestions = response.qaItems.filter(item => item.deleted === true);
+                const filteredQuestions = qaItems.filter(item => item.deleted !== true);
+                const deletedQuestions = qaItems.filter(item => item.deleted === true);
                 this.questions = filteredQuestions;
                 this.deletedQuestions = deletedQuestions;
             }
@@ -118,7 +119,7 @@ export class CustomElement extends observeState(LitElement) {
     _handleAddQuestion() {
         triggerAddQuestionEvent({ });
     }
-    
+
     async _handleDeleteQuestion(event) {
         await handleDeleteQuestion(event.detail.question);
     }

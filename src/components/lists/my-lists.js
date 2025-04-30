@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import buttonStyles from "../../css/buttons";
+import formStyles from "../../css/forms.js";
 import { customFetch } from "../../helpers/fetchHelpers.js";
 import './list-item.js';
 import '../create-list/create-list-button.js';
@@ -20,6 +21,7 @@ export class CustomElement extends LitElement {
     static get styles() {
         return [
             buttonStyles,
+            formStyles,
             css`
                 :host {
                     display: block;
@@ -30,6 +32,13 @@ export class CustomElement extends LitElement {
                     display: flex;
                     flex-direction: column;
                     gap: var(--spacing-small);
+                }
+                
+                .section-header {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
                 }
             `,
         ];
@@ -46,7 +55,7 @@ export class CustomElement extends LitElement {
         try {
             const response = await cachedFetch('/lists/mine', {}, true);
             if(response.success) {
-                this.lists = response.data;
+                this.lists = response.data.filter(list => list.id !== 0);
             } else {
                 messagesState.addMessage('error fetching lists', 'error');
             }
@@ -58,7 +67,10 @@ export class CustomElement extends LitElement {
     render() {
         return html`
             <div>
-                <h2>My Lists</h2>
+                <div class="section-header">
+                    <h2>My Lists</h2>
+                    <a href="/list/0">unassigned items</a>
+                </div>
                 ${this.lists.length > 0
                         ? html`
                             <ul>

@@ -5,13 +5,14 @@ import '../account/avatar.js';
 import '../../../svg/edit.js';
 import '../../../svg/delete.js';
 import '../../../svg/leave.js';
+import '../../../svg/plus.js';
 import buttonStyles from '../../../css/buttons.js'
 import '../../groups/edit-group-form.js';
 import {isGroupAdmin, isGroupOwner} from "../../../helpers/groupHelpers.js";
 import {deleteGroup, leaveGroup} from "../../../helpers/api/groups.js";
 import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
 import {messagesState} from "../../../state/messagesStore.js";
-import {triggerGroupUpdated} from "../../../events/eventListeners.js";
+import {triggerGroupUpdated, triggerBulkAddToGroupModal} from "../../../events/eventListeners.js";
 
 /**
  * Group details component that displays group information and admin actions
@@ -121,6 +122,16 @@ export class GroupDetails extends observeState(LitElement) {
                         transform: translateX(3px);
                     }
                 }
+                
+                .add-button.icon-button {
+                    --icon-color: var(--green-normal);
+                    --icon-color-hover: var(--green-darker);
+                    --icon-hover-background: var(--green-light);
+                    
+                    &:hover {
+                        transform: scale(1.1);
+                    }
+                }
             `
         ];
     }
@@ -204,6 +215,14 @@ export class GroupDetails extends observeState(LitElement) {
         }
     }
 
+    /**
+     * Opens the bulk add to group modal
+     * @private
+     */
+    _handleAddItems() {
+        triggerBulkAddToGroupModal(this.groupData);
+    }
+
     render() {
         const isOwner = isGroupOwner(this.groupData, userState?.userData?.id);
         const isAdmin = isGroupAdmin(this.groupData, userState?.userData?.id);
@@ -218,6 +237,14 @@ export class GroupDetails extends observeState(LitElement) {
             <p class="group-description">${this.groupData?.groupDescription}</p>
             
             <div class="action-buttons">
+                <button aria-label="add-items-to-group"
+                        class="icon-button button add-button"
+                        @click="${this._handleAddItems}"
+                        title="Add Items to Group"
+                >
+                    <plus-icon></plus-icon>
+                </button>
+                
                 ${isAdmin ? html`
                     <button aria-label="edit-group"
                             class="icon-button button username-edit-button"

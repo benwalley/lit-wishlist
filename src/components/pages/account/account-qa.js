@@ -107,8 +107,9 @@ export class AccountQA extends observeState(LitElement) {
         try {
             const userId = userState.userData.id;
             const response = await getQAItems(userId);
+            console.log({response})
             if (response.success) {
-                this.qaItems = response.qaItems || [];
+                this.qaItems = response.data || [];
                 this.qaItems = this.qaItems.filter(item => item.deleted !== true);
             } else {
                 messagesState.addMessage(response.message || 'Failed to fetch Q&A items.', 'error');
@@ -150,7 +151,7 @@ export class AccountQA extends observeState(LitElement) {
                     questionText: updatedItem.questionText,
                     answerText: updatedItem.answers?.[0]?.answerText,
                     userId: userState.userData.id,
-                    shareWithUsers: [userState.userData.id]
+                    sharedWithUserIds: [userState.userData.id]
                 });
                 if (response.success) {
                     this.qaItems = this.qaItems.map(item => (item.id === itemId ? response.qaData : item));

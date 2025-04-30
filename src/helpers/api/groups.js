@@ -61,7 +61,7 @@ export async function createGroup(groupData) {
         };
 
         const group = await customFetch('/groups/create', options, true);
-        return {success: true, groupData: group}
+        return group;
     } catch(e) {
         return {error: e, success: false}
     }
@@ -248,5 +248,29 @@ export async function updateGroup(groupData) {
     }
 }
 
+/**
+ * Bulk share lists and questions with a group
+ * @param {string} groupId - The ID of the group to share with
+ * @param {Array} listIds - Array of list IDs to share with the group
+ * @param {Array} questionIds - Array of question IDs to share with the group
+ * @returns {Promise<{success: boolean, data: Object}|{success: boolean, error: Error}>}
+ */
+export async function bulkShareWithGroup(groupId, listIds = [], questionIds = []) {
+    try {
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ listIds, questionIds }),
+        };
+
+        const result = await customFetch(`/groups/${groupId}/bulk-share`, options, true);
+        return { success: true, data: result };
+    } catch (error) {
+        console.error('Error sharing items with group:', error);
+        return { success: false, error };
+    }
+}
 
 

@@ -119,7 +119,7 @@ export async function updateAnswer(answerData) {
 export async function getQAItems(userId) {
     try {
         const response = await cachedFetch(`/qa/user/${userId}`, {}, true);
-        return {success: true, qaItems: response}
+        return response;
     } catch (e) {
         handleQAError('There was an error fetching the Q&A items. Please try again.')
         return {success: false, message: 'There was an error fetching the Q&A items. Please try again.'}
@@ -129,7 +129,7 @@ export async function getQAItems(userId) {
 export async function getAskedQAItems(userId) {
     try {
         const response = await cachedFetch(`/qa/userAsked/${userId}`, {}, true);
-        return {success: true, qaItems: response}
+        return response
     } catch (e) {
         handleQAError('There was an error fetching the Q&A items. Please try again.')
         return {success: false, message: 'There was an error fetching the Q&A items. Please try again.'}
@@ -187,19 +187,19 @@ export async function handleDeleteQuestion(question) {
         const sharedWithUsers = question.sharedWithUsers || [];
         const sharedWithGroups = question.sharedWithGroups || [];
         const totalSharedEntities = sharedWithUsers.length + sharedWithGroups.length;
-        
+
         // Create submessage with shared info if applicable
         let submessage = 'The users who answered this question will still see it with a message telling them it was deleted';
-        
+
         if (totalSharedEntities > 1) {
             submessage += '<br><br><strong>This question is shared with:</strong><br>';
-            
+
             if (sharedWithGroups.length > 0) {
                 submessage += '<strong>Groups:</strong> ';
                 submessage += sharedWithGroups.map(group => group.groupName).join(', ');
                 submessage += '<br>';
             }
-            
+
             if (sharedWithUsers.length > 0) {
                 submessage += '<strong>Users:</strong> ';
                 submessage += sharedWithUsers.map(user => user.name).join(', ');

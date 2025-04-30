@@ -396,8 +396,15 @@ export class QAItem extends observeState(LitElement) {
         }
     }
 
+    _hasEmptyAnswer() {
+        if(this.isEditing) return false;
+        if(this.item.loading) return false;
+        if(this.item.answers.length === 0) return true;
+        return false;
+    }
+
     render() {
-        const hasEmptyAnswer = !this.isEditing && !this.item.loading && (this.item.answers?.length === 0 || !this.item.answers[0]?.answerText?.trim());
+        const hasEmptyAnswer = this._hasEmptyAnswer();
 
         return html`
             <div class="item-container ${this.isEditing ? 'editing' : ''} ${hasEmptyAnswer ? 'empty-answer' : ''}">
