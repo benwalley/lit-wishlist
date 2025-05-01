@@ -71,6 +71,8 @@ export class MyGroupsList extends LitElement {
                     flex-direction: column;
                     gap: var(--spacing-normal);
                     margin-top: var(--spacing-small);
+                    max-height: 200px;
+                    overflow-y: auto;
                 }
                 
                 .empty-state {

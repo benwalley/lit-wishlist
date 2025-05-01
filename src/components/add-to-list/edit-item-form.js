@@ -15,6 +15,7 @@ import {triggerUpdateItem} from "../../events/eventListeners.js";
 import {invalidateCache} from "../../helpers/caching.js";
 import {messagesState} from "../../state/messagesStore.js";
 import '../../svg/gear.js';
+import '../lists/select-my-lists.js';
 
 export class EditItemForm extends LitElement {
     static properties = {
@@ -40,6 +41,7 @@ export class EditItemForm extends LitElement {
         visibility: {type: String},
         matchListVisibility: {type: Boolean},
         saving: {type: Boolean},
+        selectedListIds: {type: Array},
     };
 
     constructor() {
@@ -66,6 +68,7 @@ export class EditItemForm extends LitElement {
         this.matchListVisibility = true;
         this.visibleToUsers = [];
         this.visibleToGroups = [];
+        this.selectedListIds = [];
     }
 
     updated(changedProperties) {
@@ -144,6 +147,15 @@ export class EditItemForm extends LitElement {
         this.matchListVisibility = this.itemData.matchListVisibility !== false;
         this.visibleToUsers = this.itemData.visibleToUsers || [];
         this.visibleToGroups = this.itemData.visibleToGroups || [];
+        
+        // Set initial list IDs if available
+        if (this.itemData.listIds && Array.isArray(this.itemData.listIds)) {
+            this.selectedListIds = [...this.itemData.listIds];
+        } else if (this.itemData.listId) {
+            this.selectedListIds = [this.itemData.listId];
+        } else {
+            this.selectedListIds = [];
+        }
     }
 
     static get styles() {
@@ -256,7 +268,8 @@ export class EditItemForm extends LitElement {
                     border: 1px solid var(--border-color);
                 }
                 
-                .public-toggle-section h3 {
+                .public-toggle-section h3,
+                .list-selector-container h3 {
                     margin: 0 0 var(--spacing-small) 0;
                     font-size: var(--font-size-small);
                     font-weight: 600;
@@ -269,10 +282,20 @@ export class EditItemForm extends LitElement {
                     gap: var(--spacing-small);
                 }
                 
-                .public-toggle-description {
+                .public-toggle-description,
+                .list-selector-description {
                     font-size: var(--font-size-x-small);
                     color: var(--text-color-medium-dark);
                     line-height: 1.4;
+                    margin-bottom: var(--spacing-small);
+                }
+                
+                .list-selector-container {
+                    margin-bottom: var(--spacing-normal);
+                    padding: var(--spacing-small);
+                    background-color: var(--background-dark);
+                    border-radius: var(--border-radius-normal);
+                    border: 1px solid var(--border-color);
                 }
                 
                 .button-container {
@@ -334,6 +357,7 @@ export class EditItemForm extends LitElement {
             visibleToUsers: this.visibleToUsers,
             visibleToGroups: this.visibleToGroups,
             matchListVisibility: this.matchListVisibility,
+            listIds: this.selectedListIds,
         };
 
         const options = {
@@ -407,6 +431,10 @@ export class EditItemForm extends LitElement {
                     </div>
 
                     <div class="column">
+                        <select-my-lists 
+                            .selectedListIds="${this.selectedListIds}" 
+                            @change="${this._handleListSelectionChange}"
+                        ></select-my-lists>
                         <wysiwyg-editor
                                 @content-changed=${(e) => this.notes = e.detail.content}
                                 .content="${this.notes}"
@@ -481,6 +509,10 @@ export class EditItemForm extends LitElement {
         this.matchListVisibility = matchListVisibility;
         this.visibleToGroups = selectedGroups || [];
         this.visibleToUsers = selectedUsers || [];
+    }
+    
+    _handleListSelectionChange(e) {
+        this.selectedListIds = e.detail.selectedListIds || [];
     }
 }
 
