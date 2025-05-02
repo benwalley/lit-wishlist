@@ -17,6 +17,7 @@ import './add-question-modal.js';
 import '../groups/bulk-add-to-group-modal.js'
 import '../lists/bulk-add-to-list-modal.js';
 import './delete-list/delete-list.js';
+import '../lists/edit-list-modal.js';
 
 export class AuthContainer extends observeState(LitElement) {
     static styles = css`
@@ -81,6 +82,7 @@ export class AuthContainer extends observeState(LitElement) {
             <bulk-add-to-group-modal></bulk-add-to-group-modal>
             <bulk-add-to-list-modal></bulk-add-to-list-modal>
             <delete-list></delete-list>
+            <edit-list-modal></edit-list-modal>
         `;
     }
 }

@@ -5,6 +5,9 @@ import './item-tile.js'
 import '../../lists/edit-list-modal.js'
 import '../../../svg/edit.js'
 import '../../../svg/delete.js'
+import '../../../svg/dots.js'
+import '../../../svg/share.js'
+import '../../global/action-dropdown.js'
 import {openEditListModal} from '../../lists/edit-list-modal.js'
 import {listenUpdateItem, listenUpdateList, triggerDeleteList} from "../../../events/eventListeners.js";
 import buttonStyles from '../../../css/buttons.js';
@@ -69,6 +72,7 @@ export class ListViewContainer extends LitElement {
                     align-items: flex-start;
                     gap: 1rem;
                     padding: 1rem;
+                    position: relative;
                     
                     h1 {
                         margin: 0;
@@ -77,6 +81,17 @@ export class ListViewContainer extends LitElement {
                 
                 .header-content {
                     flex-grow: 1;
+                }
+                
+                .header-top {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                }
+                
+                .kebab-menu {
+                    font-size: var(--font-size-large);
+                    color: var(--text-color-medium-dark);
                 }
                 
                 .header-actions {
@@ -91,6 +106,15 @@ export class ListViewContainer extends LitElement {
 
                 .delete-button {
                     font-size: var(--font-size-large);
+                }
+                
+                .action-icon {
+                    margin-right: var(--spacing-small);
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 18px;
+                    height: 18px;
                 }
 
                 .list-items {
@@ -144,6 +168,37 @@ export class ListViewContainer extends LitElement {
         triggerDeleteList(this.listData);
     }
 
+    _handleShareList() {
+        // You can implement share functionality here
+        messagesState.addMessage('Share functionality coming soon!');
+    }
+
+    _getActionDropdownItems() {
+        return [
+            {
+                id: 'edit',
+                label: 'Edit List',
+                icon: html`<edit-icon class="action-icon"></edit-icon>`,
+                classes: 'blue-text',
+                action: () => this._handleEditList()
+            },
+            {
+                id: 'share',
+                label: 'Share List',
+                icon: html`<share-icon class="action-icon"></share-icon>`,
+                classes: 'purple-text',
+                action: () => this._handleShareList()
+            },
+            {
+                id: 'delete',
+                label: 'Delete List',
+                icon: html`<delete-icon class="action-icon"></delete-icon>`,
+                classes: 'danger-text',
+                action: () => this._handleDeleteList()
+            }
+        ];
+    }
+
     render() {
         // If this.loading is true, show a loading message
         if (this.loading) {
@@ -155,23 +210,26 @@ export class ListViewContainer extends LitElement {
             <div class="list-header">
                 <custom-avatar size="100" username="${this.listData?.listName}"></custom-avatar>
                 <div class="header-content">
-                    <h1>${this.listData?.listName}</h1>
-                    <div>${this.listData?.description}</div>
-                    ${this.listId > 0 ? html`
-                        <div class="header-actions">
-                            <button class="edit-button icon-button blue-text"
-                                    @click="${this._handleEditList}"
-                                    aria-label="Edit List"
+                    <div class="header-top">
+                        <h1>${this.listData?.listName}</h1>
+                        
+                        ${this.listId > 0 ? html`
+                            <action-dropdown
+                                .items="${this._getActionDropdownItems()}"
+                                placement="bottom-end"
                             >
-                                <edit-icon></edit-icon>
-                            </button>
-                            <button class="delete-button icon-button danger-text"
-                                    @click="${this._handleDeleteList}"
-                                    aria-label="Delete List">
-                                <delete-icon></delete-icon>
-                            </button>
-                        </div>
-                    ` : ''}
+                                <button
+                                    slot="toggle"
+                                    class="kebab-menu icon-button"
+                                    aria-label="List actions"
+                                >
+                                    <dots-icon></dots-icon>
+                                </button>
+                            </action-dropdown>
+                        ` : ''}
+                    </div>
+                    
+                    <div>${this.listData?.description}</div>
                 </div>
             </div>
             <div class="list-items">
@@ -183,7 +241,6 @@ export class ListViewContainer extends LitElement {
                 }
             </div>
             
-            <edit-list-modal></edit-list-modal>
         `;
     }
 }

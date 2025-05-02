@@ -96,8 +96,6 @@ export class AccountContainer extends LitElement {
                 <section>
                     <account-secondary-lists></account-secondary-lists>
                 </section>
-                
-                <edit-list-modal></edit-list-modal>
             </main>
         `;
     }

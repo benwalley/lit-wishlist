@@ -16,6 +16,7 @@ import {getUserImageIdByUserId, getUsernameById} from "../../helpers/generalHelp
 import {observeState} from "lit-element-state";
 import {showConfirmation} from "../global/custom-confirm/confirm-helper.js";
 import {triggerDeleteList, triggerUpdateList} from "../../events/eventListeners.js";
+import {triggerEditListEvent} from "../../events/custom-events.js";
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
@@ -147,12 +148,7 @@ export class CustomElement extends observeState(LitElement) {
     _handleEdit(e) {
         e.preventDefault();
         e.stopPropagation();
-
-        // Import and use the openEditListModal function
-        import('./edit-list-modal.js').then(module => {
-            const { openEditListModal } = module;
-            openEditListModal(this.itemData);
-        });
+        triggerEditListEvent(this.itemData)
     }
 
     render() {

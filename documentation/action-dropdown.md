@@ -1,6 +1,6 @@
 # Action Dropdown Component
 
-The `action-dropdown` component provides a customizable dropdown menu for various actions.
+The `action-dropdown` component provides a customizable dropdown menu for various actions, often used with a kebab/dots menu for contextual actions.
 
 ## Basic Usage
 
@@ -46,6 +46,59 @@ html`
 `;
 ```
 
+## Kebab Menu Example (from list-view-container)
+
+The action-dropdown is commonly used with a dots/kebab menu for page-level actions. Note the use of color classes to visually distinguish different types of actions:
+
+```javascript
+// Define action items as a method
+_getActionDropdownItems() {
+  return [
+    {
+      id: 'edit',
+      label: 'Edit List',
+      icon: html`<edit-icon class="action-icon"></edit-icon>`,
+      classes: 'blue-text',    // Standard action - blue
+      action: () => this._handleEditList()
+    },
+    {
+      id: 'share',
+      label: 'Share List',
+      icon: html`<share-icon class="action-icon"></share-icon>`,
+      classes: 'purple-text',  // Special feature - purple
+      action: () => this._handleShareList()
+    },
+    {
+      id: 'delete',
+      label: 'Delete List',
+      icon: html`<delete-icon class="action-icon"></delete-icon>`,
+      classes: 'danger-text',  // Destructive action - red
+      action: () => this._handleDeleteList()
+    }
+  ];
+}
+
+// In render method
+html`
+  <div class="header-top">
+    <h1>${this.listData?.listName}</h1>
+    
+    <action-dropdown
+      .items="${this._getActionDropdownItems()}"
+      placement="bottom-end"
+    >
+      <button
+        slot="toggle"
+        class="kebab-menu icon-button"
+        aria-label="List actions"
+      >
+        <dots-icon></dots-icon>
+      </button>
+    </action-dropdown>
+  </div>
+`;
+```
+
 ## Properties
 
 | Property   | Type    | Description                                  |
@@ -66,22 +119,32 @@ Each item in the `items` array can have the following properties:
 | action      | Function | Function to execute when the item is clicked         |
 | classes     | String   | CSS classes to apply to the item                     |
 
-## Available Button Classes
+## Available Button Classes and Color Semantics
 
-The action-dropdown component supports all the button styles defined in `src/css/buttons.js`. Some useful classes for dropdown items include:
+The action-dropdown component supports all the button styles defined in `src/css/buttons.js`. Use color classes to visually distinguish between different types of actions:
 
-| Class        | Description                                     |
-|-------------|-------------------------------------------------|
-| primary      | Primary button style with filled background     |
-| secondary    | Secondary button style with border              |
-| ghost        | Ghost button style with light border            |
-| danger       | Danger button style with red background         |
-| danger-text  | Text-only danger style (red text)               |
-| blue-text    | Text-only blue style                            |
-| green-text   | Text-only green style                           |
-| purple-text  | Text-only purple style                          |
-| small        | Small button size                               |
-| link-button  | Link-like button                                |
+| Class        | Description                                     | Usage                                    |
+|-------------|--------------------------------------------------|------------------------------------------|
+| primary      | Primary button style with filled background     | Main action                              |
+| secondary    | Secondary button style with border              | Alternative action                       |
+| ghost        | Ghost button style with light border            | Subtle action                            |
+| danger       | Danger button style with red background         | Destructive actions with high visibility |
+| danger-text  | Text-only danger style (red text)               | Destructive actions (delete, remove)     |
+| blue-text    | Text-only blue style                            | Standard actions (edit, view)            |
+| green-text   | Text-only green style                           | Positive actions (approve, confirm)      |
+| purple-text  | Text-only purple style                          | Special features (share, export)         |
+| small        | Small button size                               | Use for compact UIs                      |
+| link-button  | Link-like button                                | Navigation-like actions                  |
+
+### Color Meaning Conventions
+
+Following consistent color conventions helps users understand actions at a glance:
+
+- **Blue**: Standard, non-destructive actions (edit, view details)
+- **Purple**: Special features or sharing functionality 
+- **Green**: Positive or confirmation actions (approve, complete)
+- **Red**: Destructive or warning actions (delete, remove)
+- **Gray**: Neutral or disabled actions
 
 ## Events
 
