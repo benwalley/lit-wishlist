@@ -15,7 +15,7 @@ import {customFetch} from "../../helpers/fetchHelpers.js";
 import {getUserImageIdByUserId, getUsernameById} from "../../helpers/generalHelpers.js";
 import {observeState} from "lit-element-state";
 import {showConfirmation} from "../global/custom-confirm/confirm-helper.js";
-import {triggerUpdateList} from "../../events/eventListeners.js";
+import {triggerDeleteList, triggerUpdateList} from "../../events/eventListeners.js";
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
@@ -141,24 +141,7 @@ export class CustomElement extends observeState(LitElement) {
     async _handleDelete(e) {
         e.preventDefault();
         e.stopPropagation();
-
-        const confirmed = await showConfirmation({
-            heading: 'Delete List',
-            message: `Are you sure you want to delete "${this.itemData.listName}"?`,
-            submessage: 'This action cannot be undone.',
-            confirmLabel: 'Delete',
-            cancelLabel: 'Cancel'
-        });
-
-        if (!confirmed) return;
-
-        try {
-            const response = await customFetch(`/lists/${this.itemData.id}`, {method: 'DELETE'}, true);
-
-            triggerUpdateList();
-        } catch (error) {
-            console.error('Error deleting list:', error);
-        }
+        triggerDeleteList(this.itemData)
     }
 
     _handleEdit(e) {

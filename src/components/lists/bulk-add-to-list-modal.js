@@ -18,7 +18,7 @@ export class BulkAddToListModal extends LitElement {
 
     constructor() {
         super();
-        this.isOpen = true;
+        this.isOpen = false;
         this.selectedItemIds = [];
         this.list = null;
         this.isLoading = false;

@@ -11,6 +11,7 @@ const USER_LIST_LOADED_EVENT = 'user-list-loaded';
 const GROUP_UPDATED_EVENT = 'group-updated';
 const BULK_ADD_TO_GROUP_MODAL_EVENT = 'open-bulk-add-to-group-modal';
 const BULK_ADD_TO_LIST_MODAL_EVENT = 'open-bulk-add-to-list-modal';
+const DELETE_LIST_EVENT = 'delete-list';
 const imageUploadEvents = {
     imageSelected: 'image-selected',
     cropConfirmed: 'crop-confirmed'
@@ -115,4 +116,12 @@ export function triggerBulkAddToListModal(list) {
 
 export function listenBulkAddToListModal(callback) {
     return listenToCustomEvent(BULK_ADD_TO_LIST_MODAL_EVENT, callback);
+}
+
+export function triggerDeleteList(listData) {
+    triggerCustomEvent(DELETE_LIST_EVENT, { listData });
+}
+
+export function listenDeleteList(callback) {
+    return listenToCustomEvent(DELETE_LIST_EVENT, callback);
 }
