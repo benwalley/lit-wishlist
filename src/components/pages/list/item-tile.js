@@ -47,7 +47,8 @@ export class ItemTile extends observeState(LitElement) {
             buttonStyles,
             css`
                 :host {
-                    
+                    container-type: inline-size;
+                    container-name: item-tile;
                 }
                 
                 p {
@@ -67,6 +68,11 @@ export class ItemTile extends observeState(LitElement) {
 
                 .item-name {
                     margin: 0;
+                }
+                @container item-tile (max-width: 200px) {
+                    .item-name {
+                        font-size: var(--font-size-small);
+                    }
                 }
                 
                 .small .item-name {
@@ -90,10 +96,10 @@ export class ItemTile extends observeState(LitElement) {
 
                 .item-actions {
                     display: flex;
-                    gap: var(--spacing-small);
+                    gap: 0;
                     position: absolute;
-                    bottom: var(--spacing-small);
-                    right: var(--spacing-small);
+                    bottom: 0;
+                    right: var(--spacing-x-small);
                 }
                 
                 .small .item-actions {

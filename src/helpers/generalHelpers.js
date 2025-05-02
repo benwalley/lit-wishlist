@@ -49,3 +49,7 @@ export function getEmailAddressByUserId(userId) {
     const user = userListState.users.find(user => user.id === userId);
         return user?.email || '';
 }
+
+export function redirectToDefaultPage() {
+    window.location.href = '/';
+}

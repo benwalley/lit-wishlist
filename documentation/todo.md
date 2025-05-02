@@ -11,6 +11,5 @@
  - remove ability to edit unassigned items
  - when a user joins a group, add lists
  - Create a method of bulk managing the users and groups things are visible to
- - move unassigned items to a separate place
  - add account configuration
- - When creating a list, add bulk-assign items popup
+ - properly set selected lists in edit item popup

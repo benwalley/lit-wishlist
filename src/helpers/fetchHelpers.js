@@ -93,12 +93,10 @@ async function parseResponse(response) {
             } else {
                 responseData = await response.text(); // Fallback to text if it's not JSON
             }
-            error.responseData = responseData;  // Attach response data to the error
             console.log(error)
-            return error;
+            return responseData;
         } catch (e) {
             // If parsing fails (e.g., the body is empty or malformed), handle the fallback here
-            error.responseData = "Failed to parse response";
             console.log(error)
             return error;
         }

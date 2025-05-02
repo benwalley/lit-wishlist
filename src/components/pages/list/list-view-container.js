@@ -4,10 +4,12 @@ import '../../pages/account/avatar.js'
 import './item-tile.js'
 import '../../lists/edit-list-modal.js'
 import '../../../svg/edit.js'
+import '../../../svg/delete.js'
 import {openEditListModal} from '../../lists/edit-list-modal.js'
-import {listenUpdateList} from "../../../events/eventListeners.js";
+import {listenUpdateItem, listenUpdateList, triggerDeleteList} from "../../../events/eventListeners.js";
 import buttonStyles from '../../../css/buttons.js';
 import {messagesState} from "../../../state/messagesStore.js";
+import {redirectToDefaultPage} from "../../../helpers/generalHelpers.js";
 
 export class ListViewContainer extends LitElement {
     static properties = {
@@ -33,6 +35,7 @@ export class ListViewContainer extends LitElement {
         }
         this.fetchListData();
         listenUpdateList(this.fetchListData.bind(this))
+        listenUpdateItem(this.fetchListData.bind(this))
     }
 
     async fetchListData() {
@@ -41,6 +44,10 @@ export class ListViewContainer extends LitElement {
             if(response?.success) {
                 this.listData = response.data;
             } else {
+                if(response.message === "List not found") {
+                    redirectToDefaultPage();
+                    return;
+                }
                 messagesState.addMessage(response.message || 'Error fetching list', 'error');
             }
         } catch (error) {
@@ -79,9 +86,11 @@ export class ListViewContainer extends LitElement {
                 }
                 
                 .edit-button {
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
+                    font-size: var(--font-size-large);;
+                }
+
+                .delete-button {
+                    font-size: var(--font-size-large);
                 }
 
                 .list-items {
@@ -89,23 +98,30 @@ export class ListViewContainer extends LitElement {
                     grid-template-columns: repeat(1, 1fr);
                     gap: var(--spacing-normal);
                     padding: 0 var(--spacing-normal);
+                    max-width: 1400px;
                 }
 
-                @media (min-width: 450px) {
-                    .list-items {
-                        grid-template-columns: repeat(1, 1fr);
-                    }
-                }
-
-                @media (min-width: 768px) {
+                @media (min-width: 350px) {
                     .list-items {
                         grid-template-columns: repeat(2, 1fr);
                     }
                 }
 
-                @media (min-width: 1024px) {
+                @media (min-width: 920px) {
                     .list-items {
                         grid-template-columns: repeat(3, 1fr);
+                    }
+                }
+
+                @media (min-width: 1200px) {
+                    .list-items {
+                        grid-template-columns: repeat(4, 1fr);
+                    }
+                }
+
+                @media (min-width: 1500px) {
+                    .list-items {
+                        grid-template-columns: repeat(5, 1fr);
                     }
                 }
             `
@@ -124,6 +140,10 @@ export class ListViewContainer extends LitElement {
         openEditListModal(this.listData);
     }
 
+    _handleDeleteList() {
+        triggerDeleteList(this.listData);
+    }
+
     render() {
         // If this.loading is true, show a loading message
         if (this.loading) {
@@ -137,11 +157,21 @@ export class ListViewContainer extends LitElement {
                 <div class="header-content">
                     <h1>${this.listData?.listName}</h1>
                     <div>${this.listData?.description}</div>
-                    <div class="header-actions">
-                        <button class="secondary edit-button" @click="${this._handleEditList}">
-                            <edit-icon></edit-icon> Edit List
-                        </button>
-                    </div>
+                    ${this.listId > 0 ? html`
+                        <div class="header-actions">
+                            <button class="edit-button icon-button blue-text"
+                                    @click="${this._handleEditList}"
+                                    aria-label="Edit List"
+                            >
+                                <edit-icon></edit-icon>
+                            </button>
+                            <button class="delete-button icon-button danger-text"
+                                    @click="${this._handleDeleteList}"
+                                    aria-label="Delete List">
+                                <delete-icon></delete-icon>
+                            </button>
+                        </div>
+                    ` : ''}
                 </div>
             </div>
             <div class="list-items">

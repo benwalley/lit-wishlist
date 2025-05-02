@@ -7,11 +7,18 @@ class PriorityDisplay extends LitElement {
         return [
             buttonStyles,
             css`
+                :host {
+                    container-type: inline-size;
+                    container-name: priority-display;
+                    display: block;
+                }
+                
                 .contents {
                     display: flex;
                     align-items: center;
                     gap: 15px;
                 }
+                
                 .hearts {
                     display: flex;
                     align-items: center;
@@ -19,6 +26,34 @@ class PriorityDisplay extends LitElement {
                     
                     heart-icon {
                         cursor: default;
+                    }
+                }
+                
+                .compact-display {
+                    display: none;
+                    align-items: center;
+                    gap: 4px;
+                }
+                
+                .compact-heart {
+                    display: flex;
+                    align-items: center;
+                }
+                
+                .priority-value {
+                    font-weight: bold;
+                    font-size: 14px;
+                    color: var(--text-color-dark);
+                }
+                
+                /* Container query for smaller containers */
+                @container priority-display (max-width: 175px) {
+                    .hearts {
+                        display: none;
+                    }
+                    
+                    .compact-display {
+                        display: flex;
                     }
                 }
             `
@@ -67,9 +102,22 @@ class PriorityDisplay extends LitElement {
             ${this.showLabel ? html`<h3>Priority</h3>` : ''}
             <div class="contents">
                 <div class="hearts">${this.renderHearts()}</div>
+                
+                <!-- Compact display for small containers -->
+                <div class="compact-display">
+                    <div class="compact-heart">
+                        <heart-icon
+                            state="full"
+                            active="false"
+                            style="--heart-size: 18px;"
+                        ></heart-icon>
+                    </div>
+                    <div class="priority-value">${this.value}</div>
+                </div>
             </div>
         ` : '';
     }
 }
+
 
 customElements.define('priority-display', PriorityDisplay);

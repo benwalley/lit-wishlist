@@ -84,19 +84,21 @@ export default css`
         }
 
         /* Dropdown item styles */
-        &.danger-text {
+        &.danger-text.danger-text {
             color: var(--delete-red);
             &:hover,
             &:focus {
                 background-color: var(--delete-red-light);
+                color: var(--delete-red-darker);
             }
         }
         
-        &.blue-text {
+        &.blue-text.blue-text {
             color: var(--blue-normal);
             &:hover,
             &:focus {
                 background-color: var(--blue-light);
+                color: var(--blue-darker);
             }
         }
 
