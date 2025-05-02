@@ -18,7 +18,7 @@ export class BulkAddToListModal extends LitElement {
 
     constructor() {
         super();
-        this.isOpen = false;
+        this.isOpen = true;
         this.selectedItemIds = [];
         this.list = null;
         this.isLoading = false;
@@ -157,6 +157,7 @@ export class BulkAddToListModal extends LitElement {
                 ?isOpen=${this.isOpen}
                 @modal-changed=${this.handleModalChange}
                 noPadding="true"
+                maxWidth="600px"
             >
                 <div class="modal-container">
                     <div class="modal-header">

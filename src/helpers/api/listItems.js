@@ -25,8 +25,8 @@ export async function deleteItem(itemId) {
 
 /**
  * Bulk add items to a list
- * @param {string} listId - The ID of the list to add items to
- * @param {string[]} itemIds - Array of item IDs to add to the list
+ * @param {string|number} listId - The ID of the list to add items to
+ * @param {Array<string|number>} itemIds - Array of item IDs to add to the list
  * @returns {Promise<{success: boolean, data: Object}|{success: boolean, error: Error}>}
  */
 export async function bulkAddToList(listId, itemIds) {
@@ -50,7 +50,7 @@ export async function bulkAddToList(listId, itemIds) {
             })
         };
 
-        const result = await customFetch('/listItems/bulk-add', options, true);
+        const result = await customFetch('/listItems/bulk-add-to-list', options, true);
         return result;
     } catch (error) {
         console.error('Error adding items to list:', error);

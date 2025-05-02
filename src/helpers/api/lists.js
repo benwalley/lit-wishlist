@@ -134,3 +134,30 @@ export async function deleteList(listId) {
         return { success: false, error };
     }
 }
+
+/**
+ * Fetch all lists that belong to the current user
+ * @returns {Promise<{success: boolean, data: Array}|{success: boolean, error: Error}>}
+ */
+export async function fetchMyLists() {
+    try {
+        const response = await cachedFetch('/lists/mine', {}, true);
+
+        if (response?.responseData?.error) {
+            throw new Error(response?.responseData?.error);
+        }
+
+        if (response?.success) {
+            const lists = Array.isArray(response.data) ? response.data : [];
+            return { 
+                success: true, 
+                data: lists.filter(list => list?.id > 0)
+            };
+        }
+        
+        return { success: false, error: 'Failed to fetch lists' };
+    } catch (error) {
+        console.error('Error fetching lists:', error);
+        return { success: false, error };
+    }
+}

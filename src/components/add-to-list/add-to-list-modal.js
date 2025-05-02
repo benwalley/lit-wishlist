@@ -15,7 +15,7 @@ import './visibility-selector/visibility-selector-container.js'
 import '../lists/select-my-lists.js'
 import '../../svg/gear.js'
 import {customFetch} from "../../helpers/fetchHelpers.js";
-import {triggerUpdateList} from "../../events/eventListeners.js";
+import {triggerUpdateItem, triggerUpdateList} from "../../events/eventListeners.js";
 import {invalidateCache} from "../../helpers/caching.js";
 
 export class AddToListModal extends LitElement {
@@ -262,6 +262,7 @@ export class AddToListModal extends LitElement {
         const response = await customFetch('/listItems/create', options, true)
 
         triggerUpdateList()
+        triggerUpdateItem()
         this.closeModal();
     }
 

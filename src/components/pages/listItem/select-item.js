@@ -131,29 +131,15 @@ export class SelectItem extends LitElement {
                 <div class="checkbox ${this.isSelected ? 'selected' : ''}">
                     ${this.isSelected ? html`<check-icon></check-icon>` : null}
                 </div>
-                
-                ${this.itemData.imageId ? html`
-                    <div class="image-container">
-                        <custom-image 
-                            imageId="${this.itemData.imageId}" 
-                            alt="${this.itemData.itemName || 'Item image'}"
-                        ></custom-image>
-                    </div>
-                ` : html`
-                    <custom-avatar 
-                        size="40" 
-                        username="${this.itemData.itemName || 'Item'}"
-                    ></custom-avatar>
-                `}
+
+                <custom-avatar
+                        size="20"
+                        username="${this.itemData.name || 'Item'}"
+                        imageId="${this.itemData.imageIds?.[0] || 0}"
+                ></custom-avatar>
                 
                 <div class="item-info">
-                    <div class="item-name">${this.itemData.itemName}</div>
-                    ${this.itemData.price ? html`
-                        <div class="item-price">$${parseFloat(this.itemData.price).toFixed(2)}</div>
-                    ` : null}
-                    ${this.itemData.description ? html`
-                        <div class="item-desc">${this.itemData.description}</div>
-                    ` : null}
+                    <div class="item-name">${this.itemData.name}</div>
                 </div>
             </button>
         `;
