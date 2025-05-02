@@ -1,22 +1,24 @@
 import {LitElement, html, css} from 'lit';
-import {customFetch} from "../../helpers/fetchHelpers.js";
-import './select-list-item.js'
-import '../../svg/check.js'
-import {cachedFetch} from "../../helpers/caching.js";
-import {listenUpdateList} from "../../events/eventListeners.js";
+import './select-item.js'
+import '../../../svg/check.js'
+import {fetchMyItems} from "../../../helpers/api/listItems.js";
+import {listenUpdateItem} from "../../../events/eventListeners.js";
+import {messagesState} from "../../../state/messagesStore.js";
 
-export class CustomElement extends LitElement {
+export class SelectItems extends LitElement {
     static properties = {
-        lists: {type: Array}, // Track lists fetched from the server
-        selectedListIds: {type: Array},
-        loading: {type: Boolean}
+        items: {type: Array}, // Track items fetched from the server
+        selectedItemIds: {type: Array},
+        loading: {type: Boolean},
+        excludedItemIds: {type: Array} // Optional IDs to exclude from selection
     };
 
     constructor() {
         super();
-        this.lists = []; // Initialize lists
-        this.selectedListIds = [];
+        this.items = []; // Initialize items
+        this.selectedItemIds = [];
         this.loading = true;
+        this.excludedItemIds = [];
     }
 
     static get styles() {
@@ -85,30 +87,30 @@ export class CustomElement extends LitElement {
                 background-color: var(--grayscale-150);
             }
 
-            .lists-container {
+            .items-container {
                 display: flex;
                 flex-direction: column;
                 gap: var(--spacing-x-small);
-                max-height: 200px;
+                max-height: 300px;
                 overflow-y: auto;
                 padding: var(--spacing-x-small);
             }
 
-            .lists-container::-webkit-scrollbar {
+            .items-container::-webkit-scrollbar {
                 width: 8px;
             }
 
-            .lists-container::-webkit-scrollbar-track {
+            .items-container::-webkit-scrollbar-track {
                 background: var(--background-color);
                 border-radius: 4px;
             }
 
-            .lists-container::-webkit-scrollbar-thumb {
+            .items-container::-webkit-scrollbar-thumb {
                 background: var(--grayscale-300);
                 border-radius: 4px;
             }
 
-            .lists-container::-webkit-scrollbar-thumb:hover {
+            .items-container::-webkit-scrollbar-thumb:hover {
                 background: var(--grayscale-400);
             }
 
@@ -130,102 +132,70 @@ export class CustomElement extends LitElement {
 
     connectedCallback() {
         super.connectedCallback();
-        this.fetchLists();
-        listenUpdateList(this.fetchLists.bind(this));
+        this.fetchItems();
+        listenUpdateItem(this.fetchItems.bind(this));
     }
 
-    // Actual disconnectedCallback implementation is in fetchLists
-    // to ensure proper cleanup of async operations
-
-    async fetchLists() {
-        // Flag to track if component was unmounted during fetch
-        let isMounted = true;
-
-        // Store a reference to the component instance for cleanup
-        const cleanup = () => {
-            isMounted = false;
-        };
-
-        // Set up cleanup if component is unmounted
-        this.disconnectedCallback = () => {
-            super.disconnectedCallback();
-            cleanup();
-        };
-
+    async fetchItems() {
         try {
             this.loading = true;
-            const response = await cachedFetch('/lists/mine', {}, true);
-
-            // Check if component was unmounted during the fetch
-            if (!isMounted) return;
-
-            if (response?.responseData?.error) {
-                throw new Error(response?.responseData?.error);
-            }
-
-            // Ensure response is properly formatted and contains data
-            if (response?.success) {
-                const lists = Array.isArray(response.data) ? response.data : [];
-                this.lists = lists.filter(list => list?.id > 0);
-                if(this.lists.length === 1) {
-                    this.selectedListIds = [this.lists[0].id];
-                }
+            const response = await fetchMyItems(this.excludedItemIds);
+            
+            if (response.success) {
+                this.items = response.data;
+            } else {
+                throw new Error(response.error);
             }
         } catch (error) {
-            // Only log error if component is still mounted
-            if (isMounted) {
-                console.error('Error fetching lists:', error);
-                this.lists = []; // Reset to empty array on error
-            }
+            console.error('Error fetching items:', error);
+            messagesState.addMessage('Error fetching items', 'error');
+            this.items = []; // Reset to empty array on error
         } finally {
-            // Only update loading state if component is still mounted
-            if (isMounted) {
-                this.loading = false;
-            }
+            this.loading = false;
         }
     }
 
     _handleItemClick(event) {
         const itemData = event.detail.itemData;
-        const index = this.selectedListIds.indexOf(itemData.id);
+        const index = this.selectedItemIds.indexOf(itemData.id);
         if (index > -1) {
-            this.selectedListIds.splice(index, 1);
+            this.selectedItemIds.splice(index, 1);
         } else {
-            this.selectedListIds.push(itemData.id);
+            this.selectedItemIds.push(itemData.id);
         }
         this.requestUpdate();
         this._emitChangeEvent();
     }
 
     selectAll() {
-        // Set selectedListIds to include all list IDs, ensuring lists is an array
-        const listsArray = Array.isArray(this.lists) ? this.lists : [];
-        this.selectedListIds = listsArray
-            .filter(list => list && list.id)
-            .map(list => list.id);
+        // Set selectedItemIds to include all item IDs, ensuring items is an array
+        const itemsArray = Array.isArray(this.items) ? this.items : [];
+        this.selectedItemIds = itemsArray
+            .filter(item => item && item.id)
+            .map(item => item.id);
         this._emitChangeEvent();
         this.requestUpdate();
     }
 
     clearSelection() {
-        this.selectedListIds = [];
+        this.selectedItemIds = [];
         this._emitChangeEvent();
         this.requestUpdate();
     }
 
     _emitChangeEvent() {
-        // Ensure lists is an array before using find method
-        const listsArray = Array.isArray(this.lists) ? this.lists : [];
+        // Ensure items is an array before using find method
+        const itemsArray = Array.isArray(this.items) ? this.items : [];
 
-        const selectedLists = this.selectedListIds
-            .map(id => listsArray.find(list => list && list.id === id))
+        const selectedItems = this.selectedItemIds
+            .map(id => itemsArray.find(item => item && item.id === id))
             .filter(Boolean);
 
         this.dispatchEvent(new CustomEvent('change', {
             detail: {
-                selectedListIds: this.selectedListIds,
-                selectedLists,
-                count: this.selectedListIds.length
+                selectedItemIds: this.selectedItemIds,
+                selectedItems,
+                count: this.selectedItemIds.length
             },
             bubbles: true,
             composed: true
@@ -235,52 +205,52 @@ export class CustomElement extends LitElement {
     render() {
         if (this.loading) {
             return html`
-                <div class="loading">Loading lists...</div>
+                <div class="loading">Loading items...</div>
             `;
         }
 
-        if (!this.lists || !Array.isArray(this.lists) || this.lists.length === 0) {
+        if (!this.items || !Array.isArray(this.items) || this.items.length === 0) {
             return html`
-                <div class="empty-message">No lists available.</div>
+                <div class="empty-message">No items available to add.</div>
             `;
         }
 
         return html`
             <div class="header">
                 <div class="selection-info">
-                    <div class="title">Lists</div>
-                    ${this.selectedListIds.length > 0 ? html`
-                        <div class="selected-count">(${this.selectedListIds.length} selected)</div>
+                    <div class="title">Items</div>
+                    ${this.selectedItemIds.length > 0 ? html`
+                        <div class="selected-count">(${this.selectedItemIds.length} selected)</div>
                     ` : ''}
                 </div>
 
                 <div class="action-buttons">
-                    ${this.lists.length > 0 ? html`
+                    ${this.items.length > 0 ? html`
                         <button class="select-all" @click=${this.selectAll}>Select All</button>
                     ` : ''}
 
-                    ${this.selectedListIds.length > 0 ? html`
+                    ${this.selectedItemIds.length > 0 ? html`
                         <button class="clear" @click=${this.clearSelection}>Clear</button>
                     ` : ''}
                 </div>
             </div>
 
-            <div class="lists-container">
-                ${Array.isArray(this.lists) 
-                    ? this.lists.map(
-                        list => list ? html`
-                            <select-list-item
-                                .itemData=${list}
-                                .isSelected="${this.selectedListIds.includes(list?.id)}"
+            <div class="items-container">
+                ${Array.isArray(this.items) 
+                    ? this.items.map(
+                        item => item ? html`
+                            <select-item
+                                .itemData=${item}
+                                .isSelected="${this.selectedItemIds.includes(item?.id)}"
                                 @item-clicked="${this._handleItemClick}"
-                            ></select-list-item>
+                            ></select-item>
                         ` : ''
                     )
-                    : html`<div class="empty-message">No lists available.</div>`
+                    : html`<div class="empty-message">No items available.</div>`
                 }
             </div>
         `;
     }
 }
 
-customElements.define('select-my-lists', CustomElement);
+customElements.define('select-items', SelectItems);

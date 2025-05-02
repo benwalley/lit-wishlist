@@ -11,10 +11,11 @@ import '../../svg/gift.js';
 import '../../svg/dot.js';
 import '../../svg/user.js';
 import '../global/custom-tooltip.js'
-import {cachedFetch} from "../../helpers/caching.js";
 import {customFetch} from "../../helpers/fetchHelpers.js";
 import {getUserImageIdByUserId, getUsernameById} from "../../helpers/generalHelpers.js";
 import {observeState} from "lit-element-state";
+import {showConfirmation} from "../global/custom-confirm/confirm-helper.js";
+import {triggerUpdateList} from "../../events/eventListeners.js";
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
@@ -139,24 +140,24 @@ export class CustomElement extends observeState(LitElement) {
 
     async _handleDelete(e) {
         e.preventDefault();
+        e.stopPropagation();
+
+        const confirmed = await showConfirmation({
+            heading: 'Delete List',
+            message: `Are you sure you want to delete "${this.itemData.listName}"?`,
+            submessage: 'This action cannot be undone.',
+            confirmLabel: 'Delete',
+            cancelLabel: 'Cancel'
+        });
+
+        if (!confirmed) return;
+
         try {
             const response = await customFetch(`/lists/${this.itemData.id}`, {method: 'DELETE'}, true);
 
-            if (response?.responseData?.error) {
-                throw new Error(response?.responseData?.error);
-            }
-
-            // Use the View Transition API if available to animate the DOM changes.
-            if (document.startViewTransition) {
-                document.startViewTransition(() => {
-                    this.lists = response;
-                });
-            } else {
-                this.lists = response;
-            }
-            document.dispatchEvent(new CustomEvent('fetch-lists', {bubbles: true, composed: true,}));
+            triggerUpdateList();
         } catch (error) {
-            console.error('Error fetching lists:', error);
+            console.error('Error deleting list:', error);
         }
     }
 

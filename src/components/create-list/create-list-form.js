@@ -10,7 +10,7 @@ import '../../svg/group.js'
 import '../../svg/plus.js'
 import '../../svg/camera.js'
 import {messagesState} from "../../state/messagesStore.js";
-import {triggerUpdateList} from "../../events/eventListeners.js";
+import {triggerBulkAddToListModal, triggerUpdateList} from "../../events/eventListeners.js";
 import {createList} from "../../helpers/api/lists.js";
 
 
@@ -51,6 +51,7 @@ export class CreateListForm extends LitElement {
         if (response.success) {
             messagesState.addMessage('List successfully created');
             triggerUpdateList();
+            triggerBulkAddToListModal(response.data)
             this._closeModal();
         } else {
             messagesState.addMessage('Failed to create list', 'error');

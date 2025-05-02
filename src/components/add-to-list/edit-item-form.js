@@ -147,7 +147,7 @@ export class EditItemForm extends LitElement {
         this.matchListVisibility = this.itemData.matchListVisibility !== false;
         this.visibleToUsers = this.itemData.visibleToUsers || [];
         this.visibleToGroups = this.itemData.visibleToGroups || [];
-        
+
         // Set initial list IDs if available
         if (this.itemData.listIds && Array.isArray(this.itemData.listIds)) {
             this.selectedListIds = [...this.itemData.listIds];
@@ -357,7 +357,7 @@ export class EditItemForm extends LitElement {
             visibleToUsers: this.visibleToUsers,
             visibleToGroups: this.visibleToGroups,
             matchListVisibility: this.matchListVisibility,
-            listIds: this.selectedListIds,
+            lists: this.selectedListIds,
         };
 
         const options = {
@@ -510,7 +510,7 @@ export class EditItemForm extends LitElement {
         this.visibleToGroups = selectedGroups || [];
         this.visibleToUsers = selectedUsers || [];
     }
-    
+
     _handleListSelectionChange(e) {
         this.selectedListIds = e.detail.selectedListIds || [];
     }

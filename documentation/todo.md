@@ -13,5 +13,4 @@
  - Create a method of bulk managing the users and groups things are visible to
  - move unassigned items to a separate place
  - add account configuration
- - fix list display when editing items
- - 
+ - When creating a list, add bulk-assign items popup

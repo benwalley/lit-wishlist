@@ -40,7 +40,7 @@
 - Follow existing design patterns in components
 
 ### API fetching
- - When fetching data from an API, return an object that includes:
+ - When fetching data from an API, assume that the API response will include
    - success: (true or false)
    - data (response data if successful)
    - error (error data if an error)

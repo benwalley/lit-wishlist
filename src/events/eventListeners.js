@@ -10,6 +10,7 @@ const USER_LOADED_EVENT = 'user-loaded';
 const USER_LIST_LOADED_EVENT = 'user-list-loaded';
 const GROUP_UPDATED_EVENT = 'group-updated';
 const BULK_ADD_TO_GROUP_MODAL_EVENT = 'open-bulk-add-to-group-modal';
+const BULK_ADD_TO_LIST_MODAL_EVENT = 'open-bulk-add-to-list-modal';
 const imageUploadEvents = {
     imageSelected: 'image-selected',
     cropConfirmed: 'crop-confirmed'
@@ -106,4 +107,12 @@ export function triggerUpdateQa() {
 
 export function listenUpdateQa(callback) {
     return listenToCustomEvent(UPDATE_QA_EVENT, callback);
+}
+
+export function triggerBulkAddToListModal(list) {
+    triggerCustomEvent(BULK_ADD_TO_LIST_MODAL_EVENT, { list });
+}
+
+export function listenBulkAddToListModal(callback) {
+    return listenToCustomEvent(BULK_ADD_TO_LIST_MODAL_EVENT, callback);
 }
