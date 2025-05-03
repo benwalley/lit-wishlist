@@ -187,21 +187,25 @@ export class CustomElement extends observeState(LitElement) {
                 <div class="item-right-side">
                     <div class="top-row">
                         ${!this.viewOnly && this.itemData.id !== 0 ? html`
-                            <button class="edit-button icon-button"
-                                    aria-label="Edit List Details"
-                                    @click="${this._handleEdit}"
-                                    style="--icon-color: var(--blue-normal); 
-                            --icon-color-hover: var(--blue-darker); 
-                            --icon-hover-background: var(--blue-light)">
-                                <edit-icon style="width: 1em; height: 1em"></edit-icon>
-                            </button>
-                            <custom-tooltip style="min-width: 100px;">Edit this list</custom-tooltip>
-                            <button class="delete-button icon-button" aria-label="Delete List"
-                                    @click="${this._handleDelete}"
-                                    style="--icon-color: var(--delete-red); --icon-color-hover: var(--delete-red); --icon-hover-background: var(--delete-red-light)">
-                                <delete-icon style="width: 1em; height: 1em"></delete-icon>
-                            </button>
-                            <custom-tooltip style="min-width: 150px;">Delete this list</custom-tooltip>
+                            <div style="position: relative;">
+                                <button class="edit-button icon-button"
+                                        aria-label="Edit List Details"
+                                        @click="${this._handleEdit}"
+                                        style="--icon-color: var(--blue-normal); 
+                                --icon-color-hover: var(--blue-darker); 
+                                --icon-hover-background: var(--blue-light)">
+                                    <edit-icon style="width: 1em; height: 1em"></edit-icon>
+                                </button>
+                                <custom-tooltip style="min-width: 100px;">Edit this list</custom-tooltip>
+                            </div>
+                            <div style="position: relative;">
+                                <button class="delete-button icon-button" aria-label="Delete List"
+                                        @click="${this._handleDelete}"
+                                        style="--icon-color: var(--delete-red); --icon-color-hover: var(--delete-red); --icon-hover-background: var(--delete-red-light)">
+                                    <delete-icon style="width: 1em; height: 1em"></delete-icon>
+                                </button>
+                                <custom-tooltip style="min-width: 150px;">Delete this list</custom-tooltip>
+                            </div>
                         ` : ''}
                     </div>
                     

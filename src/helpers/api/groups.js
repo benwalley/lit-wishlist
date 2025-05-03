@@ -273,4 +273,92 @@ export async function bulkShareWithGroup(groupId, listIds = [], questionIds = []
     }
 }
 
+/**
+ * Make a user an admin of a group
+ * @param {string|number} groupId - The ID of the group
+ * @param {string|number} userId - The ID of the user to make admin
+ * @param {Array} currentAdminIds - Current admin IDs array
+ * @returns {Promise<{success: boolean, data: Object}|{success: boolean, error: Error}>}
+ */
+export async function makeUserGroupAdmin(groupId, userId, currentAdminIds = []) {
+    try {
+        // Make sure userId is included in adminIds
+        const adminIds = [...(currentAdminIds || [])];
+        if (!adminIds.includes(parseInt(userId))) {
+            adminIds.push(parseInt(userId));
+        }
+        
+        const options = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ adminIds }),
+        };
+
+        const result = await customFetch(`/groups/${groupId}`, options, true);
+        return { success: !!result.success, data: result };
+    } catch (error) {
+        console.error('Error making user admin:', error);
+        return { success: false, error };
+    }
+}
+
+/**
+ * Remove admin privileges from a user
+ * @param {string|number} groupId - The ID of the group
+ * @param {string|number} userId - The ID of the user to remove admin privileges from
+ * @param {Array} currentAdminIds - Current admin IDs array
+ * @returns {Promise<{success: boolean, data: Object}|{success: boolean, error: Error}>}
+ */
+export async function removeUserGroupAdmin(groupId, userId, currentAdminIds = []) {
+    try {
+        // Filter out the userId from adminIds
+        const adminIds = (currentAdminIds || []).filter(id => parseInt(id) !== parseInt(userId));
+        
+        const options = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ adminIds }),
+        };
+
+        const result = await customFetch(`/groups/${groupId}`, options, true);
+        return { success: !!result.success, data: result };
+    } catch (error) {
+        console.error('Error removing admin privileges:', error);
+        return { success: false, error };
+    }
+}
+
+/**
+ * Remove a user from a group
+ * @param {string|number} groupId - The ID of the group
+ * @param {string|number} userId - The ID of the user to remove
+ * @param {Array} currentMembers - Current members array
+ * @param {Array} currentAdminIds - Current admin IDs array
+ * @returns {Promise<{success: boolean, data: Object}|{success: boolean, error: Error}>}
+ */
+export async function removeUserFromGroup(groupId, userId, currentMembers = [], currentAdminIds = []) {
+    try {
+        // Filter out the userId from members and adminIds
+        const members = (currentMembers || []).filter(id => parseInt(id) !== parseInt(userId));
+        const adminIds = (currentAdminIds || []).filter(id => parseInt(id) !== parseInt(userId));
+        
+        const options = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ members, adminIds }),
+        };
+
+        const result = await customFetch(`/groups/${groupId}`, options, true);
+        return { success: !!result.success, data: result };
+    } catch (error) {
+        console.error('Error removing user from group:', error);
+        return { success: false, error };
+    }
+}
 

@@ -60,7 +60,7 @@ class ImageCropper extends observeState(LitElement) {
 
   render() {
     return html`
-      <custom-modal level="2" .isOpen="${this.modalOpen}">
+      <custom-modal level="3" .isOpen="${this.modalOpen}">
         <div class="modal-content">
           <div class="modal-header">Crop Your Image</div>
           <div class="image-container">
@@ -85,11 +85,11 @@ class ImageCropper extends observeState(LitElement) {
     // Listen for an image-selected event (expects an object with rawImage)
     listenImageSelected(this._handleImageSelected.bind(this));
   }
-  
+
   _handleImageSelected(e) {
     const { rawImage, uniqueId } = e.detail;
     if (!rawImage) return;
-    
+
     this.rawImage = rawImage;
     this.modalOpen = true;
     this.uniqueId = uniqueId;
@@ -157,7 +157,7 @@ class ImageCropper extends observeState(LitElement) {
       height: this.size,
       imageSmoothingQuality: 'high',
     });
-    
+
     canvas.toBlob(async (blob) => {
       const reader = new FileReader();
       reader.onloadend = async () => {
@@ -184,7 +184,7 @@ class ImageCropper extends observeState(LitElement) {
       reader.readAsDataURL(blob);
     }, 'image/jpeg', 0.85); // Slightly increased quality
   }
-  
+
   disconnectedCallback() {
     super.disconnectedCallback();
     // Clean up cropper instance if it exists

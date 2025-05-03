@@ -1,16 +1,6 @@
 import { LitElement, html, css } from 'lit';
 
-/**
- * <wysiwyg-editor>
- * Lightweight, dependency-free rich-text editor with a minimalist toolbar
- * that matches the mock-up provided by the Product team (bold, italic, list).
- *
- * Usage:
- *   <wysiwyg-editor
- *       placeholder="Add notes about this item…"
- *       @content-changed=${e => console.log(e.detail.content)}>
- *   </wysiwyg-editor>
- */
+
 export class WysiwygEditor extends LitElement {
     // ——————————————————————————————————————————————————————————  STYLES
     static styles = css`
@@ -71,9 +61,7 @@ export class WysiwygEditor extends LitElement {
 
     // ———————————————————————————————————————————————————————  PROPS
     static properties = {
-        /** Current HTML content */
         content: { type: String },
-        /** Placeholder text */
         placeholder: { type: String },
     };
 
@@ -87,6 +75,17 @@ export class WysiwygEditor extends LitElement {
         // Inject initial content once the component is in the DOM
         const editor = this.#editor;
         if (this.content) editor.innerHTML = this.content;
+    }
+    
+    updated(changedProperties) {
+        // Update editor content when content property changes
+        if (changedProperties.has('content') && this.#editor) {
+            // Only update if the editor content differs from the current property value
+            // This prevents infinite loops when the editor itself triggers a content change
+            if (this.#editor.innerHTML !== this.content) {
+                this.#editor.innerHTML = this.content;
+            }
+        }
     }
 
     // —————————————————————————————————————————————————————  GETTERS

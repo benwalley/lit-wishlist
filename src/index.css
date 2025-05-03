@@ -155,6 +155,8 @@
     --heading-font-family: 'lato';
     --body-font-family: 'lato';
 
+    --font-size-x-x-x-small: 0.6rem;
+    --font-size-x-x-small: 0.7rem;
     --font-size-x-small: 0.8rem;
     --font-size-small: 0.9rem;
     --font-size-normal: 1rem;

@@ -70,9 +70,10 @@ export class EditItemModal extends LitElement {
         return html`
             <custom-modal 
                 level="2"
-                triggerEvent="none"
                 @modal-changed="${this._handleModalChanged}"
-                maxWidth="1200px">
+                maxWidth="1200px"
+                noPadding
+            >
                 ${this.itemData ? html`
                     <edit-item-form 
                         .itemData="${this.itemData}"

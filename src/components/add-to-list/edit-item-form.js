@@ -149,10 +149,8 @@ export class EditItemForm extends LitElement {
         this.visibleToGroups = this.itemData.visibleToGroups || [];
 
         // Set initial list IDs if available
-        if (this.itemData.listIds && Array.isArray(this.itemData.listIds)) {
-            this.selectedListIds = [...this.itemData.listIds];
-        } else if (this.itemData.listId) {
-            this.selectedListIds = [this.itemData.listId];
+        if (this.itemData.lists && Array.isArray(this.itemData.lists)) {
+            this.selectedListIds = [...this.itemData.lists];
         } else {
             this.selectedListIds = [];
         }

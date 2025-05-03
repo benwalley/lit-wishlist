@@ -30,6 +30,9 @@ export class GroupUsersList extends observeState(LitElement) {
                 flex-direction: column;
                 gap: var(--spacing-small);
                 margin-top: var(--spacing-small);
+                /* Added to fix tooltip visibility */
+                position: relative;
+                overflow: visible;
             }
             
             .section-header {
@@ -78,8 +81,9 @@ export class GroupUsersList extends observeState(LitElement) {
                 ${this.groupData?.members?.length ?
                         this.groupData?.members?.map(user => html`
                         <user-list-display-item 
-                            .userId="${user}" 
-                            ?compact="${this.groupData?.members?.length > 5}"
+                            .userId="${user}"
+                            .groupData="${this.groupData}"
+                            ?compact="${this.groupData?.members?.length > 4}"
                         ></user-list-display-item>
                     `) : 
                     html`
