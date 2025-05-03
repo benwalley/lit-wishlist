@@ -96,6 +96,10 @@ export class UserListDisplayItem extends observeState(LitElement) {
                 .compact .user-name {
                     font-size: var(--font-size-x-small);
                 }
+                
+                .compact .icon-button {
+                    padding: 4px;
+                }
 
                 .user-desc {
                     font-size: var(--font-size-x-small);
@@ -127,12 +131,55 @@ export class UserListDisplayItem extends observeState(LitElement) {
                     display: flex;
                     align-items: center;
                 }
+                
             `
         ];
     }
 
-    async _handleMakeAdmin() {
-        if (!this.groupData || !this.userId) return;
+    /**
+     * Check if current user can make another user an admin
+     * @returns {boolean}
+     */
+    canMakeAdmin() {
+        // Any admin can make another user an admin, if the user is not already an admin and not the owner
+        return isGroupAdmin(this.groupData, userState?.userData?.id) &&
+               !isGroupAdmin(this.groupData, this.userId);
+    }
+
+    /**
+     * Check if current user can remove admin privileges from another user
+     * @returns {boolean}
+     */
+    canRemoveAdmin() {
+        // Only the owner can remove admin privileges, and can't remove owner's admin privileges
+        return isGroupOwner(this.groupData, userState?.userData?.id) &&
+               isGroupAdmin(this.groupData, this.userId) &&
+               !isGroupOwner(this.groupData, this.userId);
+    }
+
+    /**
+     * Check if current user can remove another user from the group
+     * @returns {boolean}
+     */
+    canRemoveFromGroup() {
+        // Can't remove the owner
+        if (isGroupOwner(this.groupData, this.userId)) {
+            return false;
+        }
+
+        // If the user is an admin, only the owner can remove them
+        if (isGroupAdmin(this.groupData, this.userId)) {
+            return isGroupOwner(this.groupData, userState?.userData?.id);
+        }
+
+        // Any admin can remove a regular user
+        return isGroupAdmin(this.groupData, userState?.userData?.id);
+    }
+
+    async _handleMakeAdmin(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        if (!this.groupData || !this.userId || !this.canMakeAdmin()) return;
 
         try {
             const result = await makeUserGroupAdmin(
@@ -154,8 +201,10 @@ export class UserListDisplayItem extends observeState(LitElement) {
         }
     }
 
-    async _handleRemoveAdmin() {
-        if (!this.groupData || !this.userId) return;
+    async _handleRemoveAdmin(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        if (!this.groupData || !this.userId || !this.canRemoveAdmin()) return;
 
         try {
             const result = await removeUserGroupAdmin(
@@ -177,8 +226,10 @@ export class UserListDisplayItem extends observeState(LitElement) {
         }
     }
 
-    async _handleRemoveFromGroup() {
-        if (!this.groupData || !this.userId) return;
+    async _handleRemoveFromGroup(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        if (!this.groupData || !this.userId || !this.canRemoveFromGroup()) return;
 
         try {
             const result = await removeUserFromGroup(
@@ -233,30 +284,32 @@ export class UserListDisplayItem extends observeState(LitElement) {
                     </div>
 
                     ${isGroupAdmin(this.groupData, userState?.userData?.id) ? html`
-                        ${isGroupAdmin(this.groupData, this.userId) ? html`
+                        ${this.canRemoveAdmin() ? html`
                             <button class="icon-button danger-text large"
                                     aria-label="Remove admin privileges"
                                     @click=${this._handleRemoveAdmin}>
                                 <remove-admin-icon></remove-admin-icon>
                             </button>
                             <custom-tooltip style="min-width: 200px;">Remove Admin Privileges</custom-tooltip>
+                        ` : ''}
 
-                        ` : html`
+                        ${this.canMakeAdmin() ? html`
                             <button class="icon-button green-text large"
                                     aria-label="Make admin"
                                     @click=${this._handleMakeAdmin}>
                                 <add-admin-icon></add-admin-icon>
                             </button>
                             <custom-tooltip>Make Admin</custom-tooltip>
+                        ` : ''}
 
-                        `}
-
-                        <button class="icon-button blue-text large"
-                                aria-label="Remove from group"
-                                @click=${this._handleRemoveFromGroup}>
-                            <leave-icon></leave-icon>
-                        </button>
-                        <custom-tooltip style="min-width: 150px;">Remove from Group</custom-tooltip>
+                        ${this.canRemoveFromGroup() ? html`
+                            <button class="icon-button blue-text large"
+                                   aria-label="Remove from group"
+                                   @click=${this._handleRemoveFromGroup}>
+                                <leave-icon></leave-icon>
+                            </button>
+                            <custom-tooltip style="min-width: 150px;">Remove from Group</custom-tooltip>
+                        ` : ''}
                     ` : ''}
                 </a>
         `;

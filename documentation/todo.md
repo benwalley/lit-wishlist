@@ -17,3 +17,4 @@
  - add import amazon wishlist
  - add gifts your giving management
  - add sub-user functionality
+ - Test all admin permissions for group users.
