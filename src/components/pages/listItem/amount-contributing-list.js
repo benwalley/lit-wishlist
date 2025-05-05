@@ -113,7 +113,6 @@ export class CustomElement extends LitElement {
                 amount: amount
             };
         });
-        console.log(compiledData)
         this.initialized = true;
         this._updateData(compiledData);
     }

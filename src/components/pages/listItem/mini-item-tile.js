@@ -98,7 +98,7 @@ export class MiniItemTile extends LitElement {
                     text-overflow: ellipsis;
                     overflow: hidden;
                     white-space: nowrap;
-                    max-width: 70%;
+                    max-width: 100%;
                 }
 
                 .status-line {
@@ -184,7 +184,7 @@ export class MiniItemTile extends LitElement {
                                 .value="${this.itemData.priority}"
                                 heartSize="18px"
                         ></priority-display>
-                        <price-display .itemData="${this.itemData}"></price-display>
+                        <price-display .itemData="${this.itemData}" size="small"></price-display>
                     </div>
                     ${this._renderStatus()}
                 </div>

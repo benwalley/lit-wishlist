@@ -5,13 +5,15 @@ import { currencyHelper } from "../../../helpers.js";
 export class CustomElement extends LitElement {
     static properties = {
         itemData: { type: Object },
-        showLabel: { type: Boolean }
+        showLabel: { type: Boolean },
+        size: {type: String},
     };
 
     constructor() {
         super();
         this.itemData = {};
         this.showLabel = false;
+        this.size = 'normal';
     }
 
     static get styles() {
@@ -41,6 +43,18 @@ export class CustomElement extends LitElement {
 
                 .min-max-price-container span {
                     line-height: 1;
+                }
+                
+                .small.normal-price {
+                    font-size: var(--font-size-medium);
+                }
+                
+                .min-max-price-container.small {
+                    font-size: var(--font-size-small);
+                    
+                    p {
+                        font-size: inherit;
+                    }
                 }
 
                 .normal-price {
@@ -85,7 +99,7 @@ export class CustomElement extends LitElement {
             ${hasPriceRange
                     ? html`
                         ${this.showLabel ? html`<h3>Price Range:</h3>` : ''}
-                        <div class="min-max-price-container">
+                        <div class="min-max-price-container ${this.size}">
                             <p>${formattedMinPrice}</p>
                             <span>to</span>
                             <p>${formattedMaxPrice}</p>
@@ -93,7 +107,7 @@ export class CustomElement extends LitElement {
                     `
                     : html`
                         ${this.showLabel ? html`<h3>Price:</h3>` : ''}
-                        <p class="price normal-price">${formattedPrice}</p>
+                        <p class="price normal-price ${this.size}">${formattedPrice}</p>
                     `}
         `;
     }

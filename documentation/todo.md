@@ -18,3 +18,10 @@
  - add gifts your giving management
  - add sub-user functionality
  - Test all admin permissions for group users.
+ - Add gotten indicator on list page
+ - make list page of everything you're getting
+ - fix user creation for invited users
+ - Investigate wby users who join a group don't have their list shared. (maybe because they have to unselect and select list)
+ - When adding to single list, you have to unselect and select list to add items.
+ - update public user page lists to match users
+ - add ai user image generation (and for groups and such);

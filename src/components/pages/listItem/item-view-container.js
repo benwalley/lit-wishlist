@@ -59,7 +59,6 @@ export class CustomElement extends LitElement {
 
                 .item-title {
                     line-height: 1;
-                    padding-top: 10px;
                 }
 
                 /* Use a grid layout for the overall container */
@@ -75,22 +74,29 @@ export class CustomElement extends LitElement {
                 
                 main.main-content {
                     display: grid;
-                    padding: var(--spacing-normal);
-                    padding-top: 0;
+                    padding: 0 var(--spacing-normal);
                     box-sizing: border-box;
                     width: 100%;
-                    grid-template-columns: 1fr 1fr 0;
-                    grid-template-rows: auto 1fr;
+                    max-width: 1600px;
+                    grid-template-columns: 1fr;
+                    grid-template-rows: 1fr;
                     gap: var(--spacing-normal) calc(var(--spacing-normal) * 2);
                     color: var(--text-color-dark);
                     /* Transition the grid-template-columns property without delay */
                     transition: grid-template-columns 0.3s ease;
                 }
 
-                /* When hovering over the sidebar, delay the grid expansion by 300ms */
-                main.main-content:has(aside.right-column:hover) {
-                    grid-template-columns: 1fr 1fr 320px;
-                    transition-delay: 300ms;
+                @media only screen and (min-width: 1000px) {
+                    main.main-content {
+                        grid-template-columns: 1fr 1fr;
+
+                    }
+                }
+
+                @media only screen and (min-width: 1400px) {
+                    main.main-content {
+                        grid-template-columns: 1fr 1fr 320px;
+                    }
                 }
 
                 contributors-top-bar {
@@ -112,9 +118,14 @@ export class CustomElement extends LitElement {
 
                 .details-section {
                     display: grid;
-                    gap: var(--spacing-small);
+                    gap: var(--spacing-normal);
                     margin-bottom: auto;
-                    padding-top: var(--spacing-normal);
+                }
+
+                @media only screen and (min-width: 1000px) {
+                    .details-section {
+                        padding-top: var(--spacing-normal);
+                    }
                 }
                 
                 all-images-display {
@@ -124,23 +135,18 @@ export class CustomElement extends LitElement {
                 /* Sidebar styles */
                 aside.right-column {
                     width: 300px;
-                    position: relative;
                     display: none;
                     border-left: 1px solid var(--border-color);
                     background: var(--background-light);
                     padding: var(--spacing-normal);
-                    /* Transition border-color immediately and let other properties use the standard transition */
-                    transition: border-color 0.1s ease, var(--transition-normal);
+                    display: none;
+
+                    h2 {
+                        margin-top: 0;
+                    }
                 }
 
-                /* When hovering over the sidebar, immediately darken the border */
-                aside.right-column:hover {
-                    //box-shadow: var(--shadow-2-soft);
-                    border-color: var(--grayscale-300);
-                    border-width: 3px;
-                }
-
-                @media (min-width: 800px) {
+                @media (min-width: 1400px) {
                     aside.right-column {
                         display: block;
                     }
@@ -156,7 +162,7 @@ export class CustomElement extends LitElement {
                     background: var(--background-light);
                     padding: 16px;
                     box-shadow: var(--shadow-0-soft);
-                    margin-top: var(--spacing-normal);
+                    
                 }
 
                 .tile h3 {
@@ -170,7 +176,6 @@ export class CustomElement extends LitElement {
                     display: flex;
                     gap: var(--spacing-normal);
                     flex-wrap: wrap;
-                    padding-top: var(--spacing-normal);
                 }
 
                 .action-buttons button {
@@ -272,7 +277,6 @@ export class CustomElement extends LitElement {
                             id="sidebar"
                             aria-label="Other Items in This List"
                     >
-                        <h2>Other Items in This List</h2>
                         <list-sidebar
                                 .listId="${this.listId}"
                                 .expanded="${this.sidebarExpanded}"

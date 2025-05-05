@@ -51,9 +51,16 @@ export class LoginAccountLink extends observeState(LitElement) {
                 }
                 
                 .right-side {
-                    display: flex;
+                    display: none;
                     flex-direction: column;
                     gap: var(--spacing-x-small);
+                }
+
+                @media only screen and (min-width: 400px) {
+                    .right-side {
+                        display: flex;
+
+                    }
                 }
             `
         ];

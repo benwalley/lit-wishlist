@@ -31,6 +31,7 @@ export class HeaderContainer extends observeState(LitElement) {
                     grid-column: 2;
                     position: sticky;
                     top: 0;
+                    z-index: 10;
                 }
                 header {
                     padding: 10px;

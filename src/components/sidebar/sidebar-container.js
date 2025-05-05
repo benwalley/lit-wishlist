@@ -169,6 +169,7 @@ export class CustomElement extends observeState(LitElement) {
                     <ul class="menu-section-list">
                         <li><a href="/" class="menu-item-link">Dashboard</a></li>
                         <li><a href="/lists" class="menu-item-link">All Lists</a></li>
+                        <li><a href="/gifts-tracking" class="menu-item-link">Gifts Tracking</a></li>
                         <li><a href="#" class="menu-item-link">All Users</a></li>
                         <li><a href="#" class="menu-item-link">Recent</a></li>
                         <li><a href="/qa" class="menu-item-link">Questions & Answers</a></li>

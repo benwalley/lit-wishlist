@@ -38,21 +38,24 @@ export class ContributorsTopBar extends LitElement {
             {
                 id: 'edit',
                 label: 'Edit Item',
-                icon: html`<edit-icon></edit-icon>`,
+                icon: html`
+                    <edit-icon></edit-icon>`,
                 classes: 'blue-text',
                 action: () => this.handleEditItem()
             },
             {
                 id: 'share',
                 label: 'Copy Link',
-                icon: html`<share-icon></share-icon>`,
+                icon: html`
+                    <share-icon></share-icon>`,
                 classes: 'purple-text',
                 action: () => this.handleCopyLink()
             },
             {
                 id: 'delete',
                 label: 'Delete Item',
-                icon: html`<delete-icon></delete-icon>`,
+                icon: html`
+                    <delete-icon></delete-icon>`,
                 classes: 'danger-text',
                 action: () => this.handleDeleteItem()
             }
@@ -60,7 +63,7 @@ export class ContributorsTopBar extends LitElement {
     }
 
     handleEditItem() {
-        if(!this.itemData) {
+        if (!this.itemData) {
             messagesState.addMessage('Error editing item. Please reload page and try again.', 'error');
             return;
         }
@@ -89,7 +92,7 @@ export class ContributorsTopBar extends LitElement {
             });
 
             const response = await deleteItem(this.itemId);
-            if(response.success) {
+            if (response.success) {
                 messagesState.addMessage('Item deleted successfully');
                 window.location.href = `/list/${this.listId}`;
             } else {
@@ -125,17 +128,16 @@ export class ContributorsTopBar extends LitElement {
                 }
 
                 .top-row {
-                    display: grid;
-                    grid-template-columns: auto auto;
+                    gap: var(--spacing-small);
+                    display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    gap: var(--spacing-small);
                     transition: opacity 0.3s ease-in-out;
                 }
 
                 @media (min-width: 1000px) {
                     .top-row {
-                        display: flex;
+
                     }
                 }
 
@@ -164,8 +166,8 @@ export class ContributorsTopBar extends LitElement {
                 }
 
 
-                @media (max-width: 799px) {
-                    .desktop-only {
+                @media (max-width: 1000px) {
+                    .desktop-only.desktop-only {
                         display: none;
                     }
                 }
@@ -178,12 +180,15 @@ export class ContributorsTopBar extends LitElement {
                     flex-direction: column;
                     align-items: center;
                     gap: var(--spacing-small);
-                    margin-right: auto;
+                    margin-left: auto;
+                    margin-right: 0;
                 }
 
-                @media (min-width: 800px) {
+                @media (min-width: 1000px) {
                     .contributor-details {
                         flex-direction: row;
+                        margin-right: auto;
+                        margin-left: 0;
                     }
 
                 }
@@ -221,7 +226,7 @@ export class ContributorsTopBar extends LitElement {
                         color: var(--text-color-dark);
                     }
                 }
-                
+
                 success-icon {
                     font-size: 1.2em;
                 }
@@ -308,7 +313,7 @@ export class ContributorsTopBar extends LitElement {
                     .popup-username {
                         border-bottom: 1px solid var(--border-color);
                     }
-                    
+
                     .amount-contributed {
                         font-size: var(--font-size-small);
                         align-items: center;
@@ -321,7 +326,7 @@ export class ContributorsTopBar extends LitElement {
                         font-weight: bold;
 
                     }
-                    
+
                     dollar-icon {
                         font-size: var(--font-size-small);
                         color: var(--green-normal);
@@ -480,15 +485,19 @@ export class ContributorsTopBar extends LitElement {
                                                                stackLeft="true"
                                                 >
                                                     <div class="popup-contents ">
-                                                        <div class="popup-username"><strong>${contributor.user?.name}</strong></div>
-                                                        ${contributor.getting ? html`<div class="qty amount-gotten">
+                                                        <div class="popup-username">
+                                                            <strong>${contributor.user?.name}</strong></div>
+                                                        ${contributor.getting ? html`
+                                                            <div class="qty amount-gotten">
                                                                 <success-icon></success-icon>
                                                                 Getting ${contributor.numberGetting}
                                                             </div>` : ''}
 
-                                                        ${contributor.contributing ? html`<div class="amount-contributed">
+                                                        ${contributor.contributing ? html`
+                                                            <div class="amount-contributed">
                                                                 <dollar-icon></dollar-icon>
-                                                                Contributing ${parseInt(contributor.contributeAmount) ? currencyHelper(contributor.contributeAmount) : ''}
+                                                                Contributing
+                                                                ${parseInt(contributor.contributeAmount) ? currencyHelper(contributor.contributeAmount) : ''}
                                                             </div>` : ''}
 
                                                     </div>
@@ -496,8 +505,8 @@ export class ContributorsTopBar extends LitElement {
                                             `
                                     )}
                                 </div>
-                                <div class="contributors-right fade-in">
-                  <span class="contributor-count title desktop-only">
+                                <div class="contributors-right fade-in desktop-only">
+                  <span class="contributor-count title">
                     ${this.contributors.length} people contributing
                   </span>
                                     ${this.amountPledged > 0
@@ -532,24 +541,17 @@ export class ContributorsTopBar extends LitElement {
                           this.itemData?.maxAmountWanted
                   ) || 1}
                 </span>
-                                <span>gotten</span>
+                                <span class="desktop-only">gotten</span>
                             `}
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="actions-container">
-                    <button
-                            class="button icon-button action-button fade-in"
-                            aria-label="share"
-                            @click=${this.handleCopyLink}
-                    >
-                        <share-icon></share-icon>
-                    </button>
                     <action-dropdown .items=${this.actionItems} placement="bottom-start">
                         <button
-                            class="button icon-button action-button fade-in"
-                            aria-label="Actions"
-                            slot="toggle"
+                                class="button icon-button action-button fade-in"
+                                aria-label="Actions"
+                                slot="toggle"
                         >
                             <dots-icon></dots-icon>
                         </button>

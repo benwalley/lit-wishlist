@@ -1,7 +1,8 @@
 import { LitElement, html, css } from 'lit';
 import './group-list-item.js';
-import { customFetch } from "../../helpers/fetchHelpers.js";
 import '../../svg/check.js';
+import buttonStyles from '../../css/buttons.js'
+import helperStyles from '../../css/helpers.js'
 import {cachedFetch} from "../../helpers/caching.js";
 
 class GroupListComponent extends LitElement {
@@ -20,108 +21,114 @@ class GroupListComponent extends LitElement {
         this.loading = true;
     }
 
-    static styles = css`
-        :host {
-            display: block;
-        }
+    static get styles() {
+        return [
+            buttonStyles,
+            helperStyles,
+            css`
+                :host {
+                    display: block;
+                }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: var(--spacing-x-small);
-        }
+                .header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: var(--spacing-x-small);
+                }
 
-        .title {
-            font-weight: bold;
-            font-size: var(--font-size-small);
-            color: var(--text-color-dark);
-        }
+                .title {
+                    font-weight: bold;
+                    font-size: var(--font-size-small);
+                    color: var(--text-color-dark);
+                }
 
-        .selection-info {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-x-small);
-        }
+                .selection-info {
+                    display: flex;
+                    align-items: center;
+                    gap: var(--spacing-x-small);
+                }
 
-        .selected-count {
-            font-size: var(--font-size-x-small);
-            color: var(--primary-color);
-            font-weight: bold;
-        }
+                .selected-count {
+                    font-size: var(--font-size-x-small);
+                    color: var(--primary-color);
+                    font-weight: bold;
+                }
 
-        .action-buttons {
-            display: flex;
-            gap: var(--spacing-x-small);
-        }
+                .action-buttons {
+                    display: flex;
+                    gap: var(--spacing-x-small);
+                }
 
-        button {
-            border: none;
-            background: none;
-            padding: var(--spacing-x-small) var(--spacing-small);
-            border-radius: var(--border-radius-small);
-            font-size: var(--font-size-x-small);
-            cursor: pointer;
-            transition: var(--transition-normal);
-        }
+                button {
+                    border: none;
+                    background: none;
+                    padding: var(--spacing-x-small) var(--spacing-small);
+                    border-radius: var(--border-radius-small);
+                    font-size: var(--font-size-x-small);
+                    cursor: pointer;
+                    transition: var(--transition-normal);
+                }
 
-        .select-all {
-            color: var(--primary-color);
-        }
+                .select-all {
+                    color: var(--primary-color);
+                }
 
-        .select-all:hover {
-            background-color: var(--purple-light);
-        }
+                .select-all:hover {
+                    background-color: var(--purple-light);
+                }
 
-        .clear {
-            color: var(--text-color-medium-dark);
-        }
+                .clear {
+                    color: var(--text-color-medium-dark);
+                }
 
-        .clear:hover {
-            background-color: var(--grayscale-150);
-        }
+                .clear:hover {
+                    background-color: var(--grayscale-150);
+                }
 
-        .groups-container {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-x-small);
-            max-height: 200px;
-            overflow-y: auto;
-            padding: var(--spacing-x-small);
-        }
+                .groups-container {
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-x-small);
+                    max-height: 200px;
+                    overflow-y: auto;
+                    padding: var(--spacing-x-small);
+                }
 
-        .groups-container::-webkit-scrollbar {
-            width: 8px;
-        }
+                .groups-container::-webkit-scrollbar {
+                    width: 8px;
+                }
 
-        .groups-container::-webkit-scrollbar-track {
-            background: var(--background-color);
-            border-radius: 4px;
-        }
+                .groups-container::-webkit-scrollbar-track {
+                    background: var(--background-color);
+                    border-radius: 4px;
+                }
 
-        .groups-container::-webkit-scrollbar-thumb {
-            background: var(--grayscale-300);
-            border-radius: 4px;
-        }
+                .groups-container::-webkit-scrollbar-thumb {
+                    background: var(--grayscale-300);
+                    border-radius: 4px;
+                }
 
-        .groups-container::-webkit-scrollbar-thumb:hover {
-            background: var(--grayscale-400);
-        }
+                .groups-container::-webkit-scrollbar-thumb:hover {
+                    background: var(--grayscale-400);
+                }
 
-        .empty-state {
-            padding: var(--spacing-normal);
-            text-align: center;
-            color: var(--text-color-medium-dark);
-            font-size: var(--font-size-small);
-        }
+                .empty-state {
+                    padding: var(--spacing-normal);
+                    text-align: center;
+                    color: var(--text-color-medium-dark);
+                    font-size: var(--font-size-small);
+                }
 
-        .loading {
-            padding: var(--spacing-small);
-            text-align: center;
-            color: var(--text-color-medium-dark);
-            font-size: var(--font-size-small);
-        }
-    `;
+                .loading {
+                    padding: var(--spacing-small);
+                    text-align: center;
+                    color: var(--text-color-medium-dark);
+                    font-size: var(--font-size-small);
+                }
+            `
+        ];
+    }
 
     connectedCallback() {
         super.connectedCallback();
@@ -242,7 +249,7 @@ class GroupListComponent extends LitElement {
                 </div>
             </div>
 
-            <div class="groups-container">
+            <div class="groups-container fade-out-container">
                 ${this.groups.map(item => html`
                     <group-list-item
                             .group="${item}"

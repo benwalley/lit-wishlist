@@ -1,5 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../../css/buttons";
+import helperStyles from "../../../css/helpers";
 import '../../groups/group-list-display-item.js';
 import {createGroup, getUserGroups} from '../../../helpers/api/groups.js';
 import {messagesState} from "../../../state/messagesStore.js";
@@ -50,6 +51,7 @@ export class MyGroupsList extends LitElement {
     static get styles() {
         return [
             buttonStyles,
+            helperStyles,
             css`
                 :host {
                     display: block;
@@ -151,7 +153,7 @@ export class MyGroupsList extends LitElement {
         }
 
         return html`
-            <div class="groups-container">
+            <div class="groups-container fade-out-container">
                 ${this.groups.map(group => html`
                     <group-list-display-item 
                         .group=${group}

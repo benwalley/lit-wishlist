@@ -21,16 +21,37 @@ export class CustomElement extends LitElement {
                 :host {
                     display: block;
                 }
+                
+                .no-images {
+                    width: 100%;
+                    aspect-ratio: 1/1;
+                    box-shadow: var(--shadow-1-soft);
+                    padding: var(--spacing-normal);
+                    box-sizing: border-box;
+                    background: var(--background-light);
+                    border-radius: var(--border-radius-large);
+                    display: none;
+                }
 
-                /* 
-                 * We'll treat .gallery-container as our container for 
-                 * container queries. 
-                 */
+                @media only screen and (min-width: 1000px) {
+                    .no-images {
+                        display: block;
+                    }
+                }
+
+                
                 .gallery-container {
                     display: grid;
                     gap: 1rem;
                     container-type: inline-size;
                     container-name: gallery;
+                    max-width: 400px;
+                }
+
+                @media only screen and (min-width: 1000px) {
+                    .gallery-container {
+                        max-width: none
+                    }
                 }
 
                 /* Main image styling */
@@ -42,7 +63,7 @@ export class CustomElement extends LitElement {
                 }
                 /* Main image hover effect */
                 .main-image:hover custom-image {
-                    transform: scale(1.05);
+                    transform: scale(1.03);
                 }
 
                 /* The <custom-image> itself gets a transition. */
@@ -109,7 +130,7 @@ export class CustomElement extends LitElement {
     render() {
         const { imageIds = [], name = '' } = this.itemData;
         if (!imageIds.length) {
-            return html`<p>No images available</p>`;
+            return html`<p class="no-images">No images available</p>`;
         }
 
         const currentImageId = imageIds[this.selectedImageIndex];

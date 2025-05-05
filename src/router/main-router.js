@@ -9,6 +9,7 @@ import '../components/pages/account/qa/qa-page-container.js';
 import '../components/pages/groups/group-view-container.js';
 import '../components/pages/user/user-view-container.js';
 import '../components/pages/lists/all-lists-container.js';
+import '../components/pages/gift-tracking/gifts-tracking-page.js';
 
 
 const routes = [
@@ -19,6 +20,10 @@ const routes = [
     {
         path: '/account',
         component: 'account-container',
+    },
+    {
+        path: '/gifts-tracking',
+        component: 'gifts-tracking-page',
     },
     {
         path: '/user/:userId',

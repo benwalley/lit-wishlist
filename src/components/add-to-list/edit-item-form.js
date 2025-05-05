@@ -11,7 +11,7 @@ import './images-selector.js';
 import './delete-automatically-selector.js';
 import './visibility-selector/visibility-selector-container.js';
 import {customFetch} from "../../helpers/fetchHelpers.js";
-import {triggerUpdateItem} from "../../events/eventListeners.js";
+import {triggerUpdateItem, triggerUpdateList} from "../../events/eventListeners.js";
 import {invalidateCache} from "../../helpers/caching.js";
 import {messagesState} from "../../state/messagesStore.js";
 import '../../svg/gear.js';
@@ -371,6 +371,7 @@ export class EditItemForm extends LitElement {
         if (response.success) {
             messagesState.addMessage('Item successfully updated');
             triggerUpdateItem(this.itemData.id);
+            triggerUpdateList();
             invalidateCache(`/listItems/${this.itemData.id}`);
 
             // Close the modal by dispatching an event
