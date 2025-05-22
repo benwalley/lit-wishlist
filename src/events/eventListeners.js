@@ -27,6 +27,7 @@ export function listenUpdateList(callback) {
 }
 
 export function triggerUpdateItem() {
+    invalidateCache('/giftTracking');
     triggerCustomEvent(UPDATE_ITEM_EVENT);
 }
 

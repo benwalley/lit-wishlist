@@ -1,12 +1,32 @@
 import {LitElement, html, css} from 'lit';
 import {currencyHelper} from "../../../helpers.js";
 import '../../../svg/arrow-long.js';
+import '../../../svg/check.js';
 import '../../global/custom-image.js';
+import '../../global/custom-tooltip.js';
+import '../../global/contributor-stack.js';
+import './tracking-status.js';
+import './tracking-qty-input.js';
+import './tracking-amount-input.js';
+import '../account/avatar.js';
+import {customFetch} from '../../../helpers/fetchHelpers.js';
+import {messagesState} from '../../../state/messagesStore.js';
+import {getUserImageIdByUserId, getUsernameById} from "../../../helpers/generalHelpers.js";
+import {observeState} from "lit-element-state";
 
-export class GiftTrackingRow extends LitElement {
+export class GiftTrackingRow extends observeState(LitElement) {
     static properties = {
         item: {type: Object},
         compact: {type: Boolean, reflect: true},
+        savingChanges: {type: Boolean},
+        contributeAmount: {type: Number},
+        numberGetting: {type: Number},
+        showSaveButton: {type: Boolean},
+        originalContributeAmount: {type: Number},
+        originalNumberGetting: {type: Number},
+        showUsername: {type: Boolean},
+        itemIndex: {type: Number},
+        lastItem: {type: Boolean},
     };
 
     static get styles() {
@@ -18,22 +38,44 @@ export class GiftTrackingRow extends LitElement {
                 
                 .table-row {
                     display: grid;
-                    grid-template-columns: 60px 2fr 1fr 1fr 1fr 60px;
-                    gap: var(--spacing-small);
-                    padding: var(--spacing-normal);
+                    grid-template-columns: var(--gift-tracking-columns);
                     align-items: center;
-                    transition: background-color 0.2s ease;
-                    background-color: var(--color-background-secondary);
+                    transition: var(--transition-normal);
+                    position: relative;
                 }
                 
-                .table-row:hover {
-                    background-color: var(--color-background-hover);
+                .cell {
+                    border: 0.5px solid var(--grayscale-300);
+                    box-sizing: border-box;
+                    height: 100%;
+                    line-height: 1;
+                    
+                    &.padded {
+                        padding: var(--spacing-x-small);
+                    }
                 }
                 
-                :host([compact]) .table-row {
-                    grid-template-columns: 40px 2fr 80px 80px 40px;
-                    padding: var(--spacing-small);
-                    gap: var(--spacing-xs);
+                .username.cell {
+                    border-bottom: none;
+                    border-top: none;
+                   
+                    
+                    a {
+                        display: flex;
+                        flex-direction: row;
+                        gap: 5px;
+                        align-items: center;
+                        color: var(--text-color-dark);
+                        text-decoration: none;
+                    }
+                    
+                    &.top-border {
+                        border-top: 0.5px solid var(--grayscale-300);
+                    }
+                    
+                    &.bottom-border {
+                        border-bottom: 0.5px solid var(--grayscale-300);
+                    }
                 }
                 
                 .item-image {
@@ -43,19 +85,10 @@ export class GiftTrackingRow extends LitElement {
                     object-fit: cover;
                 }
                 
-                :host([compact]) .item-image {
-                    width: 40px;
-                    height: 40px;
-                }
-                
                 .item-details {
                     display: flex;
                     flex-direction: column;
                     gap: var(--spacing-small);
-                }
-                
-                :host([compact]) .item-details {
-                    gap: var(--spacing-xs);
                 }
                 
                 .item-name {
@@ -71,35 +104,28 @@ export class GiftTrackingRow extends LitElement {
                 
                 .list-name {
                     font-size: 0.9em;
-                    color: var(--color-text-secondary);
                 }
                 
-                :host([compact]) .list-name {
-                    font-size: 0.8em;
-                }
                 
                 .status-badge {
                     display: inline-block;
                     padding: 4px 8px;
-                    border-radius: var(--border-radius-normal);
-                    font-size: 0.8em;
+                    border-radius: 50px;
+                    font-size: var(--font-size-x-small);
                     font-weight: bold;
                     text-align: center;
-                }
-                
-                :host([compact]) .status-badge {
-                    padding: 2px 4px;
-                    font-size: 0.7em;
+                    line-height: 1;
                 }
                 
                 .getting {
-                    background-color: var(--color-success-light);
-                    color: var(--color-success);
+                    background-color: var(--purple-normal);
+                    color: var(--light-text-color);
                 }
                 
                 .contributing {
-                    background-color: var(--color-primary-light);
-                    color: var(--color-primary);
+                    background-color: var(--green-normal);
+                    color: var(--light-text-color);
+                    
                 }
                 
                 .status-badge:not(.contributing):not(.getting) {
@@ -119,13 +145,56 @@ export class GiftTrackingRow extends LitElement {
                     text-overflow: ellipsis;
                 }
                 
+                .contributors {
+                    display: flex;
+                    align-items: center;
+                }
+                
+                .save-button {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 5px;
+                    background-color: var(--green-normal);
+                    color: white;
+                    border: none;
+                    border-radius: var(--border-radius-normal);
+                    padding: 4px 8px;
+                    font-size: 0.8rem;
+                    cursor: pointer;
+                    transition: var(--transition-normal);
+                    margin-left: 10px;
+                }
+                
+                .save-button:hover:not(:disabled) {
+                    background-color: var(--green-darker);
+                }
+                
+                .save-button:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                    
+                    
+                }
+                
+                .view-details-button {
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: var(--transition-200);
+                    
+                    &:hover {
+                        color: var(--purple-darker);
+                        background: var(--purple-light);
+                    }
+                }
+                
+                /* Input styles moved to respective components */
+                
                 @media (max-width: 768px) {
                     .table-row {
-                        grid-template-columns: 40px 3fr 1fr 40px;
-                    }
-                    
-                    :host([compact]) .table-row {
-                        grid-template-columns: 40px 3fr 70px 30px;
+                        grid-template-columns: 40px auto 3fr 1fr 40px;
                     }
                     
                     .list-cell, 
@@ -137,46 +206,111 @@ export class GiftTrackingRow extends LitElement {
         ];
     }
 
+    constructor() {
+        super();
+        this.savingChanges = false;
+        this.contributeAmount = 0;
+        this.numberGetting = 0;
+        this.showSaveButton = false;
+        this.originalContributeAmount = 0;
+        this.originalNumberGetting = 0;
+        this.showUsername = true;
+        this.itemIndex = 0;
+        this.lastItem = false;
+    }
+
+    // We no longer need the global event listeners since we're updating in-place
+    connectedCallback() {
+        super.connectedCallback();
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback();
+    }
+
+    updateIfDifferent() {
+        const hasContributeAmountChanged = parseFloat(this.contributeAmount) !== parseFloat(this.originalContributeAmount);
+        const hasNumberGettingChanged = parseFloat(this.numberGetting) !== parseFloat(this.originalNumberGetting || 0);
+
+        this.showSaveButton = hasContributeAmountChanged || hasNumberGettingChanged;
+    }
+
+    handleContributeAmountChange(e) {
+        this.contributeAmount = Number(e.detail.value);
+        this.updateIfDifferent();
+    }
+
+    handleNumberGettingChange(e) {
+        this.numberGetting = Number(e.detail.value);
+        this.updateIfDifferent();
+    }
+
+    updated(changedProperties) {
+        if (changedProperties.has('item') && this.item) {
+            const contributors = this.item.contributors || [];
+            const contributor = contributors.length > 0 ? contributors[0] : {};
+
+            // Set contribution amount
+            if (contributor.contributeAmount !== undefined) {
+                this.contributeAmount = contributor.contributeAmount;
+                this.originalContributeAmount = contributor.contributeAmount;
+            } else {
+                this.contributeAmount = 0;
+                this.originalContributeAmount = 0;
+            }
+
+            // Set quantity getting
+            if (contributor.numberGetting !== undefined) {
+                this.numberGetting = contributor.numberGetting;
+                this.originalNumberGetting = contributor.numberGetting;
+            } else {
+                this.numberGetting = 0;
+                this.originalNumberGetting = 0;
+            }
+        }
+    }
+
     render() {
         if (!this.item) return html``;
-        
-        const contributor = this.item.contributors && this.item.contributors.length > 0 ? this.item.contributors[0] : {};
-        const imageId = this.item.imageIds && this.item.imageIds.length > 0 ? this.item.imageIds[0] : null;
+
+        const contributors = this.item.contributors || [];
         const listId = this.item.lists && this.item.lists.length > 0 ? this.item.lists[0] : '';
-        
+
+        const contributor = contributors.length > 0 ? contributors[0] : {};
+
         return html`
             <div class="table-row">
-                <div>
-                    <custom-image 
-                        class="item-image" 
-                        image-id="${imageId}" 
-                        alt="${this.item.name}"
-                    ></custom-image>
-                </div>
-                <div class="item-details">
-                    <div class="item-name">${this.item.name}</div>
-                    <div class="list-name">${listId ? `List #${listId}` : ''}</div>
-                </div>
-                <div class="list-cell">${listId ? `List #${listId}` : ''}</div>
-                <div>
-                    ${contributor.contributing ? html`
-                        <span class="status-badge contributing">Contributing</span>
-                    ` : contributor.getting ? html`
-                        <span class="status-badge getting">Getting</span>
-                    ` : html`
-                        <span class="status-badge">${this.item.trackingType || 'Tracking'}</span>
-                    `}
-                </div>
-                <div class="amount-cell price-display">
-                    ${contributor.contributing && contributor.contributeAmount ? html`
-                        ${currencyHelper(contributor.contributeAmount)}
-                    ` : contributor.getting && contributor.numberGetting ? html`
-                        Qty: ${contributor.numberGetting}
+                
+                <div class="username cell padded ${this.showUsername ? 'top-border' : ''} ${this.lastItem ? 'bottom-border' : ''}">
+                    ${this.showUsername ? html`
+                        <a href="/user/${this.item?.itemData?.createdById}">
+                            <custom-avatar
+                                    size="16"
+                                    username="${getUsernameById(this.item?.itemData?.createdById)}"
+                                    imageId="${getUserImageIdByUserId(this.item?.itemData?.createdById)}"
+                            ></custom-avatar>
+                            <div>${getUsernameById(this.item?.itemData?.createdById)}</div>
+                        </a>
                     ` : ''}
                 </div>
-                <div class="view-link">
-                    <a href="/list/${listId}/item/${this.item.id}" aria-label="View item details">
-                        <svg-arrow-long></svg-arrow-long>
+                <div class="item-name cell padded">${this.item.itemData?.name || '--'}</div>
+                <tracking-status class=" cell" itemId="${this.item.id}"></tracking-status>
+                <div class="amount-cell price-display cell">
+                    <tracking-qty-input
+                        .value=${this.numberGetting || 0}
+                        @qty-changed=${this.handleNumberGettingChange}
+                    ></tracking-qty-input>
+                </div>
+                <div class="amount-cell price-display cell">
+                    <tracking-amount-input
+                        .value=${this.contributeAmount || 0}
+                        @amount-changed=${this.handleContributeAmountChange}
+                    ></tracking-amount-input>
+                </div>
+        
+                <div class="view-link cell">
+                    <a href="/item/${this.item.id}" aria-label="View item details" class="button icon-button text-blue view-details-button">
+                        <arrow-long-icon></arrow-long-icon>
                     </a>
                 </div>
             </div>

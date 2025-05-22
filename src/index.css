@@ -33,14 +33,17 @@
 
     /* -- Brand/Theme Colors */
     --purple-normal: #4f46e5;
+    --purple-normal-rgb: 79, 70, 229;
     --purple-light: #4f46e514;
     --purple-darker: #4338ca;
 
     --green-normal: #059669;
+    --green-normal-rgb: 5, 150, 105;
     --green-light: #05966914;  /* Updated: ~8% opacity green */
     --green-darker: #047857;
 
     --blue-normal: #3b82f6;
+    --blue-normal-rgb: 59, 130, 246;
     --blue-light:  #3b82f614;  /* Updated: ~8% opacity blue */
     --blue-darker: #2563eb;
 
@@ -80,7 +83,7 @@
     --input-background-color: var(--background-color);
 
     /* Other color variables */
-    --focus-color: var(--primary-color);
+    --focus-color: var(--blue-normal);
     --border-color-extra-light: var(--grayscale-150);
     --border-color-light: var(--grayscale-200);
     --border-color-dark: #374151;
@@ -91,6 +94,7 @@
     --delete-red-light: #fd585814;
     --success-green: #22c55e;
     --info-yellow: #f59e0b;
+    --info-yellow-rgb: 245, 158, 11;
     --info-yellow-light: #fef3c7;
     --placeholder-color: var(--grayscale-500);
 

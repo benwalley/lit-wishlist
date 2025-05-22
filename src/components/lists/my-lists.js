@@ -32,6 +32,8 @@ export class CustomElement extends LitElement {
                     display: flex;
                     flex-direction: column;
                     gap: var(--spacing-small);
+                    max-height: 300px;
+                    overflow-y: auto;
                 }
                 
                 .section-header {

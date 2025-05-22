@@ -25,3 +25,6 @@
  - When adding to single list, you have to unselect and select list to add items.
  - update public user page lists to match users
  - add ai user image generation (and for groups and such);
+ - create item route without list, and don't have list functionality. direct here when going from gifts you're getting for instance
+ - update contributing and getting buttons to give indications if you already are
+ - add venmo option to account, and allow sending money automatically.

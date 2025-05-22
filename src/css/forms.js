@@ -2,6 +2,14 @@
 import {css} from 'lit';
 
 export default css`
+    input,
+    select {
+        &:focus-visible {
+            box-shadow: 0 0 2px var(--focus-color) !important;
+            outline: none !important;
+        }    
+    }
+    
     input[type="checkbox"],
     input[type="radio"] {
         position: absolute;
@@ -58,8 +66,8 @@ export default css`
 
     input[type="checkbox"]:focus-visible + label::before,
     input[type="radio"]:focus-visible + label::before {
-        outline: 2px solid var(--focus-color);
-        outline-offset: 2px;
+        box-shadow: 0 0 2px var(--focus-color);
+        outline: none;
     }
 
     input[type="checkbox"]:checked + label::before,

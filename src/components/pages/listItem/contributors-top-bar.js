@@ -8,6 +8,7 @@ import '../../../svg/dots.js';
 import {currencyHelper} from "../../../helpers.js";
 import '../../pages/account/avatar.js';
 import '../../global/action-dropdown.js';
+import '../../global/contributor-stack.js';
 import {messagesState} from "../../../state/messagesStore.js";
 import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
 import '../../../svg/edit.js';
@@ -474,36 +475,7 @@ export class ContributorsTopBar extends LitElement {
                             `
                             : html`
                                 <div class="avatar-stack fade-in">
-                                    ${this.contributors.map(
-                                            contributor => html`
-                                                <custom-avatar size="24"
-                                                               username="${contributor.user?.name}"
-                                                               imageId="${contributor.user?.image}"
-                                                               round="true"
-                                                               border="true"
-                                                               hasPopup="true"
-                                                               stackLeft="true"
-                                                >
-                                                    <div class="popup-contents ">
-                                                        <div class="popup-username">
-                                                            <strong>${contributor.user?.name}</strong></div>
-                                                        ${contributor.getting ? html`
-                                                            <div class="qty amount-gotten">
-                                                                <success-icon></success-icon>
-                                                                Getting ${contributor.numberGetting}
-                                                            </div>` : ''}
-
-                                                        ${contributor.contributing ? html`
-                                                            <div class="amount-contributed">
-                                                                <dollar-icon></dollar-icon>
-                                                                Contributing
-                                                                ${parseInt(contributor.contributeAmount) ? currencyHelper(contributor.contributeAmount) : ''}
-                                                            </div>` : ''}
-
-                                                    </div>
-                                                </custom-avatar>
-                                            `
-                                    )}
+                                    <contributor-stack .contributors=${this.contributors}></contributor-stack>
                                 </div>
                                 <div class="contributors-right fade-in desktop-only">
                   <span class="contributor-count title">
