@@ -16,6 +16,8 @@ class MyTextInput extends LitElement {
             fullWidth: {type: Boolean},
             required: {type: Boolean},  // New required property
             dollarIcon: {type: Boolean},
+            min: {type: String},
+            max: {type: String},
         };
     }
 
@@ -31,6 +33,8 @@ class MyTextInput extends LitElement {
         this.fullWidth = true;
         this.required = false;  // Default false
         this.dollarIcon = false;
+        this.min = '';
+        this.max = '';
     }
 
     static get styles() {
@@ -80,6 +84,7 @@ class MyTextInput extends LitElement {
                 font-size: 1rem;
                 outline: none;
                 box-sizing: border-box;
+                width: 100%;
             }
 
             input.small {
@@ -190,6 +195,8 @@ class MyTextInput extends LitElement {
             placeholder="${this.placeholder}"
             @input="${this._handleInput}"
             ?required="${this.required}"
+            min="${this.min || ''}"
+            max="${this.max || ''}"
           />
           ${this._renderEyeIcon()}
         </div>

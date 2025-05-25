@@ -4,9 +4,11 @@ import formStyles from "../../../css/forms.js";
 import '../../../svg/success.js';
 import '../../../svg/contribute.js';
 import '../../../svg/gift.js';
+import '../../../svg/group.js';
 import '../../global/floating-box.js';
 import './gift-tracking-getting.js';
 import './gift-tracking-contributing.js';
+import './gift-tracking-proposals.js';
 
 export class GiftsTrackingPage extends LitElement {
     static properties = {
@@ -70,7 +72,7 @@ export class GiftsTrackingPage extends LitElement {
                     align-items: center;
                     gap: var(--spacing-x-small);
                     font-weight: 500;
-                    color: var(--medium-dark-text-color);
+                    color: var(--text-color-dark);
                     border-bottom: 3px solid transparent;
                     transition: var(--transition-200);
                 }
@@ -118,12 +120,19 @@ export class GiftsTrackingPage extends LitElement {
                             <contribute-icon></contribute-icon>
                             <span>Contributing</span>
                         </div>
+                        <div class="tab ${this.activeTab === 'proposals' ? 'active' : ''}" 
+                             @click=${() => this.switchTab('proposals')}>
+                            <group-icon></group-icon>
+                            <span>Proposals</span>
+                        </div>
                     </div>
                     
                     <div class="tab-content">
                         ${this.activeTab === 'getting' ? 
                             html`<gift-tracking-getting></gift-tracking-getting>` : 
-                            html`<gift-tracking-contributing></gift-tracking-contributing>`
+                            this.activeTab === 'contributing' ? 
+                            html`<gift-tracking-contributing></gift-tracking-contributing>` :
+                            html`<gift-tracking-proposals></gift-tracking-proposals>`
                         }
                     </div>
                 </div>

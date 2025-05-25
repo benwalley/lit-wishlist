@@ -62,3 +62,13 @@ export function currencyHelper(price) {
         currency: 'USD'
     });
 }
+
+export function formatDate(dateString) {
+    if (!dateString) return 'Unknown';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}

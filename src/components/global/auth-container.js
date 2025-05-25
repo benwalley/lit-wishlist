@@ -18,6 +18,8 @@ import '../groups/bulk-add-to-group-modal.js'
 import '../lists/bulk-add-to-list-modal.js';
 import './delete-list/delete-list.js';
 import '../lists/edit-list-modal.js';
+import '../global/add-proposal-modal.js';
+import {initializeProposalHelpers} from '../../helpers/proposalHelpers.js';
 
 export class AuthContainer extends observeState(LitElement) {
     static styles = css`
@@ -39,7 +41,8 @@ export class AuthContainer extends observeState(LitElement) {
     async firstUpdated() {
         await this.fetchUserData();
         await this.fetchAccessibleUsers();
-        listenUpdateUser(this.fetchUserData)
+        listenUpdateUser(this.fetchUserData);
+        initializeProposalHelpers();
     }
 
     async fetchUserData() {
@@ -83,6 +86,7 @@ export class AuthContainer extends observeState(LitElement) {
             <bulk-add-to-list-modal></bulk-add-to-list-modal>
             <delete-list></delete-list>
             <edit-list-modal></edit-list-modal>
+            <add-proposal-modal></add-proposal-modal>
         `;
     }
 }

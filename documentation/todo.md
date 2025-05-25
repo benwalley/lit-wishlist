@@ -28,3 +28,7 @@
  - create item route without list, and don't have list functionality. direct here when going from gifts you're getting for instance
  - update contributing and getting buttons to give indications if you already are
  - add venmo option to account, and allow sending money automatically.
+ - remove from getting if you set to zero qty (add popup to warn)
+ - handle saving proposals in gift tracking
+ - handle edit proposals in proposals page
+ - 

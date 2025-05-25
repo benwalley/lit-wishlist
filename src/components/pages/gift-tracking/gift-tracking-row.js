@@ -17,13 +17,6 @@ import {observeState} from "lit-element-state";
 export class GiftTrackingRow extends observeState(LitElement) {
     static properties = {
         item: {type: Object},
-        compact: {type: Boolean, reflect: true},
-        savingChanges: {type: Boolean},
-        contributeAmount: {type: Number},
-        numberGetting: {type: Number},
-        showSaveButton: {type: Boolean},
-        originalContributeAmount: {type: Number},
-        originalNumberGetting: {type: Number},
         showUsername: {type: Boolean},
         itemIndex: {type: Number},
         lastItem: {type: Boolean},
@@ -128,11 +121,6 @@ export class GiftTrackingRow extends observeState(LitElement) {
                     
                 }
                 
-                .status-badge:not(.contributing):not(.getting) {
-                    background-color: var(--color-background-tertiary);
-                    color: var(--color-text-secondary);
-                }
-                
                 .view-link {
                     display: flex;
                     justify-content: center;
@@ -143,6 +131,7 @@ export class GiftTrackingRow extends observeState(LitElement) {
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                    text-align: right;
                 }
                 
                 .contributors {
@@ -194,7 +183,7 @@ export class GiftTrackingRow extends observeState(LitElement) {
                 
                 @media (max-width: 768px) {
                     .table-row {
-                        grid-template-columns: 40px auto 3fr 1fr 40px;
+                        grid-template-columns: 40px auto 3fr 1fr 1fr 40px;
                     }
                     
                     .list-cell, 
@@ -206,77 +195,25 @@ export class GiftTrackingRow extends observeState(LitElement) {
         ];
     }
 
+    _getParticipants() {
+        if(this.item?.type === 'getting') {
+            return this.item?.contributors || [];
+        }
+        if(this.item?.type === 'proposal') {
+            return this.item?.proposalParticipants || [];
+        }
+        return [];
+    }
+
     constructor() {
         super();
-        this.savingChanges = false;
-        this.contributeAmount = 0;
-        this.numberGetting = 0;
-        this.showSaveButton = false;
-        this.originalContributeAmount = 0;
-        this.originalNumberGetting = 0;
         this.showUsername = true;
         this.itemIndex = 0;
         this.lastItem = false;
     }
 
-    // We no longer need the global event listeners since we're updating in-place
-    connectedCallback() {
-        super.connectedCallback();
-    }
-
-    disconnectedCallback() {
-        super.disconnectedCallback();
-    }
-
-    updateIfDifferent() {
-        const hasContributeAmountChanged = parseFloat(this.contributeAmount) !== parseFloat(this.originalContributeAmount);
-        const hasNumberGettingChanged = parseFloat(this.numberGetting) !== parseFloat(this.originalNumberGetting || 0);
-
-        this.showSaveButton = hasContributeAmountChanged || hasNumberGettingChanged;
-    }
-
-    handleContributeAmountChange(e) {
-        this.contributeAmount = Number(e.detail.value);
-        this.updateIfDifferent();
-    }
-
-    handleNumberGettingChange(e) {
-        this.numberGetting = Number(e.detail.value);
-        this.updateIfDifferent();
-    }
-
-    updated(changedProperties) {
-        if (changedProperties.has('item') && this.item) {
-            const contributors = this.item.contributors || [];
-            const contributor = contributors.length > 0 ? contributors[0] : {};
-
-            // Set contribution amount
-            if (contributor.contributeAmount !== undefined) {
-                this.contributeAmount = contributor.contributeAmount;
-                this.originalContributeAmount = contributor.contributeAmount;
-            } else {
-                this.contributeAmount = 0;
-                this.originalContributeAmount = 0;
-            }
-
-            // Set quantity getting
-            if (contributor.numberGetting !== undefined) {
-                this.numberGetting = contributor.numberGetting;
-                this.originalNumberGetting = contributor.numberGetting;
-            } else {
-                this.numberGetting = 0;
-                this.originalNumberGetting = 0;
-            }
-        }
-    }
-
     render() {
         if (!this.item) return html``;
-
-        const contributors = this.item.contributors || [];
-        const listId = this.item.lists && this.item.lists.length > 0 ? this.item.lists[0] : '';
-
-        const contributor = contributors.length > 0 ? contributors[0] : {};
 
         return html`
             <div class="table-row">
@@ -294,17 +231,24 @@ export class GiftTrackingRow extends observeState(LitElement) {
                     ` : ''}
                 </div>
                 <div class="item-name cell padded">${this.item.itemData?.name || '--'}</div>
-                <tracking-status class=" cell" itemId="${this.item.id}"></tracking-status>
+                <div class="contributors cell">
+                    <contributor-stack .contributors=${this._getParticipants()}
+                                       simple
+                    ></contributor-stack>
+                </div>
+                <tracking-status 
+                    class="cell" 
+                    itemId="${this.item.id}" 
+                    status="${this.item.status || 'none'}"
+                ></tracking-status>
                 <div class="amount-cell price-display cell">
                     <tracking-qty-input
-                        .value=${this.numberGetting || 0}
-                        @qty-changed=${this.handleNumberGettingChange}
+                        .data=${this.item}
                     ></tracking-qty-input>
                 </div>
                 <div class="amount-cell price-display cell">
                     <tracking-amount-input
-                        .value=${this.contributeAmount || 0}
-                        @amount-changed=${this.handleContributeAmountChange}
+                        .data=${this.item}
                     ></tracking-amount-input>
                 </div>
         

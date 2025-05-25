@@ -1,10 +1,11 @@
 import {getUsernameById} from "../../../helpers/generalHelpers.js";
 
-export function processContributionsData(data) {
+export function processContributionsData(getting, acceptedProposals) {
     const giftGetters = new Map();
-    for (const item of data) {
+    for (const item of getting) {
         const userId = item?.itemData?.createdById;
         if (!userId) continue;
+        item.type = 'getting';
         // Check if the item is already in the map
         if (giftGetters.has(userId)) {
             const userItems = giftGetters.get(userId);
@@ -15,10 +16,25 @@ export function processContributionsData(data) {
         }
     }
 
+    for (const proposal of acceptedProposals) {
+        const userId = proposal?.itemData?.createdById;
+        if (!userId) continue;
+        proposal.type = 'proposal';
+        if (giftGetters.has(userId)) {
+            const userItems = giftGetters.get(userId);
+            userItems.push(proposal);
+            giftGetters.set(userId, userItems);
+        } else {
+            giftGetters.set(userId, [proposal]);
+        }
+    }
+
     // Sort each user's items alphabetically by name
     for (const [userId, items] of giftGetters.entries()) {
         const sortedItems = [...items].sort((a, b) => {
-            return (a.name || '').localeCompare(b.name || '');
+            const aName = a.itemData?.name || '';
+            const bName = b.itemData?.name || '';
+            return aName.localeCompare(bName);
         });
         giftGetters.set(userId, sortedItems);
     }
@@ -36,6 +52,13 @@ export function processContributionsData(data) {
         const usernameB = getUsernameById(b.userId) || '';
         return usernameA.localeCompare(usernameB);
     });
-
     return sortedArray;
 }
+
+export const statuses = [
+    { id: 'none', label: 'Not Started', icon: 'order-icon' },
+    { id: 'ordered', label: 'Ordered', icon: 'ordered-icon' },
+    { id: 'arrived', label: 'Arrived', icon: 'arrived-icon' },
+    { id: 'wrapped', label: 'Wrapped', icon: 'wrapped-icon' },
+    { id: 'given', label: 'Given', icon: 'given-icon' }
+];

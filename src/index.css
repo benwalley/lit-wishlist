@@ -97,6 +97,7 @@
     --info-yellow-rgb: 245, 158, 11;
     --info-yellow-light: #fef3c7;
     --placeholder-color: var(--grayscale-500);
+    --changed-outline-color: #7bd0b6;
 
     /* Header/Footer/Links */
     --header-text-color: var(--text-color-dark);

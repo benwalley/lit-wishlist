@@ -3,90 +3,55 @@ import '../../../svg/ordered.js';
 import '../../../svg/arrived.js';
 import '../../../svg/wrapped.js';
 import '../../../svg/given.js';
+import '../../../svg/order.js';
 import formStyles from '../../../css/forms.js'
 import {customFetch} from '../../../helpers/fetchHelpers.js';
 import {messagesState} from '../../../state/messagesStore.js';
+import {statuses} from "./gift-giving-helpers.js";
 
 export class TrackingStatus extends LitElement {
     static properties = {
         itemId: {type: String},
-        selected: {type: String},
-        loading: {type: Boolean}
+        status: {type: String},
+        loading: {type: Boolean},
+        originalStatus: {type: String, state: true},
+        hasChanged: {type: Boolean, state: true}
     };
 
     constructor() {
         super();
         this.itemId = '';
-        this.selected = '';
+        this.status = 'none';
         this.loading = false;
+        this.originalStatus = 'none';
+        this.hasChanged = false;
     }
 
     connectedCallback() {
         super.connectedCallback();
-        this.fetchStatus();
+        // In a real implementation, you would fetch the current status
+        // this.fetchCurrentStatus();
     }
 
-    async fetchStatus() {
-        if (!this.itemId) return;
-
-        try {
-            // In the future, this would fetch from an API endpoint
-            // For now, it's just a mock - we'll simulate getting data
-
-            // Placeholder for API call
-            // const response = await customFetch(`/tracking/${this.itemId}`, {}, true);
-            // if (response.success && response.data?.status) {
-            //    this.selected = response.data.status;
-            // }
-        } catch (error) {
-            console.error('Error fetching tracking status:', error);
+    updated(changedProperties) {
+        if (changedProperties.has('status')) {
+            if (changedProperties.get('status') === undefined) {
+                // First time setting status, store as original
+                this.originalStatus = this.status || 'none';
+            }
+            this.hasChanged = this.status !== this.originalStatus;
         }
     }
 
-    async handleStatusChange(e) {
-        if (this.loading) return;
+    updateStatus(newStatus) {
+        if (this.loading || !this.itemId) return;
 
-        const newStatus = e.target.value;
-        if (this.selected === newStatus) return;
+        this.status = newStatus;
+    }
 
-        this.loading = true;
-
-        try {
-            const oldStatus = this.selected;
-            this.selected = newStatus;
-
-            // Force update of the select class
-            this.requestUpdate();
-
-            // In the future: Save to API
-            // const response = await customFetch(`/tracking/${this.itemId}`, {
-            //    method: 'PUT',
-            //    headers: { 'Content-Type': 'application/json' },
-            //    body: JSON.stringify({ status: newStatus }),
-            // }, true);
-
-            // if (!response.success) {
-            //    this.selected = oldStatus; // Revert if API call fails
-            //    throw new Error('Failed to update status');
-            // }
-
-            const statusNames = {
-                '': 'Not started',
-                'ordered': 'Ordered',
-                'arrived': 'Arrived',
-                'wrapped': 'Wrapped',
-                'given': 'Given'
-            };
-
-            const statusName = statusNames[newStatus] || 'Not started';
-            messagesState.addMessage(`Item status updated to ${statusName.toLowerCase()}`);
-
-        } catch (error) {
-            messagesState.addMessage('Failed to update tracking status', 'error');
-            console.error('Error updating tracking status:', error);
-        } finally {
-            this.loading = false;
-        }
+    getStatusLabel(statusId) {
+        const status = statuses.find(s => s.id === statusId);
+        return status ? status.label : 'Unknown';
     }
 
     static get styles() {
@@ -94,109 +59,142 @@ export class TrackingStatus extends LitElement {
             formStyles,
             css`
                 :host {
-                    display: inline-block;
+                    display: block;
+                    height: 100%;
+                }
+                
+                .container {
+                    display: grid;
+                    height: 100%;
+                    grid-template-columns: repeat(5, 1fr);
+                    box-sizing: border-box;
+                }
+                
+                .container.changed {
+                    position: relative;
+                    &:before {
+                        position: absolute;
+                        pointer-events: none;
+                        content: '';
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        border: 2px solid var(--changed-outline-color);
+                        z-index: 1;
+                    }
                 }
 
-                select {
-                    appearance: none;
-                    border: 1px solid var(--border-color);
-                    border-radius: var(--border-radius-normal);
-                    padding: 3px 10px;
-                    padding-right: 30px;
-                    font-size: var(--font-size-small);
-                    font-family: inherit;
-                    color: var(--text-color-dark);
+                .status-cell {
+                    border: 0.5px solid var(--border-color);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                     cursor: pointer;
-                    min-width: 140px;
-                    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-                    background-repeat: no-repeat;
-                    background-position: right 8px center;
-                    background-size: 16px;
-                    transition: var(--transition-200);
+                    transition: background-color 0.2s, color 0.2s;
+                    position: relative;
+                    color: var(--medium-text-color);
                 }
-
-
-                .loading {
-                    opacity: 0.7;
-                    pointer-events: none;
+                
+                .status-cell:hover {
+                    background-color: var(--grayscale-200);
                 }
-
-                /* Option styles - these only work in some browsers */
-                option {
-                    padding: 8px;
+                
+                .status-cell.selected {
+                    background-color: var(--green-normal);
+                    color: white;
                 }
-
-                /* Status-specific backgrounds */
-                .status-not-started {
-                    background-color: var(--delete-red-light);
-                    color: var(--delete-red);
-                    border-color: var(--delete-red);
+                
+                .status-cell.completed {
+                    background-color: var(--grayscale-200);
+                    color: var(--green-normal);
                 }
-
-                .status-ordered {
-                    background-color: var(--purple-light);
-                    color: var(--purple-normal);
-                    border-color: var(--purple-normal);
-                }
-
-                .status-arrived {
-                    background-color: var(--info-yellow-light);
-                    color: var(--info-yellow);
-                    border-color: var(--info-yellow);
-                }
-
-                .status-wrapped {
-                    background-color: var(--blue-light);
-                    color: var(--blue-normal);
-                    border-color: var(--blue-normal);
-                }
-
-                .status-given {
+                
+                .status-cell.original {
                     background-color: var(--green-light);
                     color: var(--green-normal);
-                    border-color: var(--green-normal);
                 }
-
-                /* Status-specific option colors */
-                .not-started {
-                    color: var(--grayscale-400);
-                }
-
-                .ordered {
-                    color: var(--green-normal);
-                }
-
-                .arrived {
-                    color: var(--info-yellow);
-                }
-
-                .wrapped {
-                    color: var(--blue-normal);
-                }
-
-                .given {
-                    color: var(--purple-normal);
+                
+                .status-cell svg {
+                    width: 18px;
+                    height: 18px;
                 }
             `
         ];
     }
 
-    getStatusClass() {
-        const statusMap = {
-            '': 'status-not-started',
-            'ordered': 'status-ordered',
-            'arrived': 'status-arrived',
-            'wrapped': 'status-wrapped',
-            'given': 'status-given'
-        };
+    isSelected(statusId) {
+        const currentStatus = this.status || 'none';
+        return currentStatus === statusId;
+    }
 
-        return statusMap[this.selected] || 'status-not-started';
+    isCompleted(statusId) {
+        const currentIndex = statuses.findIndex(s => s.id === this.status);
+        const statusIndex = statuses.findIndex(s => s.id === statusId);
+        return statusIndex < currentIndex;
+    }
+
+    isOriginal(statusId) {
+        return this.originalStatus === statusId && this.hasChanged;
+    }
+
+    renderIcon(iconName) {
+        switch(iconName) {
+            case 'order-icon':
+                return html`<order-icon></order-icon>`;
+            case 'ordered-icon':
+                return html`<ordered-icon></ordered-icon>`;
+            case 'arrived-icon':
+                return html`<arrived-icon></arrived-icon>`;
+            case 'wrapped-icon':
+                return html`<wrapped-icon></wrapped-icon>`;
+            case 'given-icon':
+                return html`<given-icon></given-icon>`;
+            default:
+                return html``;
+        }
+    }
+
+    renderStatusCell(status) {
+        const isSelected = this.isSelected(status.id);
+        const isCompleted = this.isCompleted(status.id);
+        const isOriginal = this.isOriginal(status.id);
+
+        let cellClass = '';
+        if (isSelected) {
+            cellClass = 'selected';
+        } else if (isOriginal) {
+            cellClass = 'original';
+        } else if (isCompleted) {
+            cellClass = 'completed';
+        }
+
+        return html`
+            <div 
+                class="status-cell ${cellClass}" 
+                @click=${() => this.updateStatus(status.id)}
+            >
+                ${status.icon ? html`
+                    ${this.renderIcon(status.icon)}
+                    <custom-tooltip>
+                        ${status.label}
+                    </custom-tooltip>
+                ` : ''}
+                ${this.loading && isSelected ? html`
+                    <div class="loading-overlay">
+                        <span>...</span>
+                    </div>
+                ` : ''}
+            </div>
+        `;
     }
 
     render() {
+        const containerClass = `container ${this.hasChanged ? 'changed' : ''}`;
+
         return html`
-            <div class="${this.loading ? 'loading' : ''}">
-              
+            <div class="${containerClass}">
+                ${statuses.map(status => this.renderStatusCell(status))}
             </div>
         `;
     }

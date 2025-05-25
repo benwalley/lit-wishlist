@@ -31,6 +31,7 @@ class UserListComponent extends LitElement {
             justify-content: space-between;
             align-items: center;
             padding: var(--spacing-x-small);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .title {

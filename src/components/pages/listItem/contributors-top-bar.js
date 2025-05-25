@@ -1,7 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../../css/buttons";
 import {cachedFetch} from "../../../helpers/caching.js";
-import {listenUpdateItem} from "../../../events/eventListeners.js";
+import {listenUpdateItem, triggerProposalModal} from "../../../events/eventListeners.js";
 import '../../../svg/success.js';
 import '../../../svg/share.js';
 import '../../../svg/dots.js';
@@ -13,6 +13,7 @@ import {messagesState} from "../../../state/messagesStore.js";
 import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
 import '../../../svg/edit.js';
 import '../../../svg/delete.js';
+import '../../../svg/group.js';
 import {openEditItemModal} from "../../add-to-list/edit-item-modal.js";
 import {deleteItem} from "../../../helpers/api/listItems.js";
 
@@ -59,6 +60,14 @@ export class ContributorsTopBar extends LitElement {
                     <delete-icon></delete-icon>`,
                 classes: 'danger-text',
                 action: () => this.handleDeleteItem()
+            },
+            {
+                id: 'proposal',
+                label: 'Create Proposal',
+                icon: html`
+                    <group-icon></group-icon>`,
+                classes: 'green-text',
+                action: () => triggerProposalModal(this.itemData)
             }
         ];
     }

@@ -46,7 +46,7 @@ export class ActionDropdown extends LitElement {
 
         .dropdown-content {
             display: none;
-            position: absolute;
+            position: fixed;
             background: var(--background-color-light, white);
             min-width: 180px;
             border-radius: var(--border-radius-normal);
@@ -179,6 +179,7 @@ export class ActionDropdown extends LitElement {
             
             computePosition(referenceEl, menu, {
                 placement: preferredPlacement,
+                strategy: 'fixed', // Use fixed strategy to handle scroll properly
                 middleware: [
                     offset(8), // Add some spacing
                     flip({

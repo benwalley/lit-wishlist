@@ -185,7 +185,7 @@ class CustomModal extends LitElement {
 
     closeModal() {
         this.isOpen = false;
-        this.dispatchEvent(new CustomEvent('modal-changed', {
+        this.dispatchEvent(new CustomEvent('modal-closed', {
             detail: {
                 isOpen: false,
             },

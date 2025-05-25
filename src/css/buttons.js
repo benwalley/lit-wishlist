@@ -153,12 +153,13 @@ export default css`
         &.icon-button,
         &.link-button {
             --icon-color: var(--link-button-text);
+            --icon-background: transparent;
             --icon-color-hover: var(--link-button-hover-text);
             --icon-hover-background: var(--link-button-hover-background);
             border-radius: var(--border-radius-normal);
             color: var(--icon-color);
             padding: 8px;
-            background: none;
+            background: var(--icon-background);
 
             &:hover,
             &:focus,

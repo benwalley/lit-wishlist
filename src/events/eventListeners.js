@@ -12,6 +12,11 @@ const GROUP_UPDATED_EVENT = 'group-updated';
 const BULK_ADD_TO_GROUP_MODAL_EVENT = 'open-bulk-add-to-group-modal';
 const BULK_ADD_TO_LIST_MODAL_EVENT = 'open-bulk-add-to-list-modal';
 const DELETE_LIST_EVENT = 'delete-list';
+const PROPOSAL_MODAL_EVENT = 'open-proposal-modal';
+const PROPOSAL_CREATED_EVENT = 'proposal-created';
+const EDIT_PROPOSAL_MODAL_EVENT = 'open-edit-proposal-modal';
+const DELETE_PROPOSAL_EVENT = 'delete-proposal';
+const PROPOSAL_DELETED_EVENT = 'proposal-deleted';
 const imageUploadEvents = {
     imageSelected: 'image-selected',
     cropConfirmed: 'crop-confirmed'
@@ -27,7 +32,8 @@ export function listenUpdateList(callback) {
 }
 
 export function triggerUpdateItem() {
-    invalidateCache('/giftTracking');
+    invalidateCache('/giftTracking/*');
+    invalidateCache('/proposals/*');
     triggerCustomEvent(UPDATE_ITEM_EVENT);
 }
 
@@ -125,4 +131,40 @@ export function triggerDeleteList(listData) {
 
 export function listenDeleteList(callback) {
     return listenToCustomEvent(DELETE_LIST_EVENT, callback);
+}
+
+export function triggerProposalModal(itemData) {
+    triggerCustomEvent(PROPOSAL_MODAL_EVENT, { itemData });
+}
+
+export function listenProposalModal(callback) {
+    return listenToCustomEvent(PROPOSAL_MODAL_EVENT, callback);
+}
+
+export function triggerProposalCreated(proposal) {
+    triggerCustomEvent(PROPOSAL_CREATED_EVENT, { proposal });
+}
+
+export function listenProposalCreated(callback) {
+    return listenToCustomEvent(PROPOSAL_CREATED_EVENT, callback);
+}
+
+export function triggerEditProposalModal(proposalData) {
+    triggerCustomEvent(PROPOSAL_MODAL_EVENT, { proposalData, isEditMode: true });
+}
+
+export function triggerDeleteProposal(proposal) {
+    triggerCustomEvent(DELETE_PROPOSAL_EVENT, { proposal });
+}
+
+export function listenDeleteProposal(callback) {
+    return listenToCustomEvent(DELETE_PROPOSAL_EVENT, callback);
+}
+
+export function triggerProposalDeleted(proposalId) {
+    triggerCustomEvent(PROPOSAL_DELETED_EVENT, { proposalId });
+}
+
+export function listenProposalDeleted(callback) {
+    return listenToCustomEvent(PROPOSAL_DELETED_EVENT, callback);
 }
