@@ -1,14 +1,14 @@
 import {css, html, LitElement} from 'lit';
 import buttonStyles from "../../../css/buttons";
-import {customFetch} from "../../../helpers/fetchHelpers.js";
-import {invalidateCache} from "../../../helpers/caching.js";
 import {triggerUpdateItem} from "../../../events/eventListeners.js";
+import {bulkUpdateGetting} from "../../../helpers/api/gifts.js";
 import '../../../svg/cart.js';
 import '../../global/custom-modal.js';
 import '../../users/your-users-list.js'
 import '../../global/multi-select-dropdown.js'
 import '../../global/qty-input.js'
 import './number-getting-list.js'
+import {messagesState} from "../../../state/messagesStore.js";
 
 export class CustomElement extends LitElement {
     static properties = {
@@ -20,7 +20,9 @@ export class CustomElement extends LitElement {
         total: { type: Number, state: true },
         contributors: { type: Array, state: true },
         yourUsers: { type: Array, state: true },
-        newData: { type: Array, state: true }
+        newData: { type: Array, state: true },
+        compact: { type: Boolean},
+        modalOpen: { type: Boolean, state: true },
     };
 
     constructor() {
@@ -33,6 +35,8 @@ export class CustomElement extends LitElement {
         this.total = 0;
         this.contributors = [];
         this.newData = [];
+        this.compact = false;
+        this.modalOpen = false;
     }
 
     static get styles() {
@@ -107,15 +111,18 @@ export class CustomElement extends LitElement {
         ];
     }
 
-    _openModal() {
-        const modal = this.shadowRoot.querySelector('custom-modal');
-        modal.openModal();
+    _openModal(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.modalOpen = true;
     }
 
     _closeModal(e) {
-        const modal = this.shadowRoot.querySelector('custom-modal');
-        modal.closeModal();
-        this.error = '';
+        this.modalOpen = false;
+    }
+
+    _handleModalClosed(event) {
+        this.modalOpen = false;
     }
 
     handleError(message) {
@@ -125,21 +132,22 @@ export class CustomElement extends LitElement {
     async _handleConfirm() {
         this.loading = true;
         try {
-            const data = this.newData.map(item => ({
-                userId: item.id,
-                qty: item.qty,
+            const data = this.newData.map(user => ({
+                giverId: user.id,
+                getterId: this.itemData?.createdById,
+                numberGetting: user.qty,
                 itemId: this.itemId,
-                getting: true,
             }));
-            const options = {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-            };
-            await customFetch('/contributors/update/batch', options, true);
-            invalidateCache(`/contributors/item/${this.itemId}`);
-            triggerUpdateItem();
-            this._closeModal();
+            
+            const response = await bulkUpdateGetting(data);
+            if(response.success) {
+                triggerUpdateItem();
+                this._closeModal();
+                messagesState.addMessage('Successfully updated getting data.', 'success');
+            } else {
+                messagesState.addMessage(response.publicMessage || 'Failed to update getting data.', 'error');
+            }
+
         } catch (e) {
             console.error(e);
             this.error = 'Failed to process request.';
@@ -157,11 +165,22 @@ export class CustomElement extends LitElement {
         const maxAmount = Math.max(parseInt(this.itemData?.amountWanted) || 1, this.itemData?.maxAmountWanted);
         const progressPercent = Math.min((this.total / maxAmount) * 100, 100);
         return html`
-            <button class="button shadow primary large fancy get-this-button" @click="${this._openModal}">
+            ${this.compact ? html`
+            <button class="icon-button get-this-button green-text" @click="${this._openModal}">
                 <cart-icon></cart-icon>
-                <span>I'll get This</span>
-            </button>
-            <custom-modal maxWidth="400px" noPadding="true">
+            </button>` : html`
+                <button class="button shadow primary large fancy get-this-button" @click="${this._openModal}">
+                    <cart-icon></cart-icon>
+                    <span>I'll get This</span>
+                </button>
+            `}
+            <custom-modal 
+                maxWidth="400px" 
+                noPadding="true"
+                lazyLoad
+                .isOpen="${this.modalOpen}"
+                @modal-closed="${this._handleModalClosed}"
+            >
                 <div class="modal-contents">
                     <div class="modal-header">
                         <h3>Who is getting this?</h3>
@@ -171,10 +190,7 @@ export class CustomElement extends LitElement {
                         <div class="progress-bar ${progressPercent === 100 ? 'full' : ''}" style="width: ${progressPercent}%;"></div>
                     </div>
                     <number-getting-list
-                            .users="${this.yourUsers}"
-                            .contributors="${this.contributors}"
-                            .data="${this.newData}"
-                            .itemId="${this.itemId}"
+                            .itemData="${this.itemData}"
                             @data-changed="${this._handleDataChange}"
                     ></number-getting-list>
                     ${this.error ? html`<div class="error">${this.error}</div>` : ''}

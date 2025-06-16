@@ -339,7 +339,10 @@ export class AddToListModal extends LitElement {
                         </div>
 
                         <div class="right-column">
-                            <select-my-lists @change="${this._handleSelectedListsChange}"></select-my-lists>
+                            <select-my-lists 
+                                    @change="${this._handleSelectedListsChange}"
+                                    .selectedListIds="${this.selectedListIds}"
+                            ></select-my-lists>
                             <wysiwyg-editor
                                     @content-changed=${(e) => this.notes = e.detail.content}
                                     content="${this.notes}"

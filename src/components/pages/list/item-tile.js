@@ -6,8 +6,11 @@ import './priority-display.js';
 import '../../../svg/new-tab.js';
 import '../../../svg/edit.js';
 import '../../../svg/delete.js';
+import '../../../svg/dollar.js';
+import '../../../svg/group.js';
 import '../../global/custom-tooltip.js'
 import '../listItem/price-display.js'
+import './gotten-contributing-badges.js';
 import { navigate} from "../../../router/main-router.js";
 import {openEditItemModal} from '../../add-to-list/edit-item-modal.js';
 import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
@@ -15,6 +18,7 @@ import {deleteItem} from "../../../helpers/api/listItems.js";
 import {messagesState} from "../../../state/messagesStore.js";
 import {userState} from "../../../state/userStore.js";
 import {observeState} from "lit-element-state";
+import {canUserContribute} from "../../../helpers/userHelpers.js";
 
 
 export class ItemTile extends observeState(LitElement) {
@@ -49,6 +53,7 @@ export class ItemTile extends observeState(LitElement) {
                 :host {
                     container-type: inline-size;
                     container-name: item-tile;
+                    position: relative;
                 }
                 
                 p {
@@ -135,7 +140,6 @@ export class ItemTile extends observeState(LitElement) {
                     
                     &:hover {
                         box-shadow: var(--shadow-1-soft);
-                        transform: scale(1.01);
                         border: 1px solid var(--primary-color);
                     }
                 }
@@ -208,11 +212,22 @@ export class ItemTile extends observeState(LitElement) {
         }
     }
 
+    handleGetClick(e) {
+
+    }
+
+    handleContributeClick(e) {
+
+    }
+
 
     render() {
         const link = this.getLink();
 
         return html`<a class="item-link ${this.small ? 'small' : ''}" href="/list/${this.listId}/item/${this.itemData?.id}">
+            <gotten-contributing-badges
+                    .itemData="${this.itemData}"
+            ></gotten-contributing-badges>
             <custom-image
                     imageId="${this.itemData?.imageIds?.[0]}"
                     alt="${this.itemData?.name}"
@@ -229,20 +244,11 @@ export class ItemTile extends observeState(LitElement) {
                         heartSize="20px"
                 ></priority-display>` : ''}
                 
-                <div class="item-actions">
-                    ${link ? html`<a
-                                  class="button icon-button blue-text"
-                                  aria-label="Open link to product"
-                                  href="${link.url}"
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                          >
-                              <new-tab-icon></new-tab-icon>
-                          </a>
-                          <custom-tooltip>Link to ${link.displayName ?? link.url} (opens in new tab)</custom-tooltip>
-                          ` : ''}
-                    
-                    ${this.isListOwner() ? html`
+               
+            </div>
+        </a>
+        <div class="item-actions">
+            ${this.isListOwner() ? html`
                         <button
                                 class="button icon-button delete-button danger-text"
                                 aria-label="Delete item"
@@ -258,9 +264,11 @@ export class ItemTile extends observeState(LitElement) {
                             <edit-icon></edit-icon>
                         </button>
                     ` : ''}
-                </div>
-            </div>
-        </a>
+            ${canUserContribute(userState.userData, this.itemData) ? html`
+                        <get-this-button .itemId="${this.itemData?.id}" .itemData="${this.itemData}" compact></get-this-button>
+                        <contribute-button .itemId="${this.itemData?.id}" .itemData="${this.itemData}" compact></contribute-button>
+                    ` : ''}
+        </div>
         `;
     }
 }

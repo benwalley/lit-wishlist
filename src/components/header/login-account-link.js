@@ -1,6 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import {observeState} from 'lit-element-state';
 import {userState} from "../../state/userStore.js";
+import {globalState} from "../../state/globalStore.js";
 import buttonStyles from "../../css/buttons.js";
 import '../global/custom-tooltip.js'
 import '../pages/account/avatar.js';
@@ -59,6 +60,7 @@ export class LoginAccountLink extends observeState(LitElement) {
                 @media only screen and (min-width: 400px) {
                     .right-side {
                         display: flex;
+                        justify-content: center;
 
                     }
                 }
@@ -80,7 +82,7 @@ export class LoginAccountLink extends observeState(LitElement) {
                 ></custom-avatar>
                 <div class="right-side">
                     <span class="name-text">${userState?.userData?.name || 'Name not found'}</span>
-                    <span class="name-subtitle">user subtitle</span>
+                    
                 </div>
                 
             </a>
@@ -90,7 +92,7 @@ export class LoginAccountLink extends observeState(LitElement) {
             `
         }
         return html`
-            <a href="/" class="button secondary">Log In</a>
+            <a href="${globalState.landingPage}" class="button secondary">Log In</a>
             <custom-tooltip>
                 Create an account for more functionality
             </custom-tooltip>

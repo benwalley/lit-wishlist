@@ -12,6 +12,7 @@ import {currencyHelper} from "../../../helpers.js";
 import {acceptProposal, declineProposal} from '../../../helpers/api/proposals.js';
 import {messagesState} from '../../../state/messagesStore.js';
 import {triggerUpdateItem} from '../../../events/eventListeners.js';
+import {getUserImageIdByUserId, getUsernameById} from "../../../helpers/generalHelpers.js";
 
 export class ProposalParticipants extends observeState(LitElement) {
     static properties = {
@@ -236,7 +237,7 @@ export class ProposalParticipants extends observeState(LitElement) {
     }
 
     _canTakeAction(participant) {
-        return participant.user?.id === userState?.userData?.id;
+        return participant.userId === userState?.userData?.id;
     }
 
     _canAccept(participant) {
@@ -266,13 +267,13 @@ export class ProposalParticipants extends observeState(LitElement) {
                     <div class="participant">
                         <div class="participant-info">
                             <custom-avatar 
-                                    username="${participant.user?.name || 'Unknown User'}"
-                                    imageId="${participant.user?.image || ''}"
+                                    username="${getUsernameById(participant.userId)}"
+                                    imageId="${getUserImageIdByUserId(participant.userId)}"
                                     size="28"
                                     round="true"
                             ></custom-avatar>
                             <span class="participant-name">
-                                ${participant.user?.name || 'Unknown User'}
+                                ${getUsernameById(participant.userId)}
                             </span>
                             <span class="participant-status-badge status-${this._getParticipantStatus(participant)}">
                                 ${this._getParticipantStatus(participant)}

@@ -8,16 +8,13 @@ import '../../global/contributor-stack.js';
 import './tracking-status.js';
 import './tracking-qty-input.js';
 import './tracking-amount-input.js';
-import '../account/avatar.js';
-import {customFetch} from '../../../helpers/fetchHelpers.js';
-import {messagesState} from '../../../state/messagesStore.js';
-import {getUserImageIdByUserId, getUsernameById} from "../../../helpers/generalHelpers.js";
 import {observeState} from "lit-element-state";
+import {userState} from "../../../state/userStore.js";
+import  "./giving-tracking.js";
 
 export class GiftTrackingRow extends observeState(LitElement) {
     static properties = {
         item: {type: Object},
-        showUsername: {type: Boolean},
         itemIndex: {type: Number},
         lastItem: {type: Boolean},
     };
@@ -48,28 +45,6 @@ export class GiftTrackingRow extends observeState(LitElement) {
                     }
                 }
                 
-                .username.cell {
-                    border-bottom: none;
-                    border-top: none;
-                   
-                    
-                    a {
-                        display: flex;
-                        flex-direction: row;
-                        gap: 5px;
-                        align-items: center;
-                        color: var(--text-color-dark);
-                        text-decoration: none;
-                    }
-                    
-                    &.top-border {
-                        border-top: 0.5px solid var(--grayscale-300);
-                    }
-                    
-                    &.bottom-border {
-                        border-bottom: 0.5px solid var(--grayscale-300);
-                    }
-                }
                 
                 .item-image {
                     width: 60px;
@@ -85,7 +60,7 @@ export class GiftTrackingRow extends observeState(LitElement) {
                 }
                 
                 .item-name {
-                    font-weight: bold;
+                    //font-weight: bold;
                 }
                 
                 :host([compact]) .item-name {
@@ -196,18 +171,14 @@ export class GiftTrackingRow extends observeState(LitElement) {
     }
 
     _getParticipants() {
-        if(this.item?.type === 'getting') {
-            return this.item?.contributors || [];
+        if(this.item?.proposalId) {
+            return [];
         }
-        if(this.item?.type === 'proposal') {
-            return this.item?.proposalParticipants || [];
-        }
-        return [];
+        return [userState.userData?.id]
     }
 
     constructor() {
         super();
-        this.showUsername = true;
         this.itemIndex = 0;
         this.lastItem = false;
     }
@@ -218,23 +189,10 @@ export class GiftTrackingRow extends observeState(LitElement) {
         return html`
             <div class="table-row">
                 
-                <div class="username cell padded ${this.showUsername ? 'top-border' : ''} ${this.lastItem ? 'bottom-border' : ''}">
-                    ${this.showUsername ? html`
-                        <a href="/user/${this.item?.itemData?.createdById}">
-                            <custom-avatar
-                                    size="16"
-                                    username="${getUsernameById(this.item?.itemData?.createdById)}"
-                                    imageId="${getUserImageIdByUserId(this.item?.itemData?.createdById)}"
-                            ></custom-avatar>
-                            <div>${getUsernameById(this.item?.itemData?.createdById)}</div>
-                        </a>
-                    ` : ''}
-                </div>
-                <div class="item-name cell padded">${this.item.itemData?.name || '--'}</div>
+                <div class="item-name cell padded">${this.item.item?.name || '--'}</div>
                 <div class="contributors cell">
-                    <contributor-stack .contributors=${this._getParticipants()}
-                                       simple
-                    ></contributor-stack>
+                    <giving-tracking .givingData=${this.item}
+                    ></giving-tracking>
                 </div>
                 <tracking-status 
                     class="cell" 

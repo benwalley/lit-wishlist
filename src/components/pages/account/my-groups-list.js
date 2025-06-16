@@ -73,8 +73,8 @@ export class MyGroupsList extends LitElement {
                     flex-direction: column;
                     gap: var(--spacing-normal);
                     margin-top: var(--spacing-small);
-                    max-height: 200px;
-                    overflow-y: auto;
+                    max-height: 300px;
+                    overflow: auto;
                 }
                 
                 .empty-state {
@@ -153,7 +153,7 @@ export class MyGroupsList extends LitElement {
         }
 
         return html`
-            <div class="groups-container fade-out-container">
+            <div class="groups-container">
                 ${this.groups.map(group => html`
                     <group-list-display-item 
                         .group=${group}

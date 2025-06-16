@@ -11,25 +11,23 @@ import '../../svg/gift.js';
 import '../../svg/dot.js';
 import '../../svg/user.js';
 import '../global/custom-tooltip.js'
-import {customFetch} from "../../helpers/fetchHelpers.js";
 import {getUserImageIdByUserId, getUsernameById} from "../../helpers/generalHelpers.js";
 import {observeState} from "lit-element-state";
-import {showConfirmation} from "../global/custom-confirm/confirm-helper.js";
 import {triggerDeleteList, triggerUpdateList} from "../../events/eventListeners.js";
 import {triggerEditListEvent} from "../../events/custom-events.js";
+import {canUserEditList} from "../../helpers/userHelpers.js";
+import {userState} from "../../state/userStore.js";
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
         itemData: {type: Object},
         isSelectList: {type: Boolean},
-        viewOnly: {type: Boolean},
         showOwner: {type: Boolean},
     };
 
     constructor() {
         super();
         this.itemData = {};
-        this.viewOnly = false;
         this.showOwner = false;
     }
 
@@ -57,7 +55,6 @@ export class CustomElement extends observeState(LitElement) {
                     &:hover {
                         border: 1px solid var(--primary-color);
                         box-shadow: var(--shadow-1-soft);
-                        transform: translateY(-1px);
                     }
                 }
                 
@@ -145,6 +142,10 @@ export class CustomElement extends observeState(LitElement) {
         triggerDeleteList(this.itemData)
     }
 
+    get canEdit() {
+        return canUserEditList(userState.userData, this.itemData);
+    }
+
     _handleEdit(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -186,7 +187,7 @@ export class CustomElement extends observeState(LitElement) {
                 </div>
                 <div class="item-right-side">
                     <div class="top-row">
-                        ${!this.viewOnly && this.itemData.id !== 0 ? html`
+                        ${this.canEdit ? html`
                             <div style="position: relative;">
                                 <button class="edit-button icon-button"
                                         aria-label="Edit List Details"

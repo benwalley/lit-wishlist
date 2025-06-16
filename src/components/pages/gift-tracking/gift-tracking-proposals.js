@@ -68,7 +68,10 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                 :host {
                     display: block;
                     width: 100%;
+                    box-sizing: border-box;
                     margin: 0 auto;
+                    padding: 0 var(--spacing-normal);
+                    max-width: 1200px;
                 }
 
                 .proposals-container {

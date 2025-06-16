@@ -6,6 +6,7 @@ export class QtyInput extends LitElement {
         value: { type: Number },
         min: { type: Number },
         max: { type: Number },
+        size: { type: String },
     };
 
     constructor() {
@@ -13,6 +14,7 @@ export class QtyInput extends LitElement {
         this.value = 0;
         this.min = 0;
         this.max = Infinity;
+        this.size = 'normal';
     }
 
     static styles = [
@@ -79,6 +81,28 @@ export class QtyInput extends LitElement {
                 outline: 2px solid var(--focus-color);
                 outline-offset: 2px;
             }
+
+            /* Small size styles */
+            .size-small button {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+            .size-small input {
+                width: 18px;
+                font-size: 0.875rem;
+            }
+
+            /* Large size styles */
+            .size-large button {
+                width: 48px;
+                height: 48px;
+                font-size: 1.5rem;
+            }
+            .size-large input {
+                width: 80px;
+                font-size: 1.125rem;
+            }
         `
     ];
 
@@ -124,7 +148,7 @@ export class QtyInput extends LitElement {
 
     render() {
         return html`
-            <div class="qty-container">
+            <div class="qty-container size-${this.size}">
                 <button
                         @click=${this._decrement}
                         aria-label="Decrease quantity"

@@ -2,9 +2,10 @@ import {LitElement, html, css} from 'lit';
 import {observeState} from 'lit-element-state';
 import {userState} from '../../state/userStore.js';
 import {userListState} from "../../state/userListStore.js";
+import {globalState} from '../../state/globalStore.js';
 import './loading-screen.js';
 import {initRouter, navigate} from "../../router/main-router.js";
-import {getAccessibleUsers, getCurrentUser} from "../../helpers/api/users.js";
+import {getAccessibleUsers, getCurrentUser, getYourUsers} from "../../helpers/api/users.js";
 import {
     listenUpdateUser,
     triggerInitialUserLoaded,
@@ -41,18 +42,22 @@ export class AuthContainer extends observeState(LitElement) {
     async firstUpdated() {
         await this.fetchUserData();
         await this.fetchAccessibleUsers();
-        listenUpdateUser(this.fetchUserData);
+        listenUpdateUser(this.fetchUserData.bind(this));
         initializeProposalHelpers();
     }
 
     async fetchUserData() {
         try {
             const userData = await getCurrentUser();
+            const myUsers = await getYourUsers();
             userState.userData = userData;
+            if(myUsers?.success) {
+                userState.myUsers = myUsers.data;
+            }
             userState.loadingUser = false;
             triggerInitialUserLoaded()
             if (!userData?.id) {
-                navigate('/')
+                navigate(globalState.landingPage)
             }
         } catch (e) {
             console.log('user is not logged in')
@@ -80,13 +85,14 @@ export class AuthContainer extends observeState(LitElement) {
                     : html`
                         <slot></slot>`
             }
+            ${userState.userData?.id ? html`
             <edit-item-modal></edit-item-modal>
             <add-question-modal></add-question-modal>
             <bulk-add-to-group-modal></bulk-add-to-group-modal>
             <bulk-add-to-list-modal></bulk-add-to-list-modal>
             <delete-list></delete-list>
             <edit-list-modal></edit-list-modal>
-            <add-proposal-modal></add-proposal-modal>
+            <add-proposal-modal></add-proposal-modal>` : ''}
         `;
     }
 }

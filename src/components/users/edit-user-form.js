@@ -10,7 +10,7 @@ import {customFetch} from "../../helpers/fetchHelpers.js";
 import {updateUserData} from "../../helpers/api/users.js";
 import {messagesState} from "../../state/messagesStore.js";
 import '../global/image-changer.js';
-import {listenUserUpdated} from "../../events/eventListeners.js";
+import {listenUserUpdated, triggerUpdateUser} from "../../events/eventListeners.js";
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
@@ -73,7 +73,8 @@ export class CustomElement extends observeState(LitElement) {
         this.dispatchEvent(new CustomEvent('close-edit-user-modal'));
     }
 
-    async _handleSave() {
+    async _handleSubmit(e) {
+        e.preventDefault();
         if (!userState.userData.id) return;
         const data = {
             image: this.imageId,
@@ -85,6 +86,7 @@ export class CustomElement extends observeState(LitElement) {
         if (response.success) {
             messagesState.addMessage('User info successfully updated');
             this._close();
+            triggerUpdateUser();
         } else {
             this._showError(
                 response.message || 'There was an error saving your user. Please try again.'
@@ -153,46 +155,48 @@ export class CustomElement extends observeState(LitElement) {
             <div class="header">
                 <h2>Edit Profile</h2>
             </div>
-            <div class="content">
-                
-                <div class="user-image">
-                    <!-- Use the component's username property -->
-                    <custom-avatar size="120" 
-                                   shadow 
-                                   username="${this.username}" 
-                                   imageId="${this.imageId}">
-                    </custom-avatar>
-                    <image-changer  
-                                    imageId="${this.imageId}"
-                                    @image-updated="${this._onImageChanged}"></image-changer>
+            <form @submit="${this._handleSubmit}">
+                <div class="content">
+                    
+                    <div class="user-image">
+                        <!-- Use the component's username property -->
+                        <custom-avatar size="120" 
+                                       shadow 
+                                       username="${this.username}" 
+                                       imageId="${this.imageId}">
+                        </custom-avatar>
+                        <image-changer  
+                                        imageId="${this.imageId}"
+                                        @image-updated="${this._onImageChanged}"></image-changer>
+                    </div>
+                    <span>Click the camera to change your profile picture</span>
+
+                    <!-- Listen for value-changed events to update properties -->
+                    <custom-input
+                            placeholder="Username"
+                            showLabel
+                            value="${this.username}"
+                            @value-changed="${this._onUsernameChanged}"
+                    ></custom-input>
+                    <custom-input
+                            placeholder="Description"
+                            showLabel
+                            value="${this.description}"
+                            @value-changed="${this._onDescriptionChanged}"
+                    ></custom-input>
+
+                    <!-- Error message -->
+                    ${this.errorMessage ? html`<div class="error">${this.errorMessage}</div>` : ''}
                 </div>
-                <span>Click the camera to change your profile picture</span>
-
-                <!-- Listen for value-changed events to update properties -->
-                <custom-input
-                        placeholder="Username"
-                        showLabel
-                        value="${this.username}"
-                        @value-changed="${this._onUsernameChanged}"
-                ></custom-input>
-                <custom-input
-                        placeholder="Description"
-                        showLabel
-                        value="${this.description}"
-                        @value-changed="${this._onDescriptionChanged}"
-                ></custom-input>
-
-                <!-- Error message -->
-                ${this.errorMessage ? html`<div class="error">${this.errorMessage}</div>` : ''}
-            </div>
-            <div class="footer">
-                <button class="button ghost shadow" @click="${() => this._close(true)}">
-                    Cancel
-                </button>
-                <button class="button primary shadow" @click="${this._handleSave}">
-                    Save Changes
-                </button>
-            </div>
+                <div class="footer">
+                    <button type="button" class="button ghost shadow" @click="${() => this._close(true)}">
+                        Cancel
+                    </button>
+                    <button type="submit" class="button primary shadow">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
         `;
     }
 }

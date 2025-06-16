@@ -4,12 +4,13 @@ import './user-list-item.js'
 import '../global/multi-select-dropdown.js'
 import '../global/single-select-dropdown.js'
 import '../../svg/check.js'
+import {cachedFetch} from "../../helpers/caching.js";
 
 class UserListComponent extends LitElement {
     static properties = {
         users: {type: Array},
         apiEndpoint: {type: String},
-        selectedUsers: {type: Array},
+        selectedUserIds: {type: Array},
         loading: {type: Boolean},
     };
 
@@ -17,7 +18,7 @@ class UserListComponent extends LitElement {
         super();
         this.users = [];
         this.apiEndpoint = '/users/yours';
-        this.selectedUsers = []; // Using an array now
+        this.selectedUserIds = [];
         this.loading = true;
     }
 
@@ -128,11 +129,6 @@ class UserListComponent extends LitElement {
     connectedCallback() {
         super.connectedCallback();
         this.fetchUsers();
-
-        // Bind methods
-        this.toggleUserSelection = this.toggleUserSelection.bind(this);
-        this.selectAll = this.selectAll.bind(this);
-        this.clearSelection = this.clearSelection.bind(this);
     }
 
     disconnectedCallback() {
@@ -142,7 +138,7 @@ class UserListComponent extends LitElement {
     async fetchUsers() {
         try {
             this.loading = true;
-            const response = await customFetch(this.apiEndpoint, {}, true);
+            const response = await cachedFetch(this.apiEndpoint, {}, true);
             const users = await response;
             this.users = users;
         } catch (error) {
@@ -159,42 +155,42 @@ class UserListComponent extends LitElement {
         }
 
         const userId = e.detail.user.id;
-
-        // Toggle selection status using array methods
-        if (this.selectedUsers.includes(userId)) {
-            this.selectedUsers = this.selectedUsers.filter(id => id !== userId);
+        console.log('happening')
+        if (this.selectedUserIds.includes(userId)) {
+            this.selectedUserIds = this.selectedUserIds.filter(id => id !== userId);
         } else {
-            this.selectedUsers = [...this.selectedUsers, userId];
+            this.selectedUserIds = [...this.selectedUserIds, userId];
         }
 
         this._dispatchSelectionChangedEvent();
-        this.requestUpdate();
     }
 
     selectAll() {
-        // Set selectedUsers to include all user IDs
-        this.selectedUsers = this.users
+        // Set selectedUserIds to include all user IDs
+        this.selectedUserIds = this.users
             .filter(user => user && user.id)
             .map(user => user.id);
         this._dispatchSelectionChangedEvent();
-        this.requestUpdate();
     }
 
     clearSelection() {
-        this.selectedUsers = [];
+        this.selectedUserIds = [];
         this._dispatchSelectionChangedEvent();
-        this.requestUpdate();
+    }
+
+    setUserIds(userIds) {
+        this.selectedUserIds = userIds;
     }
 
     _dispatchSelectionChangedEvent() {
-        const selectedUsers = this.selectedUsers
+        const selectedUsers = this.selectedUserIds
             .map(id => this.users.find(user => user && user.id === id))
             .filter(Boolean);
 
         this.dispatchEvent(new CustomEvent('selection-changed', {
             detail: {
                 selectedUsers,
-                count: this.selectedUsers.length
+                count: this.selectedUserIds.length
             },
             bubbles: true,
             composed: true
@@ -218,8 +214,8 @@ class UserListComponent extends LitElement {
             <div class="header">
                 <div class="selection-info">
                     <div class="title">Users</div>
-                    ${this.selectedUsers.length > 0 ? html`
-                        <div class="selected-count">(${this.selectedUsers.length} selected)</div>
+                    ${this.selectedUserIds.length > 0 ? html`
+                        <div class="selected-count">(${this.selectedUserIds.length} selected)</div>
                     ` : ''}
                 </div>
 
@@ -228,7 +224,7 @@ class UserListComponent extends LitElement {
                         <button class="select-all" @click=${this.selectAll}>Select All</button>
                     ` : ''}
 
-                    ${this.selectedUsers.length > 0 ? html`
+                    ${this.selectedUserIds.length > 0 ? html`
                         <button class="clear" @click=${this.clearSelection}>Clear</button>
                     ` : ''}
                 </div>
@@ -238,7 +234,7 @@ class UserListComponent extends LitElement {
                 ${this.users.map(item => html`
                     <user-list-item
                             .userData="${item}"
-                            ?isSelected=${item && item.id && this.selectedUsers.includes(item.id)}
+                            ?isSelected=${item && item.id && this.selectedUserIds.includes(item.id)}
                             @user-selected=${this.toggleUserSelection}
                     ></user-list-item>
                 `)}

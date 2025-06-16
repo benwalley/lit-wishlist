@@ -8,6 +8,8 @@ import '../../global/custom-tooltip.js'
 import '../listItem/price-display.js'
 import {navigate} from "../../../router/main-router.js";
 import '../../../svg/arrow-long-left.js'
+import '../../../svg/cart.js'
+import '../../../svg/group.js'
 
 export class MiniItemTile extends LitElement {
     static properties = {
@@ -29,6 +31,7 @@ export class MiniItemTile extends LitElement {
             css`
                 :host {
                     display: block;
+                    position: relative;
                 }
 
                 .item-link {
@@ -125,6 +128,41 @@ export class MiniItemTile extends LitElement {
                     transition: var(--transition-normal);
                     color: var(--medium-text-color);
                 }
+                
+                .status-indicators {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    position: absolute;
+                    top: var(--spacing-x-small);
+                    right: var(--spacing-x-small);
+                }
+                
+                .status-indicator {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    font-size: 12px;
+                    font-weight: 500;
+                    padding: 2px 6px;
+                    border-radius: 10px;
+                }
+                
+                .gotten-indicator {
+                    background-color: var(--green-normal);
+                    color: var(--light-text-color);
+                }
+                
+                .contributing-indicator {
+                    background-color: var(--purple-normal);
+                    color: var(--light-text-color);
+                }
+                
+                .status-indicator cart-icon,
+                .status-indicator group-icon {
+                    width: 12px;
+                    height: 12px;
+                }
             `
         ];
     }
@@ -148,6 +186,20 @@ export class MiniItemTile extends LitElement {
     _handleNavigate(e) {
         e.preventDefault();
         navigate(`/list/${this.listId}/item/${this.itemData?.id}`);
+    }
+
+    /**
+     * Check if someone is getting this item
+     */
+    isGotten() {
+        return this.itemData?.getting?.length > 0;
+    }
+
+    /**
+     * Check if someone wants to contribute to this item
+     */
+    isContributing() {
+        return this.itemData?.goInOn?.length > 0;
     }
 
     _renderStatus() {
@@ -188,6 +240,21 @@ export class MiniItemTile extends LitElement {
                     </div>
                     ${this._renderStatus()}
                 </div>
+                
+                <div class="status-indicators">
+                    ${this.isGotten() ? html`
+                        <div class="status-indicator gotten-indicator">
+                            <cart-icon></cart-icon>
+                        </div>
+                    ` : ''}
+                    
+                    ${this.isContributing() ? html`
+                        <div class="status-indicator contributing-indicator">
+                            <group-icon></group-icon>
+                        </div>
+                    ` : ''}
+                </div>
+                
                 <arrow-long-left-icon></arrow-long-left-icon>
             </a>
         `;

@@ -17,6 +17,8 @@ const PROPOSAL_CREATED_EVENT = 'proposal-created';
 const EDIT_PROPOSAL_MODAL_EVENT = 'open-edit-proposal-modal';
 const DELETE_PROPOSAL_EVENT = 'delete-proposal';
 const PROPOSAL_DELETED_EVENT = 'proposal-deleted';
+const UPDATE_EVENTS_EVENT = 'update-events';
+const EDIT_EVENT_EVENT = 'edit-event';
 const imageUploadEvents = {
     imageSelected: 'image-selected',
     cropConfirmed: 'crop-confirmed'
@@ -34,6 +36,7 @@ export function listenUpdateList(callback) {
 export function triggerUpdateItem() {
     invalidateCache('/giftTracking/*');
     invalidateCache('/proposals/*');
+    invalidateCache('/events/*');
     triggerCustomEvent(UPDATE_ITEM_EVENT);
 }
 
@@ -167,4 +170,22 @@ export function triggerProposalDeleted(proposalId) {
 
 export function listenProposalDeleted(callback) {
     return listenToCustomEvent(PROPOSAL_DELETED_EVENT, callback);
+}
+
+export function triggerUpdateEvents() {
+    invalidateCache('/events');
+    invalidateCache('/events/*');
+    triggerCustomEvent(UPDATE_EVENTS_EVENT);
+}
+
+export function listenUpdateEvents(callback) {
+    return listenToCustomEvent(UPDATE_EVENTS_EVENT, callback);
+}
+
+export function triggerEditEvent(eventData) {
+    triggerCustomEvent(EDIT_EVENT_EVENT, { eventData });
+}
+
+export function listenEditEvent(callback) {
+    return listenToCustomEvent(EDIT_EVENT_EVENT, callback);
 }

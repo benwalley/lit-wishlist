@@ -5,6 +5,7 @@ import { getAllAccessibleLists } from '../../../helpers/api/lists.js';
 import { listenUpdateList } from '../../../events/eventListeners.js';
 import '../../../components/lists/list-item.js';
 import '../../../components/loading/skeleton-loader.js';
+import '../../global/custom-input.js';
 
 class AllListsContainer extends observeState(LitElement) {
     static get properties() {
@@ -57,23 +58,8 @@ class AllListsContainer extends observeState(LitElement) {
                 max-width: 300px;
             }
 
-            .search-input input {
-                border: 1px solid var(--border-color);
-                border-radius: var(--border-radius-normal);
-                padding: 8px 12px;
-                padding-left: 36px;
-                font-size: var(--font-size-normal);
+            .search-input custom-input {
                 width: 100%;
-                background-color: var(--background-dark);
-                color: var(--text-color-dark);
-            }
-
-            .search-icon {
-                position: absolute;
-                left: 12px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: var(--text-color-medium-dark);
             }
 
             .no-lists {
@@ -107,14 +93,11 @@ class AllListsContainer extends observeState(LitElement) {
     connectedCallback() {
         super.connectedCallback();
         this.fetchLists();
-        this._updateListListener = listenUpdateList(this.fetchLists.bind(this));
+        listenUpdateList(this.fetchLists.bind(this));
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
-        if (this._updateListListener) {
-            this._updateListListener.remove();
-        }
     }
 
     async fetchLists() {
@@ -133,7 +116,7 @@ class AllListsContainer extends observeState(LitElement) {
     }
 
     _handleFilterChange(e) {
-        this.filterTerm = e.target.value.toLowerCase();
+        this.filterTerm = e.detail.value.toLowerCase();
     }
 
     renderSkeletons() {
@@ -143,10 +126,13 @@ class AllListsContainer extends observeState(LitElement) {
     }
 
     renderLists() {
-        const filteredLists = this.filterTerm
-            ? this.lists.filter(list => list.listName.toLowerCase().includes(this.filterTerm))
-            : this.lists;
-
+        const filteredLists = this.lists.filter(list => {
+            if(list.id === 0) return false;
+            if(this.filterTerm) {
+                return list.listName.toLowerCase().includes(this.filterTerm)
+            }
+            return true;
+        });
         if (filteredLists.length === 0) {
             return html`<div class="no-lists">
                 ${this.filterTerm 
@@ -166,13 +152,11 @@ class AllListsContainer extends observeState(LitElement) {
                 <div class="lists-header">
                     <h1>All Lists</h1>
                     <div class="search-input">
-                        <span class="search-icon">🔍</span>
-                        <input 
-                            type="text" 
+                        <custom-input 
                             placeholder="Search lists..." 
-                            @input=${this._handleFilterChange} 
                             .value=${this.filterTerm}
-                        >
+                            @value-changed=${this._handleFilterChange}
+                        ></custom-input>
                     </div>
                 </div>
                 

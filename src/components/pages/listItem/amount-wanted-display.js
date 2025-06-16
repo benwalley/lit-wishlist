@@ -9,47 +9,19 @@ import '../../loading/skeleton-loader.js'
 export class CustomElement extends LitElement {
     static properties = {
         itemData: { type: Object },
-        amountGotten: {type: Number}
     };
 
     constructor() {
         super();
         this.itemData = {};
-        this.amountGotten = 0;
     }
 
-    connectedCallback() {
-        super.connectedCallback();
-        if (!this.itemData?.id) {
-            return;
+    _getAmountGotten() {
+        let total = 0;
+        for(const contributor of this.itemData.getting) {
+            total += parseFloat(contributor.numberGetting || 0);
         }
-        this.fetchContributorData();
-        listenUpdateItem(this.fetchContributorData.bind(this));
-    }
-
-    async fetchContributorData() {
-        this.loading = true;
-        this.requestUpdate();
-
-        try {
-            const response = await cachedFetch(`/contributors/item/${this.itemData.id}`, {}, true);
-            if (response?.responseData?.error) {
-                console.error('Error fetching contributors:', response.responseData.error);
-                this.loading = false;
-                return;
-            }
-            const contributors = response;
-            this.contributors = contributors;
-            this.amountGotten = 0;
-            for (const user of contributors) {
-                this.amountGotten += parseInt(user.numberGetting || 1);
-            }
-        } catch (error) {
-            console.error('Error fetching contributors:', error);
-        } finally {
-            this.loading = false;
-            this.requestUpdate();
-        }
+        return total;
     }
 
     static get styles() {
@@ -122,7 +94,7 @@ export class CustomElement extends LitElement {
                             <skeleton-loader width="100%" height="20px"></skeleton-loader>
                         ` : html`
                             <success-icon></success-icon>
-                            <span>${this.amountGotten}</span>
+                            <span>${this._getAmountGotten()}</span>
                             <span>gotten</span>
                         `}
             </div>

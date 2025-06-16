@@ -1,14 +1,11 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../../css/buttons";
-import {cachedFetch} from "../../../helpers/caching.js";
 import {listenUpdateItem, triggerProposalModal} from "../../../events/eventListeners.js";
 import '../../../svg/success.js';
 import '../../../svg/share.js';
 import '../../../svg/dots.js';
-import {currencyHelper} from "../../../helpers.js";
 import '../../pages/account/avatar.js';
 import '../../global/action-dropdown.js';
-import '../../global/contributor-stack.js';
 import {messagesState} from "../../../state/messagesStore.js";
 import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
 import '../../../svg/edit.js';
@@ -16,6 +13,7 @@ import '../../../svg/delete.js';
 import '../../../svg/group.js';
 import {openEditItemModal} from "../../add-to-list/edit-item-modal.js";
 import {deleteItem} from "../../../helpers/api/listItems.js";
+import '../../global/contributor-stack/contributor-stack-container.js'
 
 export class ContributorsTopBar extends LitElement {
     static properties = {
@@ -23,7 +21,6 @@ export class ContributorsTopBar extends LitElement {
         contributors: {type: Array},
         listId: {type: String},
         itemId: {type: String},
-        loading: {type: Boolean},
         amountPledged: {type: Number},
         actionItems: {type: Array},
     };
@@ -31,10 +28,8 @@ export class ContributorsTopBar extends LitElement {
     constructor() {
         super();
         this.itemData = {};
-        this.contributors = [];
         this.listId = '';
         this.itemId = '';
-        this.loading = true; // Initial loading state
         this.amountPledged = 0;
         this.actionItems = [
             {
@@ -101,6 +96,7 @@ export class ContributorsTopBar extends LitElement {
                 cancelLabel: 'Cancel'
             });
 
+            if (!confirmed) return
             const response = await deleteItem(this.itemId);
             if (response.success) {
                 messagesState.addMessage('Item deleted successfully');
@@ -273,25 +269,7 @@ export class ContributorsTopBar extends LitElement {
                 .action-button:hover {
                     transform: scale(1.1);
                 }
-
-                /* Bounce Animation for Back Arrow Icon */
-                @keyframes bounce {
-                    0% {
-                        transform: translateX(0);
-                    }
-                    30% {
-                        transform: translateX(-5px);
-                    }
-                    50% {
-                        transform: translateX(0);
-                    }
-                    70% {
-                        transform: translateX(-2px);
-                    }
-                    100% {
-                        transform: translateX(0);
-                    }
-                }
+                
 
                 /* Fade In Transition */
 
@@ -344,122 +322,29 @@ export class ContributorsTopBar extends LitElement {
                     }
 
                 }
-
-                /* Skeleton Loading Styles for general areas */
-
-                .skeleton {
-                    background: #e0e0e0;
-                    border-radius: 4px;
-                    position: relative;
-                    overflow: hidden;
-                }
-
-                .skeleton::after {
-                    content: "";
-                    position: absolute;
-                    top: 0;
-                    left: -150%;
-                    height: 100%;
-                    width: 150%;
-                    background: linear-gradient(
-                            90deg,
-                            transparent,
-                            rgba(255, 255, 255, 0.4),
-                            transparent
-                    );
-                    animation: loading 1.5s infinite;
-                }
-
-                @keyframes loading {
-                    0% {
-                        left: -150%;
-                    }
-                    50% {
-                        left: 100%;
-                    }
-                    100% {
-                        left: 100%;
-                    }
-                }
-
-                .skeleton-circle {
-                    width: 24px;
-                    height: 24px;
-                    border-radius: 50%;
-                }
-
-                .skeleton-text {
-                    height: 14px;
-                    border-radius: 4px;
-                }
-
-                /* Skeleton variant for green background sections */
-
-                .skeleton--on-green {
-                    background: rgba(255, 255, 255, 0.6);
-                }
-
-                .skeleton--on-green::after {
-                    background: linear-gradient(
-                            90deg,
-                            transparent,
-                            rgba(255, 255, 255, 0.8),
-                            transparent
-                    );
-                }
             `
         ];
     }
 
-    connectedCallback() {
-        super.connectedCallback();
-        if (!this.itemId?.length) {
-            return;
-        }
-        this.fetchContributorData();
-        listenUpdateItem(this.fetchContributorData.bind(this));
-    }
-
-    async fetchContributorData() {
-        this.loading = true;
-        this.requestUpdate();
-
-        try {
-            const response = await cachedFetch(`/contributors/item/${this.itemId}`, {}, true);
-            if (response?.responseData?.error) {
-                console.error('Error fetching contributors:', response.responseData.error);
-                this.loading = false;
-                return;
-            }
-            this.contributors = response;
-
-            // Recalculate the total amount pledged based on merged contributors
-            this.amountPledged = this.contributors.reduce(
-                (total, user) => total + parseFloat(user.contributeAmount || 0),
-                0
-            );
-
-        } catch (error) {
-            console.error('Error fetching contributors:', error);
-        } finally {
-            this.loading = false;
-            this.requestUpdate();
-        }
-    }
-
-
-    // Getter to sum the numberGetting from all contributors
     get totalNumberGotten() {
-        return this.contributors.reduce(
-            (total, contributor) => total + (contributor.numberGetting || 0),
-            0
-        );
+        let totalNumber = 0;
+        for(const contributor of this.itemData?.getting || []) {
+            totalNumber += contributor.numberGetting;
+        }
+        return totalNumber;
+    }
+
+    get getters() {
+        return this.itemData?.getting || [];
+    }
+
+    get wantToGet() {
+        return this.itemData?.goInOn || [];
     }
 
     render() {
         return html`
             <div class="top-row fade-in">
-                <!-- Back Arrow with Bounce Transition on Hover -->
                 <a
                         href="/list/${this.listId}"
                         class="back-arrow button link-button"
@@ -469,10 +354,15 @@ export class ContributorsTopBar extends LitElement {
                     <span class="desktop-only">Back To List</span>
                 </a>
 
-                <!-- Contributor Details -->
                 <div class="contributor-details">
-                    ${this.loading
+                    ${this.itemData
                             ? html`
+                                <div class="avatar-stack fade-in">
+                                    <contributor-stack-container .itemData="${this.itemData}"></contributor-stack-container>
+                                </div>
+                                
+                            `
+                            : html`
                                 <div class="avatar-stack">
                                     <div class="skeleton skeleton-circle"></div>
                                     <div class="skeleton skeleton-circle" style="margin-left: -8px;"></div>
@@ -481,48 +371,31 @@ export class ContributorsTopBar extends LitElement {
                                     <div class="skeleton skeleton-text" style="width: 120px; margin-top: 5px;"></div>
                                     <div class="skeleton skeleton-text" style="width: 80px; margin-top: 5px;"></div>
                                 </div>
-                            `
-                            : html`
-                                <div class="avatar-stack fade-in">
-                                    <contributor-stack .contributors=${this.contributors}></contributor-stack>
-                                </div>
-                                <div class="contributors-right fade-in desktop-only">
-                  <span class="contributor-count title">
-                    ${this.contributors.length} people contributing
-                  </span>
-                                    ${this.amountPledged > 0
-                                            ? html`
-                                                <span class="amount">
-                          ${currencyHelper(this.amountPledged)} pledged
-                        </span>
-                                            `
-                                            : ''}
-                                </div>
-                            `}
+                `}
                 </div>
 
-                <!-- Amount Gotten (with green skeletons if loading) -->
                 <div class="amount-gotten fade-in ${this.totalNumberGotten === 0 ? 'none-gotten' : ''}">
-                    ${this.loading
+                    ${this.itemData
                             ? html`
+                                
+                                <success-icon></success-icon>
+                                <span>${this.totalNumberGotten}</span>
+                                <span>of</span>
+                                <span>
+                                  ${Math.max(
+                                          this.itemData?.amountWanted,
+                                          this.itemData?.maxAmountWanted
+                                  ) || 1}
+                                </span>
+                                <span class="desktop-only">gotten</span>
+                            `
+                            : html`
                                 <div class="skeleton skeleton--on-green skeleton-text"
                                      style="width: 40px; height: 20px;"></div>
                                 <span>of</span>
                                 <div class="skeleton skeleton--on-green skeleton-text"
                                      style="width: 40px; height: 20px;"></div>
                                 <span>gotten</span>
-                            `
-                            : html`
-                                <success-icon></success-icon>
-                                <span>${this.totalNumberGotten}</span>
-                                <span>of</span>
-                                <span>
-                  ${Math.max(
-                          this.itemData?.amountWanted,
-                          this.itemData?.maxAmountWanted
-                  ) || 1}
-                </span>
-                                <span class="desktop-only">gotten</span>
                             `}
                 </div>
 

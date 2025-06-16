@@ -270,7 +270,7 @@ export class AddProposalModal extends observeState(LitElement) {
                 .item-name {
                     font-size: var(--font-size-large);
                     font-weight: bold;
-                    color: var(--text-color-dark);
+                    color: var(--purple-normal);
                 }
 
                 .item-description {
@@ -325,7 +325,6 @@ export class AddProposalModal extends observeState(LitElement) {
     }
 
     _initializeIfUserReady() {
-        // Check if user is available and we're currently loading
         if (userState?.userData?.id && this.loading) {
             // Set current user as selected and as default buyer
             this.selectedUserIds = [userState.userData.id];
@@ -389,6 +388,7 @@ export class AddProposalModal extends observeState(LitElement) {
     _handleUsersSelectionChanged(event) {
         // Store full user objects for display
         let selectedUsers = event.detail.selectedUsers || [];
+        const originallySelectedUserIds = selectedUsers.map(user => user.id);
 
         // Ensure current user is always included
         if (userState?.userData?.id && !selectedUsers.find(u => u.id === userState.userData.id)) {
@@ -414,10 +414,7 @@ export class AddProposalModal extends observeState(LitElement) {
         ];
 
         this.selectedUsers = orderedUsers;
-        // Store user IDs for the your-users-list component
         this.selectedUserIds = this.selectedUsers.map(user => user.id);
-
-        // Reset buyer selection if they're no longer in selected users
         if (this.selectedBuyer && !orderedUsers.find(u => u.id === this.selectedBuyer.id)) {
             this.selectedBuyer = null;
         }
@@ -443,7 +440,6 @@ export class AddProposalModal extends observeState(LitElement) {
         if (event.target.checked) {
             this.selectedBuyer = user;
         } else {
-            // Prevent deselecting - always keep the current selection
             event.target.checked = true;
         }
     }
@@ -511,10 +507,14 @@ export class AddProposalModal extends observeState(LitElement) {
                 this.isOpen = false;
                 triggerProposalCreated(response.data);
             } else {
-                messagesState.addMessage(response.error || 'Failed to send proposal', 'error');
+                if(response.publicMessage) {
+                    messagesState.addMessage(response.publicMessage, 'error');
+                } else {
+                    messagesState.addMessage('Failed to save proposal', 'error');
+                }
             }
         } catch (error) {
-            messagesState.addMessage('Failed to send proposal', 'error');
+            messagesState.addMessage('Failed to save proposal', 'error');
         } finally {
             this.loading = false;
             triggerUpdateItem();
@@ -584,7 +584,7 @@ export class AddProposalModal extends observeState(LitElement) {
                                 <your-users-list
                                     class="full-width"
                                     apiEndpoint="/users/accessible"
-                                    .selectedUsers=${this.selectedUserIds}
+                                    .selectedUserIds=${this.selectedUserIds}
                                     @selection-changed=${this._handleUsersSelectionChanged}
                                     multiSelect="true"
                                 ></your-users-list>

@@ -7,15 +7,20 @@ import '../create-list/create-list-button.js';
 import { cachedFetch, invalidateCache } from "../../helpers/caching.js";
 import {messagesState} from "../../state/messagesStore.js";
 import {listenUpdateList} from "../../events/eventListeners.js";
+import {observeState} from "lit-element-state";
+import {userState} from "../../state/userStore.js";
 
-export class CustomElement extends LitElement {
+export class CustomElement extends observeState(LitElement) {
     static properties = {
-        lists: { type: Array }, // Track lists fetched from the server
+        userId: { type: Number },
+        lists: { type: Array },
     };
 
     constructor() {
         super();
-        this.lists = []; // Initialize lists
+        this.userId = 0;
+        this.lists = [];
+
     }
 
     static get styles() {
@@ -46,6 +51,15 @@ export class CustomElement extends LitElement {
         ];
     }
 
+    _isListOwner() {
+        if(!this.userId) return true;
+        const userId = userState.userData?.id;
+        if(this.userId === userId) {
+            return true;
+        }
+        return false;
+    }
+
     connectedCallback() {
         super.connectedCallback();
         // Fetch lists when the component is added to the DOM.
@@ -55,7 +69,8 @@ export class CustomElement extends LitElement {
 
     async fetchLists() {
         try {
-            const response = await cachedFetch('/lists/mine', {}, true);
+            const url = this.userId ? `/lists/user/${this.userId}` : '/lists/mine';
+            const response = await cachedFetch(url, {}, true);
             if(response.success) {
                 this.lists = response.data.filter(list => list.id !== 0);
             } else {
@@ -70,25 +85,21 @@ export class CustomElement extends LitElement {
         return html`
             <div>
                 <div class="section-header">
-                    <h2>My Lists</h2>
-                    <a href="/list/0">unassigned items</a>
+                    <h2>Lists</h2>
+                    ${this._isListOwner() ? html`<a href="/list/0">unassigned items</a>` : ''}
                 </div>
                 ${this.lists.length > 0
                         ? html`
                             <ul>
-                                ${this.lists.map(
-                                        // Ensure each list item gets a unique view transition name.
-                                        (list) => html`
-                                            <list-item
-                                                    .itemData=${list}
-                                                    data-view-transition-name="list-item-${list.id}"
-                                            ></list-item>
-                                        `
+                                ${this.lists.map((list) => html`
+                                    <list-item
+                                        .itemData=${list}
+                                    ></list-item>`
                                 )}
                             </ul>
                         `
                         : html`<p>No lists available.</p>`}
-                <create-list-button></create-list-button>
+                 ${this._isListOwner() ? html`<create-list-button></create-list-button>` : ''}
             </div>
         `;
     }

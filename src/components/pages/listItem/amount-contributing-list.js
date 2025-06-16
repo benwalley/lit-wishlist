@@ -69,12 +69,10 @@ export class CustomElement extends LitElement {
         } catch (error) {
             console.error('Error fetching users:', error);
         } finally {
-            this.requestUpdate();
         }
     }
 
     async _fetchContributorData() {
-        this.requestUpdate();
         try {
             const response = await cachedFetch(`/contributors/item/${this.itemId}`, {}, true);
             if (response?.responseData?.error) {
@@ -92,7 +90,6 @@ export class CustomElement extends LitElement {
             console.error('Error fetching contributors:', error);
         } finally {
             this.contributorsLoaded = true;
-            this.requestUpdate();
         }
     }
 

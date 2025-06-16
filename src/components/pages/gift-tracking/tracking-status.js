@@ -29,14 +29,11 @@ export class TrackingStatus extends LitElement {
 
     connectedCallback() {
         super.connectedCallback();
-        // In a real implementation, you would fetch the current status
-        // this.fetchCurrentStatus();
     }
 
     updated(changedProperties) {
         if (changedProperties.has('status')) {
             if (changedProperties.get('status') === undefined) {
-                // First time setting status, store as original
                 this.originalStatus = this.status || 'none';
             }
             this.hasChanged = this.status !== this.originalStatus;

@@ -80,9 +80,18 @@ export async function logout() {
 
 export async function getAccessibleUsers() {
     try {
-        const users = await customFetch('/users/accessible', {}, true);
+        const users = await cachedFetch('/users/accessible', {}, true);
         return users;
 
+    } catch (error) {
+        console.error('Error fetching users:', error);
+    }
+}
+
+export async function getYourUsers() {
+    try {
+        const response = await cachedFetch(`/users/yours`, {}, true);
+        return response;
     } catch (error) {
         console.error('Error fetching users:', error);
     }

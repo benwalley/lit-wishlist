@@ -6,8 +6,9 @@ import '../../svg/success.js';
 import '../../svg/dollar.js';
 import '../../svg/info.js';
 import {getUserImageIdByUserId, getUsernameById} from "../../helpers/generalHelpers.js";
+import {observeState} from "lit-element-state";
 
-export class ContributorStack extends LitElement {
+export class ContributorStack extends observeState(LitElement) {
     static properties = {
         contributors: {type: Array},
         maxDisplayed: {type: Number},
@@ -195,72 +196,42 @@ export class ContributorStack extends LitElement {
         const displayedContributors = this.contributors.slice(0, this.maxDisplayed);
         const remainingCount = Math.max(0, this.contributors.length - this.maxDisplayed);
 
-        if (this.simple) {
-            return html`
+        return html`
+            ${this.simple ? html`
                 <div class="simple-view" @click="${this.openModal}" title="View all contributors">
                     ${this.contributors.length} contributor${this.contributors.length !== 1 ? 's' : ''}
                 </div>
-                
-                <custom-modal 
-                    ?isOpen=${this.modalOpen} 
-                    @modal-closed=${this.closeModal}
-                    hideCloseBtn="false"
-                    maxWidth="400px"
-                >
-                    <div class="modal-content">
-                        <div class="modal-title">
-                            ${this.contributors.length} Contributors
+            ` : html`
+                <div class="contributor-stack">
+                    ${displayedContributors.map((contributor, index) => html`
+                        <custom-avatar
+                            size="24"
+                            username="${getUsernameById(contributor.userId)}"
+                            imageId="${getUserImageIdByUserId(contributor.userId)}"
+                            round="true"
+                            border="true"
+                            hasPopup="true"
+                            stackLeft="${index > 0}"
+                        >
+                            <div class="popup-contents">
+                                ${this.renderContributorInfo(contributor)}
+                            </div>
+                        </custom-avatar>
+                    `)}
+                    
+                    ${remainingCount > 0 ? html`
+                        <div class="more-indicator" title="${remainingCount} more contributors">
+                            +${remainingCount}
                         </div>
-                        <div class="all-contributors">
-                            ${this.contributors.map(contributor => html`
-                                <div class="contributor-row">
-                                    <custom-avatar
-                                        size="36"
-                                        username="${getUsernameById(contributor.userId)}"
-                                        imageId="${getUserImageIdByUserId(contributor.userId)}"
-                                        round="true"
-                                    ></custom-avatar>
-                                    <div class="contributor-info">
-                                        ${this.renderContributorInfo(contributor)}
-                                    </div>
-                                </div>
-                            `)}
+                    ` : ''}
+                    
+                    ${this.contributors.length > 0 ? html`
+                        <div class="info-icon-container" @click="${this.openModal}" title="View all contributors">
+                            <info-icon></info-icon>
                         </div>
-                    </div>
-                </custom-modal>
-            `;
-        }
-
-        return html`
-            <div class="contributor-stack">
-                ${displayedContributors.map((contributor, index) => html`
-                    <custom-avatar
-                        size="24"
-                        username="${getUsernameById(contributor.userId)}"
-                        imageId="${getUserImageIdByUserId(contributor.userId)}"
-                        round="true"
-                        border="true"
-                        hasPopup="true"
-                        stackLeft="${index > 0}"
-                    >
-                        <div class="popup-contents">
-                            ${this.renderContributorInfo(contributor)}
-                        </div>
-                    </custom-avatar>
-                `)}
-                
-                ${remainingCount > 0 ? html`
-                    <div class="more-indicator" title="${remainingCount} more contributors">
-                        +${remainingCount}
-                    </div>
-                ` : ''}
-                
-                ${this.contributors.length > 0 ? html`
-                    <div class="info-icon-container" @click="${this.openModal}" title="View all contributors">
-                        <info-icon></info-icon>
-                    </div>
-                ` : ''}
-            </div>
+                    ` : ''}
+                </div>
+            `}
             
             <custom-modal 
                 ?isOpen=${this.modalOpen} 

@@ -21,6 +21,10 @@ export async function fetchGiftsUserIsGetting() {
     }
 }
 
+export async function fetchUsersWithNoGiftGotten() {
+
+}
+
 export async function bulkUpdateGiftStatus(data) {
     try {
         const options = {
@@ -33,6 +37,50 @@ export async function bulkUpdateGiftStatus(data) {
 
         return await customFetch('/giftTracking/bulkSave', options, true);
     } catch (e) {
-        return {error: e, success: false}
+        return {publicMessage: e, success: false}
     }
 }
+
+/**
+ * Updates the "getting" status for multiple users on a single item
+ * @param {Array} data - Array of objects with {giverId, getterId, numberGetting, itemId}
+ * @returns {Promise<{success: boolean, data?: any, error?: string, publicMessage?: string}>}
+ */
+export async function bulkUpdateGetting(data) {
+    try {
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        };
+
+        return await customFetch('/giftTracking/bulkUpdateGetting', options, true);
+    } catch (e) {
+        return {publicMessage: e, success: false}
+    }
+}
+
+/**
+ * Updates the "participating/contributing" status for multiple users on a single item
+ * @param {Array} data - Array of objects with {giverId, getterId, itemId, participating}
+ * @returns {Promise<{success: boolean, data?: any, error?: string, publicMessage?: string}>}
+ */
+export async function bulkUpdateGoInOn(data) {
+    try {
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        };
+
+        return await customFetch('/giftTracking/bulkUpdateGoInOn', options, true);
+    } catch (e) {
+        return {publicMessage: e, success: false}
+    }
+}
+
+

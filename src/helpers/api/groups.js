@@ -84,7 +84,7 @@ export async function inviteUserToGroup(groupId, email) {
         };
 
         const result = await customFetch(`/groups/${groupId}/invite`, options, true);
-        return { success: true, data: result };
+        return result;
     } catch (error) {
         console.error('Error inviting user to group:', error);
         return { success: false, error };
@@ -287,7 +287,7 @@ export async function makeUserGroupAdmin(groupId, userId, currentAdminIds = []) 
         if (!adminIds.includes(parseInt(userId))) {
             adminIds.push(parseInt(userId));
         }
-        
+
         const options = {
             method: 'PUT',
             headers: {
@@ -315,7 +315,7 @@ export async function removeUserGroupAdmin(groupId, userId, currentAdminIds = []
     try {
         // Filter out the userId from adminIds
         const adminIds = (currentAdminIds || []).filter(id => parseInt(id) !== parseInt(userId));
-        
+
         const options = {
             method: 'PUT',
             headers: {
@@ -345,7 +345,7 @@ export async function removeUserFromGroup(groupId, userId, currentMembers = [], 
         // Filter out the userId from members and adminIds
         const members = (currentMembers || []).filter(id => parseInt(id) !== parseInt(userId));
         const adminIds = (currentAdminIds || []).filter(id => parseInt(id) !== parseInt(userId));
-        
+
         const options = {
             method: 'PUT',
             headers: {

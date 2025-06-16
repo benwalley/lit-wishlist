@@ -81,7 +81,6 @@ export class UploadByUrl extends LitElement {
     _handleInput(e) {
         this._urlValue = e.detail.value.trim();
         this._error = '';
-        this.requestUpdate();
     }
 
     _isValidInput() {

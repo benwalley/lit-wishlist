@@ -31,4 +31,12 @@
  - remove from getting if you set to zero qty (add popup to warn)
  - handle saving proposals in gift tracking
  - handle edit proposals in proposals page
+ - add subuser functionality
+ - add notification if a proposal you accepted has been deleted
+ - add an indicator of who a list is shared with
+ - Fix z index of header when modals open
+ - update contributing top bar when user gets or doesn't get.
+ - Add getting indicator on sidebar list on item page
+ - Add item page not related to list.
+ - 
  - 

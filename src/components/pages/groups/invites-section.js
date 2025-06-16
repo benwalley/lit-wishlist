@@ -210,7 +210,8 @@ export class InvitesSection extends observeState(LitElement) {
                 await this._fetchInvitedUsers(); // Refresh list
                 this._toggleInviteForm(false); // Hide form on success
                 triggerGroupUpdated();
-                messagesState.addMessage('Invitation sent successfully', 'success');
+                console.log(result)
+                messagesState.addMessage(result.message || 'Invitation sent successfully', 'success');
             } else {
                 this._inviteError = result.message || 'Failed to send invite. Please try again.';
                 // Don't show generic message if specific one exists
@@ -279,14 +280,13 @@ export class InvitesSection extends observeState(LitElement) {
     _renderInviteForm() {
         return html`
             <div class="invite-form" role="region" aria-labelledby="invite-form-title">
-                <h3 id="invite-form-title" class="form-title">Invite a user to this group</h3>
+                <h3 id="invite-form-title" class="form-title">Invite a user or users to this group</h3>
                 <custom-input
                     label="User Email Address"
-                    placeholder="Enter email address"
+                    placeholder="user@test.com, usertwo@test.com"
                     .value=${this._inviteEmail}
                     @value-changed=${this._handleInviteEmailChange}
                     ?required=${true}
-                    type="email"
                     error-message=${this._inviteError}
                 ></custom-input>
                 ${this._inviteError ? html`<p class="error-message" role="alert">${this._inviteError}</p>` : ''}

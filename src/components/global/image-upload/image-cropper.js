@@ -93,7 +93,6 @@ class ImageCropper extends observeState(LitElement) {
     this.rawImage = rawImage;
     this.modalOpen = true;
     this.uniqueId = uniqueId;
-    this.requestUpdate();
   }
 
   updated(changedProps) {

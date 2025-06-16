@@ -1,6 +1,9 @@
 import { getJwt, setJwt, getRefreshToken } from '../localStorage/tokens.js';
 import { envVars } from '../config.js';
 
+// Global variable to track ongoing token refresh
+let tokenRefreshPromise = null;
+
 /**
  * Main function to perform a fetch request, with optional authentication and retries.
  *
@@ -114,10 +117,17 @@ async function parseResponse(response) {
 
 /**
  * Handles token refreshing when a 401 error is encountered.
+ * Ensures only one refresh request happens at a time by using a shared promise.
  *
  * @returns {Promise<boolean>} - Resolves to true if the token was refreshed, false otherwise.
  */
 async function refreshAuthToken() {
+    // If a token refresh is already in progress, wait for it to complete
+    if (tokenRefreshPromise) {
+        console.log('Token refresh already in progress. Waiting for completion...');
+        return await tokenRefreshPromise;
+    }
+
     const refreshToken = getRefreshToken();
 
     if (!refreshToken) {
@@ -125,6 +135,24 @@ async function refreshAuthToken() {
         return false;
     }
 
+    // Create a new refresh promise and store it globally
+    tokenRefreshPromise = performTokenRefresh(refreshToken);
+
+    try {
+        return await tokenRefreshPromise;
+    } finally {
+        // Clear the promise when done (success or failure)
+        tokenRefreshPromise = null;
+    }
+}
+
+/**
+ * Performs the actual token refresh API call.
+ *
+ * @param {string} refreshToken - The refresh token to use.
+ * @returns {Promise<boolean>} - Resolves to true if successful, false otherwise.
+ */
+async function performTokenRefresh(refreshToken) {
     try {
         const response = await fetch(`${envVars.API_URL}/auth/refresh`, {
             method: 'POST',
@@ -134,18 +162,24 @@ async function refreshAuthToken() {
             body: JSON.stringify({ refreshToken }),
         });
 
-        if (! (response.ok || response.success)) {
+        if (!response.ok) {
             console.warn('Failed to refresh token:', response.statusText);
             return false;
         }
 
         const tokenData = await response.json();
 
-        const token = tokenData?.jwtToken;
-        console.log(token)
-        // Save the new JWT
-        setJwt(token);
-        return true;
+        const token = tokenData?.data?.jwtToken || tokenData?.jwtToken;
+        console.log('New token received:', token ? 'Yes' : 'No');
+        
+        if (token) {
+            // Save the new JWT
+            setJwt(token);
+            return true;
+        } else {
+            console.warn('No token received in refresh response');
+            return false;
+        }
     } catch (error) {
         console.error('Error refreshing token:', error);
         return false;

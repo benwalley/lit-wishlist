@@ -1,14 +1,14 @@
 import {css, html, LitElement} from 'lit';
 import buttonStyles from "../../../css/buttons";
-import {customFetch} from "../../../helpers/fetchHelpers.js";
-import {invalidateCache} from "../../../helpers/caching.js";
 import {triggerUpdateItem} from "../../../events/eventListeners.js";
+import {bulkUpdateGoInOn} from "../../../helpers/api/gifts.js";
 import '../../../svg/contribute.js';
 import '../../global/custom-modal.js';
 import '../../users/your-users-list.js'
 import '../../global/multi-select-dropdown.js'
 import '../../global/qty-input.js'
-import './amount-contributing-list.js'
+import './contributing-list.js'
+import {messagesState} from "../../../state/messagesStore.js";
 
 export class CustomElement extends LitElement {
     static properties = {
@@ -20,7 +20,9 @@ export class CustomElement extends LitElement {
         total: { type: Number, state: true },
         contributors: { type: Array, state: true },
         yourUsers: { type: Array, state: true },
-        newData: { type: Array, state: true }
+        newData: { type: Array, state: true },
+        compact: { type: Boolean},
+        modalOpen: { type: Boolean, state: true },
     };
 
     constructor() {
@@ -33,6 +35,8 @@ export class CustomElement extends LitElement {
         this.total = 0;
         this.contributors = [];
         this.newData = [];
+        this.compact = false;
+        this.modalOpen = false;
     }
 
     static get styles() {
@@ -91,40 +95,43 @@ export class CustomElement extends LitElement {
         ];
     }
 
-    _openModal() {
-        const modal = this.shadowRoot.querySelector('custom-modal');
-        modal.openModal();
+    _openModal(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.modalOpen = true;
     }
 
     _closeModal(e) {
-        const modal = this.shadowRoot.querySelector('custom-modal');
-        modal.closeModal();
-        this.error = '';
+        this.modalOpen = false;
     }
 
-    handleError(message) {
-        this.error = message;
+    _handleModalClosed(event) {
+        this.modalOpen = false;
+        this.error = '';
+        this.loading = false;
+        this.newData = [];
+        this.total = 0;
     }
 
     async _handleConfirm() {
-        console.log(this.newData)
         this.loading = true;
         try {
-            const data = this.newData.map(item => ({
-                userId: item.id,
-                contributeAmount: item.amount,
+            const data = this.newData.map(user => ({
+                giverId: user.id,
+                getterId: this.itemData?.createdById,
                 itemId: this.itemId,
-                contributing: true,
+                participating: true
             }));
-            const options = {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-            };
-            await customFetch('/contributors/update/batch', options, true);
-            invalidateCache(`/contributors/item/${this.itemId}`);
-            triggerUpdateItem();
-            this._closeModal();
+
+            const response = await bulkUpdateGoInOn(data);
+            if(response.success) {
+                triggerUpdateItem();
+                this._closeModal();
+                messagesState.addMessage('Successfully updated contributing data.', 'success');
+            } else {
+                messagesState.addMessage(response.publicMessage || 'Failed to update contributing data.', 'error');
+            }
+
         } catch (e) {
             console.error(e);
             this.error = 'Failed to process request.';
@@ -138,26 +145,32 @@ export class CustomElement extends LitElement {
     }
 
     render() {
-        const maxAmount = Math.max(parseInt(this.itemData?.amountWanted) || 1, this.itemData?.maxAmountWanted);
-        const progressPercent = Math.min((this.total / maxAmount) * 100, 100);
         return html`
-            <button class="button shadow contribute-button ghost large fancy" @click="${this._openModal}">
-                <contribute-icon></contribute-icon>
-                <span>Contribute</span>
-            </button>
-            <custom-modal maxWidth="400px" noPadding="true">
+            ${this.compact ? html`
+            <button class="icon-button contribute-button purple-text" @click="${this._openModal}">
+                <group-icon></group-icon>
+            </button>` : html`
+                <button class="button shadow contribute-button ghost large fancy" @click="${this._openModal}">
+                    <contribute-icon></contribute-icon>
+                    <span>Contribute</span>
+                </button>
+            `}
+            <custom-modal 
+                maxWidth="400px" 
+                noPadding="true"
+                lazyLoad
+                .isOpen="${this.modalOpen}"
+                @modal-closed="${this._handleModalClosed}"
+            >
                 <div class="modal-contents">
                     <div class="modal-header">
                         <h3>Who is contributing?</h3>
-                        <small>Let others know that  you want to go in on this, and optionally enter an amount you're willing to contribute</small>
+                        <small>Let others know that you want to go in on this.</small>
                     </div>
-                    <amount-contributing-list
-                            .users="${this.yourUsers}"
-                            .contributors="${this.contributors}"
-                            .data="${this.newData}"
-                            .itemId="${this.itemId}"
+                    <contributing-list
+                            .itemData="${this.itemData}"
                             @data-changed="${this._handleDataChange}"
-                    ></amount-contributing-list>
+                    ></contributing-list>
                     ${this.error ? html`<div class="error">${this.error}</div>` : ''}
                     <div class="modal-footer">
                         <button class="button ghost shadow" @click="${this._closeModal}" ?disabled="${this.loading}">

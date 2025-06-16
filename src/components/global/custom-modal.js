@@ -8,7 +8,7 @@ class CustomModal extends LitElement {
         noPadding: { type: Boolean },
         maxWidth: { type: String },
         level: {type: Number},
-
+        lazyLoad: { type: Boolean },
     };
 
     constructor() {
@@ -19,6 +19,7 @@ class CustomModal extends LitElement {
         this.noPadding = false;
         this.maxWidth = '1200px';
         this.level = 1;
+        this.lazyLoad = false;
 
         // Bind methods
         this.openModal = this.openModal.bind(this);
@@ -236,7 +237,7 @@ class CustomModal extends LitElement {
                     </button>
                     <!-- Scrollable content container -->
                     <div class="modal-content">
-                        <slot></slot>
+                        ${this.lazyLoad ? (this.isOpen ? html`<slot></slot>` : '') : html`<slot></slot>`}
                     </div>
                 </div>
             </div>

@@ -177,7 +177,6 @@ export class MultiSelectDropdown extends LitElement {
 
     clearAll() {
         this.selectedKeys.clear();
-        this.requestUpdate();
         this.dispatchEvent(new CustomEvent('selection-changed', {
             detail: {selectedKeys: [...this.selectedKeys]}
         }));
@@ -190,7 +189,6 @@ export class MultiSelectDropdown extends LitElement {
         } else {
             this.selectedKeys.add(key);
         }
-        this.requestUpdate();
         this.dispatchEvent(new CustomEvent('selection-changed', {
             detail: {selectedKeys: [...this.selectedKeys]}
         }));

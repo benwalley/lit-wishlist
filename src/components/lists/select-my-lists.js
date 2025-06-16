@@ -8,7 +8,7 @@ import {messagesState} from "../../state/messagesStore.js";
 
 export class CustomElement extends LitElement {
     static properties = {
-        lists: {type: Array}, // Track lists fetched from the server
+        lists: {type: Array},
         selectedListIds: {type: Array},
         loading: {type: Boolean}
     };
@@ -38,11 +38,16 @@ export class CustomElement extends LitElement {
         try {
             this.loading = true;
             const response = await fetchMyLists();
-            
+
             if (response.success) {
                 this.lists = response.data;
                 if(this.lists.length === 1) {
                     this.selectedListIds = [this.lists[0].id];
+                    this.dispatchEvent(new CustomEvent('change', {
+                        detail: {
+                            selectedListIds: this.selectedListIds,
+                        },
+                    }));
                 }
             } else {
                 throw new Error(response.error);
@@ -58,7 +63,7 @@ export class CustomElement extends LitElement {
 
     _handleSelectionChange(event) {
         this.selectedListIds = event.detail.selectedItemIds;
-        
+
         // Forward the event with our component's naming convention
         this.dispatchEvent(new CustomEvent('change', {
             detail: {

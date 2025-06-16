@@ -1,6 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import {observeState} from 'lit-element-state';
 import {userState} from '../../../state/userStore.js';
+import '../../../svg/dollar.js';
 
 export class TrackingAmountInput extends observeState(LitElement) {
     static properties = {
@@ -16,6 +17,7 @@ export class TrackingAmountInput extends observeState(LitElement) {
                 display: block;
                 width: 100%;
                 height: 100%;
+                position: relative;
             }
        
             .amount-input {
@@ -54,6 +56,15 @@ export class TrackingAmountInput extends observeState(LitElement) {
                 width: 100%;
                 height: 100%;
             }
+            
+            .input-decorator {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                left: 3px;
+                font-size: var(--font-size-small);
+                color: var(--green-normal);
+            }
         `;
     }
 
@@ -71,21 +82,10 @@ export class TrackingAmountInput extends observeState(LitElement) {
 
     updated(changedProperties) {
         if (changedProperties.has('data') && this.data) {
-            if (this.data.type === 'proposal' && this.data.proposalParticipants && userState.userData?.id) {
-                // Find the current user's proposal participant
-                const userParticipant = this.data.proposalParticipants.find(
-                    participant => participant.userId === userState.userData.id
-                );
-                if (userParticipant) {
-                    this.value = userParticipant.amountRequested || 0;
-                    this.originalValue = userParticipant.amountRequested || 0;
-                    this.hasChanged = false;
-                }
-            } else if (this.data.type === 'getting' && this.data.contributeAmount !== undefined) {
-                this.value = this.data.contributeAmount;
-                this.hasChanged = false;
-                this.originalValue = this.data.contributeAmount;
-            }
+            let newValue = parseFloat(this.data.actualPrice);
+            this.value = newValue
+            this.hasChanged = false;
+            this.originalValue = newValue;
         }
 
         if (changedProperties.has('value')) {
@@ -99,10 +99,10 @@ export class TrackingAmountInput extends observeState(LitElement) {
     }
 
     render() {
-        const isProposal = this.data?.type === 'proposal';
 
         return html`
             <div class="amount-input-container">
+                <dollar-icon class="input-decorator"></dollar-icon>
                 <input 
                     type="number" 
                     class="amount-input ${this.hasChanged ? 'changed' : ''}" 
@@ -110,8 +110,7 @@ export class TrackingAmountInput extends observeState(LitElement) {
                     @input=${this.handleChange}
                     min="0"
                     step="0.01"
-                    ?disabled=${isProposal}
-                >
+                />
             </div>
         `;
     }

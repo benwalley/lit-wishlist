@@ -1,6 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import '../../svg/eye.js';
 import '../../svg/dollar.js';
+import '../../svg/search.js';
 import '../global/custom-tooltip.js';
 
 class MyTextInput extends LitElement {

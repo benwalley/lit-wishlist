@@ -55,7 +55,6 @@ class UserListComponent extends LitElement {
         } else {
             this.selectedUsers.add(userId);
         }
-        this.requestUpdate();
     }
 
     render() {

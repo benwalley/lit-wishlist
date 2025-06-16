@@ -4,6 +4,7 @@ class GlobalState extends LitState {
     static get stateVars() {
         return {
             menuExpanded: false,
+            landingPage: '/lists',
         };
     }
 }

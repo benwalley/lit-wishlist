@@ -1,6 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import {observeState} from 'lit-element-state';
 import {userState} from "../../../state/userStore.js";
+import {globalState} from "../../../state/globalStore.js";
 import {logout} from "../../../helpers/api/users.js";
 import {setJwt, setRefreshToken} from "../../../localStorage/tokens.js";
 import {navigate} from "../../../router/main-router.js";
@@ -51,7 +52,7 @@ export class LogoutButton extends observeState(LitElement) {
         userState.userData = undefined;
         messagesState.addMessage('Successfully logged out', 'success')
         invalidateCache()
-        navigate('/');
+        navigate(globalState.landingPage);
     }
 
     render() {

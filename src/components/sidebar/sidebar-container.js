@@ -4,15 +4,56 @@ import logo from '../../assets/logo.svg';
 import {observeState} from 'lit-element-state';
 import {globalState} from "../../state/globalStore.js";
 import '../../svg/x.js'
+import '../../svg/world.js'
+import '../../svg/heart.js'
+import '../../svg/calendar.js'
+import '../../svg/gift.js'
+import '../../svg/user.js'
+import '../../svg/hourglass.js'
+import '../../svg/question-mark.js'
+import '../../svg/gear.js'
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
         value: { type: String },
+        currentPath: { type: String },
     };
 
     constructor() {
         super();
         this.value = '';
+        this.currentPath = window.location.pathname;
+    }
+
+    connectedCallback() {
+        super.connectedCallback();
+        // Listen for navigation changes
+        this._handlePopState = () => {
+            this.currentPath = window.location.pathname;
+        };
+        window.addEventListener('popstate', this._handlePopState);
+
+        // Also listen for programmatic navigation
+        this._originalPushState = history.pushState;
+        history.pushState = (...args) => {
+            this._originalPushState.apply(history, args);
+            this.currentPath = window.location.pathname;
+        };
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        window.removeEventListener('popstate', this._handlePopState);
+        if (this._originalPushState) {
+            history.pushState = this._originalPushState;
+        }
+    }
+
+    _isActive(path) {
+        // Handle exact matches and path segments
+        if (path === '/' && this.currentPath === '/') return true;
+        if (path !== '/' && this.currentPath.startsWith(path)) return true;
+        return false;
     }
 
     // Closes the menu if user clicks on the overlay
@@ -61,9 +102,29 @@ export class CustomElement extends observeState(LitElement) {
 
                 .menu-item-link {
                     padding: 12px 16px;
-                    display: block;
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
                     color: var(--text-color-dark);
                     text-decoration: none;
+                    border-radius: var(--border-radius-small);
+                    transition: var(--transition-normal);
+                }
+                
+                .menu-item-link .icon {
+                    width: 18px;
+                    height: 18px;
+                    flex-shrink: 0;
+                }
+                
+                .menu-item-link:hover {
+                    background-color: var(--option-select-background-hover);
+                }
+                
+                .menu-item-link.active {
+                    background-color: var(--primary-color);
+                    color: white;
+                    font-weight: 600;
                 }
 
                 .menu-section-heading {
@@ -161,31 +222,57 @@ export class CustomElement extends observeState(LitElement) {
                 <button @click="${this._closeMenu}" class="button icon-button close-button">
                     <x-icon></x-icon>
                 </button>
-                <a href="/">
+                <a href="${globalState.landingPage}">
                     <img src="${logo}" alt="Logo" width="40px">
                 </a>
                 <nav>
                     <h2 class="menu-section-heading">Main Menu</h2>
                     <ul class="menu-section-list">
-                        <li><a href="/" class="menu-item-link">Dashboard</a></li>
-                        <li><a href="/lists" class="menu-item-link">All Lists</a></li>
-                        <li><a href="/gifts-tracking" class="menu-item-link">Gifts Tracking</a></li>
-                        <li><a href="#" class="menu-item-link">All Users</a></li>
-                        <li><a href="#" class="menu-item-link">Recent</a></li>
-                        <li><a href="/qa" class="menu-item-link">Questions & Answers</a></li>
+                        <li><a href="/account" class="menu-item-link ${this._isActive('/account') ? 'active' : ''}">
+                            <world-icon class="icon"></world-icon>
+                            <span>Dashboard</span>
+                        </a></li>
+                        <li><a href="/lists" class="menu-item-link ${this._isActive('/lists') ? 'active' : ''}">
+                            <heart-icon class="icon" active="false"></heart-icon>
+                            <span>All Lists</span>
+                        </a></li>
+                        <li><a href="/events" class="menu-item-link ${this._isActive('/events') ? 'active' : ''}">
+                            <calendar-icon class="icon"></calendar-icon>
+                            <span>Events</span>
+                        </a></li>
+                        <li><a href="/proposals" class="menu-item-link ${this._isActive('/proposals') ? 'active' : ''}">
+                            <gift-icon class="icon"></gift-icon>
+                            <span>Proposals</span>
+                        </a></li>
+                        <li><a href="#" class="menu-item-link">
+                            <user-icon class="icon"></user-icon>
+                            <span>All Users</span>
+                        </a></li>
+                        <li><a href="/qa" class="menu-item-link ${this._isActive('/qa') ? 'active' : ''}">
+                            <question-mark-icon class="icon"></question-mark-icon>
+                            <span>Questions & Answers</span>
+                        </a></li>
                     </ul>
 
                     <h2 class="menu-section-heading">Other Links</h2>
                     <ul class="menu-section-list">
-                        <li><a href="#" class="menu-item-link">Dashboard</a></li>
-                        <li><a href="#" class="menu-item-link">My Lists</a></li>
-                        <li><a href="#" class="menu-item-link">Recent</a></li>
+                        <li><a href="#" class="menu-item-link">
+                            <world-icon class="icon"></world-icon>
+                            <span>Dashboard</span>
+                        </a></li>
+                        <li><a href="#" class="menu-item-link">
+                            <heart-icon class="icon" active="false"></heart-icon>
+                            <span>My Lists</span>
+                        </a></li>
                     </ul>
 
                     <div class="settings-section-container">
                         <ul>
                             <li>
-                                <button>Settings</button>
+                                <button class="button">
+                                    <gear-icon class="icon" style="width: 16px; height: 16px; margin-right: 8px;"></gear-icon>
+                                    Settings
+                                </button>
                             </li>
                             <li>
                                 <span>For feature suggestions or to report a bug, email</span>

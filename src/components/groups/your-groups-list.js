@@ -183,7 +183,6 @@ class GroupListComponent extends LitElement {
         }
 
         this._dispatchSelectionChangedEvent();
-        this.requestUpdate();
     }
 
     selectAll() {
@@ -192,13 +191,11 @@ class GroupListComponent extends LitElement {
             .filter(group => group && group.id)
             .map(group => group.id);
         this._dispatchSelectionChangedEvent();
-        this.requestUpdate();
     }
 
     clearSelection() {
         this.selectedGroups = [];
         this._dispatchSelectionChangedEvent();
-        this.requestUpdate();
     }
 
     _dispatchSelectionChangedEvent() {
@@ -249,7 +246,7 @@ class GroupListComponent extends LitElement {
                 </div>
             </div>
 
-            <div class="groups-container fade-out-container">
+            <div class="groups-container">
                 ${this.groups.map(item => html`
                     <group-list-item
                             .group="${item}"

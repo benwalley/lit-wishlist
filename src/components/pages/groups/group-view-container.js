@@ -46,18 +46,11 @@ export class GroupViewContainer extends observeState(LitElement) {
                 return;
             }
             this.groupData = response.data;
-            this.requestUpdate();
         } catch (error) {
             console.error('Error fetching group:', error);
         } finally {
             this.loading = false;
         }
-    }
-
-    _handleUserSelected(event) {
-        const selectedUser = event.detail.user;
-        console.log('User selected:', selectedUser);
-        // Handle user selection here
     }
 
     _handleInviteUser() {
@@ -111,7 +104,6 @@ export class GroupViewContainer extends observeState(LitElement) {
                 <section>
                     <group-users-list 
                         .groupData="${this.groupData}"
-                        @user-selected="${this._handleUserSelected}"
                         @invite-user="${this._handleInviteUser}"
                     ></group-users-list>
                 </section>

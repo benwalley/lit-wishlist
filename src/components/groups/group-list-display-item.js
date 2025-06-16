@@ -25,17 +25,14 @@ class GroupItemComponent extends observeState(LitElement) {
             color: var(--text-color-dark);
             gap: var(--spacing-small);
             align-items: center;
-            padding: var(--spacing-small);
+            padding: var(--spacing-x-small);
             transition: var(--transition-200);
             border: 1px solid transparent;
             border-radius: 10px;
             
             &:hover {
-                //background-color: var(--purple-light);
-                //scale: 1.005;
-                //border-color: var(--primary-color);
-                transform: translateY(-2px);
-                box-shadow: var(--shadow-2-soft);
+                border-color: var(--primary-color);
+                box-shadow: var(--shadow-1-soft);
             }
         }
         

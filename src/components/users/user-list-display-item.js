@@ -108,7 +108,7 @@ export class UserListDisplayItem extends observeState(LitElement) {
                     overflow: hidden;
                     text-overflow: ellipsis;
                     margin-top: 2px;
-                    line-height: 1;
+                    line-height: 1.2;
                 }
 
                 .admin-badge {

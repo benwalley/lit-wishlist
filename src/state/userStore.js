@@ -4,7 +4,8 @@ class UserState extends LitState {
     static get stateVars() {
         return {
             userData: false,
-            loadingUser:true,
+            myUsers: [],
+            loadingUser: true,
         };
     }
 }
