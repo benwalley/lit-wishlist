@@ -224,7 +224,10 @@ export class ListViewContainer extends observeState(LitElement) {
         // Otherwise, show the list data
         return html`
             <div class="list-header">
-                <custom-avatar size="100" username="${this.listData?.listName}"></custom-avatar>
+                <custom-avatar size="100" 
+                    username="${this.listData?.listName}"
+                   imageId="${this.listData?.imageId || ''}"
+                ></custom-avatar>
                 <div class="header-content">
                     <div class="header-top">
                         <h1>${this.listData?.listName}</h1>

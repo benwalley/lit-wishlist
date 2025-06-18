@@ -1,5 +1,6 @@
 // custom-modal.js
 import { LitElement, html, css } from 'lit';
+import '../../svg/x.js';
 
 class CustomModal extends LitElement {
     static properties = {
@@ -24,104 +25,92 @@ class CustomModal extends LitElement {
         // Bind methods
         this.openModal = this.openModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
-        this._handleKeyDown = this._handleKeyDown.bind(this);
-        this._onOverlayClick = this._onOverlayClick.bind(this);
+        this._handleDialogClose = this._handleDialogClose.bind(this);
+        this._handleDialogClick = this._handleDialogClick.bind(this);
     }
 
     static styles = css`
-        /* Overlay with fade in/out transition */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            backdrop-filter: blur(4px);
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            /* Start hidden */
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-        /* When open, make the overlay visible and interactive */
-        .overlay.open {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        /* Modal container with a pop-in effect */
-        .modal {
+        /* Native dialog element styling */
+        .dialog {
             background: var(--modal-background-color, #fff);
             border-radius: var(--border-radius-large, 8px);
+            border: none;
             width: 90%;
+            color: var(--text-color-dark);
             max-width: var(--max-width, 1200px);
             box-shadow: var(--shadow-2-soft, 0 2px 10px rgba(0, 0, 0, 0.1));
-            position: relative;
             outline: none;
             /* Initial state before transition */
             opacity: 0;
             transform: translateY(20px) scale(0.95);
             transition: opacity 0.3s ease, transform 0.3s ease;
-            height: auto;
             max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; /* Prevent double scrollbars */
+            padding: 0;
+            margin: auto;
+            /* Hide when not open */
+            pointer-events: none;
+            /* Fit content height */
+            height: fit-content;
         }
-        /* When overlay is open, animate the modal into view */
-        .overlay.open .modal {
+        
+        x-icon {
+            font-size: var(--font-size-small);
+        }
+        
+        /* When not open, completely hide the dialog */
+        .dialog:not([open]) {
+            display: none;
+        }
+        
+        /* Dialog backdrop styling */
+        .dialog::backdrop {
+            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        /* When dialog is open, animate it into view */
+        .dialog[open] {
             opacity: 1;
             transform: translateY(0) scale(1);
+            pointer-events: auto;
+            display: flex;
+        }
+        
+        .dialog[open]::backdrop {
+            opacity: 1;
         }
 
         /* Scrollable content area */
         .modal-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            /* Custom scrollbar styling */
+            width: 100%;
             scrollbar-width: thin;
             scrollbar-color: var(--grayscale-400) transparent;
-            overflow: hidden;
-        }
-        
-        /* The actual content that gets slotted will scroll */
-        ::slotted(*) {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; /* Let internal elements handle their own scrolling */
+            overflow: auto;
         }
         
         /* Webkit scrollbar styles */
-        .modal-content::-webkit-scrollbar,
-        ::slotted(*)::-webkit-scrollbar {
+        .modal-content::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
-        .modal-content::-webkit-scrollbar-track,
-        ::slotted(*)::-webkit-scrollbar-track {
+        .modal-content::-webkit-scrollbar-track {
             background: transparent;
             border-radius: 4px;
         }
-        .modal-content::-webkit-scrollbar-thumb,
-        ::slotted(*)::-webkit-scrollbar-thumb {
+        .modal-content::-webkit-scrollbar-thumb {
             background-color: var(--grayscale-400);
             border-radius: 4px;
             border: 2px solid transparent;
             background-clip: content-box;
         }
-        .modal-content::-webkit-scrollbar-thumb:hover,
-        ::slotted(*)::-webkit-scrollbar-thumb:hover {
+        .modal-content::-webkit-scrollbar-thumb:hover {
             background-color: var(--grayscale-500);
         }
         
         /* Apply padding if not explicitly disabled */
-        .modal.padding .modal-content {
+        .dialog.padding .modal-content {
             padding: var(--spacing-small, 1rem);
         }
 
@@ -134,31 +123,32 @@ class CustomModal extends LitElement {
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
+            z-index: 200;
             color: var(--text-color-dark);
-        }
-        .close-button:focus {
-            outline: 2px solid #000;
         }
     `;
 
     connectedCallback() {
         super.connectedCallback();
         window.addEventListener(this.triggerEvent, this.openModal);
-        window.addEventListener('keydown', this._handleKeyDown);
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
         window.removeEventListener(this.triggerEvent, this.openModal);
-        window.removeEventListener('keydown', this._handleKeyDown);
-        // Ensure scrolling is enabled if the element is removed while open.
-        document.body.style.overflow = '';
     }
 
-    // Disable background scrolling when modal is open.
+    // Handle dialog state changes
     updated(changedProperties) {
         if (changedProperties.has('isOpen')) {
-            document.body.style.overflow = this.isOpen ? 'hidden' : '';
+            const dialog = this.shadowRoot.querySelector('.dialog');
+            if (dialog) {
+                if (this.isOpen && !dialog.open) {
+                    dialog.showModal();
+                } else if (!this.isOpen && dialog.open) {
+                    dialog.close();
+                }
+            }
         }
     }
 
@@ -176,12 +166,6 @@ class CustomModal extends LitElement {
             bubbles: true,
             composed: true
         }));
-        this.updateComplete.then(() => {
-            const modal = this.shadowRoot.querySelector('.modal');
-            if (modal) {
-                modal.focus();
-            }
-        });
     }
 
     closeModal() {
@@ -196,51 +180,41 @@ class CustomModal extends LitElement {
         if (this.triggerElement) {
             this.triggerElement.focus();
         }
-
     }
 
-    _handleKeyDown(e) {
-        if (this.isOpen && e.key === 'Escape') {
-            e.preventDefault();
+    _handleDialogClose(e) {
+        // Handle native dialog close event
+        if (this.isOpen) {
             this.closeModal();
         }
     }
 
-    _onOverlayClick(e) {
-        if (e.target.classList.contains('overlay')) {
+    _handleDialogClick(e) {
+        // Close modal when clicking on the dialog element itself (backdrop area)
+        if (e.target === e.currentTarget) {
             this.closeModal();
         }
     }
 
     render() {
         return html`
-            <div
-                    class="overlay ${this.isOpen ? 'open' : ''}"
-                    @click=${this._onOverlayClick}
-                    ?inert=${!this.isOpen}
-                    aria-hidden=${!this.isOpen}
-                    style="z-index: ${this.level + 100};"
+            <dialog
+                class="dialog ${this.noPadding ? '' : 'padding'}"
+                style="--max-width: ${this.maxWidth}; z-index: ${this.level + 100};"
+                @close=${this._handleDialogClose}
+                @click=${this._handleDialogClick}
             >
-                <div
-                        class="modal ${this.noPadding ? '' : 'padding'}"
-                        role="dialog"
-                        aria-modal="true"
-                        tabindex="-1"
-                        style="--max-width: ${this.maxWidth};"
+                <button
+                    class="close-button"
+                    @click=${this.closeModal}
+                    aria-label="Close modal"
                 >
-                    <button
-                            class="close-button"
-                            @click=${this.closeModal}
-                            aria-label="Close modal"
-                    >
-                        &times;
-                    </button>
-                    <!-- Scrollable content container -->
-                    <div class="modal-content">
-                        ${this.lazyLoad ? (this.isOpen ? html`<slot></slot>` : '') : html`<slot></slot>`}
-                    </div>
+                    <x-icon></x-icon>
+                </button>
+                <div class="modal-content">
+                    ${this.lazyLoad ? (this.isOpen ? html`<slot></slot>` : '') : html`<slot></slot>`}
                 </div>
-            </div>
+            </dialog>
         `;
     }
 }
