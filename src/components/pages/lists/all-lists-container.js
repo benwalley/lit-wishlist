@@ -39,7 +39,7 @@ class AllListsContainer extends observeState(LitElement) {
                 width: 100%;
             }
 
-            @media (min-width: 768px) {
+            @media (min-width: 930px) {
                 .lists-container {
                     grid-template-columns: repeat(2, 1fr);
                 }

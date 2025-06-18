@@ -74,7 +74,7 @@ export class EditListForm extends LitElement {
             triggerUpdateList();
             this._closeModal();
         } else {
-            messagesState.addMessage('Failed to update list', 'error');
+            messagesState.addMessage(response.message || 'Failed to update list', 'error');
         }
     }
 

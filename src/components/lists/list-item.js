@@ -39,12 +39,17 @@ export class CustomElement extends observeState(LitElement) {
                     
                 }
                 
+                .list-name-avatar {
+                    margin-bottom: auto;
+                }
+                
                 .container {
                     transition: var(--transition-normal);
                     background: var(--background-dark);
                     display: flex;
+                    position: relative;
                     flex-direction: row;
-                    align-items: center;
+                    align-items: flex-start;
                     gap: var(--spacing-small);
                     text-decoration: none;
                     margin: 0;
@@ -61,6 +66,7 @@ export class CustomElement extends observeState(LitElement) {
                 .name-section {
                     padding: 0;
                     flex-grow: 1;
+                    gap: 4px;
                     justify-content: flex-start;
                     display: flex;
                     flex-direction: column;
@@ -95,6 +101,7 @@ export class CustomElement extends observeState(LitElement) {
 
                 h3 {
                     margin: 0;
+                    line-height: 1;
                     color: var(--text-color-dark);
                     width: 100%;
                 }
@@ -104,31 +111,33 @@ export class CustomElement extends observeState(LitElement) {
                     padding: 5px;
                 }
                 
-                .item-right-side {
+                .actions-section {
+                    position: absolute;
+                    top: var(--spacing-x-small);
+                    right:  var(--spacing-x-small);
                     display: flex;
-                    flex-direction: column;
-                    flex-wrap: wrap;
-                    justify-content: flex-end;
-                    color: var(--text-color-dark);
+                    flex-direction: row;
+                }
+                
                     
-                    .top-row {
-                        display: flex;
-                        justify-content: flex-end;
+
+                .owner-info {
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-start;
+                    gap: var(--spacing-x-small);
+                    margin-left: -40px;
+                    font-size: var(--font-size-x-small);
+                    color: var(--text-color-medium-dark);
+                    
+                    user-icon {
+                        font-size: var(--font-size-x-small);
                     }
 
-                    .owner-info {
-                        display: flex;
-                        align-items: center;
-                        gap: 4px;
-                        font-size: var(--font-size-x-small);
-                        color: var(--text-color-medium-dark);
-
-                        span {
-                            white-space: nowrap;
-                            overflow: hidden;
-                            text-overflow: ellipsis;
-                            max-width: 100px;
-                        }
+                    span {
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
                     }
                 }
 
@@ -156,10 +165,12 @@ export class CustomElement extends observeState(LitElement) {
         return html`
             <a class="container" href="${`/list/${this.itemData.id}`}">
                <custom-avatar 
+                       classs="list-name-avatar"
                     size="35" 
                     username="${this.itemData.listName}"
                     imageId="${this.itemData.imageId}"
-               ></custom-avatar>
+               ></custom-avatar 
+                       clas>
                 <div class="name-section">
                     <h3>${this.itemData.listName }</h3>
                     <div class="name-bottom-section">
@@ -183,11 +194,16 @@ export class CustomElement extends observeState(LitElement) {
                             </span>
                         </div>
                     </div>
+                    ${this.itemData.ownerId && this.showOwner ? html`
+                        <div class="owner-info bottom-row">
+                            <user-icon></user-icon>
+                            <span>${getUsernameById(this.itemData?.ownerId)}</span>
+                        </div>
+                    ` : ''}
                     
                 </div>
-                <div class="item-right-side">
-                    <div class="top-row">
-                        ${this.canEdit ? html`
+                <div class="actions-section">
+                    ${this.canEdit ? html`
                             <div style="position: relative;">
                                 <button class="edit-button icon-button"
                                         aria-label="Edit List Details"
@@ -208,20 +224,6 @@ export class CustomElement extends observeState(LitElement) {
                                 <custom-tooltip style="min-width: 150px;">Delete this list</custom-tooltip>
                             </div>
                         ` : ''}
-                    </div>
-                    
-                    ${this.itemData.ownerId && this.showOwner ? html`
-                        <div class="owner-info bottom-row">
-                            <custom-avatar
-                                    .username="${getUsernameById(this.itemData?.ownerId)}"
-                                    imageId="${getUserImageIdByUserId(this.itemData?.ownerId)}"
-                                    size="16"
-                            >
-                            </custom-avatar>
-                            <span>${getUsernameById(this.itemData?.ownerId)}</span>
-                        </div>
-                    ` : ''}
-                    
                 </div>
                 
             </a>

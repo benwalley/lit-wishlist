@@ -106,7 +106,7 @@ export async function updateList(listData) {
         };
 
         const result = await customFetch(`/lists/${listData.id}`, options, true);
-        return { success: true, data: result };
+        return result;
     } catch (error) {
         console.error('Error updating list:', error);
         return { success: false, error };
@@ -149,12 +149,12 @@ export async function fetchMyLists() {
 
         if (response?.success) {
             const lists = Array.isArray(response.data) ? response.data : [];
-            return { 
-                success: true, 
+            return {
+                success: true,
                 data: lists.filter(list => list?.id > 0)
             };
         }
-        
+
         return { success: false, error: 'Failed to fetch lists' };
     } catch (error) {
         console.error('Error fetching lists:', error);

@@ -1,6 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import {observeState} from 'lit-element-state';
 import {userState} from "../../../state/userStore.js";
+import {globalState} from "../../../state/globalStore.js";
 import './login-account.js';
 import '../../global/custom-input.js'
 import {navigate} from "../../../router/main-router.js";
@@ -113,7 +114,7 @@ export class GuestHomeContainer extends observeState(LitElement) {
     _checkAuthentication() {
         // Ensure that user data has finished loading
         if (!(userState.loadingUser) && userState.userData?.id) {
-            navigate('/account')
+            navigate(globalState.landingPage)
         }
     }
 

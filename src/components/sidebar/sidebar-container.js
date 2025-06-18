@@ -5,7 +5,7 @@ import {observeState} from 'lit-element-state';
 import {globalState} from "../../state/globalStore.js";
 import '../../svg/x.js'
 import '../../svg/world.js'
-import '../../svg/heart.js'
+import '../../svg/empty-heart.js'
 import '../../svg/calendar.js'
 import '../../svg/gift.js'
 import '../../svg/user.js'
@@ -233,7 +233,7 @@ export class CustomElement extends observeState(LitElement) {
                             <span>Dashboard</span>
                         </a></li>
                         <li><a href="/lists" class="menu-item-link ${this._isActive('/lists') ? 'active' : ''}">
-                            <heart-icon class="icon" active="false"></heart-icon>
+                            <empty-heart-icon class="icon" active="false"></empty-heart-icon>
                             <span>All Lists</span>
                         </a></li>
                         <li><a href="/events" class="menu-item-link ${this._isActive('/events') ? 'active' : ''}">
@@ -261,7 +261,7 @@ export class CustomElement extends observeState(LitElement) {
                             <span>Dashboard</span>
                         </a></li>
                         <li><a href="#" class="menu-item-link">
-                            <heart-icon class="icon" active="false"></heart-icon>
+                            <empty-heart-icon class="icon" active="false"></empty-heart-icon>
                             <span>My Lists</span>
                         </a></li>
                     </ul>

@@ -13,8 +13,10 @@ import {listenUpdateItem, listenUpdateList, triggerDeleteList} from "../../../ev
 import buttonStyles from '../../../css/buttons.js';
 import {messagesState} from "../../../state/messagesStore.js";
 import {redirectToDefaultPage} from "../../../helpers/generalHelpers.js";
+import {observeState} from "lit-element-state";
+import {userState} from "../../../state/userStore.js";
 
-export class ListViewContainer extends LitElement {
+export class ListViewContainer extends observeState(LitElement) {
     static properties = {
         listId: { type: String },
         listData: {type: Object},
@@ -174,20 +176,31 @@ export class ListViewContainer extends LitElement {
     }
 
     _getActionDropdownItems() {
-        return [
-            {
-                id: 'edit',
-                label: 'Edit List',
-                icon: html`<edit-icon class="action-icon"></edit-icon>`,
-                classes: 'blue-text',
-                action: () => this._handleEditList()
-            },
+        const { ownerId } = this.listData;
+        const userId = userState?.userData?.id;
+
+        // Always available
+        const baseActions = [
             {
                 id: 'share',
                 label: 'Share List',
                 icon: html`<share-icon class="action-icon"></share-icon>`,
                 classes: 'purple-text',
                 action: () => this._handleShareList()
+            }
+        ];
+
+        // If user isn’t the owner, we’re done
+        if (ownerId !== userId) return baseActions;
+
+        // Extra owner-only actions
+        const editActions = [
+            {
+                id: 'edit',
+                label: 'Edit List',
+                icon: html`<edit-icon class="action-icon"></edit-icon>`,
+                classes: 'blue-text',
+                action: () => this._handleEditList()
             },
             {
                 id: 'delete',
@@ -197,7 +210,10 @@ export class ListViewContainer extends LitElement {
                 action: () => this._handleDeleteList()
             }
         ];
+
+        return [...baseActions, ...editActions];
     }
+
 
     render() {
         // If this.loading is true, show a loading message

@@ -7,8 +7,8 @@ export class UserIcon extends LitElement {
       display: inline-block;
 
       /* Default width/height (fallback) */
-      width: 24px;
-      height: 24px;
+      width: 1em;
+      height: 1em;
 
       /* Default color (fallback) */
       color: currentColor;
