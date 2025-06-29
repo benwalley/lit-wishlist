@@ -58,6 +58,13 @@ export class GottenContributingBadges extends observeState(LitElement) {
                     color: var(--info-yellow);
                 }
                 
+                .contributor-list,
+                .gotten-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-x-small);
+                }
+                
                 .tooltip {
                     h3 {
                         margin: 0;
@@ -120,7 +127,7 @@ export class GottenContributingBadges extends observeState(LitElement) {
                 </div>
                 <custom-tooltip style="min-width: 200px" class="tooltip">
                     <h3>Gotten By:</h3>
-                    <ul>
+                    <ul class="gotten-list">
                         ${this.getGetting().map(contributor => html`
                             <li>
                                 <custom-avatar
@@ -143,7 +150,7 @@ export class GottenContributingBadges extends observeState(LitElement) {
                 </div>
                 <custom-tooltip style="min-width: 200px" class="tooltip">
                     <h3>Wants to go in on:</h3>
-                    <ul>
+                    <ul class="contributor-list">
                         ${this.getContributors().map(contributor => html`
                             <li>
                                 <custom-avatar

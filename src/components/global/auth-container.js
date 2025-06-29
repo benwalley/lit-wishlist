@@ -3,10 +3,12 @@ import {observeState} from 'lit-element-state';
 import {userState} from '../../state/userStore.js';
 import {userListState} from "../../state/userListStore.js";
 import {globalState} from '../../state/globalStore.js';
+import {groupInvitationsState} from '../../state/groupInvitationsStore.js';
 import './loading-screen.js';
 import {initRouter, navigate} from "../../router/main-router.js";
 import {getAccessibleUsers, getCurrentUser, getYourUsers} from "../../helpers/api/users.js";
 import {
+    listenGroupUpdated,
     listenUpdateUser,
     triggerInitialUserLoaded,
     triggerUpdateUser,
@@ -33,8 +35,17 @@ export class AuthContainer extends observeState(LitElement) {
         @media (min-width: 768px) {
             :host {
                 display: grid;
-                grid-template-columns: 275px 1fr;
                 grid-template-rows: auto 1fr;
+            }
+            
+            /* When user is authenticated, show sidebar layout */
+            :host(.authenticated) {
+                grid-template-columns: 275px 1fr;
+            }
+            
+            /* When user is not authenticated, full width layout */
+            :host(.unauthenticated) {
+                grid-template-columns: 1fr;
             }
         }
     `;
@@ -42,8 +53,35 @@ export class AuthContainer extends observeState(LitElement) {
     async firstUpdated() {
         await this.fetchUserData();
         await this.fetchAccessibleUsers();
-        listenUpdateUser(this.fetchUserData.bind(this));
+        listenUpdateUser(() => {
+            this.fetchUserData();
+            this.fetchAccessibleUsers();
+        });
+        listenGroupUpdated(() => {
+            this.fetchAccessibleUsers();
+        })
         initializeProposalHelpers();
+    }
+
+    updated(changedProperties) {
+        super.updated(changedProperties);
+        // Update CSS class based on authentication state
+        this._updateAuthenticationClass();
+    }
+
+    _updateAuthenticationClass() {
+        if (userState.loadingUser) {
+            // Don't change class while loading
+            return;
+        }
+
+        if (userState.userData?.id) {
+            this.classList.remove('unauthenticated');
+            this.classList.add('authenticated');
+        } else {
+            this.classList.remove('authenticated');
+            this.classList.add('unauthenticated');
+        }
     }
 
     async fetchUserData() {
@@ -58,6 +96,9 @@ export class AuthContainer extends observeState(LitElement) {
             triggerInitialUserLoaded()
             if (!userData?.id) {
                 navigate(globalState.landingPage)
+            } else {
+                // Fetch group invitations when user is authenticated
+                groupInvitationsState.fetchInvitations();
             }
         } catch (e) {
             console.log('user is not logged in')

@@ -38,5 +38,6 @@
  - update contributing top bar when user gets or doesn't get.
  - Add getting indicator on sidebar list on item page
  - Add item page not related to list.
+ - add user to list page.
  - 
  - 

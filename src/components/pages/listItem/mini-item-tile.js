@@ -10,8 +10,11 @@ import {navigate} from "../../../router/main-router.js";
 import '../../../svg/arrow-long-left.js'
 import '../../../svg/cart.js'
 import '../../../svg/group.js'
+import {canUserContribute} from "../../../helpers/userHelpers.js";
+import {observeState} from "lit-element-state";
+import {userState} from "../../../state/userStore.js";
 
-export class MiniItemTile extends LitElement {
+export class MiniItemTile extends observeState(LitElement) {
     static properties = {
         itemData: {type: Object},
         listId: {type: String},
@@ -40,7 +43,7 @@ export class MiniItemTile extends LitElement {
                     align-items: center;
                     text-decoration: none;
                     color: inherit;
-                    background: var(--background-light);
+                    background: var(--background-dark);
                     border: 1px solid var(--light-border-color);
                     border-radius: var(--border-radius-normal);
                     padding: var(--spacing-small);
@@ -84,6 +87,7 @@ export class MiniItemTile extends LitElement {
                     flex-direction: column;
                     flex: 1;
                     min-width: 0;
+                    margin-bottom: auto;
                 }
 
                 .row {
@@ -103,21 +107,7 @@ export class MiniItemTile extends LitElement {
                     white-space: nowrap;
                     max-width: 100%;
                 }
-
-                .status-line {
-                    margin-top: 4px;
-                    font-size: 12px;
-                    color: #999999;
-                }
-
-                .status-line.purchased {
-                    color: green;
-                }
-
-                .status-line.interested {
-                    color: #db7700; /* orange-ish */
-                }
-
+                
                 price-display {
                     margin-top: 4px;
                 }
@@ -202,17 +192,6 @@ export class MiniItemTile extends LitElement {
         return this.itemData?.goInOn?.length > 0;
     }
 
-    _renderStatus() {
-        // Example logic: if an item is purchased or if someone is interested.
-        // Adjust as needed based on how your data is structured
-        if (this.itemData?.purchased) {
-            return html`<span class="status-line purchased">Purchased</span>`;
-        } else if (this.itemData?.someoneInterested) {
-            return html`<span class="status-line interested">Someone Interested</span>`;
-        }
-        return html`<span class="status-line">None</span>`;
-    }
-
     render() {
         const link = this.getLink();
 
@@ -238,22 +217,23 @@ export class MiniItemTile extends LitElement {
                         ></priority-display>
                         <price-display .itemData="${this.itemData}" size="small"></price-display>
                     </div>
-                    ${this._renderStatus()}
                 </div>
                 
-                <div class="status-indicators">
-                    ${this.isGotten() ? html`
-                        <div class="status-indicator gotten-indicator">
-                            <cart-icon></cart-icon>
-                        </div>
-                    ` : ''}
-                    
-                    ${this.isContributing() ? html`
-                        <div class="status-indicator contributing-indicator">
-                            <group-icon></group-icon>
-                        </div>
-                    ` : ''}
-                </div>
+                ${canUserContribute(userState.userData, this.itemData) ? html`
+                    <div class="status-indicators">
+                        ${this.isGotten() ? html`
+                            <div class="status-indicator gotten-indicator">
+                                <cart-icon></cart-icon>
+                            </div>
+                        ` : ''}
+                        
+                        ${this.isContributing() ? html`
+                            <div class="status-indicator contributing-indicator">
+                                <group-icon></group-icon>
+                            </div>
+                        ` : ''}
+                    </div>
+                ` : ''}
                 
                 <arrow-long-left-icon></arrow-long-left-icon>
             </a>

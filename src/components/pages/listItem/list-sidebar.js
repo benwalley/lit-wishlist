@@ -82,7 +82,6 @@ export class CustomElement extends LitElement {
                     @mouseenter="${this._handleMouseEnter}"
                     aria-hidden="${!this.expanded ? 'true' : 'false'}"
             >
-                <h2>${this.listData?.listName}</h2>
                 ${this.listData?.listItems?.map(
                         item => html`
                             <mini-item-tile

@@ -1,7 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../css/buttons";
 import '../global/custom-modal';
-import { listenBulkAddToGroupModal, triggerGroupUpdated } from '../../events/eventListeners';
+import {listenBulkAddToGroupModal, triggerGroupUpdated, triggerUpdateList} from '../../events/eventListeners';
 import '../../svg/check.js';
 import '../pages/account/avatar.js';
 import '../pages/account/qa/select-my-questions.js';

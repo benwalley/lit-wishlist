@@ -4,8 +4,10 @@ import '../../svg/check.js';
 import buttonStyles from '../../css/buttons.js'
 import helperStyles from '../../css/helpers.js'
 import {cachedFetch} from "../../helpers/caching.js";
+import {observeState} from "lit-element-state";
+import {userState} from "../../state/userStore.js";
 
-class GroupListComponent extends LitElement {
+class GroupListComponent extends observeState(LitElement) {
     static properties = {
         groups: { type: Array },
         apiEndpoint: { type: String },
@@ -90,7 +92,7 @@ class GroupListComponent extends LitElement {
                     display: flex;
                     flex-direction: column;
                     gap: var(--spacing-x-small);
-                    max-height: 200px;
+                    max-height: 250px;
                     overflow-y: auto;
                     padding: var(--spacing-x-small);
                 }
@@ -132,7 +134,13 @@ class GroupListComponent extends LitElement {
 
     connectedCallback() {
         super.connectedCallback();
-        this.fetchGroups();
+        
+        // Only fetch data if user is authenticated
+        if (userState.userData?.id) {
+            this.fetchGroups();
+        } else {
+            this.loading = false; // Stop loading state
+        }
 
         // Bind methods
         this.toggleGroupSelection = this.toggleGroupSelection.bind(this);
@@ -148,6 +156,12 @@ class GroupListComponent extends LitElement {
     }
 
     async fetchGroups() {
+        // Don't fetch if user is not authenticated
+        if (!userState.userData?.id) {
+            this.loading = false;
+            return;
+        }
+        
         try {
             this.loading = true;
             const response = await cachedFetch(this.apiEndpoint, {}, true);

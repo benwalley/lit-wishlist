@@ -5,8 +5,10 @@ import {listenUpdateList} from "../../events/eventListeners.js";
 import {fetchMyLists} from "../../helpers/api/lists.js";
 import '../../components/global/selectable-list/selectable-list.js';
 import {messagesState} from "../../state/messagesStore.js";
+import {userState} from "../../state/userStore.js";
+import {observeState} from "lit-element-state";
 
-export class CustomElement extends LitElement {
+export class CustomElement extends observeState(LitElement) {
     static properties = {
         lists: {type: Array},
         selectedListIds: {type: Array},
@@ -30,11 +32,23 @@ export class CustomElement extends LitElement {
 
     connectedCallback() {
         super.connectedCallback();
-        this.fetchLists();
-        listenUpdateList(this.fetchLists.bind(this));
+        
+        // Only fetch data if user is authenticated
+        if (userState.userData?.id) {
+            this.fetchLists();
+            listenUpdateList(this.fetchLists.bind(this));
+        } else {
+            this.loading = false; // Stop loading state
+        }
     }
 
     async fetchLists() {
+        // Don't fetch if user is not authenticated
+        if (!userState.userData?.id) {
+            this.loading = false;
+            return;
+        }
+        
         try {
             this.loading = true;
             const response = await fetchMyLists();

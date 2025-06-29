@@ -121,7 +121,7 @@ class AllListsContainer extends observeState(LitElement) {
 
     renderSkeletons() {
         return Array(6).fill(0).map(() => html`
-            <skeleton-loader type="list-item"></skeleton-loader>
+            <skeleton-loader type="list-item" height="87px"</skeleton-loader>
         `);
     }
 

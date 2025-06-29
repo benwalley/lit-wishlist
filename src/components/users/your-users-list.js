@@ -5,8 +5,10 @@ import '../global/multi-select-dropdown.js'
 import '../global/single-select-dropdown.js'
 import '../../svg/check.js'
 import {cachedFetch} from "../../helpers/caching.js";
+import {observeState} from "lit-element-state";
+import {userState} from "../../state/userStore.js";
 
-class UserListComponent extends LitElement {
+class UserListComponent extends observeState(LitElement) {
     static properties = {
         users: {type: Array},
         apiEndpoint: {type: String},
@@ -128,7 +130,13 @@ class UserListComponent extends LitElement {
 
     connectedCallback() {
         super.connectedCallback();
-        this.fetchUsers();
+
+        // Only fetch data if user is authenticated
+        if (userState.userData?.id) {
+            this.fetchUsers();
+        } else {
+            this.loading = false; // Stop loading state
+        }
     }
 
     disconnectedCallback() {
@@ -136,6 +144,12 @@ class UserListComponent extends LitElement {
     }
 
     async fetchUsers() {
+        // Don't fetch if user is not authenticated
+        if (!userState.userData?.id) {
+            this.loading = false;
+            return;
+        }
+
         try {
             this.loading = true;
             const response = await cachedFetch(this.apiEndpoint, {}, true);
@@ -231,7 +245,7 @@ class UserListComponent extends LitElement {
             </div>
 
             <div class="users-container">
-                ${this.users.map(item => html`
+                ${this.users?.map(item => html`
                     <user-list-item
                             .userData="${item}"
                             ?isSelected=${item && item.id && this.selectedUserIds.includes(item.id)}

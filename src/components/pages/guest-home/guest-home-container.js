@@ -5,87 +5,126 @@ import {globalState} from "../../../state/globalStore.js";
 import './login-account.js';
 import '../../global/custom-input.js'
 import {navigate} from "../../../router/main-router.js";
+import buttonStyles from "../../../css/buttons.js";
 import posthog from 'posthog-js'
 
 
 export class GuestHomeContainer extends observeState(LitElement) {
-    static styles = css`
-        :host {
-            display: block;
-            font-family: Arial, sans-serif;
-            height: 100%;
-        }
+    static get styles() {
+        return [
+            buttonStyles,
+            css`
+                :host {
+                    display: block;
+                    font-family: var(--font-family, Arial, sans-serif);
+                    height: 100%;
+                }
 
-        .container {
-            display: flex;
-            height: 100%;
-        }
+                .container {
+                    display: flex;
+                    height: 100%;
+                }
 
-        .left,
-        .right {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+                .left,
+                .right {
+                    flex: 1;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
 
+                .left {
+                    background: var(--background-color);
+                    color: var(--text-color-dark);
+                }
 
-        .right {
-            background-color: var(--primary-color);
-            position: relative;
-        }
+                .right {
+                    background: linear-gradient(135deg, var(--primary-color) 0%, var(--purple-darker, #6b46c1) 100%);
+                    position: relative;
+                    color: white;
+                }
 
-        .right:after {
-            content: '';
-            width: 50vw;
-            position: absolute;
-            top: 0;
-            left: calc(100% - 1px);
-            background: var(--primary-color);
-            display: block;
-            height: 100%;
-        }
+                .right:after {
+                    content: '';
+                    width: 50vw;
+                    position: absolute;
+                    top: 0;
+                    left: calc(100% - 1px);
+                    background: linear-gradient(135deg, var(--primary-color) 0%, var(--purple-darker, #6b46c1) 100%);
+                    display: block;
+                    height: 100%;
+                }
 
-        .form-container {
-            width: 80%;
-            max-width: 400px;
-            padding: var(--spacing-large) 0;
-        }
+                .form-container {
+                    width: 80%;
+                    max-width: 400px;
+                    padding: var(--spacing-large) 0;
+                    z-index: 1;
+                    position: relative;
+                }
 
-        h2 {
-            margin-bottom: 1rem;
-            font-size: var(--font-size-x-large);
-        }
+                h2 {
+                    margin: 0 0 var(--spacing-normal) 0;
+                    font-size: var(--font-size-xx-large);
+                    font-weight: 700;
+                    color: inherit;
+                }
 
-        .details {
-            font-size: var(--font-size-small);
-        }
+                .right h2 {
+                    color: white;
+                    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                }
 
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-normal);
-        }
+                .details {
+                    font-size: var(--font-size-normal);
+                    line-height: 1.6;
+                    color: var(--text-color-medium-dark);
+                    margin-bottom: var(--spacing-normal);
+                }
 
-        input {
-            padding: 0.5rem;
-            font-size: 1rem;
-        }
+                .details ul {
+                    margin: var(--spacing-small) 0;
+                    padding-left: var(--spacing-normal);
+                }
 
-        button {
-            padding: 0.5rem;
-            font-size: 1rem;
-            cursor: pointer;
-            border: none;
-            background-color: #0078d4;
-            color: white;
-            border-radius: 5px;
-        }
+                .details li {
+                    margin-bottom: var(--spacing-x-small);
+                }
 
-        button:hover {
-            background-color: #005bb5;
-        }
-    `;
+                form {
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-normal);
+                    margin-top: var(--spacing-normal);
+                }
+
+                .search-description {
+                    font-size: var(--font-size-small);
+                    color: rgba(255, 255, 255, 0.9);
+                    margin-bottom: var(--spacing-normal);
+                    line-height: 1.5;
+                }
+
+                /* Responsive design */
+                @media (max-width: 768px) {
+                    .container {
+                        flex-direction: column;
+                    }
+                    
+                    .right:after {
+                        display: none;
+                    }
+                    
+                    .form-container,
+                    .right .form-container {
+                        width: 90%;
+                        max-width: none;
+                        padding: var(--spacing-normal);
+                    }
+                }
+            `
+        ];
+    }
 
     firstUpdated() {
         this._checkAuthentication();
@@ -141,12 +180,16 @@ export class GuestHomeContainer extends observeState(LitElement) {
                         <!-- Right Section -->
                         <div class="right">
                             <div class="form-container">
-                                <h2>Search</h2>
+                                <h2>Discover Lists</h2>
+                                <p class="search-description">
+                                    Find and explore public wishlists from friends, family, and the community. 
+                                    Search by name or username to discover what others are wishing for.
+                                </p>
                                 <form @submit=${this._handleSearchSubmit}>
                                     <custom-input type="text"
-                                                  placeholder="Search for a list or a user"
+                                                  placeholder="Search for a list or user..."
                                                   required></custom-input>
-                                    <button class="button full-width secondary" type="submit">Search</button>
+                                    <button class="button primary shadow full-width" type="submit">Search Lists</button>
                                 </form>
                             </div>
                         </div>

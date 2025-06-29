@@ -50,6 +50,7 @@ export class CustomElement extends LitElement {
                 .get-this-button,
                 .contribute-button {
                     width: 100%;
+                    font-size: var(--font-size-large);
                 }
 
                 .modal-header {
@@ -120,7 +121,7 @@ export class CustomElement extends LitElement {
                 giverId: user.id,
                 getterId: this.itemData?.createdById,
                 itemId: this.itemId,
-                participating: true
+                participating: user.contributing // Use the actual contributing status from the user data
             }));
 
             const response = await bulkUpdateGoInOn(data);

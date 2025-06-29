@@ -63,7 +63,18 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     triggerDataChangedEvent() {
-        const total = this.userList.reduce((acc, user) => acc + (user.qty || 0), 0);
+        // Calculate total from current user selection
+        const userListTotal = this.userList.reduce((acc, user) => acc + (user.qty || 0), 0);
+        
+        // Calculate total from all other users not in the current user's group
+        const myUserIds = this.userList.map(user => user.id);
+        const othersTotal = (this.itemData?.getting || [])
+            .filter(getter => !myUserIds.includes(getter.giverId))
+            .reduce((acc, getter) => acc + (getter.numberGetting || 0), 0);
+        
+        // Total is user selection + others getting it
+        const total = userListTotal + othersTotal;
+        
         this.dispatchEvent(new CustomEvent('data-changed', {
             bubbles: true,
             composed: true,

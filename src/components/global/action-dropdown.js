@@ -1,23 +1,13 @@
 import {LitElement, html, css} from 'lit';
-import {
-    autoUpdate,
-    computePosition,
-    offset,
-    flip,
-    shift
-} from '@floating-ui/dom';
 import '../../svg/chevron-down.js';
 import '../../svg/chevron-up.js';
 import buttonStyles from '../../css/buttons.js';
-
-// Global registry to track open dropdowns
-const DROPDOWN_REGISTRY = new Set();
+import {computePosition, flip, shift, offset} from '@floating-ui/dom';
 
 export class ActionDropdown extends LitElement {
     static properties = {
         open: {type: Boolean, reflect: true},
-        items: {type: Array},
-        placement: {type: String}
+        items: {type: Array}
     };
 
     static styles = [
@@ -45,16 +35,20 @@ export class ActionDropdown extends LitElement {
         }
 
         .dropdown-content {
-            display: none;
-            position: fixed;
             background: var(--background-color-light, white);
             min-width: 180px;
             border-radius: var(--border-radius-normal);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 9999;
+            border: 1px solid var(--border-color);
+            margin: 0;
+            padding: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1000;
         }
-
-        .dropdown-content.visible {
+        
+        .dropdown-content:popover-open {
             display: block;
         }
 
@@ -98,142 +92,98 @@ export class ActionDropdown extends LitElement {
         super();
         this.open = false;
         this.items = [];
-        this.placement = 'bottom-end';
-        this._cleanup = null;
         
         // Binding methods
-        this._handleOutsideClick = this._handleOutsideClick.bind(this);
-        this._handleEscKey = this._handleEscKey.bind(this);
+        this._handlePopoverToggle = this._handlePopoverToggle.bind(this);
     }
 
     connectedCallback() {
         super.connectedCallback();
-        document.addEventListener('keydown', this._handleEscKey);
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
-        document.removeEventListener('click', this._handleOutsideClick);
-        document.removeEventListener('keydown', this._handleEscKey);
-        DROPDOWN_REGISTRY.delete(this);
-        
-        // Clean up positioning logic
-        if (this._cleanup) {
-            this._cleanup();
-            this._cleanup = null;
-        }
+        // Cleanup will be handled automatically by the popover API
     }
 
     firstUpdated() {
-        // Add click handler to the toggle button
+        // Set up popover event listeners
+        const popoverElement = this.shadowRoot.querySelector('.dropdown-content');
+        if (popoverElement) {
+            popoverElement.addEventListener('toggle', this._handlePopoverToggle);
+        }
+        
+        // Set up click handlers for slotted toggle elements
         const slot = this.shadowRoot.querySelector('slot[name="toggle"]');
         slot.addEventListener('slotchange', () => {
             const toggleElements = slot.assignedElements();
             toggleElements.forEach(element => {
-                element.addEventListener('click', (e) => this._handleToggleClick(e));
-            });
-        });
-    }
-
-    _handleToggleClick(e) {
-        e.stopPropagation();
-        
-        if (this.open) {
-            this.close();
-        } else {
-            // Close any other open dropdowns
-            this._closeAllDropdowns();
-            this.open = true;
-            
-            const menu = this.shadowRoot.querySelector('.dropdown-content');
-            const toggleBtn = this.shadowRoot.querySelector('.dropdown-toggle');
-            
-            if (menu && toggleBtn) {
-                // Show the menu first so it has dimensions
-                menu.classList.add('visible');
-                
-                // Set up the floating UI positioning
-                this._setupPositioning(toggleBtn, menu);
-                
-                // Register this dropdown as open
-                DROPDOWN_REGISTRY.add(this);
-                
-                // Add click listener with a small delay to prevent immediate closing
-                setTimeout(() => {
-                    document.addEventListener('click', this._handleOutsideClick);
-                }, 0);
-            }
-        }
-    }
-
-    _setupPositioning(referenceEl, menu) {
-        // Clean up any existing positioning logic
-        if (this._cleanup) {
-            this._cleanup();
-        }
-        
-        // Setup autoUpdate to reposition when needed
-        this._cleanup = autoUpdate(referenceEl, menu, () => {
-            // Determine the preferred placement
-            const preferredPlacement = this.placement || 'bottom-end';
-            
-            computePosition(referenceEl, menu, {
-                placement: preferredPlacement,
-                strategy: 'fixed', // Use fixed strategy to handle scroll properly
-                middleware: [
-                    offset(8), // Add some spacing
-                    flip({
-                        fallbackPlacements: ['top-end', 'bottom-end', 'top-start', 'bottom-start']
-                    }),
-                    shift({ padding: 8 }) // Keep within viewport
-                ]
-            }).then(({ x, y, placement, middlewareData }) => {
-                // Apply the positioning
-                Object.assign(menu.style, {
-                    left: `${x}px`,
-                    top: `${y}px`,
-                    position: 'fixed' // Fixed positioning to avoid overflow issues
+                element.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.toggle();
                 });
             });
         });
     }
 
-    _closeAllDropdowns() {
-        for (const dropdown of DROPDOWN_REGISTRY) {
-            if (dropdown !== this) {
-                dropdown.close();
-            }
+    async _updatePosition() {
+        const referenceElement = this.shadowRoot.querySelector('.dropdown-toggle');
+        const floatingElement = this.shadowRoot.querySelector('.dropdown-content');
+        
+        if (!referenceElement || !floatingElement) return;
+
+        const {x, y} = await computePosition(referenceElement, floatingElement, {
+            placement: 'bottom-end',
+            middleware: [
+                offset(4),
+                flip(),
+                shift({padding: 8})
+            ]
+        });
+
+        Object.assign(floatingElement.style, {
+            left: `${x}px`,
+            top: `${y}px`,
+        });
+    }
+
+    _handlePopoverToggle(e) {
+        // Update the open state to match the popover state
+        this.open = e.newState === 'open';
+        
+        // Update position when opening
+        if (this.open) {
+            this._updatePosition();
+        }
+        
+        // Dispatch event for any components that need to know about state changes
+        this.dispatchEvent(new CustomEvent('dropdown-toggle', {
+            detail: { open: this.open },
+            bubbles: true,
+            composed: true
+        }));
+    }
+
+    async show() {
+        const popover = this.shadowRoot.querySelector('.dropdown-content');
+        if (popover && popover.showPopover) {
+            popover.showPopover();
+            await this._updatePosition();
         }
     }
 
-    close() {
-        this.open = false;
-        
-        const menu = this.shadowRoot.querySelector('.dropdown-content');
-        if (menu) {
-            menu.classList.remove('visible');
-        }
-        
-        DROPDOWN_REGISTRY.delete(this);
-        document.removeEventListener('click', this._handleOutsideClick);
-        
-        // Clean up floating UI when closed
-        if (this._cleanup) {
-            this._cleanup();
-            this._cleanup = null;
+    hide() {
+        const popover = this.shadowRoot.querySelector('.dropdown-content');
+        if (popover && popover.hidePopover) {
+            popover.hidePopover();
         }
     }
 
-    _handleOutsideClick(e) {
-        // Check if clicked outside this dropdown
-        if (!e.composedPath().includes(this)) {
-            this.close();
-        }
-    }
-
-    _handleEscKey(e) {
-        if (e.key === 'Escape' && this.open) {
-            this.close();
+    toggle() {
+        const popover = this.shadowRoot.querySelector('.dropdown-content');
+        if (popover && popover.togglePopover) {
+            popover.togglePopover();
         }
     }
 
@@ -255,14 +205,19 @@ export class ActionDropdown extends LitElement {
             composed: true
         }));
         
-        this.close();
+        this.hide();
     }
 
     updated(changedProps) {
-        if (changedProps.has('open') && !this.open) {
-            const menu = this.shadowRoot.querySelector('.dropdown-content');
-            if (menu) {
-                menu.classList.remove('visible');
+        // Sync external open state changes with popover
+        if (changedProps.has('open')) {
+            const popover = this.shadowRoot.querySelector('.dropdown-content');
+            if (popover) {
+                if (this.open && !popover.matches(':popover-open')) {
+                    this.show();
+                } else if (!this.open && popover.matches(':popover-open')) {
+                    this.hide();
+                }
             }
         }
     }
@@ -273,7 +228,10 @@ export class ActionDropdown extends LitElement {
                 <slot name="toggle"></slot>
             </div>
             
-            <div class="dropdown-content">
+            <div 
+                class="dropdown-content" 
+                popover="auto"
+            >
                 <div class="menu-items">
                     ${this.items.map(item => {
                         // Start with the basic dropdown-item class

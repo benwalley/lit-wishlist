@@ -1,5 +1,6 @@
 // router.js
 import { Router } from '@vaadin/router';
+import { userState } from '../state/userStore.js';
 import '../components/pages/guest-home/guest-home-container.js';
 import '../components/pages/account/account-container.js'
 import '../components/pages/list/list-view-container.js'
@@ -12,6 +13,23 @@ import '../components/pages/lists/all-lists-container.js';
 import '../components/pages/events/event-view-container.js';
 import '../components/pages/events/events-page.js';
 import '../components/pages/gift-tracking/gift-tracking-proposals.js';
+import '../components/pages/groups/groups-page.js';
+
+// Authentication guard function
+const requireAuth = (context, commands) => {
+    // If still loading user data, allow navigation (auth-container will handle)
+    if (userState.loadingUser) {
+        return undefined;
+    }
+    
+    // If no authenticated user, redirect to login page
+    if (!userState.userData?.id) {
+        return commands.redirect('/');
+    }
+    
+    // User is authenticated, allow access
+    return undefined;
+};
 
 
 const routes = [
@@ -22,42 +40,57 @@ const routes = [
     {
         path: '/account',
         component: 'account-container',
+        action: requireAuth,
     },
     {
         path: '/user/:userId',
         component: 'user-view-container',
+        action: requireAuth,
     },
     {
         path: '/group/:groupId',
         component: 'group-view-container',
+        action: requireAuth,
     },
     {
         path: '/lists',
         component: 'all-lists-container',
+        action: requireAuth,
     },
     {
         path: '/list/:listId',
         component: 'list-view-container',
+        action: requireAuth,
     },
     {
         path: '/list/:listId/item/:itemId',
         component: 'item-view-container',
+        action: requireAuth,
     },
     {
         path: '/qa',
         component: 'qa-page-container',
+        action: requireAuth,
     },
     {
         path: '/events/:eventId',
         component: 'event-view-container',
+        action: requireAuth,
     },
     {
         path: '/events',
         component: 'events-page',
+        action: requireAuth,
     },
     {
         path: '/proposals',
         component: 'gift-tracking-proposals',
+        action: requireAuth,
+    },
+    {
+        path: '/groups',
+        component: 'groups-page',
+        action: requireAuth,
     },
     {
         path: '(.*)',

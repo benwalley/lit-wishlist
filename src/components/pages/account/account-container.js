@@ -32,6 +32,7 @@ export class AccountContainer extends LitElement {
                     display: grid;
                     gap: var(--spacing-normal);
                     padding: var(--spacing-normal);
+                    max-width: 1200px;
                 }
 
                 @media (min-width: 768px) {

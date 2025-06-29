@@ -4,61 +4,33 @@ import '../account/avatar.js';
 import '../../../svg/check.js';
 import '../../../svg/delete.js';
 import '../../../svg/arrow-long.js';
+import '../../../svg/bell.js';
 import '../../global/custom-tooltip.js'
-import {getInvitedGroups, acceptGroupInvitation, declineGroupInvitation} from '../../../helpers/api/groups.js';
 import {messagesState} from "../../../state/messagesStore.js";
-import {listenGroupUpdated, triggerGroupUpdated} from "../../../events/eventListeners.js";
+import {listenGroupUpdated, triggerGroupUpdated, triggerBulkAddToGroupModal, triggerUpdateList} from "../../../events/eventListeners.js";
+import {observeState} from 'lit-element-state';
+import {groupInvitationsState} from '../../../state/groupInvitationsStore.js';
 
-export class InvitedGroups extends LitElement {
-    static properties = {
-        groups: { type: Array },
-        loading: { type: Boolean },
-        error: { type: String },
-    };
-
-    constructor() {
-        super();
-        this.groups = [];
-        this.loading = true;
-        this.error = '';
-    }
-
+export class InvitedGroups extends observeState(LitElement) {
     connectedCallback() {
         super.connectedCallback();
-        this.fetchInvitedGroups();
-        listenGroupUpdated(this.fetchInvitedGroups.bind(this));
+        listenGroupUpdated(() => {
+            groupInvitationsState.fetchInvitations();
+        });
     }
 
-    async fetchInvitedGroups() {
-        try {
-            this.loading = true;
-            const result = await getInvitedGroups();
-
-            if (!result.success) {
-                this.error = 'Failed to load invited groups';
-                messagesState.addMessage('Failed to load invited groups', 'error');
-            } else {
-                this.groups = result.data || [];
-            }
-        } catch (err) {
-            this.error = 'An error occurred loading invited groups';
-            messagesState.addMessage('An error occurred loading invited groups', 'error');
-        } finally {
-            this.loading = false;
-        }
-    }
-
-    async handleAcceptInvite(groupId, event) {
+    async handleAcceptInvite(group, event) {
         event.preventDefault();
         event.stopPropagation();
         try {
-            const result = await acceptGroupInvitation(groupId);
-            if (result.success) {
-                messagesState.addMessage('Group invitation accepted');
-                triggerGroupUpdated();
-                await this.fetchInvitedGroups();
-            } else {
-                throw new Error('Failed to accept invitation');
+            const result = await groupInvitationsState.acceptInvitation(group.id);
+            messagesState.addMessage('Group invitation accepted');
+            triggerGroupUpdated();
+            triggerUpdateList();
+
+            // Trigger the bulk add modal to allow adding items/lists to the newly joined group
+            if (result.data) {
+                triggerBulkAddToGroupModal(group);
             }
         } catch (error) {
             messagesState.addMessage('Failed to accept invitation', 'error');
@@ -69,14 +41,10 @@ export class InvitedGroups extends LitElement {
         event.preventDefault();
         event.stopPropagation();
         try {
-            const result = await declineGroupInvitation(groupId);
-            if (result.success) {
-                messagesState.addMessage('Group invitation declined');
-                triggerGroupUpdated();
-                await this.fetchInvitedGroups();
-            } else {
-                throw new Error('Failed to decline invitation');
-            }
+            await groupInvitationsState.declineInvitation(groupId);
+            messagesState.addMessage('Group invitation declined');
+            triggerGroupUpdated();
+            triggerUpdateList();
         } catch (error) {
             messagesState.addMessage('Failed to decline invitation', 'error');
         }
@@ -110,12 +78,33 @@ export class InvitedGroups extends LitElement {
                 }
                 
                 .empty-state {
-                    padding: var(--spacing-small);
-                    background-color: var(--background-light);
-                    border-radius: var(--border-radius-small);
-                    font-size: var(--font-size-small);
-                    color: var(--text-color-medium-dark);
+                    padding: 48px 24px;
                     text-align: center;
+                    color: var(--text-color-medium-dark);
+                    background-color: var(--background-light);
+                    border-radius: var(--border-radius-normal);
+                    border: 2px dashed var(--border-color);
+                }
+
+                .empty-state-icon {
+                    width: 48px;
+                    height: 48px;
+                    margin: 0 auto 16px;
+                    opacity: 0.5;
+                    color: var(--text-color-medium-dark);
+                }
+
+                .empty-state-title {
+                    font-size: var(--font-size-large);
+                    font-weight: 600;
+                    margin: 0 0 8px 0;
+                    color: var(--text-color-dark);
+                }
+
+                .empty-state-description {
+                    font-size: var(--font-size-normal);
+                    margin: 0;
+                    line-height: 1.5;
                 }
                 
                 .loading {
@@ -171,7 +160,7 @@ export class InvitedGroups extends LitElement {
                 <h2 class="title">Group Invitations</h2>
             </div>
             
-            ${this.loading ? 
+            ${groupInvitationsState.loading ? 
                 html`<div class="loading">Loading invitations...</div>` :
                 this.renderGroups()
             }
@@ -179,17 +168,25 @@ export class InvitedGroups extends LitElement {
     }
 
     renderGroups() {
-        if (this.error) {
-            return html`<div class="empty-state">${this.error}</div>`;
+        if (groupInvitationsState.error) {
+            return html`<div class="empty-state">${groupInvitationsState.error}</div>`;
         }
 
-        if (!this.groups || this.groups.length === 0) {
-            return html`<div class="empty-state">You don't have any group invitations.</div>`;
+        if (!groupInvitationsState.invitations || groupInvitationsState.invitations.length === 0) {
+            return html`
+                <div class="empty-state">
+                    <bell-icon class="empty-state-icon"></bell-icon>
+                    <h3 class="empty-state-title">No Invitations</h3>
+                    <p class="empty-state-description">
+                        You don't have any pending group invitations at the moment. Check back later!
+                    </p>
+                </div>
+            `;
         }
 
         return html`
             <div class="groups-container">
-                ${this.groups.map(group => html`
+                ${groupInvitationsState.invitations.map(group => html`
                     <a class="compact-group-item" href="/group/${group.id}">
                         <custom-avatar 
                             size="40" 
@@ -220,7 +217,7 @@ export class InvitedGroups extends LitElement {
                         
                         <button 
                             class="icon-button accept-button" 
-                            @click="${(e) => this.handleAcceptInvite(group.id, e)}"
+                            @click="${(e) => this.handleAcceptInvite(group, e)}"
                             title="Accept invitation"
                             style="--icon-color: var(--green-normal);
                                  --icon-color-hover: var(--green-darker);

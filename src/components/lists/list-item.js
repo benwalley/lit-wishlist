@@ -66,7 +66,7 @@ export class CustomElement extends observeState(LitElement) {
                 .name-section {
                     padding: 0;
                     flex-grow: 1;
-                    gap: 4px;
+                    gap: 8px;
                     justify-content: flex-start;
                     display: flex;
                     flex-direction: column;
@@ -102,8 +102,10 @@ export class CustomElement extends observeState(LitElement) {
                 h3 {
                     margin: 0;
                     line-height: 1;
+                    font-size: var(--font-size-large);
                     color: var(--text-color-dark);
                     width: 100%;
+                    padding-bottom: 2px;
                 }
 
                 .icon-button.icon-button {
@@ -126,13 +128,9 @@ export class CustomElement extends observeState(LitElement) {
                     align-items: center;
                     justify-content: flex-start;
                     gap: var(--spacing-x-small);
-                    margin-left: -40px;
                     font-size: var(--font-size-x-small);
-                    color: var(--text-color-medium-dark);
-                    
-                    user-icon {
-                        font-size: var(--font-size-x-small);
-                    }
+                    color: var(--medium-text-color);
+                    line-height: 1;
 
                     span {
                         white-space: nowrap;
@@ -166,13 +164,20 @@ export class CustomElement extends observeState(LitElement) {
             <a class="container" href="${`/list/${this.itemData.id}`}">
                <custom-avatar 
                        classs="list-name-avatar"
-                    size="35" 
+                    size="65" 
                     username="${this.itemData.listName}"
                     imageId="${this.itemData.imageId}"
-               ></custom-avatar 
-                       clas>
+               ></custom-avatar>
                 <div class="name-section">
-                    <h3>${this.itemData.listName }</h3>
+                    <div>
+                        <h3>${this.itemData.listName }</h3>
+                        ${this.itemData.ownerId && this.showOwner ? html`
+                        <div class="owner-info bottom-row">
+                            <span>${getUsernameById(this.itemData?.ownerId)}</span>
+                        </div>
+                    ` : ''}
+                    </div>
+                    
                     <div class="name-bottom-section">
                         <div class="list-info">
                             ${this.itemData.public ? html`
@@ -194,12 +199,6 @@ export class CustomElement extends observeState(LitElement) {
                             </span>
                         </div>
                     </div>
-                    ${this.itemData.ownerId && this.showOwner ? html`
-                        <div class="owner-info bottom-row">
-                            <user-icon></user-icon>
-                            <span>${getUsernameById(this.itemData?.ownerId)}</span>
-                        </div>
-                    ` : ''}
                     
                 </div>
                 <div class="actions-section">

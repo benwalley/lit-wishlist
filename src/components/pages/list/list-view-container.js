@@ -5,6 +5,7 @@ import './item-tile.js'
 import '../../lists/edit-list-modal.js'
 import '../../../svg/edit.js'
 import '../../../svg/delete.js'
+import '../../../svg/user.js'
 import '../../../svg/dots.js'
 import '../../../svg/share.js'
 import '../../global/action-dropdown.js'
@@ -12,9 +13,10 @@ import {openEditListModal} from '../../lists/edit-list-modal.js'
 import {listenUpdateItem, listenUpdateList, triggerDeleteList} from "../../../events/eventListeners.js";
 import buttonStyles from '../../../css/buttons.js';
 import {messagesState} from "../../../state/messagesStore.js";
-import {redirectToDefaultPage} from "../../../helpers/generalHelpers.js";
+import {getUsernameById, redirectToDefaultPage} from "../../../helpers/generalHelpers.js";
 import {observeState} from "lit-element-state";
 import {userState} from "../../../state/userStore.js";
+import {cachedFetch} from "../../../helpers/caching.js";
 
 export class ListViewContainer extends observeState(LitElement) {
     static properties = {
@@ -45,7 +47,7 @@ export class ListViewContainer extends observeState(LitElement) {
 
     async fetchListData() {
         try {
-            const response = await customFetch(`/lists/${this.listId}`, {}, true);
+            const response = await cachedFetch(`/lists/${this.listId}`, {}, true);
             if(response?.success) {
                 this.listData = response.data;
             } else {
@@ -78,6 +80,7 @@ export class ListViewContainer extends observeState(LitElement) {
                     
                     h1 {
                         margin: 0;
+                        line-height: 1;
                     }
                 }
                 
@@ -100,6 +103,25 @@ export class ListViewContainer extends observeState(LitElement) {
                     display: flex;
                     gap: var(--spacing-small);
                     margin-top: var(--spacing-x-small);
+                }
+                
+                .name-section {
+                    p {
+                        margin: 0;
+                        padding-bottom: var(--spacing-small);
+                        color: var(--text-color-medium-dark);
+                        font-size: var(--font-size-small);
+                        
+                        a {
+                            color: inherit;
+                            text-decoration: none;
+                            transition: var(--transition-200);
+                            
+                            &:hover {
+                                color: var(--text-color-dark);
+                            }
+                        }
+                    }
                 }
                 
                 .edit-button {
@@ -230,7 +252,15 @@ export class ListViewContainer extends observeState(LitElement) {
                 ></custom-avatar>
                 <div class="header-content">
                     <div class="header-top">
-                        <h1>${this.listData?.listName}</h1>
+                        <div class="name-section">
+                            <h1>${this.listData?.listName}</h1>
+                            <p>
+                                <user-icon></user-icon>
+                                <span>Owner: 
+                                    <a href="/user/${this.listData?.ownerId}">${getUsernameById(this.listData?.ownerId)}</a>
+                                </span>
+                            </p>
+                        </div>
                         
                         ${this.listId > 0 ? html`
                             <action-dropdown

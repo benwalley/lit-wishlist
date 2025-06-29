@@ -17,12 +17,21 @@ export class MainContentContainer extends observeState(LitElement) {
 
     static styles = css`
         :host {
-            grid-column: 2;
             grid-row: 2;
             flex-grow: 1;
             width: 100%;
             margin: 0 auto;
             display: grid;
+        }
+        
+        /* When parent has authenticated class (sidebar visible), main content is in column 2 */
+        :host-context(.authenticated) {
+            grid-column: 2;
+        }
+        
+        /* When parent has unauthenticated class (no sidebar), main content spans full width */
+        :host-context(.unauthenticated) {
+            grid-column: 1;
         }
         
         @media (min-width: 450px) {

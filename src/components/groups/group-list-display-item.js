@@ -27,7 +27,8 @@ class GroupItemComponent extends observeState(LitElement) {
             align-items: center;
             padding: var(--spacing-x-small);
             transition: var(--transition-200);
-            border: 1px solid transparent;
+            background: var(--background-dark);
+            border: 1px solid var(--border-color);
             border-radius: 10px;
             
             &:hover {
@@ -61,19 +62,30 @@ class GroupItemComponent extends observeState(LitElement) {
             gap: var(--spacing-small);
         }
         
-        .admin-badge {
+        .badge {
             border-radius: 50px;
-            color: var(--text-color-dark);
-            background: var(--purple-light);
+            color: white;
             font-weight: bold;
             line-height: 1;
             padding: var(--spacing-x-small) var(--spacing-small);
             margin: auto 0;
+            font-size: var(--font-size-small);
+        }
+        
+        .owner-badge {
+            background: var(--purple-color, #8b5cf6);
+        }
+        
+        .admin-badge {
+            background: var(--blue-color, #3b82f6);
         }
     `;
 
+    _isOwner() {
+        return this.group?.ownerId === userState?.userData?.id;
+    }
+
     _isAdmin() {
-        if(this.group?.ownerId === userState?.userData.id)  return true;
         for(const admin of this.group?.adminIds || []) {
             if(admin === userState?.userData?.id) return true;
         }
@@ -100,7 +112,8 @@ class GroupItemComponent extends observeState(LitElement) {
                 <div class="group-info">
                     <div class="group-header-row">
                         <span class="group-name">${this.group?.groupName}</span>
-                        ${this._isAdmin() ? html`<span class="admin-badge">Admin</span>` : ''}
+                        ${this._isOwner() ? html`<span class="badge owner-badge">Owner</span>` : 
+                          this._isAdmin() ? html`<span class="badge admin-badge">Admin</span>` : ''}
                     </div>
                     <div>
                         <span>${this.group?.members?.length || 1}</span>

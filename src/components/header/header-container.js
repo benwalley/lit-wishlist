@@ -28,9 +28,18 @@ export class HeaderContainer extends observeState(LitElement) {
             buttonStyles,
             css`
                 :host {
-                    grid-column: 2;
                     position: sticky;
                     top: 0;
+                }
+                
+                /* When parent has authenticated class (sidebar visible), header is in column 2 */
+                :host-context(.authenticated) {
+                    grid-column: 2;
+                }
+                
+                /* When parent has unauthenticated class (no sidebar), header spans full width */
+                :host-context(.unauthenticated) {
+                    grid-column: 1;
                 }
                 header {
                     padding: 10px;

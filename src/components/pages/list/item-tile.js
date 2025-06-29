@@ -225,9 +225,11 @@ export class ItemTile extends observeState(LitElement) {
         const link = this.getLink();
 
         return html`<a class="item-link ${this.small ? 'small' : ''}" href="/list/${this.listId}/item/${this.itemData?.id}">
-            <gotten-contributing-badges
+            ${canUserContribute(userState.userData, this.itemData) ? html`
+                <gotten-contributing-badges
                     .itemData="${this.itemData}"
-            ></gotten-contributing-badges>
+                ></gotten-contributing-badges>
+            ` : ''}
             <custom-image
                     imageId="${this.itemData?.imageIds?.[0]}"
                     alt="${this.itemData?.name}"

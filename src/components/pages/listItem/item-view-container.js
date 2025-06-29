@@ -16,15 +16,18 @@ import '../../../svg/edit.js';
 import './list-sidebar.js';
 import {cachedFetch, invalidateCache} from "../../../helpers/caching.js";
 import {formatDate} from "../../../helpers/generalHelpers.js";
-import {triggerUpdateItem} from "../../../events/eventListeners.js";
+import {listenUpdateItem, triggerUpdateItem} from "../../../events/eventListeners.js";
 import './get-this-button.js';
 import './contribute-button.js';
 import '../../global/action-dropdown.js';
 import {openEditItemModal} from '../../add-to-list/edit-item-modal.js';
 import {messagesState} from "../../../state/messagesStore.js";
+import {canUserContribute} from "../../../helpers/userHelpers.js";
+import {userState} from "../../../state/userStore.js";
+import {observeState} from "lit-element-state";
 
 
-export class CustomElement extends LitElement {
+export class CustomElement extends observeState(LitElement) {
     static properties = {
         itemId: {type: String},
         listId: {type: String},
@@ -95,6 +98,7 @@ export class CustomElement extends LitElement {
 
                 @media only screen and (min-width: 1400px) {
                     main.main-content {
+                        padding-right: 0;
                         grid-template-columns: 1fr 1fr 320px;
                     }
                 }
@@ -138,7 +142,7 @@ export class CustomElement extends LitElement {
                     display: none;
                     border-left: 1px solid var(--border-color);
                     background: var(--background-light);
-                    padding: var(--spacing-normal);
+                    padding: var(--spacing-small);
                     display: none;
 
                     h2 {
@@ -193,6 +197,7 @@ export class CustomElement extends LitElement {
             return;
         }
         this.fetchListData();
+        listenUpdateItem(() => this.fetchListData())
     }
 
     async fetchListData() {
@@ -264,11 +269,13 @@ export class CustomElement extends LitElement {
                                         <notes-display .itemData="${this.itemData}"></notes-display>
                                     </div>
                                     
+                                    ${canUserContribute(userState.userData, this.itemData) ? html`
+                                        <div class="action-buttons">
+                                            <get-this-button .itemId="${this.itemId}" .itemData="${this.itemData}"></get-this-button>
+                                            <contribute-button .itemId="${this.itemId}" .itemData="${this.itemData}"></contribute-button>
+                                        </div>
+                                    ` : ''}
                                     
-                                    <div class="action-buttons">
-                                        <get-this-button .itemId="${this.itemId}" .itemData="${this.itemData}"></get-this-button>
-                                        <contribute-button .itemId="${this.itemId}" .itemData="${this.itemData}"></contribute-button>
-                                    </div>
                                 </div>
                             `}
 

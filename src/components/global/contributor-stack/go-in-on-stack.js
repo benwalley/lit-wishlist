@@ -3,6 +3,7 @@ import '../../pages/account/avatar.js';
 import '../custom-modal.js';
 import {getUserImageIdByUserId, getUsernameById} from "../../../helpers/generalHelpers.js";
 import {observeState} from "lit-element-state";
+import {userState} from "../../../state/userStore.js";
 
 export class GoInOnStack extends observeState(LitElement) {
     static properties = {
@@ -49,7 +50,10 @@ export class GoInOnStack extends observeState(LitElement) {
             }
             
             h3 {
-                margin-top: 0;
+                margin: 0;
+                padding: var(--spacing-normal);
+                background: var(--background-dark);
+                border-bottom: 1px solid var(--border-color);
             }
             
             .go-in-on-stack {
@@ -115,15 +119,12 @@ export class GoInOnStack extends observeState(LitElement) {
                 color: var(--dark-text-color);
             }
             
-            .modal-content {
-                padding: var(--spacing-normal);
-            }
             
             .user-item {
                 display: flex;
                 align-items: center;
                 gap: var(--spacing-small);
-                padding: var(--spacing-small);
+                padding: 15px;
                 border-bottom: 1px solid var(--border-color);
             }
             
@@ -138,11 +139,27 @@ export class GoInOnStack extends observeState(LitElement) {
             .user-name {
                 font-weight: 500;
                 color: var(--dark-text-color);
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                
+                &:hover {
+                    text-decoration: underline;
+                }
             }
             
             .participating-status {
                 font-size: 0.875rem;
                 color: var(--medium-text-color);
+            }
+            
+            .current-user-dot {
+                width: 7px;
+                height: 7px;
+                background-color: var(--info-yellow);
+                border-radius: 50%;
+                margin-left: var(--spacing-x-small);
+                flex-shrink: 0;
             }
         `;
     }
@@ -193,6 +210,7 @@ export class GoInOnStack extends observeState(LitElement) {
                 .isOpen="${this.modalOpen}" 
                 @modal-closed="${this.closeModal}"
                 maxWidth="400px"
+                noPadding
             >
                 <div class="modal-content">
                     <h3>People Who Want to Go In On This</h3>
@@ -204,7 +222,12 @@ export class GoInOnStack extends observeState(LitElement) {
                                 imageId="${getUserImageIdByUserId(user.giverId)}"
                             ></custom-avatar>
                             <div class="user-info">
-                                <div class="user-name">${getUsernameById(user.giverId)}</div>
+                                <a href="/user/${user.giverId}" class="user-name">
+                                    <span>${getUsernameById(user.giverId)}</span>
+                                    ${user.giverId === userState?.userData?.id ? html`
+                                        <div class="current-user-dot"></div>
+                                    ` : ''}
+                                </a>
                                 <div class="participating-status">Wants to contribute</div>
                             </div>
                         </div>

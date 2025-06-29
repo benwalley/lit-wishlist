@@ -44,6 +44,18 @@ export class CustomElement extends observeState(LitElement) {
                     gap: var(--spacing-small);
                 }
                 
+                .toggle-container {
+                    position: relative;
+                    display: inline-block;
+                }
+                
+                .toggle-input {
+                    position: absolute;
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                }
+                
                 .toggle-switch {
                     position: relative;
                     width: 50px;
@@ -52,10 +64,16 @@ export class CustomElement extends observeState(LitElement) {
                     border-radius: 12px;
                     cursor: pointer;
                     transition: background-color 0.3s;
+                    display: block;
                 }
                 
-                .toggle-switch.active {
+                .toggle-input:checked + .toggle-switch {
                     background-color: var(--primary-button-background);
+                }
+                
+                .toggle-input:focus + .toggle-switch {
+                    outline: 2px solid var(--primary-button-background);
+                    outline-offset: 2px;
                 }
                 
                 .toggle-slider {
@@ -70,7 +88,7 @@ export class CustomElement extends observeState(LitElement) {
                     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
                 }
                 
-                .toggle-switch.active .toggle-slider {
+                .toggle-input:checked + .toggle-switch .toggle-slider {
                     transform: translateX(26px);
                 }
             `
@@ -100,7 +118,8 @@ export class CustomElement extends observeState(LitElement) {
             bubbles: true,
             composed: true,
             detail: {
-                data: contributingUsers,
+                data: this.userList, // Send all users with their contributing status
+                contributingUsers: contributingUsers, // Keep for backward compatibility
                 total: contributingUsers.length
             }
         }));
@@ -160,12 +179,19 @@ export class CustomElement extends observeState(LitElement) {
                             <div class="user-name">${userData.name}</div>
                         </div>
                         <div class="contributing-toggle">
-                            <div 
-                                class="toggle-switch ${userData.contributing ? 'active' : ''}"
-                                @click="${() => this._toggleContributing(index)}"
-                            >
-                                <div class="toggle-slider"></div>
-                            </div>
+                            <label class="toggle-container" for="contributing-${userData.id}">
+                                <input 
+                                    type="checkbox"
+                                    id="contributing-${userData.id}"
+                                    class="toggle-input"
+                                    .checked="${userData.contributing}"
+                                    @change="${() => this._toggleContributing(index)}"
+                                    aria-label="Toggle contributing status for ${userData.name}"
+                                >
+                                <span class="toggle-switch">
+                                    <span class="toggle-slider"></span>
+                                </span>
+                            </label>
                         </div>
                     </div>
                 `

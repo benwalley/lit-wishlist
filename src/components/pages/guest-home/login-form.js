@@ -58,8 +58,8 @@ export class LoginForm extends LitElement {
             this.handleError(userData);
     }
 
-    handleError() {
-
+    handleError(data) {
+        messagesState.addMessage(data.message || 'Login failed. Please check your credentials.', 'error', 5000);
     }
 
     handleSuccess(userData) {

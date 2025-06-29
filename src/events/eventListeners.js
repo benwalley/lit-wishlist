@@ -36,6 +36,8 @@ export function listenUpdateList(callback) {
 export function triggerUpdateItem() {
     invalidateCache('/giftTracking/*');
     invalidateCache('/proposals/*');
+    invalidateCache('/listItems/*');
+    invalidateCache('/lists/*');
     invalidateCache('/events/*');
     triggerCustomEvent(UPDATE_ITEM_EVENT);
 }
@@ -45,6 +47,7 @@ export function listenUpdateItem(callback) {
 }
 
 export function triggerUpdateUser() {
+    invalidateCache('/users/*')
     triggerCustomEvent(UPDATE_USER_EVENT);
 }
 

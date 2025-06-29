@@ -7,6 +7,7 @@ import {messagesState} from "../../../state/messagesStore.js";
 import '../../global/custom-modal.js';
 import '../../groups/create-group-form.js';
 import {listenGroupUpdated} from "../../../events/eventListeners.js";
+import '../../../svg/group.js';
 export class MyGroupsList extends LitElement {
     static properties = {
         groups: { type: Array },
@@ -73,17 +74,38 @@ export class MyGroupsList extends LitElement {
                     flex-direction: column;
                     gap: var(--spacing-normal);
                     margin-top: var(--spacing-small);
-                    max-height: 300px;
+                    max-height: 250px;
                     overflow: auto;
                 }
                 
                 .empty-state {
-                    padding: var(--spacing-small);
-                    background-color: var(--background-light);
-                    border-radius: var(--border-radius-small);
-                    font-size: var(--font-size-small);
-                    color: var(--text-color-medium-dark);
+                    padding: 48px 24px;
                     text-align: center;
+                    color: var(--text-color-medium-dark);
+                    background-color: var(--background-light);
+                    border-radius: var(--border-radius-normal);
+                    border: 2px dashed var(--border-color);
+                }
+
+                .empty-state-icon {
+                    width: 48px;
+                    height: 48px;
+                    margin: 0 auto 16px;
+                    opacity: 0.5;
+                    color: var(--text-color-medium-dark);
+                }
+
+                .empty-state-title {
+                    font-size: var(--font-size-large);
+                    font-weight: 600;
+                    margin: 0 0 8px 0;
+                    color: var(--text-color-dark);
+                }
+
+                .empty-state-description {
+                    font-size: var(--font-size-normal);
+                    margin: 0;
+                    line-height: 1.5;
                 }
                 
                 .loading {
@@ -134,6 +156,7 @@ export class MyGroupsList extends LitElement {
                 ?isOpen="${this.isCreateModalOpen}"
                 maxWidth="600px"
                 @modal-changed="${(e) => this.isCreateModalOpen = e.detail.isOpen}"
+                @modal-closed="${(e) => this.isCreateModalOpen = false}"
             >
                 <create-group-form
                     @close-modal="${this._handleCloseModal}"
@@ -149,7 +172,15 @@ export class MyGroupsList extends LitElement {
         }
 
         if (!this.groups || this.groups.length === 0) {
-            return html`<div class="empty-state">You don't have any groups yet.</div>`;
+            return html`
+                <div class="empty-state">
+                    <group-icon class="empty-state-icon"></group-icon>
+                    <h3 class="empty-state-title">No Groups Yet</h3>
+                    <p class="empty-state-description">
+                        Create your first group to start collaborating with others on wishlists and gift giving.
+                    </p>
+                </div>
+            `;
         }
 
         return html`

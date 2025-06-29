@@ -12,7 +12,7 @@ import {isGroupAdmin, isGroupOwner} from "../../../helpers/groupHelpers.js";
 import {deleteGroup, leaveGroup} from "../../../helpers/api/groups.js";
 import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
 import {messagesState} from "../../../state/messagesStore.js";
-import {triggerGroupUpdated, triggerBulkAddToGroupModal} from "../../../events/eventListeners.js";
+import {triggerGroupUpdated, triggerBulkAddToGroupModal, triggerUpdateList} from "../../../events/eventListeners.js";
 
 /**
  * Group details component that displays group information and admin actions
@@ -203,6 +203,7 @@ export class GroupDetails extends observeState(LitElement) {
                 if (result.success === true) {
                     messagesState.addMessage('You have left the group.');
                     triggerGroupUpdated();
+                    triggerUpdateList();
                     // Navigate back to groups list or another appropriate page
                     window.history.back();
                 } else {

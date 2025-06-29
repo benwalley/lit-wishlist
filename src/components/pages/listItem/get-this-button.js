@@ -49,6 +49,7 @@ export class CustomElement extends LitElement {
                 }
                 .get-this-button {
                     width: 100%;
+                    font-size: var(--font-size-large);
                 }
 
                 .modal-header {
@@ -138,7 +139,7 @@ export class CustomElement extends LitElement {
                 numberGetting: user.qty,
                 itemId: this.itemId,
             }));
-            
+
             const response = await bulkUpdateGetting(data);
             if(response.success) {
                 triggerUpdateItem();

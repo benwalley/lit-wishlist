@@ -3,6 +3,8 @@ import buttonStyles from "../../css/buttons";
 import logo from '../../assets/logo.svg';
 import {observeState} from 'lit-element-state';
 import {globalState} from "../../state/globalStore.js";
+import {userState} from "../../state/userStore.js";
+import {groupInvitationsState} from "../../state/groupInvitationsStore.js";
 import '../../svg/x.js'
 import '../../svg/world.js'
 import '../../svg/empty-heart.js'
@@ -12,6 +14,7 @@ import '../../svg/user.js'
 import '../../svg/hourglass.js'
 import '../../svg/question-mark.js'
 import '../../svg/gear.js'
+import '../../svg/group.js'
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
@@ -72,6 +75,11 @@ export class CustomElement extends observeState(LitElement) {
                     display: flex;
                     position: sticky;
                     top: 0;
+                }
+                
+                /* Hide sidebar completely when user is not authenticated */
+                :host-context(.unauthenticated) {
+                    display: none;
                 }
 
                 nav {
@@ -176,6 +184,28 @@ export class CustomElement extends observeState(LitElement) {
                     font-size: var(--font-size-large);
                 }
 
+                .menu-item-with-badge {
+                    position: relative;
+                }
+
+                .invitation-badge {
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    right: 6px;
+                    background-color: var(--delete-red);
+                    color: white;
+                    border-radius: 50%;
+                    min-width: 18px;
+                    height: 18px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 11px;
+                    font-weight: 600;
+                    line-height: 1;
+                }
+
                 /* On mobile, slide the nav from the left, show/hide overlay */
                 @media (max-width: 767px) {
                     :host {
@@ -214,6 +244,11 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     render() {
+        // Only render sidebar if user is authenticated
+        if (!userState.userData?.id) {
+            return html``;
+        }
+
         return html`
             <aside
                     class="navigation-section ${globalState.menuExpanded ? 'expanded' : 'collapsed'}"
@@ -244,6 +279,15 @@ export class CustomElement extends observeState(LitElement) {
                             <gift-icon class="icon"></gift-icon>
                             <span>Proposals</span>
                         </a></li>
+                        <li class="menu-item-with-badge">
+                            <a href="/groups" class="menu-item-link ${this._isActive('/groups') ? 'active' : ''}">
+                                <group-icon class="icon"></group-icon>
+                                <span>Groups</span>
+                            </a>
+                            ${groupInvitationsState.invitationCount > 0 ? html`
+                                <div class="invitation-badge">${groupInvitationsState.invitationCount}</div>
+                            ` : ''}
+                        </li>
                         <li><a href="#" class="menu-item-link">
                             <user-icon class="icon"></user-icon>
                             <span>All Users</span>
