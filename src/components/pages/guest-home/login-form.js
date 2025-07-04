@@ -6,6 +6,7 @@ import { messagesState } from "../../../state/messagesStore.js"
 import {navigate} from "../../../router/main-router.js";
 import {userState} from "../../../state/userStore.js";
 import {setJwt, setRefreshToken} from "../../../localStorage/tokens.js";
+import {triggerUpdateUser} from "../../../events/eventListeners.js";
 
 
 export class LoginForm extends LitElement {
@@ -63,7 +64,6 @@ export class LoginForm extends LitElement {
     }
 
     handleSuccess(userData) {
-        console.log(userData?.user);
         const id = userData?.user?.id;
         const jwt = userData?.tokens?.jwtToken
         const refreshToken = userData?.tokens?.refreshToken
@@ -75,7 +75,7 @@ export class LoginForm extends LitElement {
         userState.loadingUser = false;
         setJwt(jwt)
         setRefreshToken(refreshToken)
-
+        triggerUpdateUser();
         messagesState.addMessage('Successfully logged in.', 'success', 5000);
         navigate(`/account`)
     }

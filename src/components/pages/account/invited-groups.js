@@ -121,13 +121,14 @@ export class InvitedGroups extends observeState(LitElement) {
                     grid-template-columns: auto 1fr auto auto;
                     align-items: center;
                     padding: var(--spacing-small);
+                    border: 1px solid var(--border-color);
                     border-radius: var(--border-radius-normal);
                     background-color: var(--background-light);
                     transition: var(--transition-200);
                     
                     &:hover {
                         box-shadow: var(--shadow-1-soft);
-                        transform: translateY(-1px);
+                        border-color: var(--primary-color);
                     }
                 }
                 

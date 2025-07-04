@@ -65,7 +65,6 @@ export class AuthContainer extends observeState(LitElement) {
 
     updated(changedProperties) {
         super.updated(changedProperties);
-        // Update CSS class based on authentication state
         this._updateAuthenticationClass();
     }
 

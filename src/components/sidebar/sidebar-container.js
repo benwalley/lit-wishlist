@@ -15,6 +15,7 @@ import '../../svg/hourglass.js'
 import '../../svg/question-mark.js'
 import '../../svg/gear.js'
 import '../../svg/group.js'
+import '../../svg/cloud-upload.js'
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
@@ -295,6 +296,10 @@ export class CustomElement extends observeState(LitElement) {
                         <li><a href="/qa" class="menu-item-link ${this._isActive('/qa') ? 'active' : ''}">
                             <question-mark-icon class="icon"></question-mark-icon>
                             <span>Questions & Answers</span>
+                        </a></li>
+                        <li><a href="/import" class="menu-item-link ${this._isActive('/import') ? 'active' : ''}">
+                            <cloud-upload-icon class="icon"></cloud-upload-icon>
+                            <span>Import Amazon Wishlist</span>
                         </a></li>
                     </ul>
 

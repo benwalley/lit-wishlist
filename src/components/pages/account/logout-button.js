@@ -8,6 +8,7 @@ import {navigate} from "../../../router/main-router.js";
 import {messagesState} from "../../../state/messagesStore.js";
 import buttonStyles from "../../../css/buttons.js";
 import {invalidateCache} from "../../../helpers/caching.js";
+import {triggerUpdateUser} from "../../../events/eventListeners.js";
 
 export class LogoutButton extends observeState(LitElement) {
     static properties = {
@@ -50,6 +51,7 @@ export class LogoutButton extends observeState(LitElement) {
         setJwt(undefined);
         setRefreshToken(undefined);
         userState.userData = undefined;
+        userState.myUsers = [];
         messagesState.addMessage('Successfully logged out', 'success')
         invalidateCache()
         navigate(globalState.landingPage);

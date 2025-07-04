@@ -82,6 +82,7 @@ export function listenUserUpdated(callback) {
 
 export function triggerGroupUpdated() {
     invalidateCache("/groups/*")
+    invalidateCache("/users/accessible")
     triggerCustomEvent(GROUP_UPDATED_EVENT);
 }
 
