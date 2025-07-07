@@ -29,7 +29,7 @@ export class AuthContainer extends observeState(LitElement) {
         :host {
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            height: 100vh;
         }
 
         @media (min-width: 768px) {

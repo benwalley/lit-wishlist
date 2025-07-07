@@ -65,6 +65,13 @@ export class ItemTile extends observeState(LitElement) {
                     aspect-ratio: 1.25/1;
                     display: flex;
                     object-fit: cover;
+                    overflow: hidden;
+                }
+                
+                .middle-row {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
                 }
                 
                 .small custom-image {
@@ -73,6 +80,7 @@ export class ItemTile extends observeState(LitElement) {
 
                 .item-name {
                     margin: 0;
+                    margin-bottom: auto;
                 }
                 @container item-tile (max-width: 200px) {
                     .item-name {
@@ -89,6 +97,7 @@ export class ItemTile extends observeState(LitElement) {
                 
                 .right-side-container {
                     display: flex;
+                    flex-grow: 1;
                     flex-direction: column;
                     gap: var(--spacing-small);
                     padding: var(--spacing-small);
@@ -118,7 +127,6 @@ export class ItemTile extends observeState(LitElement) {
                 }
                 
                 priority-display {
-                    margin-top: auto;
                     padding-right: 30px;
                 }
                 
@@ -129,7 +137,8 @@ export class ItemTile extends observeState(LitElement) {
                 .item-link {
                     transition: var(--transition-normal);
                     cursor: pointer;
-                    display: grid;
+                    display: flex;
+                    flex-direction: column;
                     height: 100%;
                     position: relative;
                     overflow: hidden;
@@ -159,22 +168,6 @@ export class ItemTile extends observeState(LitElement) {
                 }
             `
         ];
-    }
-
-    /**
-     * Get the first valid link from the item data.
-     * @returns {string|null} The URL of the first link, or null if no valid link is found.
-     */
-    getLink() {
-        try {
-            const links = this.itemData.links;
-            if (links?.length === 0) return;
-            const firstLinkJson = JSON.parse(links[0]);
-            if(!firstLinkJson?.url) return false;
-            return firstLinkJson;
-        } catch (error) {
-            return false;
-        }
     }
 
     _handleEditClick(e) {
@@ -212,18 +205,8 @@ export class ItemTile extends observeState(LitElement) {
         }
     }
 
-    handleGetClick(e) {
-
-    }
-
-    handleContributeClick(e) {
-
-    }
-
 
     render() {
-        const link = this.getLink();
-
         return html`<a class="item-link ${this.small ? 'small' : ''}" href="/list/${this.listId}/item/${this.itemData?.id}">
             ${canUserContribute(userState.userData, this.itemData) ? html`
                 <gotten-contributing-badges
@@ -238,9 +221,13 @@ export class ItemTile extends observeState(LitElement) {
             ></custom-image>
             <div class="right-side-container">
                 <h3 class="item-name">${this.itemData?.name}</h3>
-                ${!this.small ? html`<div>
-                    <price-display .itemData="${this.itemData}"></price-display>
-                </div>` : ''}
+                <div class="middle-row">
+                    ${!this.small ? html`<div>
+                        <price-display .itemData="${this.itemData}"></price-display>
+                    </div>` : ''}
+                    <links-display condensed onlyFirst .itemData="${this.itemData}"></links-display>
+                </div>
+                
                 ${!this.small ? html`<priority-display
                         .value="${this.itemData.priority}"
                         heartSize="20px"

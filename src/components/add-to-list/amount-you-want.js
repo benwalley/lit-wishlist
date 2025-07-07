@@ -93,7 +93,7 @@ class AmountSelector extends LitElement {
                     class="small-input"
                     type="number"
                     name="min"
-                    Label="Min"
+                Label="Min"
                     placeholder="Min"
                     .value=${this.min ?? ''}
                     @input=${this._onMinChange}

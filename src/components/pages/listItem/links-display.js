@@ -7,13 +7,15 @@ import '../../../svg/link.js'
 export class CustomElement extends LitElement {
     static properties = {
         itemData: {type: Object},
-        onlyFirst: {type: Boolean}
+        onlyFirst: {type: Boolean},
+        condensed: {type: Boolean}
     };
 
     constructor() {
         super();
         this.itemData = {};
         this.onlyFirst = false;
+        this.condensed = false;
     }
 
     static get styles() {
@@ -23,13 +25,17 @@ export class CustomElement extends LitElement {
                 :host {
                     /* Add any host styles if needed */
                 }
+                
+                .condensed link-icon {
+                    font-size: var(--font-size-large);
+                }
 
                 .link-container a {
                     display: inline-flex;
                     align-items: center;
                     text-decoration: none;
                     gap: 5px;
-                    color: var(--link-color);
+                    color: var(--blue-normal);
                     
                     link-icon {
                         transition: var(--transition-normal);
@@ -47,51 +53,26 @@ export class CustomElement extends LitElement {
         ];
     }
 
-    /**
-     * Parses the JSON strings from itemData.links into an array of link objects.
-     * @returns {Array} Array of valid link objects.
-     */
-    parseLinks() {
-        const rawLinks = this.itemData?.links || [];
-        return rawLinks.reduce((acc, linkString) => {
-            try {
-                const linkObj = JSON.parse(linkString);
-                if (linkObj?.url) {
-                    if (!linkObj.displayName) {
-                        // Create a displayName based on the base URL (hostname)
-                        const urlInstance = new URL(linkObj.url);
-                        linkObj.displayName = urlInstance.hostname;
-                    }
-                    acc.push(linkObj);
-                }
-            } catch (e) {
-                console.error('Error parsing link:', linkString, e);
-            }
-            return acc;
-        }, []);
-    }
-
 
     /**
      * Computes which links to display based on the onlyFirst property.
      * @returns {Array} Array of link objects to display.
      */
     get linksToDisplay() {
-        const parsedLinks = this.parseLinks();
-        return this.onlyFirst ? parsedLinks.slice(0, 1) : parsedLinks;
+        return this.onlyFirst ? this.itemData?.itemLinks.slice(0, 1) : this.itemData?.itemLinks;
     }
 
     render() {
         return html`
-            <div class="link-container">
+            <div class="link-container ${this.condensed ? ' condensed' : ''}">
                 ${this.linksToDisplay.map(link => html`
                     <div>
                         <a href="${link.url.startsWith('http') ? link.url : `https://${link.url}`}"
                            target="_blank"
                            rel="noopener noreferrer">
                             <link-icon></link-icon>
-                            ${link.displayName}
-                            <new-tab-icon></new-tab-icon>
+                            ${!this.condensed ? 
+                            html`${link.label} <new-tab-icon></new-tab-icon>` : ''}
                         </a>
                         <custom-tooltip>${link.url}</custom-tooltip>
                     </div>

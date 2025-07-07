@@ -34,7 +34,6 @@ export class CustomElement extends observeState(LitElement) {
         itemData: {type: Object},
         loading: {type: Boolean},
         sidebarExpanded: {type: Boolean},
-        hasLinks: {type: Boolean},
     };
 
     constructor() {
@@ -44,7 +43,6 @@ export class CustomElement extends observeState(LitElement) {
         this.itemData = {};
         this.loading = true;
         this.sidebarExpanded = false;
-        this.hasLinks = false;
     }
 
     onBeforeEnter(location, commands, router) {
@@ -58,6 +56,8 @@ export class CustomElement extends observeState(LitElement) {
             css`
                 :host {
                     display: block;
+                    height: 100%;
+                    overflow: hidden;
                 }
 
                 .item-title {
@@ -65,6 +65,7 @@ export class CustomElement extends observeState(LitElement) {
                 }
 
                 /* Use a grid layout for the overall container */
+
                 .containing-element {
                     display: grid;
                     height: 100%;
@@ -74,9 +75,10 @@ export class CustomElement extends observeState(LitElement) {
                     grid-template-columns: 1fr;
                     transition: var(--transition-normal);
                 }
-                
+
                 main.main-content {
                     display: grid;
+                    overflow: hidden;
                     padding: 0 var(--spacing-normal);
                     box-sizing: border-box;
                     width: 100%;
@@ -101,6 +103,15 @@ export class CustomElement extends observeState(LitElement) {
                         padding-right: 0;
                         grid-template-columns: 1fr 1fr 320px;
                     }
+                }
+                
+                .main-content-wrapper {
+                    grid-column: 1 / span 2;
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: var(--spacing-normal);
+                    overflow: scroll;
+                    padding-bottom: var(--spacing-large);
                 }
 
                 contributors-top-bar {
@@ -128,15 +139,12 @@ export class CustomElement extends observeState(LitElement) {
 
                 @media only screen and (min-width: 1000px) {
                     .details-section {
-                        padding-top: var(--spacing-normal);
+                        padding-top: calc(var(--spacing-normal));
                     }
-                }
-                
-                all-images-display {
-                    padding-top: var(--spacing-normal);
                 }
 
                 /* Sidebar styles */
+
                 aside.right-column {
                     width: 300px;
                     display: none;
@@ -144,6 +152,7 @@ export class CustomElement extends observeState(LitElement) {
                     background: var(--background-light);
                     padding: var(--spacing-small);
                     display: none;
+                    overflow: scroll;
 
                     h2 {
                         margin-top: 0;
@@ -166,7 +175,7 @@ export class CustomElement extends observeState(LitElement) {
                     background: var(--background-light);
                     padding: 16px;
                     box-shadow: var(--shadow-0-soft);
-                    
+
                 }
 
                 .tile h3 {
@@ -205,13 +214,6 @@ export class CustomElement extends observeState(LitElement) {
             const response = await cachedFetch(`/listItems/${this.itemId}`, {}, true);
             if (response.success) {
                 this.itemData = response.data;
-                for(const item of this.itemData.links || []) {
-                    const parsed = JSON.parse(item);
-                    if (parsed.url) {
-                        this.hasLinks = true;
-                        break;
-                    }
-                }
             } else {
                 messagesState.addMessage(response.message || 'there was an error fetching the item', 'error');
             }
@@ -232,50 +234,56 @@ export class CustomElement extends observeState(LitElement) {
     render() {
         return html`
             <div class="containing-element">
-                <contributors-top-bar 
-                        .itemId="${this.itemId}" 
+                <contributors-top-bar
+                        .itemId="${this.itemId}"
                         .listId="${this.listId}"
                         .itemData="${this.itemData}"></contributors-top-bar>
-                <main class="main-content ${this.sidebarExpanded ? 'expanded' : 'collapsed'}" aria-busy="${this.loading ? 'true' : 'false'}">
+                <main class="main-content ${this.sidebarExpanded ? 'expanded' : 'collapsed'}"
+                      aria-busy="${this.loading ? 'true' : 'false'}">
                     ${this.loading
                             ? html`<p>Loading item data…</p>`
                             : html`
-                                <all-images-display .itemData="${this.itemData}"></all-images-display>
-                                <div class="details-section">
-                                    <h1 class="item-title">${this.itemData.name}</h1>
-                                    <p class="added-date">
-                                        <calendar-icon></calendar-icon>
-                                        <span>Added ${formatDate(this.itemData.createdAt)}</span>
-                                    </p>
-                                    <priority-display
-                                            value="${this.itemData?.priority}"
-                                            heartSize="20px"
-                                    ></priority-display>
-                                    <div class="tile">
-                                        <price-display .itemData="${this.itemData}" showLabel></price-display>
-                                    </div>
-                                    <div class="tile">
-                                        <h3 class="section-title">Quantity Wanted</h3>
-                                        <amount-wanted-display
-                                                .itemData="${this.itemData}"
-                                        ></amount-wanted-display>
-                                    </div>
-                                    ${this.hasLinks ? html`<div class="tile">
-                                        <h3 class="section-title">Where to buy</h3>
-                                        <links-display .itemData="${this.itemData}"></links-display>
-                                    </div>` : ''}
-                                    <div class="tile">
-                                        <h3 class="section-title">Notes</h3>
-                                        <notes-display .itemData="${this.itemData}"></notes-display>
-                                    </div>
-                                    
-                                    ${canUserContribute(userState.userData, this.itemData) ? html`
+                                <div class="main-content-wrapper">
+                                    <all-images-display .itemData="${this.itemData}"></all-images-display>
+                                    <div class="details-section">
+                                        <h1 class="item-title">${this.itemData.name}</h1>
+                                        <p class="added-date">
+                                            <calendar-icon></calendar-icon>
+                                            <span>Added ${formatDate(this.itemData.createdAt)}</span>
+                                        </p>
+                                        <priority-display
+                                                value="${this.itemData?.priority}"
+                                                heartSize="20px"
+                                        ></priority-display>
+                                        <div class="tile">
+                                            <price-display .itemData="${this.itemData}" showLabel></price-display>
+                                        </div>
+                                        <div class="tile">
+                                            <h3 class="section-title">Quantity Wanted</h3>
+                                            <amount-wanted-display
+                                                    .itemData="${this.itemData}"
+                                            ></amount-wanted-display>
+                                        </div>
+                                        ${this.itemData?.itemLinks?.length ? html`
+                                        <div class="tile">
+                                            <h3 class="section-title">Where to buy</h3>
+                                            <links-display .itemData="${this.itemData}"></links-display>
+                                        </div>` : ''}
+                                        <div class="tile">
+                                            <h3 class="section-title">Notes</h3>
+                                            <notes-display .itemData="${this.itemData}"></notes-display>
+                                        </div>
+
+                                        ${canUserContribute(userState.userData, this.itemData) ? html`
                                         <div class="action-buttons">
-                                            <get-this-button .itemId="${this.itemId}" .itemData="${this.itemData}"></get-this-button>
-                                            <contribute-button .itemId="${this.itemId}" .itemData="${this.itemData}"></contribute-button>
+                                            <get-this-button .itemId="${this.itemId}"
+                                                             .itemData="${this.itemData}"></get-this-button>
+                                            <contribute-button .itemId="${this.itemId}"
+                                                               .itemData="${this.itemData}"></contribute-button>
                                         </div>
                                     ` : ''}
-                                    
+
+                                    </div>
                                 </div>
                             `}
 
@@ -293,7 +301,7 @@ export class CustomElement extends observeState(LitElement) {
                 </main>
 
                 <!-- Sidebar wrapped in an <aside> with an accessible name -->
-                
+
             </div>
         `;
     }

@@ -59,6 +59,44 @@ export async function bulkAddToList(listId, itemIds) {
 }
 
 /**
+ * Bulk create items
+ * @param {Array<Object>} items - Array of items to create
+ * @param {Array<number>} listIds - Optional array of list IDs to associate items with
+ * @returns {Promise<{success: boolean, data: Object}|{success: boolean, error: Error}>}
+ */
+export async function bulkCreateItems(items, listIds = []) {
+    try {
+        if (!items || !Array.isArray(items) || items.length === 0) {
+            return { success: false, error: 'At least one item is required' };
+        }
+
+        // Validate that each item has a name (required field)
+        for (const item of items) {
+            if (!item.name || typeof item.name !== 'string' || item.name.trim() === '') {
+                return { success: false, error: 'Each item must have a name' };
+            }
+        }
+
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                items,
+                listIds
+            })
+        };
+
+        const result = await customFetch('/listItems/bulk-create', options, true);
+        return result;
+    } catch (error) {
+        console.error('Error creating items:', error);
+        return { success: false, error };
+    }
+}
+
+/**
  * Fetch all items that belong to the current user
  * @param {Array} excludedItemIds - Optional array of item IDs to exclude from results
  * @returns {Promise<{success: boolean, data: Array}|{success: boolean, error: Error}>}

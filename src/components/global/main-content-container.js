@@ -22,6 +22,7 @@ export class MainContentContainer extends observeState(LitElement) {
             width: 100%;
             margin: 0 auto;
             display: grid;
+            overflow: auto;
         }
         
         /* When parent has authenticated class (sidebar visible), main content is in column 2 */

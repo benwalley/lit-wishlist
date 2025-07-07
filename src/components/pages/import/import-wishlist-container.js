@@ -5,13 +5,19 @@ import buttonStyles from '../../../css/buttons.js';
 import { importAmazonWishlist } from '../../../helpers/api/import.js';
 import { messagesState } from '../../../state/messagesStore.js';
 import { navigate } from '../../../router/main-router.js';
+import './import-container.js';
 
 class ImportWishlistContainer extends observeState(LitElement) {
     static get properties() {
         return {
             wishlistUrl: { type: String },
             isSubmitting: { type: Boolean },
-            importResult: { type: Object }
+            importResult: { type: Object },
+            showImportReview: { type: Boolean },
+            currentLoadingState: { type: Number },
+            loadingStateText: { type: String },
+            loadingStateIcon: { type: String },
+            isTransitioning: { type: Boolean }
         };
     }
 
@@ -21,9 +27,8 @@ class ImportWishlistContainer extends observeState(LitElement) {
             css`
                 :host {
                     display: block;
-                    padding: var(--spacing-normal);
-                    max-width: 600px;
                     margin: 0 auto;
+                    width: 100%;
                 }
 
                 .import-header {
@@ -40,17 +45,14 @@ class ImportWishlistContainer extends observeState(LitElement) {
                 .page-description {
                     color: var(--text-color-medium-dark);
                     line-height: 1.5;
-                    margin-bottom: 32px;
+                    margin-bottom: var(--spacing-normal);
                 }
 
                 .import-form {
                     display: flex;
                     flex-direction: column;
-                    gap: 24px;
-                    background: var(--card-background);
-                    padding: 32px;
-                    border-radius: var(--border-radius-normal);
-                    border: 1px solid var(--border-color);
+                    gap: var(--spacing-normal);
+                    padding: var(--spacing-normal);
                 }
 
                 .form-group {
@@ -67,7 +69,7 @@ class ImportWishlistContainer extends observeState(LitElement) {
 
                 .form-actions {
                     display: flex;
-                    justify-content: center;
+                    justify-content: flex-end;
                     margin-top: 16px;
                 }
 
@@ -119,6 +121,91 @@ class ImportWishlistContainer extends observeState(LitElement) {
                     margin: 0;
                     line-height: 1.4;
                 }
+
+                .loading-state {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: var(--spacing-normal);
+                    padding: var(--spacing-large);
+                    text-align: center;
+                    margin-top: var(--spacing-normal);
+                }
+
+                .loading-icon {
+                    font-size: 3rem;
+                    animation: pulse 2s infinite;
+                    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+                    opacity: 1;
+                }
+
+                .loading-icon.transitioning {
+                    opacity: 0;
+                    transform: scale(0.8);
+                }
+
+                .loading-text {
+                    font-size: var(--font-size-normal);
+                    color: var(--text-color-medium-dark);
+                    margin: 0;
+                    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+
+                .loading-text.transitioning {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+
+                .loading-progress {
+                    width: 100%;
+                    max-width: 300px;
+                    height: 8px;
+                    background: var(--background-color-light);
+                    border-radius: 4px;
+                    overflow: hidden;
+                    position: relative;
+                }
+
+                .loading-progress-bar {
+                    height: 100%;
+                    background: linear-gradient(90deg, var(--primary-color), var(--primary-color-light));
+                    border-radius: 4px;
+                    transition: width 0.8s ease;
+                }
+
+                @keyframes pulse {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.1); }
+                    100% { transform: scale(1); }
+                }
+
+                @keyframes slideInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                @keyframes slideInScale {
+                    from {
+                        opacity: 0;
+                        transform: scale(0.5);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                }
+
+                .loading-state-enter {
+                    animation: slideInUp 0.5s ease-out;
+                }
             `
         ];
     }
@@ -128,76 +215,140 @@ class ImportWishlistContainer extends observeState(LitElement) {
         this.wishlistUrl = '';
         this.isSubmitting = false;
         this.importResult = null;
+        this.showImportReview = false;
+        this.currentLoadingState = 0;
+        this.loadingStateText = '';
+        this.loadingStateIcon = '';
+        this.loadingInterval = null;
+        this.isTransitioning = false;
+
+        // Fun loading states - each lasts 3 seconds
+        this.loadingStates = [
+            { text: 'Connecting to Amazon...', icon: '🔗' },
+            { text: 'Fetching wishlist content...', icon: '📦' },
+            { text: 'Parsing HTML structure...', icon: '🔍' },
+            { text: 'Analyzing product data...', icon: '🧠' },
+            { text: 'Extracting images...', icon: '🖼️' },
+            { text: 'Processing prices...', icon: '💰' },
+            { text: 'Validating product links...', icon: '🔗' },
+            { text: 'Organizing items...', icon: '📋' },
+            { text: 'Running quality checks...', icon: '✅' },
+            { text: 'Finalizing import...', icon: '🎯' }
+        ];
     }
 
     _handleUrlChange(e) {
         this.wishlistUrl = e.detail.value;
     }
 
+    _startLoadingStates() {
+        this.currentLoadingState = 0;
+        // Set initial state without transition
+        const initialState = this.loadingStates[0];
+        this.loadingStateText = initialState.text;
+        this.loadingStateIcon = initialState.icon;
+        this.isTransitioning = false;
+
+        this.loadingInterval = setInterval(() => {
+            this.currentLoadingState++;
+            if (this.currentLoadingState < this.loadingStates.length) {
+                this._updateLoadingState();
+            } else {
+                // Cycle back to earlier states if still loading
+                this.currentLoadingState = this.loadingStates.length - 3;
+                this._updateLoadingState();
+            }
+        }, 4000); // 3 seconds per state
+    }
+
+    _updateLoadingState() {
+        // Start transition out
+        this.isTransitioning = true;
+
+        // After fade out completes, update content and fade in
+        setTimeout(() => {
+            const state = this.loadingStates[this.currentLoadingState];
+            this.loadingStateText = state.text;
+            this.loadingStateIcon = state.icon;
+
+            // Small delay before fading in
+            setTimeout(() => {
+                this.isTransitioning = false;
+            }, 50);
+        }, 300); // Match the CSS transition duration
+    }
+
+    _stopLoadingStates() {
+        if (this.loadingInterval) {
+            clearInterval(this.loadingInterval);
+            this.loadingInterval = null;
+        }
+    }
+
     async _handleSubmit(e) {
         e.preventDefault();
-        
+
         if (!this.wishlistUrl.trim()) {
             return;
         }
 
         this.isSubmitting = true;
         this.importResult = null;
+        this._startLoadingStates();
 
         try {
             const response = await importAmazonWishlist(this.wishlistUrl.trim());
-            
+
             if (response.success) {
                 this.importResult = response.data;
                 messagesState.addMessage(
-                    `Successfully imported ${response.data.totalItems} items from "${response.data.wishlistTitle}"`,
+                    `Successfully fetched ${response.data.totalItems} items from "${response.data.wishlistTitle}"`,
                     'success'
                 );
-                
-                // Navigate to lists page after a short delay to show success message
-                setTimeout(() => {
-                    navigate('/lists');
-                }, 1500);
-                
+
+                // Show the import review interface instead of auto-importing
+                this._showImportReview();
+
             } else {
                 // Handle different error cases
-                const errorMessage = this._getErrorMessage(response.error);
+                const errorMessage = this._getErrorMessage(response);
                 messagesState.addMessage(errorMessage, 'error');
                 console.error('Import failed:', response.error);
             }
-            
+
         } catch (error) {
             console.error('Error importing wishlist:', error);
             messagesState.addMessage('An unexpected error occurred. Please try again.', 'error');
         } finally {
             this.isSubmitting = false;
+            this._stopLoadingStates();
         }
     }
 
-    _getErrorMessage(error) {
-        // Handle different error types based on the API response
-        if (error?.message) {
-            const message = error.message;
-            
-            if (message.includes('required')) {
-                return 'Please enter a valid Amazon wishlist URL.';
-            } else if (message.includes('valid Amazon wishlist URL')) {
-                return 'Please provide a valid Amazon wishlist URL.';
-            } else if (message.includes('private')) {
-                return 'This wishlist is private and cannot be accessed. Please make sure the wishlist is public.';
-            } else if (message.includes('not found')) {
-                return 'The requested wishlist could not be found. Please check the URL and try again.';
-            } else if (message.includes('Unauthorized')) {
-                return 'You are not authorized to perform this action. Please log in and try again.';
-            }
-            
-            return message;
-        }
-        
-        return 'Failed to import wishlist. Please try again.';
+    _getErrorMessage(response) {
+        return response.publicMessage || 'Failed to import wishlist. Please try again.';
+    }
+
+    _showImportReview() {
+        this.showImportReview = true;
+    }
+
+    _backToForm() {
+        this.showImportReview = false;
+        this.importResult = null;
+        this.wishlistUrl = '';
     }
 
     render() {
+        if (this.showImportReview && this.importResult) {
+            return html`
+                <import-container
+                    .importData="${this.importResult}"
+                    .onBackToForm="${this._backToForm.bind(this)}"
+                ></import-container>
+            `;
+        }
+
         return html`
             <div class="import-header">
                 <h1>Import Amazon Wishlist</h1>
@@ -234,15 +385,18 @@ class ImportWishlistContainer extends observeState(LitElement) {
                         class="button primary submit-button"
                         ?disabled=${this.isSubmitting || !this.wishlistUrl.trim()}
                     >
-                        ${this.isSubmitting ? 'Importing...' : 'Import Wishlist'}
+                        ${this.isSubmitting ? 'Fetching Items...' : 'Fetch Wishlist Items'}
                     </button>
                 </div>
             </form>
 
-            ${this.importResult ? html`
-                <div class="success-result">
-                    <h3>Import Successful!</h3>
-                    <p>Successfully imported ${this.importResult.totalItems} items from "${this.importResult.wishlistTitle}". You will be redirected to your lists shortly.</p>
+            ${this.isSubmitting ? html`
+                <div class="loading-state loading-state-enter">
+                    <div class="loading-icon ${this.isTransitioning ? 'transitioning' : ''}">${this.loadingStateIcon}</div>
+                    <p class="loading-text ${this.isTransitioning ? 'transitioning' : ''}">${this.loadingStateText}</p>
+                    <div class="loading-progress">
+                        <div class="loading-progress-bar" style="width: ${((this.currentLoadingState + 1) / this.loadingStates.length) * 100}%"></div>
+                    </div>
                 </div>
             ` : ''}
         `;

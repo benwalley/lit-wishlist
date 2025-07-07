@@ -83,7 +83,7 @@ class MultiInput extends LitElement {
 
     /**
      * Parse the comma-separated `placeholder` into an array of keys.
-     * e.g. "url,displayName" => ["url", "displayName"]
+     * e.g. "url,label" => ["url", "label"]
      */
     _getPlaceholderArray() {
         return this.placeholder

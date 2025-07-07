@@ -5,7 +5,7 @@ import '../global/custom-input.js'
 import '../global/custom-toggle.js'
 import './price-input.js'
 import buttonStyles from "../../css/buttons.js";
-import './multi-input.js'
+import './links-input.js'
 import './wysiwyg-editor.js'
 import './amount-you-want.js'
 import './priority-selector.js'
@@ -54,7 +54,7 @@ export class AddToListModal extends LitElement {
         this.singlePrice = 0;
         this.minPrice = 0;
         this.maxPrice = 0;
-        this.links = [{url: '', displayName: ''}];
+        this.links = [{url: '', label: ''}];
         this.notes = '';
         this.images = [];
         this.imageIds = []; // Add this to ensure property is initialized
@@ -233,7 +233,7 @@ export class AddToListModal extends LitElement {
             price: this.singlePrice,
             minPrice: this.minPrice,
             maxPrice: this.maxPrice,
-            links: this.links,
+            itemLinks: this.links,
             notes: this.notes,
             note: this.notes, // Include both for backward compatibility
             imageIds: this.imageIds.filter(id => id !== 0),
@@ -272,7 +272,7 @@ export class AddToListModal extends LitElement {
         this.singlePrice = 0;
         this.minPrice = 0;
         this.maxPrice = 0;
-        this.links = [{url: '', displayName: ''}];
+        this.links = [{url: '', label: ''}];
         this.notes = '';
         this.imageIds = [];
         this.amount = '';
@@ -323,11 +323,9 @@ export class AddToListModal extends LitElement {
                                 ></price-input>
                             </div>
                             <div>
-                                <multi-input .values="${this.links}"
-                                             sectionName="Link(s)"
-                                             placeholder= ${'https://..., Display Name'}
+                                <links-input .values="${this.links}"
                                              @values-change="${(e) => this.links = e.detail.values}">
-                                </multi-input>
+                                </links-input>
                             </div>
                             <priority-selector
                                     .value="${this.priority}"

@@ -14,6 +14,7 @@ class PrioritySelector extends LitElement {
                     align-items: center;
                     gap: 10px;
                 }
+                
                 button {
                     border-radius: 50px !important;
                     width: 22px;
@@ -23,6 +24,7 @@ class PrioritySelector extends LitElement {
                     align-items: center;
                     justify-content: center;
                 }
+                
                 .hearts {
                     display: flex;
                     align-items: center;
@@ -33,17 +35,44 @@ class PrioritySelector extends LitElement {
                     font-size: var(--font-size-normal);
                     padding-bottom: var(--spacing-x-small);
                 }
+
+                /* Small size styles */
+                :host([size="small"]) .contents {
+                    gap: 12px;
+                }
+                
+                :host([size="small"]) button {
+                    width: 19px;
+                    height: 19px;
+                }
+                
+                :host([size="small"]) h3 {
+                    font-size: var(--font-size-small);
+                    padding-bottom: var(--spacing-x-small);
+                }
+                
+                :host([size="small"]) .hearts heart-icon {
+                    --heart-size: 20px;
+                }
+                
+                :host([size="small"]) button minus-icon,
+                :host([size="small"]) button plus-icon {
+                    width: 12px !important;
+                    height: 12px !important;
+                }
             `
         ];
     }
 
     static properties = {
         value: {type: Number, reflect: true},
+        size: {type: String, reflect: true}
     };
 
     constructor() {
         super();
         this.value = 0;
+        this.size = 'normal'; // 'normal' or 'small'
     }
 
     updated(changedProperties) {
