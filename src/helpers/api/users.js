@@ -22,16 +22,22 @@ export async function getCurrentUser() {
  *
  * @param email
  * @param password
+ * @param username - Optional username for subuser login
  * @returns {Promise<{error}|*>}
  */
-export async function login(email, password) {
+export async function login(email, password, username = null) {
     try {
+        const body = { email, password };
+        if (username) {
+            body.username = username;
+        }
+
         const options = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json', // Set the content type to JSON
             },
-            body: JSON.stringify({ email, password }), // Add username and password to the body
+            body: JSON.stringify(body), // Add email, password, and optionally username to the body
         };
 
         const userData = await customFetch('/auth/login', options, false);
@@ -113,5 +119,28 @@ export async function getUserById(userId) {
     } catch (error) {
         console.error('Error fetching user:', error);
         return { success: false, error };
+    }
+}
+
+/**
+ * Switch to a subuser account
+ * @param {number} subuserID - The ID of the subuser to switch to
+ * @returns {Promise<{success: boolean, user?: Object, tokens?: Object, error?: string}>}
+ */
+export async function switchToSubuser(subuserID) {
+    try {
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ subuserID }),
+        };
+
+        const response = await customFetch('/auth/switchUser', options, true);
+        return response;
+    } catch (error) {
+        console.error('Error switching to subuser:', error);
+        return { success: false, error: error.message };
     }
 }

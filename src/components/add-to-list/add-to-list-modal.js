@@ -13,10 +13,14 @@ import './images-selector.js'
 import './delete-automatically-selector.js'
 import './visibility-selector/visibility-selector-container.js'
 import '../lists/select-my-lists.js'
+import '../../svg/ai.js'
+import '../global/custom-tooltip.js'
 import '../../svg/gear.js'
+import '../global/process-loading-ring.js'
 import {customFetch} from "../../helpers/fetchHelpers.js";
 import {triggerUpdateItem, triggerUpdateList} from "../../events/eventListeners.js";
 import {invalidateCache} from "../../helpers/caching.js";
+import {messagesState} from "../../state/messagesStore.js";
 
 export class AddToListModal extends LitElement {
     static properties = {
@@ -41,6 +45,9 @@ export class AddToListModal extends LitElement {
         deleteOnData: {type: String},
         visibility: {type: String},
         matchListVisibility: {type: Boolean},
+        fetchUrl: {type: String},
+        isFetching: {type: Boolean},
+        showFetchSection: {type: Boolean},
     };
 
 
@@ -68,6 +75,37 @@ export class AddToListModal extends LitElement {
         this.visibleToUsers = [];
         this.visibleToGroups = [];
         this.selectedListIds = [];
+        this.fetchUrl = '';
+        this.isFetching = false;
+        this.showFetchSection = true;
+
+        // Define loading phases for item fetching
+        this.fetchingPhases = [
+            {
+                icon: html`<ai-icon></ai-icon>`,
+                message: 'Analyzing URL...',
+                detail: 'Fetching the product page',
+                duration: 3000
+            },
+            {
+                icon: html`<ai-icon></ai-icon>`,
+                message: 'Extracting details...',
+                detail: 'Getting product information',
+                duration: 4000
+            },
+            {
+                icon: html`<ai-icon></ai-icon>`,
+                message: 'Processing images...',
+                detail: 'Optimizing product photos',
+                duration: 3000
+            },
+            {
+                icon: html`<ai-icon></ai-icon>`,
+                message: 'Finalizing...',
+                detail: 'Almost ready',
+                duration: 2000
+            }
+        ];
     }
 
 
@@ -204,6 +242,50 @@ export class AddToListModal extends LitElement {
                     color: var(--text-color-medium-dark);
                     line-height: 1.4;
                 }
+
+                .fetch-url-row {
+                    display: flex;
+                    gap: var(--spacing-small);
+                    align-items: end;
+                }
+
+                .fetch-url-row custom-input {
+                    flex: 1;
+                }
+
+                .fetch-button {
+                    min-width: 44px;
+                    height: 44px;
+                    padding: var(--spacing-x-small);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                }
+
+                .fetch-button:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+
+                .fetch-button ai-icon {
+                    width: 20px;
+                    height: 20px;
+                }
+
+                .form-loading {
+                    opacity: 0.6;
+                    pointer-events: none;
+                }
+
+                .form-loading .fetch-url-row {
+                    pointer-events: auto;
+                }
+
+                .show-fetch-section-container {
+                    text-align: right;
+                    width: 100%;
+                }
             `
         ];
     }
@@ -225,6 +307,10 @@ export class AddToListModal extends LitElement {
         this.advancedOpen = !this.advancedOpen
     }
 
+    _handleToggleFetchSection() {
+        this.showFetchSection = !this.showFetchSection;
+    }
+
 
     async _submitHandler(e) {
         e.preventDefault();
@@ -233,7 +319,7 @@ export class AddToListModal extends LitElement {
             price: this.singlePrice,
             minPrice: this.minPrice,
             maxPrice: this.maxPrice,
-            itemLinks: this.links,
+            itemLinks: this.links.filter(link => link.url && link.url.trim() !== ''),
             notes: this.notes,
             note: this.notes, // Include both for backward compatibility
             imageIds: this.imageIds.filter(id => id !== 0),
@@ -266,6 +352,59 @@ export class AddToListModal extends LitElement {
         this.closeModal();
     }
 
+    async _handleFetchItem() {
+        if (!this.fetchUrl) {
+            messagesState.addMessage('Please enter a URL', 'error');
+            return;
+        }
+
+        this.isFetching = true;
+
+        try {
+            const response = await customFetch('/itemFetch/fetch', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    url: this.fetchUrl
+                })
+            }, true);
+
+            if (response.success && response.data) {
+                const data = response.data;
+
+                // Populate the form with fetched data
+                if (data.name) this.itemName = data.name;
+                if (data.price) {
+                    const priceString = data.price.replace(/[^0-9.-]+/g, '')
+                    this.singlePrice = parseFloat(priceString) || 0;
+                }
+                if (data.imageId) {
+                    this.imageIds = [data.imageId];
+                }
+                if (this.fetchUrl) {
+                    this.links = [{ url: this.fetchUrl, label: data.linkLabel || 'Product Link' }];
+                }
+                // Clear the fetch URL after successful fetch
+                this.fetchUrl = '';
+                this.showFetchSection = false;
+                messagesState.addMessage('Item details fetched successfully!', 'success');
+            } else {
+                messagesState.addMessage('Failed to fetch item details', 'error');
+            }
+        } catch (error) {
+            console.error('Error fetching item:', error);
+            messagesState.addMessage('Error fetching item details', 'error');
+        } finally {
+            this.isFetching = false;
+        }
+    }
+
+    _handleFetchUrlChange(e) {
+        this.fetchUrl = e.detail.value;
+    }
+
     clearData() {
         this.itemName = '';
         this.isPriceRange = false;
@@ -285,6 +424,9 @@ export class AddToListModal extends LitElement {
         this.visibleToUsers = [];
         this.visibleToGroups = [];
         this.selectedListIds = [];
+        this.fetchUrl = '';
+        this.isFetching = false;
+        this.showFetchSection = true;
     }
 
     closeModal() {
@@ -303,14 +445,46 @@ export class AddToListModal extends LitElement {
                     <div class="modal-header">
                         <h2 class="modal-title">Add To List</h2>
                     </div>
-                    <div class="scrolling-contents">
+                    <div class="scrolling-contents ${this.isFetching ? 'form-loading' : ''}">
                         <div class="left-column">
+                            ${this.showFetchSection ? html`
+                                <div class="fetch-url-row">
+                                    <custom-input 
+                                        .value="${this.fetchUrl}"
+                                        label="Fetch product details from URL"
+                                        placeholder="https://example.com/product-page"
+                                        type="url"
+                                        @value-changed="${this._handleFetchUrlChange}">
+                                    </custom-input>
+                                    <button 
+                                        class="button primary fetch-button"
+                                        @click="${this._handleFetchItem}"
+                                        ?disabled="${this.isFetching || !this.fetchUrl}"
+                                    >
+                                        <ai-icon></ai-icon>
+                                        <custom-tooltip>
+                                            ${this.isFetching ? 'Fetching item details...' : 'Fetch item details'}
+                                        </custom-tooltip>
+                                    </button>
+                                </div>
+                            ` : html`
+                                <div class="show-fetch-section-container">
+                                    <button 
+                                        class="button small-link-button"
+                                        @click="${this._handleToggleFetchSection}"
+                                        type="button"
+                                    >
+                                        Show product fetch section
+                                    </button>
+                                </div>
+                            `}
                             <div>
                                 <custom-input .value="${this.itemName}"
                                               label="Item Name"
                                               id="item-name-input"
                                               fullWidth="true"
                                               placeholder="Item Name"
+                                              ?disabled="${this.isFetching}"
                                               @value-changed="${(e) => this.itemName = e.detail.value}"></custom-input>
                             </div>
                             <div>
@@ -377,11 +551,20 @@ export class AddToListModal extends LitElement {
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" class="button primary save-button">Save Item</button>
+                        <button type="submit" class="button primary save-button" ?disabled="${this.isFetching}">
+                            ${this.isFetching ? 'Fetching...' : 'Save Item'}
+                        </button>
                     </div>
                 </form>
+                <process-loading-ring
+                        ?show="${this.isFetching}"
+                        .phases="${this.fetchingPhases}"
+                        duration="10000"
+                ></process-loading-ring>
 
             </custom-modal>
+            
+            
         `;
     }
 

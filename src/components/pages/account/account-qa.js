@@ -154,7 +154,7 @@ export class AccountQA extends observeState(LitElement) {
                     sharedWithUserIds: [userState.userData.id]
                 });
                 if (response.success) {
-                    this.qaItems = this.qaItems.map(item => (item.id === itemId ? response.qaData : item));
+                    this.qaItems = this.qaItems.map(item => (item.id === itemId ? response.data : item));
                     success = true;
                     message = 'Question added successfully.';
                 } else {
@@ -251,7 +251,7 @@ export class AccountQA extends observeState(LitElement) {
                         ? html`<div class="empty-state">No Q&A items yet. Add your first question!</div>`
                         : this.qaItems.map(item => html`<qa-item .item=${item}></qa-item>`)}
             </div>
-            <a class="all-questions-link" href="/qa">Your Questions</a>
+            <a class="all-questions-link" href="/qa">Questions you've asked</a>
         `;
     }
 }

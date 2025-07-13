@@ -342,7 +342,7 @@ export class EditItemForm extends LitElement {
             price: this.singlePrice,
             minPrice: this.minPrice,
             maxPrice: this.maxPrice,
-            itemLinks: this.links,
+            itemLinks: this.links.filter(link => link.url && link.url.trim() !== ''),
             notes: this.notes,
             note: this.notes, // Include both for backward compatibility
             imageIds: this.imageIds.filter(id => id !== 0),

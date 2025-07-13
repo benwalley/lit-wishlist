@@ -1,5 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import '../../global/custom-input.js';
+import '../../global/custom-toggle.js';
 import buttonStyles from '../../../css/buttons.js'
 import {login} from "../../../helpers/api/users.js";
 import { messagesState } from "../../../state/messagesStore.js"
@@ -10,6 +11,17 @@ import {triggerUpdateUser} from "../../../events/eventListeners.js";
 
 
 export class LoginForm extends LitElement {
+    static get properties() {
+        return {
+            loginAsSubuser: { type: Boolean }
+        };
+    }
+
+    constructor() {
+        super();
+        this.loginAsSubuser = false;
+    }
+
     static get styles() {
         return [
             buttonStyles,
@@ -30,6 +42,25 @@ export class LoginForm extends LitElement {
                     font-size: 1rem;
                     cursor: pointer;
                 }
+
+                .subuser-username.hidden {
+                    display: none;
+                }
+
+                .toggle-container {
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                    width: 100%;
+                    gap: var(--spacing-small);
+                    margin-bottom: -20px;
+                }
+
+                .toggle-label {
+                    font-size: var(--font-size-small);
+                    color: var(--text-color-dark);
+                    font-weight: 500;
+                }
             `
         ];
     }
@@ -38,20 +69,43 @@ export class LoginForm extends LitElement {
         return html`
             <form @submit=${this._handleSubmit}>
                 <custom-input id="email" type="email" placeholder="Email" required label="Email"></custom-input>
+
+                <div class="toggle-container">
+                    <span class="toggle-label">Login as subuser</span>
+                    <custom-toggle
+                            .checked=${this.loginAsSubuser}
+                            @change=${this._handleSubuserToggle}
+                    ></custom-toggle>
+                </div>
+                
+                <div class="subuser-username ${this.loginAsSubuser ? '' : 'hidden'}">
+                    <custom-input id="username" type="text" placeholder="Username"
+                                  label="Username" ?required=${this.loginAsSubuser}></custom-input>
+                </div>
+                
                 <custom-input id="password" type="password" placeholder="Password" required
                               label="Password"></custom-input>
+                
                 <button type="submit" class="full-width secondary button">Login</button>
             </form>
         `;
+    }
+
+    _handleSubuserToggle(event) {
+        this.loginAsSubuser = event.detail.checked;
     }
 
     async _handleSubmit(event) {
         event.preventDefault();
         const emailInput = this.shadowRoot.querySelector('#email');
         const passwordInput = this.shadowRoot.querySelector('#password');
+        const usernameInput = this.shadowRoot.querySelector('#username');
+
         const email = emailInput?.value;
         const password = passwordInput?.value;
-        const userData = await login(email, password);
+        const username = this.loginAsSubuser ? usernameInput?.value : null;
+
+        const userData = await login(email, password, username);
         if(userData?.user?.id) {
             this.handleSuccess(userData)
             return;

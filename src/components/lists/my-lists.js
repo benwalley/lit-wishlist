@@ -1,10 +1,9 @@
 import { LitElement, html, css } from 'lit';
 import buttonStyles from "../../css/buttons";
 import formStyles from "../../css/forms.js";
-import { customFetch } from "../../helpers/fetchHelpers.js";
 import './list-item.js';
 import '../create-list/create-list-button.js';
-import { cachedFetch, invalidateCache } from "../../helpers/caching.js";
+import { fetchMyLists, fetchUserLists } from "../../helpers/api/lists.js";
 import {messagesState} from "../../state/messagesStore.js";
 import {listenUpdateList} from "../../events/eventListeners.js";
 import {observeState} from "lit-element-state";
@@ -69,15 +68,18 @@ export class CustomElement extends observeState(LitElement) {
 
     async fetchLists() {
         try {
-            const url = this.userId ? `/lists/user/${this.userId}` : '/lists/mine';
-            const response = await cachedFetch(url, {}, true);
+            const response = this.userId ? 
+                await fetchUserLists(this.userId) : 
+                await fetchMyLists();
+                
             if(response.success) {
-                this.lists = response.data.filter(list => list.id !== 0);
+                this.lists = response.data;
             } else {
-                messagesState.addMessage('error fetching lists', 'error');
+                messagesState.addMessage('Error fetching lists', 'error');
             }
         } catch (error) {
             console.error('Error fetching lists:', error);
+            messagesState.addMessage('Error fetching lists', 'error');
         }
     }
 

@@ -8,8 +8,8 @@ export class EyeIcon extends LitElement {
     static styles = css`
         :host {
             display: inline-block;
-            width: 24px;
-            height: 24px;
+            width: 1em;
+            height: 1em;
             color: currentColor;
         }
 

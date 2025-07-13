@@ -2,17 +2,21 @@ import {LitElement, html, css} from 'lit';
 import {observeState} from 'lit-element-state';
 import {userState} from '../../state/userStore.js';
 import {userListState} from "../../state/userListStore.js";
+import {viewedItemsState} from "../../state/viewedItemsStore.js";
 import {globalState} from '../../state/globalStore.js';
 import {groupInvitationsState} from '../../state/groupInvitationsStore.js';
 import './loading-screen.js';
 import {initRouter, navigate} from "../../router/main-router.js";
 import {getAccessibleUsers, getCurrentUser, getYourUsers} from "../../helpers/api/users.js";
+import {getSubusers} from "../../helpers/api/subusers.js";
+import {getViewedItems, startQueueProcessor, stopQueueProcessor} from "../../helpers/viewedItems/index.js";
 import {
     listenGroupUpdated,
     listenUpdateUser,
     triggerInitialUserLoaded,
     triggerUpdateUser,
-    triggerUserListLoaded
+    triggerUserListLoaded,
+    triggerViewedItemsLoaded
 } from "../../events/eventListeners.js";
 import '../global/messages-component.js';
 import '../add-to-list/edit-item-modal.js';
@@ -53,9 +57,12 @@ export class AuthContainer extends observeState(LitElement) {
     async firstUpdated() {
         await this.fetchUserData();
         await this.fetchAccessibleUsers();
+        await this.fetchViewedItems();
+        triggerInitialUserLoaded();
         listenUpdateUser(() => {
             this.fetchUserData();
             this.fetchAccessibleUsers();
+            this.fetchViewedItems();
         });
         listenGroupUpdated(() => {
             this.fetchAccessibleUsers();
@@ -91,13 +98,26 @@ export class AuthContainer extends observeState(LitElement) {
             if(myUsers?.success) {
                 userState.myUsers = myUsers.data;
             }
+
+            // Fetch subusers if user is authenticated
+            if (userData?.id) {
+                const subusers = await getSubusers();
+                if(subusers?.success) {
+                    userState.subusers = subusers.data;
+                } else {
+                    userState.subusers = [];
+                }
+            }
+
             userState.loadingUser = false;
-            triggerInitialUserLoaded()
             if (!userData?.id) {
+                // User not authenticated, stop queue processor
+                stopQueueProcessor();
                 navigate(globalState.landingPage)
             } else {
-                // Fetch group invitations when user is authenticated
+                // User authenticated, fetch group invitations and start queue processor
                 groupInvitationsState.fetchInvitations();
+                startQueueProcessor();
             }
         } catch (e) {
             console.log('user is not logged in')
@@ -109,10 +129,30 @@ export class AuthContainer extends observeState(LitElement) {
         try {
             const usersData = await getAccessibleUsers()
             userListState.users = usersData;
-            userListState.loadingUsers = false;
+            userListState.usersLoaded = true;
             triggerUserListLoaded()
         } catch (e) {
             userState.loadingUser = false;
+        }
+    }
+
+    async fetchViewedItems() {
+        if (!userState.userData?.id) {
+            return;
+        }
+
+        try {
+            const viewedItemsResponse = await getViewedItems();
+            if (viewedItemsResponse?.success) {
+                viewedItemsState.viewedItems = viewedItemsResponse.data;
+            } else {
+                viewedItemsState.viewedItems = [];
+            }
+            viewedItemsState.viewedItemsLoaded = true;
+            triggerViewedItemsLoaded();
+        } catch (e) {
+            console.error('Error fetching viewed items:', e);
+            viewedItemsState.viewedItems = [];
         }
     }
 

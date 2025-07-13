@@ -161,3 +161,35 @@ export async function fetchMyLists() {
         return { success: false, error };
     }
 }
+
+/**
+ * Fetch all lists that belong to a specific user
+ * @param {number} userId - The ID of the user whose lists to fetch
+ * @returns {Promise<{success: boolean, data: Array}|{success: boolean, error: Error}>}
+ */
+export async function fetchUserLists(userId) {
+    try {
+        if (!userId) {
+            throw new Error('User ID is required');
+        }
+
+        const response = await cachedFetch(`/lists/user/${userId}`, {}, true);
+
+        if (response?.responseData?.error) {
+            throw new Error(response?.responseData?.error);
+        }
+
+        if (response?.success) {
+            const lists = Array.isArray(response.data) ? response.data : [];
+            return {
+                success: true,
+                data: lists.filter(list => list?.id > 0)
+            };
+        }
+
+        return { success: false, error: 'Failed to fetch user lists' };
+    } catch (error) {
+        console.error('Error fetching user lists:', error);
+        return { success: false, error };
+    }
+}

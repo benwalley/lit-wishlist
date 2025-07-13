@@ -1,4 +1,6 @@
 import {userListState} from "../state/userListStore.js";
+import {userState} from "../state/userStore.js";
+import {viewedItemsState} from "../state/viewedItemsStore.js";
 
 let counter = 0
 
@@ -36,6 +38,58 @@ export function getUserDescriptionById(userId) {
     return user ? user.publicDescription : '';
 }
 
+
+export function isSubuser(userId) {
+    if (!userId) return false;
+
+    const user = userListState.users.find(user => user.id === userId);
+    return user?.parentId || false;
+}
+
+export function isCurrentUserSubuser() {
+    return !!userState?.userData?.parentId;
+}
+
+/**
+ * Check if an item has been viewed by the current user
+ * @param {string|number} itemId - The item ID to check
+ * @returns {boolean} - True if the item has been viewed, false otherwise
+ */
+export function isItemViewed(itemId) {
+    if (!itemId || !viewedItemsState.viewedItems) return false;
+    
+    return viewedItemsState.viewedItems.some(viewedItem => 
+        viewedItem.itemId === itemId || viewedItem.id === itemId
+    );
+}
+
+/**
+ * Get viewed item details by item ID
+ * @param {string|number} itemId - The item ID to look up
+ * @returns {Object|null} - The viewed item object, or null if not found
+ */
+export function getViewedItemById(itemId) {
+    if (!itemId || !viewedItemsState.viewedItems) return null;
+    
+    return viewedItemsState.viewedItems.find(viewedItem => 
+        viewedItem.itemId === itemId || viewedItem.id === itemId
+    ) || null;
+}
+
+export function getParentUserName(userId) {
+    if (!userId) return '';
+
+    const child = userListState.users.find(user => user.id === userId);
+    const parent = userListState.users.find(user => user.id === child.parentId);
+    return parent?.name || '';
+}
+
+export function getParentUserId(userId) {
+    if (!userId) return 0;
+
+    const child = userListState.users.find(user => user.id === userId);
+    return child.parentId || 0;
+}
 export function getUserImageIdByUserId(userId) {
     if (!userId) return 0;
 
@@ -52,4 +106,16 @@ export function getEmailAddressByUserId(userId) {
 
 export function redirectToDefaultPage() {
     window.location.href = '/';
+}
+
+/**
+ * Truncate a string to a maximum length and add ellipsis if needed
+ * @param {string} text - The text to truncate
+ * @param {number} maxLen - Maximum length before truncation
+ * @returns {string} - The truncated text with ellipsis if needed
+ */
+export function maxLength(text, maxLen) {
+    if (!text || typeof text !== 'string') return '';
+    if (text.length <= maxLen) return text;
+    return text.substring(0, maxLen) + '...';
 }

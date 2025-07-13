@@ -70,6 +70,52 @@ export default css`
             &:active {
                 background: rgba(204, 204, 204, .1);
             }
+
+            &.danger-text {
+                color: var(--delete-red);
+                border-color: var(--delete-red);
+                
+                &:hover,
+                &:focus,
+                &:active {
+                    background: var(--delete-red-light);
+                    color: var(--delete-red-darker);
+                }
+            }
+            
+            &.blue-text {
+                color: var(--blue-normal);
+                border-color: var(--blue-normal);
+                
+                &:hover,
+                &:focus,
+                &:active {
+                    background: var(--blue-light);
+                    color: var(--blue-darker);
+                }
+            }
+            
+            &.green-text {
+                color: var(--green-normal);
+                border-color: var(--green-normal);
+                
+                &:hover,
+                &:focus,
+                &:active {
+                    background: var(--green-light);
+                }
+            }
+            
+            &.purple-text {
+                color: var(--purple-normal);
+                border-color: var(--purple-normal);
+                
+                &:hover,
+                &:focus,
+                &:active {
+                    background: var(--purple-light);
+                }
+            }
         }
         
         &.danger {
@@ -206,10 +252,9 @@ export default css`
 
 
         &:disabled {
-            background-color: #e0e0e0;
-            color: #9e9e9e;
             cursor: not-allowed;
             pointer-events: none;
+            opacity: 0.5;
         }
 
         &.button-as-link {

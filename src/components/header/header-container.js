@@ -2,6 +2,8 @@ import {LitElement, html, css} from 'lit';
 import '../global/custom-tooltip.js'
 import './login-account-link.js'
 import './notifications.js'
+import './logout-element.js'
+import './switch-user-element.js'
 import './dark-mode-toggle.js'
 import '../../svg/hamburger.js'
 import '../../svg/arrow-long-left.js'
@@ -66,9 +68,9 @@ export class HeaderContainer extends observeState(LitElement) {
                 }
                 
                 .back-button {
-                    display: flex;
                     font-size: var(--font-size-large);
                     margin-right: auto;
+                    display: none;
                 }
                 
                 .back-button:hover {
@@ -76,17 +78,20 @@ export class HeaderContainer extends observeState(LitElement) {
                 }
                 
                 .header-left {
-                    display: flex;
                     align-items: center;
                     margin-right: auto;
+                    display: flex;
                 }
                 
                 @media (min-width: 768px) {
                     :host {
                         position: relative;
                     }
+                    .header-left .back-button {
+                        display: flex;
+                    }
                     header {
-                        gap: 16px;
+                        gap: 10px;
                     }
                     .mobile-sidebar-toggle {
                         display: none;
@@ -125,6 +130,8 @@ export class HeaderContainer extends observeState(LitElement) {
                 </div>
                 <dark-mode-toggle></dark-mode-toggle>
                 <notifications-element></notifications-element>
+                <logout-element></logout-element>
+                <switch-user-element></switch-user-element>
                 <div class="divider"></div>
                 <login-account-link></login-account-link>
             </header>

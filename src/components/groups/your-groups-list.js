@@ -6,6 +6,7 @@ import helperStyles from '../../css/helpers.js'
 import {cachedFetch} from "../../helpers/caching.js";
 import {observeState} from "lit-element-state";
 import {userState} from "../../state/userStore.js";
+import {listenInitialUserLoaded} from "../../events/eventListeners.js";
 
 class GroupListComponent extends observeState(LitElement) {
     static properties = {
@@ -134,7 +135,7 @@ class GroupListComponent extends observeState(LitElement) {
 
     connectedCallback() {
         super.connectedCallback();
-        
+
         // Only fetch data if user is authenticated
         if (userState.userData?.id) {
             this.fetchGroups();
@@ -148,6 +149,8 @@ class GroupListComponent extends observeState(LitElement) {
         this.clearSelection = this.clearSelection.bind(this);
 
         this.addEventListener('group-selected', this._handleGroupSelected);
+
+        listenInitialUserLoaded(() => this.fetchGroups())
     }
 
     disconnectedCallback() {
@@ -161,7 +164,7 @@ class GroupListComponent extends observeState(LitElement) {
             this.loading = false;
             return;
         }
-        
+
         try {
             this.loading = true;
             const response = await cachedFetch(this.apiEndpoint, {}, true);

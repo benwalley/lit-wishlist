@@ -19,6 +19,10 @@ import {messagesState} from "../../../state/messagesStore.js";
 import {userState} from "../../../state/userStore.js";
 import {observeState} from "lit-element-state";
 import {canUserContribute} from "../../../helpers/userHelpers.js";
+import {addItemToQueue} from "../../../helpers/viewedItems/index.js";
+import {viewedItemsState} from "../../../state/viewedItemsStore.js";
+import {listenInitialUserLoaded, listenUpdateItem, listenViewedItemsLoaded, listenUpdateViewedItems} from "../../../events/eventListeners.js";
+import {isItemViewed} from "../../../helpers/generalHelpers.js";
 
 
 export class ItemTile extends observeState(LitElement) {
@@ -33,6 +37,64 @@ export class ItemTile extends observeState(LitElement) {
         this.itemData = {};
         this.listId = '';
         this.small = false;
+        this.intersectionObserver = null;
+    }
+
+    connectedCallback() {
+        super.connectedCallback();
+
+        if(userState?.userData && viewedItemsState.viewedItemsLoaded) {
+            this.setupViewportTracking();
+        }
+
+        // Set up event listeners
+        listenInitialUserLoaded(() => {
+            this.setupViewportTracking();
+        });
+        listenViewedItemsLoaded(() => {
+            this.setupViewportTracking();
+        });
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        this.cleanupViewportTracking();
+        this.clearNewItemTimer();
+    }
+
+    setupViewportTracking() {
+        if (!this.itemData?.id || !userState.userData?.id) return;
+        if (!viewedItemsState.viewedItemsLoaded) return;
+        if(viewedItemsState.viewedItems.includes(this.itemData?.id)) return;
+
+        // Create intersection observer to track when item is visible
+        this.intersectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting && entry.intersectionRatio >= 0.9) {
+                        this.markItemAsViewed();
+                    }
+                });
+            },
+            {
+                threshold: 0.9,
+                rootMargin: '0px'
+            }
+        );
+
+        this.intersectionObserver.observe(this);
+    }
+    markItemAsViewed() {
+        if (this.itemData?.id) {
+            addItemToQueue(this.itemData.id);
+            this.requestUpdate();
+        }
+    }
+
+    cleanupViewportTracking() {
+        if (this.intersectionObserver) {
+            this.intersectionObserver.disconnect();
+            this.intersectionObserver = null;
+        }
     }
 
     /**
@@ -54,6 +116,7 @@ export class ItemTile extends observeState(LitElement) {
                     container-type: inline-size;
                     container-name: item-tile;
                     position: relative;
+                    transition: var(--transition-normal);
                 }
                 
                 p {
@@ -145,11 +208,16 @@ export class ItemTile extends observeState(LitElement) {
                     border: 1px solid var(--border-color);
                     border-radius: var(--border-radius-normal);
                     color: var(--text-color-dark);
+                    outline: 1px solid transparent;
                     text-decoration: none;
                     
                     &:hover {
                         box-shadow: var(--shadow-1-soft);
                         border: 1px solid var(--primary-color);
+                    }
+
+                    &.new-item {
+                        outline: 2px solid var(--purple-normal);
                     }
                 }
                 
@@ -205,9 +273,14 @@ export class ItemTile extends observeState(LitElement) {
         }
     }
 
+    isNew() {
+        if(!viewedItemsState?.viewedItemsLoaded) return false;
+        if(viewedItemsState?.viewedItems.includes(this.itemData?.id)) return false;
+        return true;
+    }
 
     render() {
-        return html`<a class="item-link ${this.small ? 'small' : ''}" href="/list/${this.listId}/item/${this.itemData?.id}">
+        return html`<a class="item-link ${this.small ? 'small' : ''} ${this.isNew() ? 'new-item' : ''}" href="/list/${this.listId}/item/${this.itemData?.id}">
             ${canUserContribute(userState.userData, this.itemData) ? html`
                 <gotten-contributing-badges
                     .itemData="${this.itemData}"

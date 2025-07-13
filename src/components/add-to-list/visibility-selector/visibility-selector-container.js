@@ -6,8 +6,9 @@ import '../../users/your-users-list.js'
 import buttonStyles from "../../../css/buttons.js";
 import '../../../svg/chevron-down.js';
 import '../../../svg/chevron-up.js';
+import {observeState} from "lit-element-state";
 
-class VisibilitySelectorContainer extends LitElement {
+class VisibilitySelectorContainer extends observeState(LitElement) {
     static get styles() {
         return [
             buttonStyles,
@@ -141,12 +142,22 @@ class VisibilitySelectorContainer extends LitElement {
         this.matchListVisibility = true;
     }
 
+    reset() {
+        this.selectedUsers = [];
+        this.selectedGroups = [];
+        this.matchListVisibility = true;
+    }
+
     toggleDetails() {
         this.isDetailsExpanded = !this.isDetailsExpanded;
     }
 
     togglePublic() {
         this.matchListVisibility = !this.matchListVisibility;
+
+        this.selectedGroups = [];
+        this.selectedUsers = [];
+
         this.dispatchVisibilityChangedEvent();
     }
 
@@ -167,7 +178,7 @@ class VisibilitySelectorContainer extends LitElement {
     dispatchVisibilityChangedEvent() {
         // When matchListVisibility is true, groups and users are disabled
         const isPublic = this.matchListVisibility ? this.isPublic : false;
-        
+
         this.dispatchEvent(new CustomEvent('visibility-changed', {
             detail: {
                 isPublic,
@@ -231,7 +242,7 @@ class VisibilitySelectorContainer extends LitElement {
                         <your-users-list
                                 class="full-width"
                                 apiEndpoint="/users/accessible"
-                                .selectedUsers="${this.selectedUsers}"
+                                .selectedUserIds="${this.selectedUsers}"
                                 @selection-changed="${this.handleUserSelectionChanged}"
                         ></your-users-list>
                     </div>

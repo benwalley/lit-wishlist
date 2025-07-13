@@ -138,6 +138,22 @@ export class CustomElement extends observeState(LitElement) {
                         text-overflow: ellipsis;
                     }
                 }
+                
+                .new-items-counter {
+                    background: var(--purple-normal);
+                    color: var(--light-text-color);
+                    padding: 5px;
+                    border-radius: 40px;
+                    min-width: 20px;
+                    height: 20px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    transform: translate(50%, -50%);
+                }
 
             `
         ];
@@ -224,6 +240,9 @@ export class CustomElement extends observeState(LitElement) {
                             </div>
                         ` : ''}
                 </div>
+                ${this.itemData?.unviewedItemsCount ?  html`<div class="new-items-counter">
+                    ${this.itemData?.unviewedItemsCount}
+                </div>` : '' }
                 
             </a>
         `;

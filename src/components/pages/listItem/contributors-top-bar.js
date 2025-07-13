@@ -14,6 +14,8 @@ import '../../../svg/group.js';
 import {openEditItemModal} from "../../add-to-list/edit-item-modal.js";
 import {deleteItem} from "../../../helpers/api/listItems.js";
 import '../../global/contributor-stack/contributor-stack-container.js'
+import {canUserContribute} from "../../../helpers/userHelpers.js";
+import {userState} from "../../../state/userStore.js";
 
 export class ContributorsTopBar extends LitElement {
     static properties = {
@@ -354,7 +356,7 @@ export class ContributorsTopBar extends LitElement {
                     <span class="desktop-only">Back To List</span>
                 </a>
 
-                <div class="contributor-details">
+                ${canUserContribute(userState.userData, this.itemData) ? html`<div class="contributor-details">
                     ${this.itemData
                             ? html`
                                 <div class="avatar-stack fade-in">
@@ -372,9 +374,9 @@ export class ContributorsTopBar extends LitElement {
                                     <div class="skeleton skeleton-text" style="width: 80px; margin-top: 5px;"></div>
                                 </div>
                 `}
-                </div>
+                </div>` : ''}
 
-                <div class="amount-gotten fade-in ${this.totalNumberGotten === 0 ? 'none-gotten' : ''}">
+                ${canUserContribute(userState.userData, this.itemData) ? html`<div class="amount-gotten fade-in ${this.totalNumberGotten === 0 ? 'none-gotten' : ''}">
                     ${this.itemData
                             ? html`
                                 
@@ -397,7 +399,7 @@ export class ContributorsTopBar extends LitElement {
                                      style="width: 40px; height: 20px;"></div>
                                 <span>gotten</span>
                             `}
-                </div>
+                </div>` : ''}
 
                 <!-- Action Buttons -->
                 <div class="actions-container">

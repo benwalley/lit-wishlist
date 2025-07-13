@@ -3,6 +3,7 @@ import buttonStyles from "../../../css/buttons";
 import '../../global/custom-tooltip.js'
 import '../../../svg/new-tab.js'
 import '../../../svg/link.js'
+import { maxLength } from '../../../helpers/generalHelpers.js';
 
 export class CustomElement extends LitElement {
     static properties = {
@@ -74,7 +75,7 @@ export class CustomElement extends LitElement {
                             ${!this.condensed ? 
                             html`${link.label} <new-tab-icon></new-tab-icon>` : ''}
                         </a>
-                        <custom-tooltip>${link.url}</custom-tooltip>
+                        <custom-tooltip>${maxLength(link.url, 100)}</custom-tooltip>
                     </div>
                 `)}
             </div>

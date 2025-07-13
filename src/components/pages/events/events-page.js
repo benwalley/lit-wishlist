@@ -116,7 +116,7 @@ export class EventsPage extends LitElement {
                     flex-direction: column;
                     align-items: center;
                     justify-content: center;
-                    padding: var(--spacing-x-large);
+                    padding: var(--spacing-normal);
                     text-align: center;
                     gap: var(--spacing-normal);
                     background-color: var(--background-light);

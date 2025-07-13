@@ -13,9 +13,15 @@ import '../../svg/gift.js'
 import '../../svg/user.js'
 import '../../svg/hourglass.js'
 import '../../svg/question-mark.js'
+import '../../svg/child.js'
 import '../../svg/gear.js'
 import '../../svg/group.js'
 import '../../svg/cloud-upload.js'
+import '../../svg/dots.js'
+import '../../svg/user-list.js'
+import '../../svg/thick-list.js'
+import '../../svg/dashboard.js'
+import {isCurrentUserSubuser} from "../../helpers/generalHelpers.js";
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
@@ -265,12 +271,16 @@ export class CustomElement extends observeState(LitElement) {
                     <h2 class="menu-section-heading">Main Menu</h2>
                     <ul class="menu-section-list">
                         <li><a href="/account" class="menu-item-link ${this._isActive('/account') ? 'active' : ''}">
-                            <world-icon class="icon"></world-icon>
+                            <dashboard-icon class="icon"></dashboard-icon>
                             <span>Dashboard</span>
                         </a></li>
                         <li><a href="/lists" class="menu-item-link ${this._isActive('/lists') ? 'active' : ''}">
-                            <empty-heart-icon class="icon" active="false"></empty-heart-icon>
+                            <thick-list-icon class="icon" active="false"></thick-list-icon>
                             <span>All Lists</span>
+                        </a></li>
+                        <li><a href="/my-lists" class="menu-item-link ${this._isActive('/my-lists') ? 'active' : ''}">
+                            <user-list-icon class="icon" active="false"></user-list-icon>
+                            <span>My Lists</span>
                         </a></li>
                         <li><a href="/events" class="menu-item-link ${this._isActive('/events') ? 'active' : ''}">
                             <calendar-icon class="icon"></calendar-icon>
@@ -289,29 +299,25 @@ export class CustomElement extends observeState(LitElement) {
                                 <div class="invitation-badge">${groupInvitationsState.invitationCount}</div>
                             ` : ''}
                         </li>
-                        <li><a href="#" class="menu-item-link">
-                            <user-icon class="icon"></user-icon>
-                            <span>All Users</span>
-                        </a></li>
+                        ${!isCurrentUserSubuser() ? html`<li><a href="/subusers" class="menu-item-link ${this._isActive('/subusers') ? 'active' : ''}">
+                            <child-icon class="icon subuser"></child-icon>
+                            <span>Subusers</span>
+                        </a></li>` : ''}
                         <li><a href="/qa" class="menu-item-link ${this._isActive('/qa') ? 'active' : ''}">
                             <question-mark-icon class="icon"></question-mark-icon>
                             <span>Questions & Answers</span>
-                        </a></li>
-                        <li><a href="/import" class="menu-item-link ${this._isActive('/import') ? 'active' : ''}">
-                            <cloud-upload-icon class="icon"></cloud-upload-icon>
-                            <span>Import Amazon Wishlist</span>
                         </a></li>
                     </ul>
 
                     <h2 class="menu-section-heading">Other Links</h2>
                     <ul class="menu-section-list">
-                        <li><a href="#" class="menu-item-link">
-                            <world-icon class="icon"></world-icon>
-                            <span>Dashboard</span>
+                        <li><a href="/bulk-actions" class="menu-item-link ${this._isActive('/bulk-actions') ? 'active' : ''}">
+                            <dots-icon class="icon"></dots-icon>
+                            <span>Bulk Actions</span>
                         </a></li>
-                        <li><a href="#" class="menu-item-link">
-                            <empty-heart-icon class="icon" active="false"></empty-heart-icon>
-                            <span>My Lists</span>
+                        <li><a href="/import" class="menu-item-link ${this._isActive('/import') ? 'active' : ''}">
+                            <cloud-upload-icon class="icon"></cloud-upload-icon>
+                            <span>Import Amazon Wishlist</span>
                         </a></li>
                     </ul>
 

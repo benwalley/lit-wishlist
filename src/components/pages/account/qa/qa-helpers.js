@@ -52,7 +52,7 @@ export async function createQA(qaData) {
         };
 
         const responseData = await customFetch('/qa/create', options, true);
-        return {success: true, qaData: responseData}
+        return responseData
 
     } catch (e) {
         console.log(e)
@@ -93,11 +93,6 @@ export async function updateQuestion(questionData) {
 
 export async function updateAnswer(answerData) {
     try {
-        if(!answerData.answerText?.length) {
-            handleQAError('You must have answer text')
-            return {success: false, message: 'You must enter a answer.'}
-        };
-
         const options = {
             method: 'POST',
             headers: {

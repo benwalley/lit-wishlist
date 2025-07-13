@@ -19,6 +19,8 @@ const DELETE_PROPOSAL_EVENT = 'delete-proposal';
 const PROPOSAL_DELETED_EVENT = 'proposal-deleted';
 const UPDATE_EVENTS_EVENT = 'update-events';
 const EDIT_EVENT_EVENT = 'edit-event';
+const VIEWED_ITEMS_UPDATED_EVENT = 'viewed-items-updated';
+const VIEWED_ITEMS_LOADED_EVENT = 'viewed-items-loaded';
 const imageUploadEvents = {
     imageSelected: 'image-selected',
     cropConfirmed: 'crop-confirmed'
@@ -57,7 +59,6 @@ export function listenUpdateUser(callback) {
 
 export function triggerInitialUserLoaded() {
     triggerCustomEvent(USER_LOADED_EVENT);
-    triggerUserUpdated()
 }
 
 export function listenInitialUserLoaded(callback) {
@@ -72,9 +73,6 @@ export function listenUserListLoaded(callback) {
     return listenToCustomEvent(USER_LIST_LOADED_EVENT, callback);
 }
 
-export function triggerUserUpdated() {
-    triggerCustomEvent(USER_UPDATED_EVENT);
-}
 
 export function listenUserUpdated(callback) {
     return listenToCustomEvent(USER_UPDATED_EVENT, callback);
@@ -192,4 +190,21 @@ export function triggerEditEvent(eventData) {
 
 export function listenEditEvent(callback) {
     return listenToCustomEvent(EDIT_EVENT_EVENT, callback);
+}
+
+export function triggerUpdateViewedItems() {
+    invalidateCache('/listItems/viewed');
+    triggerCustomEvent(VIEWED_ITEMS_UPDATED_EVENT);
+}
+
+export function listenUpdateViewedItems(callback) {
+    return listenToCustomEvent(VIEWED_ITEMS_UPDATED_EVENT, callback);
+}
+
+export function triggerViewedItemsLoaded() {
+    triggerCustomEvent(VIEWED_ITEMS_LOADED_EVENT);
+}
+
+export function listenViewedItemsLoaded(callback) {
+    return listenToCustomEvent(VIEWED_ITEMS_LOADED_EVENT, callback);
 }

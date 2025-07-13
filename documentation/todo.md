@@ -1,16 +1,6 @@
 # TODO:
 
- - handle group admins
-   - If you are a group admin, you can:
-     - add or remove uers from the group
-     - make a user an admin
-     - make a user non-admin
-     - 
- - prevent from going back to home page when login doesn't work initially
-   - Fix login delay
- - allow spaces or commas to separate invitations
- - add deleted items page on my account page
- - Create a method of bulk managing the users and groups things are visible to
+ - groups are showing deleted users
  - add account configuration
  - handle public pages
  - add money popup or page
@@ -39,5 +29,7 @@
  - Add getting indicator on sidebar list on item page
  - Add item page not related to list.
  - add user to list page.
- - 
+ - add url column to image table and if it already exists, don't add it again
+ - bulk actions:
+   - add to list, delete, remove from list, add to group, remove from group
  - 

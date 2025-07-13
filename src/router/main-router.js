@@ -16,6 +16,9 @@ import '../components/pages/gift-tracking/gift-tracking-proposals.js';
 import '../components/pages/groups/groups-page.js';
 import '../components/pages/import/import-wishlist-container.js';
 import '../components/pages/ai/ai-test-container.js';
+import '../components/pages/subusers/subusers-page.js';
+import '../components/pages/bulk-actions/bulk-actions-page.js';
+import '../components/pages/my-lists/my-lists-container.js';
 
 // Authentication guard function
 const requireAuth = (context, commands) => {
@@ -97,6 +100,21 @@ const routes = [
     {
         path: '/import',
         component: 'import-wishlist-container',
+        action: requireAuth,
+    },
+    {
+        path: '/subusers',
+        component: 'subusers-page',
+        action: requireAuth,
+    },
+    {
+        path: '/bulk-actions',
+        component: 'bulk-actions-page',
+        action: requireAuth,
+    },
+    {
+        path: '/my-lists',
+        component: 'my-lists-container',
         action: requireAuth,
     },
     {

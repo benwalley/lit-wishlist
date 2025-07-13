@@ -20,7 +20,10 @@ import './my-groups-list.js'
 import '../../../svg/edit.js'
 import buttonStyles from '../../../css/buttons.js'
 import '../../users/edit-user-form.js';
-export class AccountContainer extends LitElement {
+import {userState} from "../../../state/userStore.js";
+import {observeState} from "lit-element-state";
+import {isCurrentUserSubuser} from "../../../helpers/generalHelpers.js";
+export class AccountContainer extends observeState(LitElement) {
     static get styles() {
         return [
             buttonStyles,
@@ -66,9 +69,9 @@ export class AccountContainer extends LitElement {
                     <account-qa></account-qa>
                 </section>
 
-                <section>
+                ${!isCurrentUserSubuser() ? html`<section>
                     <invited-groups></invited-groups>
-                </section>
+                </section>` : ''}
 
                 <section>
                     <my-groups-list></my-groups-list>

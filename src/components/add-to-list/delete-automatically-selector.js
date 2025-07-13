@@ -69,6 +69,11 @@ class DeleteAutomaticallySelector extends LitElement {
         this.deleteDate = this.calculateDefaultDate();
     }
 
+    reset() {
+        this.deleteEnabled = false;
+        this.deleteDate = this.calculateDefaultDate();
+    }
+
     calculateDefaultDate() {
         const today = new Date();
         // Default to one year from today

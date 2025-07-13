@@ -8,15 +8,22 @@ import '../../svg/admin.js';
 import '../../svg/add-admin.js';
 import '../../svg/remove-admin.js';
 import '../../svg/owner.js';
+import '../../svg/dot.js';
 
 import '../global/custom-tooltip.js';
-import {getUserDescriptionById, getUserImageIdByUserId, getUsernameById} from "../../helpers/generalHelpers.js";
+import {
+    getParentUserId, getParentUserName,
+    getUserDescriptionById,
+    getUserImageIdByUserId,
+    getUsernameById,
+    isSubuser
+} from "../../helpers/generalHelpers.js";
 import {observeState} from "lit-element-state";
 import {userState} from "../../state/userStore.js";
 import {isGroupAdmin, isGroupOwner} from "../../helpers/groupHelpers.js";
 import {messagesState} from "../../state/messagesStore.js";
 import {invalidateCache} from "../../helpers/caching.js";
-import {triggerGroupUpdated} from "../../events/eventListeners.js";
+import {triggerGroupUpdated, triggerUpdateList} from "../../events/eventListeners.js";
 import {makeUserGroupAdmin, removeUserGroupAdmin, removeUserFromGroup} from "../../helpers/api/groups.js";
 import buttonStyles from "../../css/buttons";
 
@@ -82,6 +89,7 @@ export class UserListDisplayItem extends observeState(LitElement) {
                     display: flex;
                     flex-direction: column;
                     min-width: 0;
+                    line-height: 1;
                 }
 
                 .user-name {
@@ -110,6 +118,12 @@ export class UserListDisplayItem extends observeState(LitElement) {
                     margin-top: 2px;
                     line-height: 1.2;
                 }
+                
+                dot-icon {
+                    color: var(--info-yellow);
+                    font-size: var(--spacing-x-small);
+                    padding-left: var(--spacing-x-small);
+                }
 
                 .admin-badge {
                     font-size: var(--font-size-x-x-x-small);
@@ -130,6 +144,20 @@ export class UserListDisplayItem extends observeState(LitElement) {
                 .name-with-badge {
                     display: flex;
                     align-items: center;
+                }
+                
+                .subuser-details {
+                    font-size: var(--font-size-x-x-small);
+                    color: var(--medium-text-color);
+                    
+                    a {
+                        text-decoration: none;
+                        color: inherit;
+                        
+                        &:hover {
+                            text-decoration: underline;
+                        }
+                    }
                 }
                 
             `
@@ -155,6 +183,10 @@ export class UserListDisplayItem extends observeState(LitElement) {
         return isGroupOwner(this.groupData, userState?.userData?.id) &&
                isGroupAdmin(this.groupData, this.userId) &&
                !isGroupOwner(this.groupData, this.userId);
+    }
+
+    isCurrentUser(userId) {
+        return userState?.userData?.id === userId;
     }
 
     /**
@@ -241,8 +273,8 @@ export class UserListDisplayItem extends observeState(LitElement) {
 
             if (result.success) {
                 messagesState.addMessage('User removed from group');
-                invalidateCache(`/groups/${this.groupData.id}`);
                 triggerGroupUpdated();
+                triggerUpdateList();
             } else {
                 messagesState.addMessage('Failed to remove user from group', 'error');
             }
@@ -269,6 +301,7 @@ export class UserListDisplayItem extends observeState(LitElement) {
                     <div class="user-info">
                         <div class="name-with-badge">
                             <div class="user-name">${getUsernameById(this.userId) || 'Unknown User'}</div>
+                            ${this.isCurrentUser(this.userId) ? html`<dot-icon></dot-icon>` : ''}
                             ${isGroupOwner(this.groupData, this.userId) ? html`
                                         <span class="admin-badge owner">
                                             owner
@@ -276,10 +309,12 @@ export class UserListDisplayItem extends observeState(LitElement) {
                                     isGroupAdmin(this.groupData, this.userId) ? html`<span
                                             class="admin-badge admin">admin</span>` : ''}
                         </div>
-                        ${this.showDescription && !this.compact
-                                ? html`
-                                    <div class="user-desc">${getUserDescriptionById(this.userId)}</div>`
-                                : null
+                        ${isSubuser(this.userId) ? html`
+                                    <div class="subuser-details">
+                                         <span>Subuser of</span>
+                                        <a href="/user/${getParentUserId(this.userId)}">${getParentUserName(this.userId)}</a>
+                                    </div>`
+                                : ''
                         }
                     </div>
 

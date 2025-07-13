@@ -306,7 +306,7 @@ export class QAItem extends observeState(LitElement) {
         return html`
             <h3 class="question">${this.item.questionText}</h3>
             <div class="answer-container ${this._isQuestionCreator() ? 'editable' : ''}" 
-                 @click="${this._isQuestionCreator() ? this._openEditPopup : null}">
+                 @click="${this._isQuestionCreator() ? this._openEditPopup : () => {this.isEditing = true;}}">
                 ${hasEmptyAnswer
                         ? html`<span class="missing-info">Needs an answer</span>`
                         : html`<p class="answer">${this.item.answers[0]?.answerText}</p>`

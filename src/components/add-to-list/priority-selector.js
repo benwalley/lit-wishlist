@@ -66,13 +66,28 @@ class PrioritySelector extends LitElement {
 
     static properties = {
         value: {type: Number, reflect: true},
-        size: {type: String, reflect: true}
+        size: {type: String, reflect: true},
+        hideLabel: {type: Boolean, reflect: true}
     };
 
     constructor() {
         super();
         this.value = 0;
         this.size = 'normal'; // 'normal' or 'small'
+        this.hideLabel = false; // show the "Priority" label by default
+    }
+    
+    connectedCallback() {
+        super.connectedCallback();
+        // Ensure value is a number
+        this.value = Number(this.value) || 0;
+    }
+    
+    willUpdate(changedProperties) {
+        // Ensure value is always a number before any update
+        if (changedProperties.has('value')) {
+            this.value = Number(this.value) || 0;
+        }
     }
 
     updated(changedProperties) {
@@ -126,7 +141,7 @@ class PrioritySelector extends LitElement {
 
     render() {
         return html`
-      <h3>Priority</h3>
+      ${!this.hideLabel ? html`<h3>Priority</h3>` : ''}
       <div class="contents">
         <button
           class="button primary"
@@ -137,6 +152,7 @@ class PrioritySelector extends LitElement {
         </button>
         <div class="hearts">${this.renderHearts()}</div>
         <button
+          class="button primary"
           @click="${() => (this.value = Math.min(5, this.value + 0.5))}"
           ?disabled="${this.value >= 5}"
         >

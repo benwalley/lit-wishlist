@@ -5,6 +5,7 @@ import '../../../global/custom-input.js'
 import '../../../users/your-users-list.js'
 import '../../../groups/your-groups-list.js'
 import '../../../../svg/message.js';
+import '../../../../svg/check.js';
 import {messagesState} from "../../../../state/messagesStore.js";
 import '../../../global/due-date-picker.js';
 import { observeState } from 'lit-element-state';
@@ -92,12 +93,41 @@ export class CustomElement extends observeState(LitElement) {
                     padding-bottom: var(--spacing-x-small);
                 }
                 
-                .anonymous-label {
-                    font-weight: bold;
-                    display: block;
-                    font-size: var(--font-size-normal);
+                .checkbox-group {
+                    display: flex;
+                    align-items: center;
+                    gap: var(--spacing-small);
+                    cursor: pointer;
+                }
+                
+                .checkbox {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-width: 16px;
+                    height: 16px;
+                    border-radius: 4px;
+                    border: 2px solid var(--grayscale-300);
+                    transition: var(--transition-normal);
                 }
 
+                .checkbox.selected {
+                    border-color: var(--blue-normal);
+                    background-color: var(--blue-normal);
+                    color: white;
+                }
+
+                check-icon {
+                    width: 16px;
+                    height: 16px;
+                    color: white;
+                }
+                
+                .anonymous-label {
+                    font-weight: bold;
+                    font-size: var(--font-size-normal);
+                    cursor: pointer;
+                }
             `
         ];
     }
@@ -128,8 +158,8 @@ export class CustomElement extends observeState(LitElement) {
         this.questionText = event.target.value;
     }
 
-    _handleAnonymousChange(event) {
-        this.isAnonymous = event.target.checked;
+    _handleAnonymousToggle() {
+        this.isAnonymous = !this.isAnonymous;
     }
 
     _validateInput() {
@@ -227,14 +257,11 @@ export class CustomElement extends observeState(LitElement) {
                 </div>
 
 
-                <div class="checkbox-group">
-                    <input
-                            type="checkbox"
-                            id="anonymousCheck"
-                            .checked=${this.isAnonymous}
-                            @change=${this._handleAnonymousChange}
-                    />
-                    <label for="anonymousCheck" class="anonymous-label">Ask Anonymously</label>
+                <div class="checkbox-group" @click=${this._handleAnonymousToggle}>
+                    <div class="checkbox ${this.isAnonymous ? 'selected' : ''}">
+                        ${this.isAnonymous ? html`<check-icon></check-icon>` : null}
+                    </div>
+                    <span class="anonymous-label">Ask Anonymously</span>
                 </div>
                 
                 <div style="display: flex; flex-direction: column;">

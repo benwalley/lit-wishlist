@@ -1,7 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import './select-list-item.js'
 import '../../svg/check.js'
-import {listenUpdateList} from "../../events/eventListeners.js";
+import {listenInitialUserLoaded, listenUpdateList} from "../../events/eventListeners.js";
 import {fetchMyLists} from "../../helpers/api/lists.js";
 import '../../components/global/selectable-list/selectable-list.js';
 import {messagesState} from "../../state/messagesStore.js";
@@ -30,16 +30,25 @@ export class CustomElement extends observeState(LitElement) {
         `;
     }
 
+    reset() {
+        this.selectedListIds = [];
+    }
+
     connectedCallback() {
         super.connectedCallback();
-        
+
         // Only fetch data if user is authenticated
         if (userState.userData?.id) {
             this.fetchLists();
-            listenUpdateList(this.fetchLists.bind(this));
         } else {
-            this.loading = false; // Stop loading state
+            this.loading = false;
+            listenInitialUserLoaded(() => {
+                this.fetchLists()
+            })
         }
+        listenUpdateList(() => {
+            this.fetchLists()
+        })
     }
 
     async fetchLists() {
@@ -48,7 +57,7 @@ export class CustomElement extends observeState(LitElement) {
             this.loading = false;
             return;
         }
-        
+
         try {
             this.loading = true;
             const response = await fetchMyLists();
@@ -60,7 +69,11 @@ export class CustomElement extends observeState(LitElement) {
                     this.dispatchEvent(new CustomEvent('change', {
                         detail: {
                             selectedListIds: this.selectedListIds,
+                            selectedLists: [this.lists[0]],
+                            count: 1
                         },
+                        bubbles: true,
+                        composed: true
                     }));
                 }
             } else {

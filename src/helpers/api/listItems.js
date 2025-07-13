@@ -126,3 +126,31 @@ export async function fetchMyItems(excludedItemIds = []) {
         return { success: false, error };
     }
 }
+
+/**
+ * Bulk update publicity and priority for multiple items
+ * @param {Array<{id: number, isPublic: boolean, priority: number}>} items - Array of items to update
+ * @returns {Promise<{success: boolean, data: Object}|{success: boolean, error: Error}>}
+ */
+export async function bulkUpdatePublicityAndPriority(items) {
+    try {
+        if (!items || !Array.isArray(items) || items.length === 0) {
+            return { success: false, message: 'At least one item is required' };
+        }
+
+        const options = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                items: items
+            })
+        };
+
+        const result = await customFetch('/listItems/bulk-update-publicity-priority', options, true);
+        return result;
+    } catch (error) {
+        return { success: false, message: error };
+    }
+}

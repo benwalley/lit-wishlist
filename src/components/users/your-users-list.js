@@ -1,27 +1,19 @@
 import {LitElement, html, css} from 'lit';
-import {customFetch} from "../../helpers/fetchHelpers.js";
 import './user-list-item.js'
 import '../global/multi-select-dropdown.js'
 import '../global/single-select-dropdown.js'
 import '../../svg/check.js'
-import {cachedFetch} from "../../helpers/caching.js";
 import {observeState} from "lit-element-state";
-import {userState} from "../../state/userStore.js";
+import {userListState} from "../../state/userListStore.js";
 
 class UserListComponent extends observeState(LitElement) {
     static properties = {
-        users: {type: Array},
-        apiEndpoint: {type: String},
         selectedUserIds: {type: Array},
-        loading: {type: Boolean},
     };
 
     constructor() {
         super();
-        this.users = [];
-        this.apiEndpoint = '/users/yours';
         this.selectedUserIds = [];
-        this.loading = true;
     }
 
     static styles = css`
@@ -130,36 +122,10 @@ class UserListComponent extends observeState(LitElement) {
 
     connectedCallback() {
         super.connectedCallback();
-
-        // Only fetch data if user is authenticated
-        if (userState.userData?.id) {
-            this.fetchUsers();
-        } else {
-            this.loading = false; // Stop loading state
-        }
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
-    }
-
-    async fetchUsers() {
-        // Don't fetch if user is not authenticated
-        if (!userState.userData?.id) {
-            this.loading = false;
-            return;
-        }
-
-        try {
-            this.loading = true;
-            const response = await cachedFetch(this.apiEndpoint, {}, true);
-            const users = await response;
-            this.users = users;
-        } catch (error) {
-            console.error('Error fetching users:', error);
-        } finally {
-            this.loading = false;
-        }
     }
 
     toggleUserSelection(e) {
@@ -181,7 +147,7 @@ class UserListComponent extends observeState(LitElement) {
 
     selectAll() {
         // Set selectedUserIds to include all user IDs
-        this.selectedUserIds = this.users
+        this.selectedUserIds = userListState.users
             .filter(user => user && user.id)
             .map(user => user.id);
         this._dispatchSelectionChangedEvent();
@@ -198,7 +164,7 @@ class UserListComponent extends observeState(LitElement) {
 
     _dispatchSelectionChangedEvent() {
         const selectedUsers = this.selectedUserIds
-            .map(id => this.users.find(user => user && user.id === id))
+            .map(id => userListState.users.find(user => user && user.id === id))
             .filter(Boolean);
 
         this.dispatchEvent(new CustomEvent('selection-changed', {
@@ -212,13 +178,13 @@ class UserListComponent extends observeState(LitElement) {
     }
 
     render() {
-        if (this.loading) {
+        if (!userListState.usersLoaded) {
             return html`
                 <div class="loading">Loading users...</div>
             `;
         }
 
-        if (!this.users || this.users.length === 0) {
+        if (!userListState.users || userListState.users.length === 0) {
             return html`
                 <div class="empty-state">No users found</div>
             `;
@@ -234,7 +200,7 @@ class UserListComponent extends observeState(LitElement) {
                 </div>
 
                 <div class="action-buttons">
-                    ${this.users.length > 0 ? html`
+                    ${userListState.users.length > 0 ? html`
                         <button class="select-all" @click=${this.selectAll}>Select All</button>
                     ` : ''}
 
@@ -245,7 +211,7 @@ class UserListComponent extends observeState(LitElement) {
             </div>
 
             <div class="users-container">
-                ${this.users?.map(item => html`
+                ${userListState.users?.map(item => html`
                     <user-list-item
                             .userData="${item}"
                             ?isSelected=${item && item.id && this.selectedUserIds.includes(item.id)}

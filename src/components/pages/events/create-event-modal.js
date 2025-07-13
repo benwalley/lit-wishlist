@@ -266,7 +266,7 @@ export class CreateEventModal extends observeState(LitElement) {
                         <div class="form-section">
                             <label>Select Participants</label>
                             <div class="form-section-description">
-                                Choose who should be invited to this event
+                                Choose who you will get gifts for in this event.
                             </div>
                             <div class="user-selector-container">
                                 <your-users-list

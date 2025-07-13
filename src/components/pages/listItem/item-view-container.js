@@ -25,6 +25,8 @@ import {messagesState} from "../../../state/messagesStore.js";
 import {canUserContribute} from "../../../helpers/userHelpers.js";
 import {userState} from "../../../state/userStore.js";
 import {observeState} from "lit-element-state";
+import {addItemToQueue} from "../../../helpers/viewedItems/index.js";
+import {isItemViewed} from "../../../helpers/generalHelpers.js";
 
 
 export class CustomElement extends observeState(LitElement) {
@@ -110,7 +112,7 @@ export class CustomElement extends observeState(LitElement) {
                     display: grid;
                     grid-template-columns: 1fr 1fr;
                     gap: var(--spacing-normal);
-                    overflow: scroll;
+                    overflow: auto;
                     padding-bottom: var(--spacing-large);
                 }
 
@@ -152,7 +154,7 @@ export class CustomElement extends observeState(LitElement) {
                     background: var(--background-light);
                     padding: var(--spacing-small);
                     display: none;
-                    overflow: scroll;
+                    overflow: auto;
 
                     h2 {
                         margin-top: 0;
@@ -214,6 +216,11 @@ export class CustomElement extends observeState(LitElement) {
             const response = await cachedFetch(`/listItems/${this.itemId}`, {}, true);
             if (response.success) {
                 this.itemData = response.data;
+
+                // Mark item as viewed if user is authenticated and item hasn't been viewed yet
+                if (userState.userData?.id && this.itemId && !isItemViewed(this.itemId)) {
+                    addItemToQueue(parseInt(this.itemId));
+                }
             } else {
                 messagesState.addMessage(response.message || 'there was an error fetching the item', 'error');
             }
