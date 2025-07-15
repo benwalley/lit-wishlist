@@ -66,6 +66,8 @@ export async function updateUserData(data) {
     }
 }
 
+export const updateUser = updateUserData;
+
 // Example using Fetch API
 export async function logout() {
     try {
@@ -141,6 +143,24 @@ export async function switchToSubuser(subuserID) {
         return response;
     } catch (error) {
         console.error('Error switching to subuser:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+export async function saveNote(notes) {
+    try {
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ notes }),
+        };
+
+        const response = await customFetch('/users/save-note', options, true);
+        return response;
+    } catch (error) {
+        console.error('Error saving note:', error);
         return { success: false, error: error.message };
     }
 }

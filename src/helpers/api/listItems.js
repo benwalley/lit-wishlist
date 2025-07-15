@@ -154,3 +154,28 @@ export async function bulkUpdatePublicityAndPriority(items) {
         return { success: false, message: error };
     }
 }
+
+/**
+ * Search for items by query string
+ * @param {string} query - The search query
+ * @returns {Promise<{success: boolean, data: Array}|{success: boolean, error: Error}>}
+ */
+export async function searchItems(query) {
+    try {
+        if (!query || typeof query !== 'string' || query.trim() === '') {
+            return { success: true, data: [] };
+        }
+
+        const encodedQuery = encodeURIComponent(query.trim());
+        const response = await customFetch(`/listItems/search/${encodedQuery}`, {}, true);
+        
+        if (response?.success) {
+            return { success: true, data: response.data || [] };
+        }
+
+        return { success: false, error: response?.error || 'Failed to search items' };
+    } catch (error) {
+        console.error('Error searching items:', error);
+        return { success: false, error };
+    }
+}

@@ -9,7 +9,6 @@ import '../account/account-private-notes.js';
 import '../account/account-comments.js';
 import '../account/user-details.js';
 import '../account/account-lists.js';
-import '../account/account-secondary-lists.js';
 import '../account/logout-button.js'
 import '../account/invited-groups.js'
 import '../../global/image-upload/image-uploader.js'

@@ -21,6 +21,7 @@ import '../../svg/dots.js'
 import '../../svg/user-list.js'
 import '../../svg/thick-list.js'
 import '../../svg/dashboard.js'
+import '../../svg/dollar.js'
 import {isCurrentUserSubuser} from "../../helpers/generalHelpers.js";
 
 export class CustomElement extends observeState(LitElement) {
@@ -289,6 +290,10 @@ export class CustomElement extends observeState(LitElement) {
                         <li><a href="/proposals" class="menu-item-link ${this._isActive('/proposals') ? 'active' : ''}">
                             <gift-icon class="icon"></gift-icon>
                             <span>Proposals</span>
+                        </a></li>
+                        <li><a href="/money-tracking" class="menu-item-link ${this._isActive('/money-tracking') ? 'active' : ''}">
+                            <dollar-icon class="icon"></dollar-icon>
+                            <span>Money Tracking</span>
                         </a></li>
                         <li class="menu-item-with-badge">
                             <a href="/groups" class="menu-item-link ${this._isActive('/groups') ? 'active' : ''}">

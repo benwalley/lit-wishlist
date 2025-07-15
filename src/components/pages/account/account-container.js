@@ -9,7 +9,6 @@ import './account-private-notes.js';
 import './account-comments.js';
 import './user-details.js';
 import './account-lists.js';
-import './account-secondary-lists.js';
 import './logout-button.js'
 import './invited-groups.js'
 import '../../global/image-upload/image-uploader.js'
@@ -95,10 +94,6 @@ export class AccountContainer extends observeState(LitElement) {
 
                 <section>
                     <account-comments></account-comments>
-                </section>
-
-                <section>
-                    <account-secondary-lists></account-secondary-lists>
                 </section>
             </main>
         `;

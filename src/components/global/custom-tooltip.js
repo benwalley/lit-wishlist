@@ -1,4 +1,5 @@
 import {LitElement, html, css} from 'lit';
+import {computePosition, flip, shift, offset} from '@floating-ui/dom';
 
 export class CustomTooltip extends LitElement {
     static properties = {
@@ -117,13 +118,13 @@ export class CustomTooltip extends LitElement {
         this._referenceEl.removeEventListener('blur', this._blurHandler, true);
     }
 
-    _showTooltip() {
+    async _showTooltip() {
         try {
             // Check if popover API is supported
             if (typeof this.showPopover === 'function') {
                 this.showPopover();
                 // Position the tooltip after it's shown
-                this._positionTooltip();
+                await this._positionTooltip();
             }
         } catch (error) {
             // Popover might already be open or other error
@@ -131,57 +132,24 @@ export class CustomTooltip extends LitElement {
         }
     }
 
-    _positionTooltip() {
+    async _positionTooltip() {
         if (!this._referenceEl) return;
 
-        const referenceRect = this._referenceEl.getBoundingClientRect();
-        const tooltipRect = this.getBoundingClientRect();
-        
-        // Calculate position based on placement
-        let top, left;
-        
-        switch (this.placement) {
-            case 'top':
-                top = referenceRect.top - tooltipRect.height - 8;
-                left = referenceRect.left + (referenceRect.width - tooltipRect.width) / 2;
-                break;
-            case 'right':
-                top = referenceRect.top + (referenceRect.height - tooltipRect.height) / 2;
-                left = referenceRect.right + 8;
-                break;
-            case 'left':
-                top = referenceRect.top + (referenceRect.height - tooltipRect.height) / 2;
-                left = referenceRect.left - tooltipRect.width - 8;
-                break;
-            case 'bottom':
-            default:
-                top = referenceRect.bottom + 8;
-                left = referenceRect.left + (referenceRect.width - tooltipRect.width) / 2;
-                break;
-        }
-
-        // Keep tooltip within viewport
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        
-        // Adjust horizontal position if needed
-        if (left < 8) {
-            left = 8;
-        } else if (left + tooltipRect.width > viewportWidth - 8) {
-            left = viewportWidth - tooltipRect.width - 8;
-        }
-        
-        // Adjust vertical position if needed
-        if (top < 8) {
-            top = 8;
-        } else if (top + tooltipRect.height > viewportHeight - 8) {
-            top = viewportHeight - tooltipRect.height - 8;
-        }
+        const {x, y} = await computePosition(this._referenceEl, this, {
+            placement: this.placement || 'bottom',
+            middleware: [
+                offset(8),
+                flip(),
+                shift({padding: 8})
+            ]
+        });
 
         // Apply position
-        this.style.position = 'fixed';
-        this.style.top = `${top}px`;
-        this.style.left = `${left}px`;
+        Object.assign(this.style, {
+            position: 'fixed',
+            left: `${x}px`,
+            top: `${y}px`,
+        });
     }
 
     _hideTooltip() {

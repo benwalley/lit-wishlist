@@ -19,6 +19,7 @@ import '../components/pages/ai/ai-test-container.js';
 import '../components/pages/subusers/subusers-page.js';
 import '../components/pages/bulk-actions/bulk-actions-page.js';
 import '../components/pages/my-lists/my-lists-container.js';
+import '../components/pages/money-tracking/money-tracking-page.js';
 
 // Authentication guard function
 const requireAuth = (context, commands) => {
@@ -120,6 +121,11 @@ const routes = [
     {
         path: '/ai',
         component: 'ai-test-container',
+        action: requireAuth,
+    },
+    {
+        path: '/money-tracking',
+        component: 'money-tracking-page',
         action: requireAuth,
     },
     {
