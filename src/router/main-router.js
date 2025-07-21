@@ -20,6 +20,7 @@ import '../components/pages/subusers/subusers-page.js';
 import '../components/pages/bulk-actions/bulk-actions-page.js';
 import '../components/pages/my-lists/my-lists-container.js';
 import '../components/pages/money-tracking/money-tracking-page.js';
+import '../components/pages/password-reset/password-reset-container.js';
 
 // Authentication guard function
 const requireAuth = (context, commands) => {
@@ -42,6 +43,10 @@ const routes = [
     {
         path: '/',
         component: 'guest-home',
+    },
+    {
+        path: '/reset-password',
+        component: 'password-reset-container',
     },
     {
         path: '/account',

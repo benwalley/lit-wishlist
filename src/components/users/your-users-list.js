@@ -5,15 +5,19 @@ import '../global/single-select-dropdown.js'
 import '../../svg/check.js'
 import {observeState} from "lit-element-state";
 import {userListState} from "../../state/userListStore.js";
+import {userState} from "../../state/userStore.js";
+import {listenInitialUserLoaded} from "../../events/eventListeners.js";
 
 class UserListComponent extends observeState(LitElement) {
     static properties = {
         selectedUserIds: {type: Array},
+        requireCurrentUser: {type: Boolean},
     };
 
     constructor() {
         super();
         this.selectedUserIds = [];
+        this.requireCurrentUser = false;
     }
 
     static styles = css`
@@ -33,6 +37,13 @@ class UserListComponent extends observeState(LitElement) {
             font-weight: bold;
             font-size: var(--font-size-small);
             color: var(--text-color-dark);
+            display: none;
+        }
+        
+        @media only screen and (min-width: 500px) {
+            .title {
+                display: block;
+            }
         }
 
         .selection-info {
@@ -122,6 +133,13 @@ class UserListComponent extends observeState(LitElement) {
 
     connectedCallback() {
         super.connectedCallback();
+        if(userState?.userData?.id) {
+            this.setSelectedUserIds([userState.userData.id]);
+        } else {
+            listenInitialUserLoaded(() => {
+                this.setSelectedUserIds([userState.userData.id])
+            })
+        }
     }
 
     disconnectedCallback() {
@@ -135,36 +153,41 @@ class UserListComponent extends observeState(LitElement) {
         }
 
         const userId = e.detail.user.id;
-        console.log('happening')
         if (this.selectedUserIds.includes(userId)) {
-            this.selectedUserIds = this.selectedUserIds.filter(id => id !== userId);
+            this.setSelectedUserIds(this.selectedUserIds.filter(id => id !== userId));
         } else {
-            this.selectedUserIds = [...this.selectedUserIds, userId];
+            this.setSelectedUserIds([...this.selectedUserIds, userId]);
         }
-
-        this._dispatchSelectionChangedEvent();
     }
 
     selectAll() {
-        // Set selectedUserIds to include all user IDs
-        this.selectedUserIds = userListState.users
+        const allIds = userListState.users
             .filter(user => user && user.id)
             .map(user => user.id);
-        this._dispatchSelectionChangedEvent();
+        this.setSelectedUserIds(allIds)
+
     }
 
     clearSelection() {
-        this.selectedUserIds = [];
-        this._dispatchSelectionChangedEvent();
+        this.setSelectedUserIds([]);
     }
 
-    setUserIds(userIds) {
-        this.selectedUserIds = userIds;
+    setSelectedUserIds(userIds) {
+        if(!this.requireCurrentUser) {
+            this.selectedUserIds = userIds;
+        } else {
+            const currentUserId = userState?.userData?.id;
+            if (currentUserId && !userIds.includes(currentUserId)) {
+                userIds.push(currentUserId);
+            }
+            this.selectedUserIds = userIds;
+        }
+        this._dispatchSelectionChangedEvent();
     }
 
     _dispatchSelectionChangedEvent() {
         const selectedUsers = this.selectedUserIds
-            .map(id => userListState.users.find(user => user && user.id === id))
+            .map(id => userState.myUsers.find(user => user && user.id === id))
             .filter(Boolean);
 
         this.dispatchEvent(new CustomEvent('selection-changed', {

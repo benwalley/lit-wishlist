@@ -82,7 +82,6 @@ export class CustomElement extends observeState(LitElement) {
             }
 
             const userId = userState.userData.id;
-            console.log(`Fetching questions for user ID: ${userId}`);
             const response = await getAskedQAItems(userId);
             const qaItems = response?.data || [];
             if(response.success) {

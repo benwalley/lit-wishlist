@@ -9,6 +9,7 @@ import '../../../../svg/check.js';
 import {messagesState} from "../../../../state/messagesStore.js";
 import '../../../global/due-date-picker.js';
 import { observeState } from 'lit-element-state';
+import { userState } from "../../../../state/userStore.js";
 import {createQA, updateQuestion} from "./qa-helpers.js";
 import {triggerUpdateQa} from "../../../../events/eventListeners.js";
 
@@ -16,24 +17,28 @@ import {triggerUpdateQa} from "../../../../events/eventListeners.js";
 export class CustomElement extends observeState(LitElement) {
     static properties = {
         questionText: {type: String},
+        answerText: {type: String},
         dueDate: {type: String},
         sharedWithUserIds: {type: Array},
         sharedWithGroupIds: {type: Array},
         isAnonymous: {type: Boolean},
         isEditMode: {type: Boolean},
         questionId: {type: Number},
+        askedById: {type: Number},
         preSelectedUsers: {type: Array},
     };
 
     constructor() {
         super();
         this.questionText = '';
+        this.answerText = '';
         this.sharedWithUserIds = [];
         this.sharedWithGroupIds = [];
         this.dueDate = '';
         this.isAnonymous = false;
         this.isEditMode = false;
         this.questionId = null;
+        this.askedById = null;
         this.preSelectedUsers = [];
     }
 
@@ -132,6 +137,13 @@ export class CustomElement extends observeState(LitElement) {
         ];
     }
 
+    isQuestionCreator() {
+        if (!this.isEditMode) {
+            return true;
+        }
+        return userState.userData && userState.userData.id === this.askedById;
+    }
+
     updated(changedProperties) {
         if (changedProperties.has('preSelectedUsers')) {
             if (this.preSelectedUsers.length > 0 && !this.sharedWithUserIds.length) {
@@ -143,6 +155,7 @@ export class CustomElement extends observeState(LitElement) {
     editQuestion(data) {
         this.isEditMode = true;
         this.questionText = data.questionText || '';
+        this.answerText = data.answerText || '';
         // Convert dueDate to ISO format and extract the date portion for the date picker
         this.dueDate = data.dueDate
             ? new Date(data.dueDate).toISOString().split('T')[0]
@@ -151,6 +164,7 @@ export class CustomElement extends observeState(LitElement) {
         this.sharedWithGroupIds = data.sharedWithGroupIds || [];
         this.isAnonymous = data.isAnonymous || false;
         this.questionId = data.questionId || null;
+        this.askedById = data.askedById || null;
     }
 
 
@@ -180,6 +194,7 @@ export class CustomElement extends observeState(LitElement) {
         if (!this._validateInput()) return;
         const questionData = {
             questionText: this.questionText,
+            answerText: this.answerText,
             dueDate: this.dueDate,
             sharedWithUserIds: this.sharedWithUserIds,
             sharedWithGroupIds: this.sharedWithGroupIds,
@@ -201,14 +216,18 @@ export class CustomElement extends observeState(LitElement) {
         } else {
             messagesState.addMessage(response.message || 'Failed to save question', 'error');
         }
-
-        this.clearForm();
     }
 
     clearForm() {
         this.questionText = '';
+        this.answerText = '';
+        this.dueDate = '';
+        this.sharedWithUserIds = [];
+        this.sharedWithGroupIds = [];
+        this.isAnonymous = false;
         this.isEditMode = false;
         this.questionId = null;
+        this.askedById = null;
     }
 
     _handleCancel() {
@@ -241,29 +260,33 @@ export class CustomElement extends observeState(LitElement) {
     render() {
         return html`
             <h2 class="modal-header">
-                Ask a Question
+                Q&A
             </h2>
 
             <div class="modal-contents">
-                <div class="form-group">
-                    <label for="questionText" class="section-label" style="margin: 0;">Your Question:</label>
-                    <custom-input
+               <div class="form-group">
+                    <label for="questionText" class="section-label" style="margin: 0;">Question:</label>
+                     ${this.isQuestionCreator() ? html`<custom-input
                             id="questionText"
                             .value=${this.questionText}
                             @value-changed="${(e) => this.questionText = e.detail.value}"
                             placeholder="Type your question here..."
                             required
+                    ></custom-input>` : html`
+                        <em style="margin: 0;">${this.questionText}</em>
+                     `}
+                </div>
+
+                <div class="form-group">
+                    <label class="section-label" style="margin: 0;">Answer:</label>
+                    <custom-input
+                            .value=${this.answerText || ''}
+                            @value-changed="${(e) => this.answerText = e.detail.value}"
+                            placeholder="Type your answer here..."
                     ></custom-input>
                 </div>
 
-
-                <div class="checkbox-group" @click=${this._handleAnonymousToggle}>
-                    <div class="checkbox ${this.isAnonymous ? 'selected' : ''}">
-                        ${this.isAnonymous ? html`<check-icon></check-icon>` : null}
-                    </div>
-                    <span class="anonymous-label">Ask Anonymously</span>
-                </div>
-                
+                ${this.isQuestionCreator() ? html`
                 <div style="display: flex; flex-direction: column;">
                     <h3 class="section-label">Optionally choose a due date</h3>
                     <due-date-picker 
@@ -290,9 +313,10 @@ export class CustomElement extends observeState(LitElement) {
                                 apiEndpoint="/users/accessible"
                                 .selectedUsers="${this.sharedWithUserIds}"
                                 @selection-changed="${this._handleUserSelectionChanged}"
+                                requireCurrentUser
                         ></your-users-list>
                     </div>
-                </div>
+                </div>` : ''}
               
 
             </div>

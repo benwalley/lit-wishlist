@@ -16,9 +16,6 @@ import {handleDeleteQuestion} from "./qa/qa-helpers.js";
 export class QAItem extends observeState(LitElement) {
     static properties = {
         item: { type: Object },
-        isEditing: { type: Boolean },
-        editedQuestion: { type: String },
-        editedAnswer: { type: String },
     };
 
     constructor() {
@@ -29,9 +26,6 @@ export class QAItem extends observeState(LitElement) {
             answers: [],
             loading: false,
         };
-        this.isEditing = false;
-        this.editedQuestion = '';
-        this.editedAnswer = '';
     }
 
     static get styles() {
@@ -44,18 +38,21 @@ export class QAItem extends observeState(LitElement) {
 
                 .item-container {
                     transition: var(--transition-normal);
-                    background: var(--background-dark);
                     display: flex;
                     position: relative;
                     flex-direction: column;
                     align-items: flex-start;
                     text-decoration: none;
                     margin: 0;
-                    border-radius: var(--border-radius-normal);
                     padding: var(--spacing-small);
-                    border: 1px solid var(--border-color);
+                    border-bottom: 1px solid var(--border-color);
                     overflow: hidden;
                     height: auto;
+                    cursor: pointer;
+                    
+                    &:hover {
+                        background: var(--purple-light);
+                    }
                 }
 
                 .item-container.editing {
@@ -79,20 +76,12 @@ export class QAItem extends observeState(LitElement) {
                     position: absolute;
                     right: 0;
                     top: 0;
-                    opacity: 0;
-                    transform: translateX(20px);
-                    pointer-events: none;
-                    transition: opacity 0.3s ease, transform 0.3s ease;
-                    display: flex;
-                    gap: var(--spacing-tiny);
-                    padding: var(--spacing-tiny);
-                }
-
-                /* Reveal actions on hover */
-                .item-container:hover .actions {
                     opacity: 1;
                     transform: translateX(0);
                     pointer-events: auto;
+                    display: flex;
+                    gap: var(--spacing-tiny);
+                    padding: var(--spacing-tiny);
                 }
 
                 .question {
@@ -107,15 +96,11 @@ export class QAItem extends observeState(LitElement) {
                 }
 
                 .answer {
-                    margin: var(--spacing-tiny) 0;
                     text-align: left;
-                    color: var(--text-color-medium);
+                    color: var(--medium-text-color);
+                    margin: 0;
                 }
-
-                .icon-button:hover {
-                    transform: scale(1.05);
-                }
-
+                
                 .edit-actions {
                     display: flex;
                     justify-content: space-between;
@@ -158,40 +143,16 @@ export class QAItem extends observeState(LitElement) {
             this.enterEditMode();
         }
 
-        // Listen for the close-other-editors event
-        this.addEventListener('close-other-editors', this._handleCloseOtherEditors);
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
-        this.removeEventListener('close-other-editors', this._handleCloseOtherEditors);
     }
 
-    // Handle the close-other-editors event
-    _handleCloseOtherEditors(e) {
-        // Only close if we're editing and not the item that triggered the event
-        if (this.isEditing && e.detail.sourceItemId !== this.item.id) {
-            this.isEditing = false;
-        }
-    }
 
     // Enter edit mode
     enterEditMode() {
-        // Notify other items to close their editors
-        this.dispatchEvent(new CustomEvent('close-other-editors', {
-            bubbles: true,
-            composed: true,
-            detail: { sourceItemId: this.item.id }
-        }));
-
-        if(this._isUsersPage()) {
-            this.editedQuestion = this.item.questionText;
-            this.editedAnswer = this.item.answers[0]?.answerText || '';
-            this.isEditing = true;
-            return;
-        }
-        triggerAddQuestionEvent(this.item);
-
+        this._openEditPopup();
     }
 
     _isUsersPage() {
@@ -212,11 +173,13 @@ export class QAItem extends observeState(LitElement) {
     _openEditPopup() {
         const editData = {
             questionText: this.item.questionText,
+            answerText: this.item.answers?.[0]?.answerText || '',
             dueDate: this.item.dueDate,
             sharedWithUserIds: this.item.sharedWithUserIds || this.item.sharedWithUsers?.map(user => user.id) || [],
             sharedWithGroupIds: this.item.sharedWithGroupIds || this.item.sharedWithGroups?.map(group => group.id) || [],
             isAnonymous: this.item.isAnonymous,
             questionId: this.item.id,
+            askedById: this.item.askedById,
             isEditMode: true,
         };
 
@@ -226,16 +189,7 @@ export class QAItem extends observeState(LitElement) {
 
     // Toggle edit mode
     _toggleEdit() {
-        if(this.item.isNew) {
-            this._deleteItem();
-            return;
-        }
-
-        if (this.isEditing) {
-            this.isEditing = false;
-        } else {
-            this.enterEditMode();
-        }
+        this.enterEditMode();
     }
 
     // Save edits
@@ -272,7 +226,9 @@ export class QAItem extends observeState(LitElement) {
     }
 
     // Delete item
-    async _deleteItem() {
+    async _deleteItem(e) {
+        e.preventDefault();
+        e.stopPropagation();
         if (this.item.isNew) {
             this.dispatchEvent(new CustomEvent('qa-item-deleted', {
                 detail: {item: this.item},
@@ -304,9 +260,8 @@ export class QAItem extends observeState(LitElement) {
         const hasEmptyAnswer = this.item.answers?.length === 0 || !this.item.answers[0]?.answerText?.trim();
 
         return html`
-            <h3 class="question">${this.item.questionText}</h3>
-            <div class="answer-container ${this._isQuestionCreator() ? 'editable' : ''}" 
-                 @click="${this._isQuestionCreator() ? this._openEditPopup : () => {this.isEditing = true;}}">
+            <h3 class="question" style="cursor: pointer;">${this.item.questionText}</h3>
+            <div class="answer-container editable">
                 ${hasEmptyAnswer
                         ? html`<span class="missing-info">Needs an answer</span>`
                         : html`<p class="answer">${this.item.answers[0]?.answerText}</p>`
@@ -327,8 +282,6 @@ export class QAItem extends observeState(LitElement) {
                 </div>
             </div>
             <div class="actions">
-                
-                ${this._isQuestionCreator() ? html`
                 <button
                         aria-label="edit"
                         class="icon-button"
@@ -339,7 +292,6 @@ export class QAItem extends observeState(LitElement) {
                 >
                     <edit-icon></edit-icon>
                 </button>
-                ` : ''}
                 ${this._isQuestionCreator() ? html`<button
                         aria-label="delete"
                         class="icon-button"
@@ -389,15 +341,12 @@ export class QAItem extends observeState(LitElement) {
     _renderContent() {
         if (this.item.loading) {
             return this._renderLoading();
-        } else if (this.isEditing) {
-            return this._renderEditMode();
         } else {
             return this._renderViewMode();
         }
     }
 
     _hasEmptyAnswer() {
-        if(this.isEditing) return false;
         if(this.item.loading) return false;
         if(this.item.answers.length === 0) return true;
         return false;
@@ -407,7 +356,7 @@ export class QAItem extends observeState(LitElement) {
         const hasEmptyAnswer = this._hasEmptyAnswer();
 
         return html`
-            <div class="item-container ${this.isEditing ? 'editing' : ''} ${hasEmptyAnswer ? 'empty-answer' : ''}">
+            <div class="item-container ${hasEmptyAnswer ? 'empty-answer' : ''}" @click="${this._openEditPopup}">
                 ${this._renderContent()}
             </div>
         `;

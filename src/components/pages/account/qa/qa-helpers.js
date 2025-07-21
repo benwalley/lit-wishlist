@@ -82,7 +82,7 @@ export async function updateQuestion(questionData) {
         };
 
         const updatedValue = await customFetch(`/qa/question/${questionData.questionId}`, options, true);
-        return {success: true, updatedValue}
+        return updatedValue;
 
     } catch (e) {
         console.log(e)
@@ -123,7 +123,7 @@ export async function getQAItems(userId) {
 
 export async function getAskedQAItems(userId) {
     try {
-        const response = await cachedFetch(`/qa/userAsked/${userId}`, {}, true);
+        const response = await cachedFetch(`/qa/accessible/${userId}`, {}, true);
         return response
     } catch (e) {
         handleQAError('There was an error fetching the Q&A items. Please try again.')

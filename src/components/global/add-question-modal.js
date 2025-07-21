@@ -36,13 +36,13 @@ export class AddQuestionModal extends LitElement {
     _handleOpenModal(event) {
         const editData = event.detail.editData || {};
         const qaForm = this.shadowRoot.getElementById('qa-form');
-        qaForm.questionText = editData?.questionText || ''
-        qaForm.dueDate = editData?.dueDate || ''
-        qaForm.sharedWithUserIds = editData?.sharedWithUserIds || []
-        qaForm.sharedWithGroupIds = editData?.sharedWithGroupIds || []
-        qaForm.isAnonymous = editData?.isAnonymous || false
-        qaForm.isEditMode = editData?.isEditMode ? true : false
-        qaForm.questionId = editData?.questionId || null
+        
+        if (editData && Object.keys(editData).length > 0) {
+            qaForm.editQuestion(editData);
+        } else {
+            qaForm.clearForm();
+        }
+        
         this.isOpen = true;
     }
 

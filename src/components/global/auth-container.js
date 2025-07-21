@@ -8,6 +8,7 @@ import {groupInvitationsState} from '../../state/groupInvitationsStore.js';
 import './loading-screen.js';
 import {initRouter, navigate} from "../../router/main-router.js";
 import {getAccessibleUsers, getCurrentUser, getYourUsers} from "../../helpers/api/users.js";
+import {getUserGroups} from "../../helpers/api/groups.js";
 import {getSubusers} from "../../helpers/api/subusers.js";
 import {getViewedItems, startQueueProcessor, stopQueueProcessor} from "../../helpers/viewedItems/index.js";
 import {
@@ -27,6 +28,7 @@ import './delete-list/delete-list.js';
 import '../lists/edit-list-modal.js';
 import '../global/add-proposal-modal.js';
 import {initializeProposalHelpers} from '../../helpers/proposalHelpers.js';
+import {getRefreshToken} from "../../localStorage/tokens.js";
 
 export class AuthContainer extends observeState(LitElement) {
     static styles = css`
@@ -55,6 +57,10 @@ export class AuthContainer extends observeState(LitElement) {
     `;
 
     async firstUpdated() {
+        if(!getRefreshToken()) {
+            userState.loadingUser = false;
+            return;
+        }
         await this.fetchUserData();
         await this.fetchAccessibleUsers();
         await this.fetchViewedItems();
@@ -94,9 +100,13 @@ export class AuthContainer extends observeState(LitElement) {
         try {
             const userData = await getCurrentUser();
             const myUsers = await getYourUsers();
+            const myGroups = await getUserGroups();
             userState.userData = userData;
             if(myUsers?.success) {
                 userState.myUsers = myUsers.data;
+            }
+            if(myGroups?.length) {
+                userState.myGroups = myGroups;
             }
 
             // Fetch subusers if user is authenticated

@@ -23,6 +23,7 @@ import '../../svg/thick-list.js'
 import '../../svg/dashboard.js'
 import '../../svg/dollar.js'
 import {isCurrentUserSubuser} from "../../helpers/generalHelpers.js";
+import '../settings/settings-modal.js';
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
@@ -70,6 +71,23 @@ export class CustomElement extends observeState(LitElement) {
     // Closes the menu if user clicks on the overlay
     _closeMenu() {
         globalState.menuExpanded = false;
+    }
+
+    _openSettings() {
+        const settingsModal = this.shadowRoot.querySelector('settings-modal');
+        if (settingsModal) {
+            settingsModal.open();
+        }
+    }
+
+    _handleLogout() {
+        // Handle logout logic here
+        console.log('Logout requested');
+    }
+
+    _handleDeleteAccount() {
+        // Handle account deletion logic here
+        console.log('Account deletion requested');
     }
 
     static get styles() {
@@ -213,6 +231,11 @@ export class CustomElement extends observeState(LitElement) {
                     font-weight: 600;
                     line-height: 1;
                 }
+                
+                .bug-report-section {
+                    font-size: var(--font-size-x-small);
+                    font-style: italic;
+                }
 
                 /* On mobile, slide the nav from the left, show/hide overlay */
                 @media (max-width: 767px) {
@@ -329,12 +352,12 @@ export class CustomElement extends observeState(LitElement) {
                     <div class="settings-section-container">
                         <ul>
                             <li>
-                                <button class="button">
+                                <button class="button icon-button" @click=${this._openSettings}>
                                     <gear-icon class="icon" style="width: 16px; height: 16px; margin-right: 8px;"></gear-icon>
                                     Settings
                                 </button>
                             </li>
-                            <li>
+                            <li class="bug-report-section">
                                 <span>For feature suggestions or to report a bug, email</span>
                                 <a href="mailto:benwalleyorigami@gmail.com">benwalleyorigami@gmail.com</a>
                             </li>
@@ -348,6 +371,12 @@ export class CustomElement extends observeState(LitElement) {
                     class="overlay ${globalState.menuExpanded ? 'expanded' : 'collapsed'}"
                     @click="${this._closeMenu}"
             ></div>
+            
+            <!-- Settings modal -->
+            <settings-modal 
+                @logout=${this._handleLogout}
+                @delete-account=${this._handleDeleteAccount}>
+            </settings-modal>
         `;
     }
 }

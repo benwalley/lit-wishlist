@@ -61,6 +61,21 @@ export class LoginForm extends LitElement {
                     color: var(--text-color-dark);
                     font-weight: 500;
                 }
+
+                .forgot-password-link {
+                    background: none;
+                    border: none;
+                    color: var(--primary-color);
+                    cursor: pointer;
+                    text-decoration: underline;
+                    font-size: var(--font-size-small);
+                    align-self: flex-end;
+                    margin-top: -10px;
+                }
+
+                .forgot-password-link:hover {
+                    color: var(--primary-color);
+                }
             `
         ];
     }
@@ -87,6 +102,10 @@ export class LoginForm extends LitElement {
                               label="Password"></custom-input>
                 
                 <button type="submit" class="full-width secondary button">Login</button>
+                
+                <button type="button" class="forgot-password-link" @click=${this._showForgotPassword}>
+                    Forgot Password?
+                </button>
             </form>
         `;
     }
@@ -94,6 +113,13 @@ export class LoginForm extends LitElement {
     _handleSubuserToggle(event) {
         this.loginAsSubuser = event.detail.checked;
     }
+
+    _showForgotPassword() {
+        this.dispatchEvent(new CustomEvent('show-forgot-password', {
+            bubbles: true,
+            composed: true
+        }));
+}
 
     async _handleSubmit(event) {
         event.preventDefault();

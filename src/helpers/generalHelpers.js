@@ -57,8 +57,8 @@ export function isCurrentUserSubuser() {
  */
 export function isItemViewed(itemId) {
     if (!itemId || !viewedItemsState.viewedItems) return false;
-    
-    return viewedItemsState.viewedItems.some(viewedItem => 
+
+    return viewedItemsState.viewedItems.some(viewedItem =>
         viewedItem.itemId === itemId || viewedItem.id === itemId
     );
 }
@@ -70,8 +70,8 @@ export function isItemViewed(itemId) {
  */
 export function getViewedItemById(itemId) {
     if (!itemId || !viewedItemsState.viewedItems) return null;
-    
-    return viewedItemsState.viewedItems.find(viewedItem => 
+
+    return viewedItemsState.viewedItems.find(viewedItem =>
         viewedItem.itemId === itemId || viewedItem.id === itemId
     ) || null;
 }
@@ -88,7 +88,7 @@ export function getParentUserId(userId) {
     if (!userId) return 0;
 
     const child = userListState.users.find(user => user.id === userId);
-    return child.parentId || 0;
+    return child?.parentId || 0;
 }
 export function getUserImageIdByUserId(userId) {
     if (!userId) return 0;

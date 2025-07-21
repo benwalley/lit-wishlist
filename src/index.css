@@ -2,7 +2,7 @@
     /* ===========================================
        1) Base Styling
     =========================================== */
-    font-family: "Nunito Sans", Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    font-family: "Inter", Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     font-size: 16px;
     font-weight: 400;
@@ -156,9 +156,9 @@
     /* ===========================================
        7) Typography & Layout
     =========================================== */
-    --font-family: 'Lato';
-    --heading-font-family: 'lato';
-    --body-font-family: 'lato';
+    --font-family: "Inter";
+    --heading-font-family: "Inter";
+    --body-font-family: "Inter";
 
     --font-size-x-x-x-small: 0.6rem;
     --font-size-x-x-small: 0.7rem;

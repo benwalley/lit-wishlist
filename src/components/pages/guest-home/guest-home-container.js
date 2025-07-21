@@ -44,17 +44,6 @@ export class GuestHomeContainer extends observeState(LitElement) {
                     color: white;
                 }
 
-                .right:after {
-                    content: '';
-                    width: 50vw;
-                    position: absolute;
-                    top: 0;
-                    left: calc(100% - 1px);
-                    background: linear-gradient(135deg, var(--primary-color) 0%, var(--purple-darker, #6b46c1) 100%);
-                    display: block;
-                    height: 100%;
-                }
-
                 .form-container {
                     width: 80%;
                     max-width: 400px;
@@ -109,10 +98,6 @@ export class GuestHomeContainer extends observeState(LitElement) {
                 @media (max-width: 768px) {
                     .container {
                         flex-direction: column;
-                    }
-                    
-                    .right:after {
-                        display: none;
                     }
                     
                     .form-container,

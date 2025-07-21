@@ -528,6 +528,10 @@ class BulkActionsPage extends observeState(LitElement) {
 
                 .item-name {
                     font-weight: 500;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    max-width: 600px;
+                    text-overflow: ellipsis;
                 }
 
                 .bulk-actions-bar {

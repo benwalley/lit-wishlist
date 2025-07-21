@@ -8,6 +8,8 @@ import {observeState} from 'lit-element-state';
 import {getUserImageIdByUserId, getUsernameById} from '../../../../helpers/generalHelpers.js';
 import {triggerAddQuestionEvent} from "../../../../events/custom-events.js";
 import {handleDeleteQuestion} from "./qa-helpers.js";
+import {userState} from "../../../../state/userStore.js";
+import {getGroupImageIdByGroupId, getGroupNameById} from "../../../../helpers/userHelpers.js";
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
@@ -71,7 +73,31 @@ export class CustomElement extends observeState(LitElement) {
                     display: flex;
                     flex-direction: row;
                     align-items: center;
-                    padding-bottom: var(--spacing-small);
+                }
+                
+                .created-by-details {
+                    display: flex;
+                    gap: var(--spacing-small);
+                    flex-direction: row;
+                    align-items: center;
+                    font-size: var(--font-size-small);
+                    padding-bottom: var(--spacing-normal);
+                    
+                    .created-by-user {
+                        display: flex;
+                        gap: var(--spacing-small);
+                        flex-direction: row;
+                        align-items: center;
+                    }
+                    
+                    .created-by-label {
+                        color: var(--medium-text-color);
+                    }
+                    
+                    .created-by-username {
+                        font-weight: 600;
+                        letter-spacing: 0.4px;
+                    }
                 }
 
                 .shared-with-list ul {
@@ -95,20 +121,30 @@ export class CustomElement extends observeState(LitElement) {
                     color: var(--text-color-dark);
                     text-decoration: none;
                     display: flex;
+                    flex-direction: row-reverse;
                     gap: var(--spacing-x-small);
                 }
             `
         ];
     }
 
+    isQuestionCreator() {
+       return userState.userData && userState.userData.id === this.question.askedById;
+    }
+
     _handleEditQuestion() {
+        const myAnswer = this.question.answers.find(answer => {
+            return answer.answererId === userState.userData?.id;
+        });
         const editData = {
             questionText: this.question.questionText,
+            answerText: myAnswer ? myAnswer.answerText : '',
             dueDate: this.question.dueDate,
             sharedWithUserIds: this.question.sharedWithUserIds,
             sharedWithGroupIds: this.question.sharedWithGroupIds,
             isAnonymous: this.question.isAnonymous,
             questionId: this.question.id,
+            askedById: this.question.askedById,
             isEditMode: true,
         }
         triggerAddQuestionEvent(editData);
@@ -131,52 +167,69 @@ export class CustomElement extends observeState(LitElement) {
                         <share-icon></share-icon>
                     </button>
                     <custom-tooltip style="min-width: 200px;" class="shared-with-list">
-                        ${this.question.sharedWithGroups && this.question.sharedWithGroups.length > 0 ? html`
+                        ${this.question.sharedWithGroupIds && this.question.sharedWithGroupIds.length > 0 ? html`
                             <h4>Groups</h4>
                             <ul>
-                                ${this.question.sharedWithGroups.map(group => html`
+                                ${this.question.sharedWithGroupIds.map(groupId => html`
                                     <li>
-                                        <span>${group.groupName}</span>
+                                        <span>${getGroupNameById(groupId)}</span>
                                         <custom-avatar size="20"
-                                                       username="${group.groupName}"></custom-avatar>
+                                                       username="${getGroupNameById(groupId)}"
+                                                       imageId="${getGroupImageIdByGroupId(groupId)}"
+                                        ></custom-avatar>
                                     </li>
                                 `)}
                             </ul>
                         ` : ''}
 
-                        ${this.question.sharedWithUsers && this.question.sharedWithUsers.length > 0 ? html`
+                        ${this.question.sharedWithUserIds && this.question.sharedWithUserIds.length > 0 ? html`
                             <h4>Users</h4>
                             <ul>
-                                ${this.question.sharedWithUsers.map(user => html`
+                                ${this.question.sharedWithUserIds.map(userId => html`
                                     <li>
-                                        <span>${user.name}</span>
+                                        <span>${getUsernameById(userId)}</span>
                                         <custom-avatar size="20"
-                                                       username="${user.name}"></custom-avatar>
+                                                       username="${getUsernameById(userId)}"
+                                                       imageId="${getUserImageIdByUserId(userId)}"
+                                        ></custom-avatar>
                                     </li>
                                 `)}
                             </ul>
                         ` : ''}
                     </custom-tooltip>
 
-                    <button class="edit-button icon-button"
-                            aria-label="Edit Question"
-                            @click="${this._handleEditQuestion}"
-                            style="--icon-color: var(--blue-normal); 
-                                            --icon-color-hover: var(--blue-darker); 
-                                            --icon-hover-background: var(--blue-light); 
-                                            font-size: var(--font-size-large)">
-                        <edit-icon></edit-icon>
-                    </button>
-
-                    <button class="delete-button icon-button"
-                            aria-label="Delete Question"
-                            @click="${this._handleDeleteQuestion}"
-                            style="--icon-color: var(--delete-red); 
-                                            --icon-color-hover: var(--delete-red-darker); 
-                                            --icon-hover-background: var(--delete-red-light); 
-                                            font-size: var(--font-size-large)">
-                        <delete-icon></delete-icon>
-                    </button>
+                    ${this.isQuestionCreator() ? html`
+                        <button class="edit-button icon-button"
+                                aria-label="Edit Question"
+                                @click="${this._handleEditQuestion}"
+                                style="--icon-color: var(--blue-normal); 
+                                                --icon-color-hover: var(--blue-darker); 
+                                                --icon-hover-background: var(--blue-light); 
+                                                font-size: var(--font-size-large)">
+                            <edit-icon></edit-icon>
+                        </button>
+    
+                        <button class="delete-button icon-button"
+                                aria-label="Delete Question"
+                                @click="${this._handleDeleteQuestion}"
+                                style="--icon-color: var(--delete-red); 
+                                                --icon-color-hover: var(--delete-red-darker); 
+                                                --icon-hover-background: var(--delete-red-light); 
+                                                font-size: var(--font-size-large)">
+                            <delete-icon></delete-icon>
+                        </button>` : ''}
+                </div>
+                <div class="created-by-details">
+                    <span class="created-by-label">Asked By:</span>
+                    <span class="created-by-user">
+                        <custom-avatar
+                            size="18"
+                            username="${getUsernameById(this.question.askedById)}"
+                            imageId="${getUserImageIdByUserId(this.question.askedById)}"
+                            shadow
+                        ></custom-avatar>
+                        <span class="created-by-username">${getUsernameById(this.question.askedById)}</span>
+                    </span>
                 </div>
                 <div class="answers-list">
                     ${this.question.answers.length === 0
@@ -189,6 +242,7 @@ export class CustomElement extends observeState(LitElement) {
                                         <custom-avatar size="24"
                                                      username="${getUsernameById(answer.answererId)}"
                                                      imageId="${getUserImageIdByUserId(answer.answererId)}"
+                                                       shadow
                                         ></custom-avatar>
                                         <span class="user-name">${getUsernameById(answer.answererId)}</span>
                                     </a>

@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import './login-form.js';
 import './create-account-form.js';
+import './forgot-password-form.js';
 import '../../global/floating-box.js'
 
 
@@ -29,6 +30,9 @@ export class TabbedSection extends LitElement {
     constructor() {
         super();
         this.activeTab = 'login';
+        this.addEventListener('show-forgot-password', this._showForgotPassword);
+        this.addEventListener('back-to-login', this._showLogin);
+        this.addEventListener('password-reset-sent', this._showLogin);
     }
 
     render() {
@@ -36,18 +40,30 @@ export class TabbedSection extends LitElement {
           <div class="content">
             ${this.activeTab === 'login'
                 ? html`<login-form></login-form>`
-                : html`<create-account-form></create-account-form>`}
+                : this.activeTab === 'create'
+                ? html`<create-account-form></create-account-form>`
+                : html`<forgot-password-form></forgot-password-form>`}
           </div>
-          <button
-                  @click=${() => this._setActiveTab(this.activeTab === 'login' ? 'create' : 'login')}
-          >
-              ${this.activeTab === 'login' ? 'Create An Account' : 'Log In'}
-          </button>
+          ${this.activeTab !== 'forgot-password' ? html`
+            <button
+                    @click=${() => this._setActiveTab(this.activeTab === 'login' ? 'create' : 'login')}
+            >
+                ${this.activeTab === 'login' ? 'Create An Account' : 'Log In'}
+            </button>
+          ` : ''}
     `;
     }
 
     _setActiveTab(tab) {
         this.activeTab = tab;
+    }
+
+    _showForgotPassword() {
+        this.activeTab = 'forgot-password';
+    }
+
+    _showLogin() {
+        this.activeTab = 'login';
     }
 }
 

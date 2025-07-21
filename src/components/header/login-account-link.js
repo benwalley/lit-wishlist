@@ -79,6 +79,7 @@ export class LoginAccountLink extends observeState(LitElement) {
                         .username="${userState?.userData?.name}"
                         imageId="${userState?.userData?.image}"
                         size="32"
+                        shadow
                 ></custom-avatar>
                 <div class="right-side">
                     <span class="name-text">${userState?.userData?.name || 'Name not found'}</span>

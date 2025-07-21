@@ -10,6 +10,7 @@ import '../../svg/arrow-long-left.js'
 import buttonStyles from '../../css/buttons.js'
 import {observeState} from 'lit-element-state';
 import {globalState} from "../../state/globalStore.js";
+import {userState} from "../../state/userStore.js";
 
 export class HeaderContainer extends observeState(LitElement) {
     static properties = {
@@ -23,6 +24,10 @@ export class HeaderContainer extends observeState(LitElement) {
 
     goBack() {
         window.history.back();
+    }
+
+    loggedIn() {
+        return !!userState.userData;
     }
 
     static get styles() {
@@ -112,6 +117,7 @@ export class HeaderContainer extends observeState(LitElement) {
     render() {
         return html`
             <header class="header">
+                ${this.loggedIn() ? html`
                 <div class="header-left">
                     <button @click="${this._handleToggleMobile}" class="mobile-sidebar-toggle button icon-button">
                         <hamburger-icon></hamburger-icon>
@@ -127,11 +133,11 @@ export class HeaderContainer extends observeState(LitElement) {
                             <arrow-long-left-icon></arrow-long-left-icon>
                         </button>
                     ` : ''}
-                </div>
+                </div>` : ''}
                 <dark-mode-toggle></dark-mode-toggle>
-                <notifications-element></notifications-element>
+                ${this.loggedIn() ? html`<notifications-element></notifications-element>` : ''}
                 <logout-element></logout-element>
-                <switch-user-element></switch-user-element>
+                 ${this.loggedIn() ? html`<switch-user-element></switch-user-element>` : ''}
                 <div class="divider"></div>
                 <login-account-link></login-account-link>
             </header>

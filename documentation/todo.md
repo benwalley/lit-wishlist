@@ -32,4 +32,8 @@
  - add url column to image table and if it already exists, don't add it again
  - bulk actions:
    - add to list, delete, remove from list, add to group, remove from group
- - 
+ - make initial loading screen look nice
+ - Make admin page for me.
+   - all users
+   - All items
+   - ...

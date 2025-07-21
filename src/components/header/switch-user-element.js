@@ -11,6 +11,7 @@ import '../global/custom-tooltip.js';
 import '../global/custom-modal.js';
 import './subuser-login-item.js';
 import buttonStyles from '../../css/buttons.js';
+import {invalidateCache} from "../../helpers/caching.js";
 
 class SwitchUserElement extends observeState(LitElement) {
     static get properties() {
@@ -93,7 +94,7 @@ class SwitchUserElement extends observeState(LitElement) {
 
     async _handleUserSelected(event) {
         const { userData } = event.detail;
-        
+
         if (!userData?.id) {
             messagesState.addMessage('Invalid user data', 'error');
             return;
@@ -103,20 +104,21 @@ class SwitchUserElement extends observeState(LitElement) {
 
         try {
             const response = await switchToSubuser(userData.id);
-            
+
             if (response.success && response.user && response.tokens) {
                 // Update user state
                 userState.userData = response.user;
                 userState.loadingUser = false;
-                
+
                 // Update tokens
+                invalidateCache();
                 setJwt(response.tokens.jwtToken);
                 setRefreshToken(response.tokens.refreshToken);
-                
+
                 // Trigger user update to refresh all components
                 triggerUpdateUser();
-                
-                messagesState.addMessage(`Switched to ${userData.name}`, 'success');
+
+                window.location.href = '/account';
             } else {
                 messagesState.addMessage(response.error || 'Failed to switch user', 'error');
             }

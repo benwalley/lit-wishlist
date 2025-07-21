@@ -10,12 +10,12 @@ import '../../../../components/global/selectable-list/selectable-list.js';
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
-        questions: {type: Array}, // Track questions fetched from the server
+        questions: {type: Array},
         selectedQuestionIds: {type: Array},
         loading: {type: Boolean},
-        userId: {type: String}, // ID of the user whose questions to fetch (can be overridden)
-        includeAnswered: {type: Boolean}, // Option to include answered questions
-        includeUnanswered: {type: Boolean} // Option to include unanswered questions
+        userId: {type: String},
+        includeAnswered: {type: Boolean},
+        includeUnanswered: {type: Boolean}
     };
 
     constructor() {
