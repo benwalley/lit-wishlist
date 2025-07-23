@@ -74,6 +74,11 @@ const routes = [
         action: requireAuth,
     },
     {
+        path: '/item/:itemId',
+        component: 'item-view-container',
+        action: requireAuth,
+    },
+    {
         path: '/list/:listId/item/:itemId',
         component: 'item-view-container',
         action: requireAuth,

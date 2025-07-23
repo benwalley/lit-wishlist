@@ -22,7 +22,6 @@ export default css`
             &:active,
             &:focus {
                 box-shadow: var(--button-box-shadow-hover);
-                transform: scale(1.01);
             }
         }
 
@@ -268,7 +267,7 @@ export default css`
         &:hover,
         &:active,
         &:focus {
-            transform: scale(1.01);
+            
         }
     }
 

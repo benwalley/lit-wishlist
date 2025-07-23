@@ -4,7 +4,6 @@ import '../account/avatar.js';
 import '../account/account-public-description.js';
 import '../account/qa/public-qa.js';
 import '../account/account-notifications.js';
-import '../account/account-navigation.js';
 import '../account/account-private-notes.js';
 import '../account/account-comments.js';
 import '../account/user-details.js';
@@ -15,6 +14,7 @@ import '../../global/image-upload/image-uploader.js'
 import '../../global/custom-image.js'
 import '../../lists/my-lists.js'
 import '../../lists/edit-list-modal.js'
+import '../../global/loading-screen.js'
 import '../account/my-groups-list.js'
 import '../../../svg/edit.js'
 import buttonStyles from '../../../css/buttons.js'
@@ -97,7 +97,7 @@ export class UserViewContainer extends LitElement {
 
     render() {
         if (this.loading) {
-            return html`<p>Loading...</p>`;
+            return html`<loading-screen></loading-screen>`;
         }
 
         return html`

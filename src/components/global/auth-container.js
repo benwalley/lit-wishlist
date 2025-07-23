@@ -41,12 +41,13 @@ export class AuthContainer extends observeState(LitElement) {
         @media (min-width: 768px) {
             :host {
                 display: grid;
-                grid-template-rows: auto 1fr;
+                grid-template-rows: 1fr;
             }
             
             /* When user is authenticated, show sidebar layout */
             :host(.authenticated) {
                 grid-template-columns: 275px 1fr;
+                grid-template-rows: auto 1fr;
             }
             
             /* When user is not authenticated, full width layout */

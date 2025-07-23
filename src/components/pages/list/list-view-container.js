@@ -9,6 +9,7 @@ import '../../../svg/user.js'
 import '../../../svg/dots.js'
 import '../../../svg/share.js'
 import '../../global/action-dropdown.js'
+import '../../global/loading-screen.js'
 import {openEditListModal} from '../../lists/edit-list-modal.js'
 import {listenUpdateItem, listenUpdateList, triggerDeleteList} from "../../../events/eventListeners.js";
 import buttonStyles from '../../../css/buttons.js';
@@ -240,7 +241,7 @@ export class ListViewContainer extends observeState(LitElement) {
     render() {
         // If this.loading is true, show a loading message
         if (this.loading) {
-            return html`<p>Loading...</p>`;
+            return html`<loading-screen></loading-screen>`;
         }
 
         // Otherwise, show the list data

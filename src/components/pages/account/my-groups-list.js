@@ -1,52 +1,27 @@
 import {LitElement, html, css} from 'lit';
+import {observeState} from 'lit-element-state';
 import buttonStyles from "../../../css/buttons";
 import helperStyles from "../../../css/helpers";
 import '../../groups/group-list-display-item.js';
-import {createGroup, getUserGroups} from '../../../helpers/api/groups.js';
 import {messagesState} from "../../../state/messagesStore.js";
+import {userState} from '../../../state/userStore.js';
 import '../../global/custom-modal.js';
 import '../../groups/create-group-form.js';
-import {listenGroupUpdated} from "../../../events/eventListeners.js";
+import {listenGroupUpdated, triggerUpdateUser} from "../../../events/eventListeners.js";
 import '../../../svg/group.js';
-export class MyGroupsList extends LitElement {
+export class MyGroupsList extends observeState(LitElement) {
     static properties = {
-        groups: { type: Array },
-        loading: { type: Boolean },
-        error: { type: String },
         isCreateModalOpen: { type: Boolean },
     };
 
     constructor() {
         super();
-        this.groups = [];
-        this.loading = true;
-        this.error = '';
         this.isCreateModalOpen = false;
     }
 
     connectedCallback() {
         super.connectedCallback();
-        this.fetchGroups();
-        listenGroupUpdated(this.fetchGroups.bind(this))
-    }
-
-    async fetchGroups() {
-        try {
-            this.loading = true;
-            const result = await getUserGroups();
-
-            if (result.error) {
-                this.error = 'Failed to load groups';
-                messagesState.addMessage('Failed to load groups', 'error');
-            } else {
-                this.groups = result;
-            }
-        } catch (err) {
-            this.error = 'An error occurred loading groups';
-            messagesState.addMessage('An error occurred loading groups', 'error');
-        } finally {
-            this.loading = false;
-        }
+        listenGroupUpdated(() => triggerUpdateUser())
     }
 
     static get styles() {
@@ -147,7 +122,7 @@ export class MyGroupsList extends LitElement {
                 </button>
             </div>
             
-            ${this.loading ? 
+            ${userState.loadingUser ? 
                 html`<div class="loading">Loading groups...</div>` :
                 this.renderGroups()
             }
@@ -167,11 +142,9 @@ export class MyGroupsList extends LitElement {
     }
 
     renderGroups() {
-        if (this.error) {
-            return html`<div class="empty-state">${this.error}</div>`;
-        }
+        const groups = userState.myGroups || [];
 
-        if (!this.groups || this.groups.length === 0) {
+        if (!groups || groups.length === 0) {
             return html`
                 <div class="empty-state">
                     <group-icon class="empty-state-icon"></group-icon>
@@ -185,7 +158,7 @@ export class MyGroupsList extends LitElement {
 
         return html`
             <div class="groups-container">
-                ${this.groups.map(group => html`
+                ${groups.map(group => html`
                     <group-list-display-item 
                         .group=${group}
                     ></group-list-display-item>

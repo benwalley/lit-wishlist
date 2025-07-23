@@ -4,6 +4,7 @@ import {userState} from "../../state/userStore.js";
 import {globalState} from "../../state/globalStore.js";
 import buttonStyles from "../../css/buttons.js";
 import '../global/custom-tooltip.js'
+import '../loading/skeleton-loader.js';
 import '../pages/account/avatar.js';
 
 
@@ -70,7 +71,7 @@ export class LoginAccountLink extends observeState(LitElement) {
 
     render() {
         if (userState.loadingUser) {
-            return html`<div>Loading...</div>`;
+            return html`<skeleton-loader width="100" height="20"></skeleton-loader>`;
         }
         if (userState.userData) {
            return html`

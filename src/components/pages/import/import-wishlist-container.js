@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { observeState } from 'lit-element-state';
 import '../../global/custom-input.js';
+import '../../global/process-loading-ring.js';
 import buttonStyles from '../../../css/buttons.js';
 import { importAmazonWishlist } from '../../../helpers/api/import.js';
 import { messagesState } from '../../../state/messagesStore.js';
@@ -13,11 +14,7 @@ class ImportWishlistContainer extends observeState(LitElement) {
             wishlistUrl: { type: String },
             isSubmitting: { type: Boolean },
             importResult: { type: Object },
-            showImportReview: { type: Boolean },
-            currentLoadingState: { type: Number },
-            loadingStateText: { type: String },
-            loadingStateIcon: { type: String },
-            isTransitioning: { type: Boolean }
+            showImportReview: { type: Boolean }
         };
     }
 
@@ -122,90 +119,24 @@ class ImportWishlistContainer extends observeState(LitElement) {
                     line-height: 1.4;
                 }
 
-                .loading-state {
+                .loading-backdrop {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: rgba(0, 0, 0, 0.2);
                     display: flex;
-                    flex-direction: column;
                     align-items: center;
-                    gap: var(--spacing-normal);
-                    padding: var(--spacing-large);
-                    text-align: center;
-                    margin-top: var(--spacing-normal);
+                    justify-content: center;
+                    z-index: 1000;
+                    backdrop-filter: blur(2px);
                 }
 
-                .loading-icon {
-                    font-size: 3rem;
-                    animation: pulse 2s infinite;
-                    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-                    opacity: 1;
+                .loading-backdrop.dark-mode {
+                    background-color: rgba(0, 0, 0, 0.3);
                 }
 
-                .loading-icon.transitioning {
-                    opacity: 0;
-                    transform: scale(0.8);
-                }
-
-                .loading-text {
-                    font-size: var(--font-size-normal);
-                    color: var(--text-color-medium-dark);
-                    margin: 0;
-                    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-
-                .loading-text.transitioning {
-                    opacity: 0;
-                    transform: translateY(-10px);
-                }
-
-                .loading-progress {
-                    width: 100%;
-                    max-width: 300px;
-                    height: 8px;
-                    background: var(--background-color-light);
-                    border-radius: 4px;
-                    overflow: hidden;
-                    position: relative;
-                }
-
-                .loading-progress-bar {
-                    height: 100%;
-                    background: linear-gradient(90deg, var(--primary-color), var(--primary-color-light));
-                    border-radius: 4px;
-                    transition: width 0.8s ease;
-                }
-
-                @keyframes pulse {
-                    0% { transform: scale(1); }
-                    50% { transform: scale(1.1); }
-                    100% { transform: scale(1); }
-                }
-
-                @keyframes slideInUp {
-                    from {
-                        opacity: 0;
-                        transform: translateY(20px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-
-                @keyframes slideInScale {
-                    from {
-                        opacity: 0;
-                        transform: scale(0.5);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: scale(1);
-                    }
-                }
-
-                .loading-state-enter {
-                    animation: slideInUp 0.5s ease-out;
-                }
             `
         ];
     }
@@ -216,24 +147,33 @@ class ImportWishlistContainer extends observeState(LitElement) {
         this.isSubmitting = false;
         this.importResult = null;
         this.showImportReview = false;
-        this.currentLoadingState = 0;
-        this.loadingStateText = '';
-        this.loadingStateIcon = '';
-        this.loadingInterval = null;
-        this.isTransitioning = false;
 
-        // Fun loading states - each lasts 3 seconds
-        this.loadingStates = [
-            { text: 'Connecting to Amazon...', icon: '🔗' },
-            { text: 'Fetching wishlist content...', icon: '📦' },
-            { text: 'Parsing HTML structure...', icon: '🔍' },
-            { text: 'Analyzing product data...', icon: '🧠' },
-            { text: 'Extracting images...', icon: '🖼️' },
-            { text: 'Processing prices...', icon: '💰' },
-            { text: 'Validating product links...', icon: '🔗' },
-            { text: 'Organizing items...', icon: '📋' },
-            { text: 'Running quality checks...', icon: '✅' },
-            { text: 'Finalizing import...', icon: '🎯' }
+        // Loading phases for process-loading-ring
+        this.loadingPhases = [
+            { icon: html`🔗`, message: 'Connecting to Amazon...', duration: 4000 },
+            { icon: html`📦`, message: 'Fetching wishlist content...', duration: 4000 },
+            { icon: html`🔍`, message: 'Parsing HTML structure...', duration: 4000 },
+            { icon: html`🧠`, message: 'Analyzing product data...', duration: 4000 },
+            { icon: html`🎪`, message: 'Flibbertigibbeting...', duration: 4000 },
+            { icon: html`🖼️`, message: 'Extracting images...', duration: 4000 },
+            { icon: html`💰`, message: 'Processing prices...', duration: 4000 },
+            { icon: html`🔗`, message: 'Validating product links...', duration: 4000 },
+            { icon: html`📋`, message: 'Organizing items...', duration: 4000 },
+            { icon: html`✅`, message: 'Running quality checks...', duration: 4000 },
+            { icon: html`⏰`, message: 'Taking my time...', duration: 4000 },
+            { icon: html`🚗`, message: 'Stuck in traffic...', duration: 4000 },
+            { icon: html`🏛️`, message: 'Waiting in line at the bank...', duration: 4000 },
+            { icon: html`🍽️`, message: 'Working up an appetite...', duration: 4000 },
+            { icon: html`☕`, message: 'Getting another coffee...', duration: 4000 },
+            { icon: html`🐕`, message: 'Walking the dog...', duration: 4000 },
+            { icon: html`📱`, message: 'Checking social media...', duration: 4000 },
+            { icon: html`🍕`, message: 'Ordering pizza...', duration: 4000 },
+            { icon: html`🧦`, message: 'Looking for matching socks...', duration: 4000 },
+            { icon: html`🐢`, message: 'Moving at turtle speed...', duration: 4000 },
+            { icon: html`🎭`, message: 'Practicing dramatic pauses...', duration: 4000 },
+            { icon: html`🧘`, message: 'Meditating on life choices...', duration: 4000 },
+            { icon: html`🎪`, message: 'Joining the circus...', duration: 4000 },
+            { icon: html`🎯`, message: 'Finalizing import...', duration: 4000 },
         ];
     }
 
@@ -241,49 +181,6 @@ class ImportWishlistContainer extends observeState(LitElement) {
         this.wishlistUrl = e.detail.value;
     }
 
-    _startLoadingStates() {
-        this.currentLoadingState = 0;
-        // Set initial state without transition
-        const initialState = this.loadingStates[0];
-        this.loadingStateText = initialState.text;
-        this.loadingStateIcon = initialState.icon;
-        this.isTransitioning = false;
-
-        this.loadingInterval = setInterval(() => {
-            this.currentLoadingState++;
-            if (this.currentLoadingState < this.loadingStates.length) {
-                this._updateLoadingState();
-            } else {
-                // Cycle back to earlier states if still loading
-                this.currentLoadingState = this.loadingStates.length - 3;
-                this._updateLoadingState();
-            }
-        }, 4000); // 3 seconds per state
-    }
-
-    _updateLoadingState() {
-        // Start transition out
-        this.isTransitioning = true;
-
-        // After fade out completes, update content and fade in
-        setTimeout(() => {
-            const state = this.loadingStates[this.currentLoadingState];
-            this.loadingStateText = state.text;
-            this.loadingStateIcon = state.icon;
-
-            // Small delay before fading in
-            setTimeout(() => {
-                this.isTransitioning = false;
-            }, 50);
-        }, 300); // Match the CSS transition duration
-    }
-
-    _stopLoadingStates() {
-        if (this.loadingInterval) {
-            clearInterval(this.loadingInterval);
-            this.loadingInterval = null;
-        }
-    }
 
     async _handleSubmit(e) {
         e.preventDefault();
@@ -294,7 +191,6 @@ class ImportWishlistContainer extends observeState(LitElement) {
 
         this.isSubmitting = true;
         this.importResult = null;
-        this._startLoadingStates();
 
         try {
             const response = await importAmazonWishlist(this.wishlistUrl.trim());
@@ -321,7 +217,6 @@ class ImportWishlistContainer extends observeState(LitElement) {
             messagesState.addMessage('An unexpected error occurred. Please try again.', 'error');
         } finally {
             this.isSubmitting = false;
-            this._stopLoadingStates();
         }
     }
 
@@ -391,12 +286,12 @@ class ImportWishlistContainer extends observeState(LitElement) {
             </form>
 
             ${this.isSubmitting ? html`
-                <div class="loading-state loading-state-enter">
-                    <div class="loading-icon ${this.isTransitioning ? 'transitioning' : ''}">${this.loadingStateIcon}</div>
-                    <p class="loading-text ${this.isTransitioning ? 'transitioning' : ''}">${this.loadingStateText}</p>
-                    <div class="loading-progress">
-                        <div class="loading-progress-bar" style="width: ${((this.currentLoadingState + 1) / this.loadingStates.length) * 100}%"></div>
-                    </div>
+                <div class="loading-backdrop">
+                    <process-loading-ring
+                        ?show="${this.isSubmitting}"
+                        .phases="${this.loadingPhases}"
+                        duration="60000"
+                    ></process-loading-ring>
                 </div>
             ` : ''}
         `;

@@ -3,6 +3,7 @@ import {observeState} from 'lit-element-state';
 import {userState} from "../../../state/userStore.js";
 import {globalState} from "../../../state/globalStore.js";
 import './login-account.js';
+import '../../global/loading-screen.js'
 import '../../global/custom-input.js'
 import {navigate} from "../../../router/main-router.js";
 import buttonStyles from "../../../css/buttons.js";
@@ -144,7 +145,7 @@ export class GuestHomeContainer extends observeState(LitElement) {
 
     render() {
         return userState.loadingUser ?
-            'loading...' : html`
+            html`<loading-screen></loading-screen>` : html`
                     <div class="container">
                         <!-- Left Section -->
                         <div class="left">

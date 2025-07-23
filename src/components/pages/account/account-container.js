@@ -4,7 +4,6 @@ import './avatar.js';
 import './account-public-description.js';
 import './account-qa.js';
 import './account-notifications.js';
-import './account-navigation.js';
 import './account-private-notes.js';
 import './account-comments.js';
 import './user-details.js';
@@ -19,7 +18,6 @@ import './my-groups-list.js'
 import '../../../svg/edit.js'
 import buttonStyles from '../../../css/buttons.js'
 import '../../users/edit-user-form.js';
-import {userState} from "../../../state/userStore.js";
 import {observeState} from "lit-element-state";
 import {isCurrentUserSubuser} from "../../../helpers/generalHelpers.js";
 export class AccountContainer extends observeState(LitElement) {
@@ -75,25 +73,12 @@ export class AccountContainer extends observeState(LitElement) {
                 <section>
                     <my-groups-list></my-groups-list>
                 </section>
-
-                <section>
-                    <account-notifications></account-notifications>
-                </section>
-
                 <section>
                     <my-lists></my-lists>
-                </section>
-                
-                <section>
-                    <account-navigation></account-navigation>
                 </section>
 
                 <section>
                     <account-private-notes></account-private-notes>
-                </section>
-
-                <section>
-                    <account-comments></account-comments>
                 </section>
             </main>
         `;

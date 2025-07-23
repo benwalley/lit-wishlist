@@ -1,5 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../../css/buttons";
+import scrollbarStyles from "../../../css/scrollbars.js";
 import {customFetch} from "../../../helpers/fetchHelpers.js";
 import '../../global/custom-image.js';
 import './price-display.js';
@@ -15,7 +16,7 @@ import '../../../svg/cart.js';
 import '../../../svg/edit.js';
 import './list-sidebar.js';
 import {cachedFetch, invalidateCache} from "../../../helpers/caching.js";
-import {formatDate} from "../../../helpers/generalHelpers.js";
+import {formatDate, getUserImageIdByUserId, getUsernameById} from "../../../helpers/generalHelpers.js";
 import {listenUpdateItem, triggerUpdateItem} from "../../../events/eventListeners.js";
 import './get-this-button.js';
 import './contribute-button.js';
@@ -49,12 +50,13 @@ export class CustomElement extends observeState(LitElement) {
 
     onBeforeEnter(location, commands, router) {
         this.itemId = location.params.itemId;
-        this.listId = location.params.listId;
+        this.listId = location.params.listId || '';
     }
 
     static get styles() {
         return [
             buttonStyles,
+            scrollbarStyles,
             css`
                 :host {
                     display: block;
@@ -64,6 +66,23 @@ export class CustomElement extends observeState(LitElement) {
 
                 .item-title {
                     line-height: 1;
+                }
+
+                .gift-for {
+                    display: flex;
+                    flex-direction: row;
+                    gap: var(--spacing-small);
+                    
+                    a {
+                        font-size: var(--font-size-medium);
+                        color: var(--text-color-dark);
+                        text-decoration: none;
+                        font-weight: bold;
+                    }
+                }
+
+                .gift-for .owner-name {
+                    
                 }
 
                 /* Use a grid layout for the overall container */
@@ -105,6 +124,11 @@ export class CustomElement extends observeState(LitElement) {
                         padding-right: 0;
                         grid-template-columns: 1fr 1fr 320px;
                     }
+                    
+                    /* When no listId (standalone mode), use 2-column layout */
+                    main.main-content.no-sidebar {
+                        grid-template-columns: 1fr 1fr;
+                    }
                 }
                 
                 .main-content-wrapper {
@@ -114,6 +138,7 @@ export class CustomElement extends observeState(LitElement) {
                     gap: var(--spacing-normal);
                     overflow: auto;
                     padding-bottom: var(--spacing-large);
+                    max-width: 1000px;
                 }
 
                 contributors-top-bar {
@@ -165,6 +190,11 @@ export class CustomElement extends observeState(LitElement) {
                     aside.right-column {
                         display: block;
                     }
+                    
+                    /* Hide sidebar when no listId (standalone mode) */
+                    aside.right-column.hidden {
+                        display: none;
+                    }
                 }
 
                 .added-date {
@@ -195,6 +225,10 @@ export class CustomElement extends observeState(LitElement) {
 
                 .action-buttons button {
                     flex-grow: 1;
+                }
+                
+                .gift-for-label {
+                    color: var(--medium-text-color);
                 }
 
             `,
@@ -245,7 +279,7 @@ export class CustomElement extends observeState(LitElement) {
                         .itemId="${this.itemId}"
                         .listId="${this.listId}"
                         .itemData="${this.itemData}"></contributors-top-bar>
-                <main class="main-content ${this.sidebarExpanded ? 'expanded' : 'collapsed'}"
+                <main class="main-content ${this.sidebarExpanded ? 'expanded' : 'collapsed'} ${!this.listId ? 'no-sidebar' : ''}"
                       aria-busy="${this.loading ? 'true' : 'false'}">
                     ${this.loading
                             ? html`<p>Loading item data…</p>`
@@ -253,6 +287,23 @@ export class CustomElement extends observeState(LitElement) {
                                 <div class="main-content-wrapper">
                                     <all-images-display .itemData="${this.itemData}"></all-images-display>
                                     <div class="details-section">
+                                        ${this.itemData?.createdById ? html`
+                                            <div class="gift-for">
+                                                <custom-avatar
+                                                    size="50"
+                                                    shadow
+                                                    round
+                                                    username="${getUsernameById(this.itemData.createdById)}"
+                                                    imageId="${getUserImageIdByUserId(this.itemData.createdById)}"
+                                                ></custom-avatar>
+                                                <div class="right-side">
+                                                    <div class="gift-for-label">Gift for</div>
+                                                    <a href="/users/${this.itemData.createdById}">
+                                                        ${getUsernameById(this.itemData.createdById)}
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        ` : ''}
                                         <h1 class="item-title">${this.itemData.name}</h1>
                                         <p class="added-date">
                                             <calendar-icon></calendar-icon>
@@ -294,8 +345,9 @@ export class CustomElement extends observeState(LitElement) {
                                 </div>
                             `}
 
+                    ${this.listId ? html`
                     <aside
-                            class="right-column ${this.sidebarExpanded ? 'expanded' : 'collapsed'}"
+                            class="right-column custom-scrollbar ${this.sidebarExpanded ? 'expanded' : 'collapsed'}"
                             id="sidebar"
                             aria-label="Other Items in This List"
                     >
@@ -305,6 +357,7 @@ export class CustomElement extends observeState(LitElement) {
                                 @sidebar-toggle="${this.handleSidebarToggle}"
                         ></list-sidebar>
                     </aside>
+                    ` : ''}
                 </main>
 
                 <!-- Sidebar wrapped in an <aside> with an accessible name -->

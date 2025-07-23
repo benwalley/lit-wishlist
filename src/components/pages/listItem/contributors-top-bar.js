@@ -347,14 +347,14 @@ export class ContributorsTopBar extends LitElement {
     render() {
         return html`
             <div class="top-row fade-in">
-                <a
+                ${this.listId ? html`<a
                         href="/list/${this.listId}"
                         class="back-arrow button link-button"
                         aria-label="Back to List"
                 >
                     <arrow-long-left-icon aria-hidden="true"></arrow-long-left-icon>
                     <span class="desktop-only">Back To List</span>
-                </a>
+                </a>` : html`<span></span>`}
 
                 ${canUserContribute(userState.userData, this.itemData) ? html`<div class="contributor-details">
                     ${this.itemData

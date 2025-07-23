@@ -63,6 +63,7 @@ export class GettingStack extends observeState(LitElement) {
             .getting-stack {
                 display: flex;
                 align-items: center;
+                cursor: pointer;
                 gap: var(--spacing-small);
             }
             
@@ -183,7 +184,7 @@ export class GettingStack extends observeState(LitElement) {
         const totalGetting = this.gettingList.reduce((sum, item) => sum + (item.numberGetting || 0), 0);
 
         return html`
-            <div class="getting-stack">
+            <div class="getting-stack" @click="${this.openModal}">
                 ${this.showAvatars ? html`
                     <div class="avatar-container">
                         <div class="avatar-stack">
@@ -206,7 +207,7 @@ export class GettingStack extends observeState(LitElement) {
                     </div>
                 ` : ''}
                 
-                <div class="getting-text" @click="${this.openModal}">
+                <div class="getting-text">
                     ${this.numberPeopleGetting} ${this.numberPeopleGetting === 1 ? 'person' : 'people'} getting
                 </div>
             </div>

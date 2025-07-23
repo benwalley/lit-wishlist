@@ -406,8 +406,8 @@ class BulkActionsPage extends observeState(LitElement) {
                     display: grid;
                     grid-template-columns: 40px 40px 1fr 100px 182px;
                     gap: 0;
-                    border: 2px solid #ddd;
-                    border-radius: 8px;
+                    border: 2px solid var(--border-color);
+                    border-radius: var(--border-radius-normal);
                     overflow: hidden;
                 }
                 
@@ -420,20 +420,20 @@ class BulkActionsPage extends observeState(LitElement) {
                 }
                 
                 .grid-row:hover .grid-cell {
-                    background-color: white;
+                    background-color: var(--background-light);
                 }
                 
                 .grid-row.selected .grid-cell {
-                    background-color: white;
+                    background-color: var(--background-light);
                 }
 
                 .grid-header {
-                    background-color: #f5f5f5;
+                    background-color: var(--background-dark);
                     padding: 10px 8px;
                     font-weight: bold;
                     line-height: 1;
-                    border-right: 1px solid #ddd;
-                    border-bottom: 2px solid #ddd;
+                    border-right: 1px solid var(--border-color);
+                    border-bottom: 2px solid var(--border-color);
                 }
 
                 .grid-header:last-child {

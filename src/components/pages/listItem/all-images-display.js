@@ -46,6 +46,7 @@ export class CustomElement extends LitElement {
                     container-type: inline-size;
                     container-name: gallery;
                     max-width: 400px;
+                    padding-top: var(--spacing-normal);
                 }
 
                 @media only screen and (min-width: 1000px) {

@@ -19,41 +19,72 @@ export class FractionalLoader extends LitElement {
     }
 
     static styles = css`
-    :host {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0.3s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      pointer-events: none;
-    }
-    :host([show]) {
-      visibility: visible;
-      opacity: 1;
-    }
-    .ring { width: 280px; height: 280px; transform: rotate(-90deg); }
-    circle { fill: none; stroke-width: 6; stroke-linecap: round; }
-    .track { stroke: var(--purple-normal, #4f46e5); opacity: 0.3; }
-    .progress { stroke: var(--purple-normal, #4f46e5); transition: stroke-dasharray 0.3s linear; }
-    .center {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      text-align: center;
-    }
-    .icon { font-size: 2.5rem; color: var(--purple-normal, #4f46e5); }
-    .text { margin: 0; font-size: 1.25rem; font-weight: bold; color: var(--purple-normal, #4f46e5); }
-  `;
+        :host {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+            filter: drop-shadow(1px 1px 8px #ffffff);
+        }
+
+        :host([show]) {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .ring {
+            width: 280px;
+            height: 280px;
+            transform: rotate(-90deg);
+        }
+
+        circle {
+            fill: none;
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+
+        .track {
+            stroke: var(--purple-normal, #4f46e5);
+            opacity: 0.3;
+        }
+
+        .progress {
+            stroke: var(--purple-normal, #4f46e5);
+            transition: stroke-dasharray 0.3s linear;
+        }
+
+        .center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-align: center;
+        }
+
+        .icon {
+            font-size: 2.5rem;
+            color: var(--purple-normal, #4f46e5);
+        }
+
+        .text {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--purple-normal, #4f46e5);
+        }
+    `;
 
     connectedCallback() {
         super.connectedCallback();
@@ -91,12 +122,12 @@ export class FractionalLoader extends LitElement {
         const now = Date.now();
         const elapsed = now - this._startTime;
         const totalDuration = this._totalDuration || this.duration;
-        
+
         // Calculate progress based on phase durations
         this._progress = this._calculateProgress(elapsed, totalDuration);
-        
+
         this.requestUpdate();
-        
+
         // Continue animation until we reach very close to 100%
         if (this._progress < 99.9) {
             this._animationFrame = requestAnimationFrame(() => this._animate());
@@ -121,7 +152,7 @@ export class FractionalLoader extends LitElement {
             const t = elapsed / totalDuration;
             return 100 * (1 - Math.exp(-3 * t));
         }
-        
+
         let cumulativeDuration = 0;
         for (let i = 0; i < this.phases.length; i++) {
             const phaseDuration = this.phases[i].duration || 1000;
@@ -130,7 +161,7 @@ export class FractionalLoader extends LitElement {
                 const phaseElapsed = elapsed - cumulativeDuration;
                 const phaseProgress = phaseElapsed / phaseDuration;
                 const smoothProgress = 1 - Math.exp(-3 * phaseProgress); // Asymptotic within phase
-                
+
                 // Calculate overall progress
                 const baseProgress = (cumulativeDuration / totalDuration) * 100;
                 const phaseContribution = ((phaseDuration / totalDuration) * 100) * smoothProgress;
@@ -138,7 +169,7 @@ export class FractionalLoader extends LitElement {
             }
             cumulativeDuration += phaseDuration;
         }
-        
+
         // If we've exceeded all phases, approach 100% asymptotically
         const t = (elapsed - totalDuration) / 5000; // 5 second tail
         return 95 + (5 * (1 - Math.exp(-2 * t)));
@@ -146,10 +177,10 @@ export class FractionalLoader extends LitElement {
 
     _phase() {
         if (!this.phases.length) return {};
-        
+
         const now = Date.now();
         const elapsed = now - this._startTime;
-        
+
         let cumulativeDuration = 0;
         for (let i = 0; i < this.phases.length; i++) {
             const phaseDuration = this.phases[i].duration || 1000;
@@ -158,7 +189,7 @@ export class FractionalLoader extends LitElement {
             }
             cumulativeDuration += phaseDuration;
         }
-        
+
         // Return last phase if we've exceeded all durations
         return this.phases[this.phases.length - 1];
     }

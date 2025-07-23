@@ -238,14 +238,6 @@ export class GroupDetails extends observeState(LitElement) {
             <p class="group-description">${this.groupData?.groupDescription}</p>
             
             <div class="action-buttons">
-                <button aria-label="add-items-to-group"
-                        class="icon-button button add-button"
-                        @click="${this._handleAddItems}"
-                        title="Add Items to Group"
-                >
-                    <plus-icon></plus-icon>
-                </button>
-                
                 ${isAdmin ? html`
                     <button aria-label="edit-group"
                             class="icon-button button username-edit-button"
