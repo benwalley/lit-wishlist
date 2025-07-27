@@ -21,6 +21,7 @@ import {listenUpdateItem, triggerUpdateItem} from "../../../events/eventListener
 import './get-this-button.js';
 import './contribute-button.js';
 import '../../global/action-dropdown.js';
+import './shared-with.js';
 import {openEditItemModal} from '../../add-to-list/edit-item-modal.js';
 import {messagesState} from "../../../state/messagesStore.js";
 import {canUserContribute} from "../../../helpers/userHelpers.js";
@@ -231,6 +232,12 @@ export class CustomElement extends observeState(LitElement) {
                     color: var(--medium-text-color);
                 }
 
+                .left-column {
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-normal);
+                }
+
             `,
         ];
     }
@@ -285,7 +292,10 @@ export class CustomElement extends observeState(LitElement) {
                             ? html`<p>Loading item data…</p>`
                             : html`
                                 <div class="main-content-wrapper">
-                                    <all-images-display .itemData="${this.itemData}"></all-images-display>
+                                    <div class="left-column">
+                                        <all-images-display .itemData="${this.itemData}"></all-images-display>
+                                        <shared-with .itemData="${this.itemData}"></shared-with>
+                                    </div>
                                     <div class="details-section">
                                         ${this.itemData?.createdById ? html`
                                             <div class="gift-for">
@@ -298,7 +308,7 @@ export class CustomElement extends observeState(LitElement) {
                                                 ></custom-avatar>
                                                 <div class="right-side">
                                                     <div class="gift-for-label">Gift for</div>
-                                                    <a href="/users/${this.itemData.createdById}">
+                                                    <a href="/user/${this.itemData.createdById}">
                                                         ${getUsernameById(this.itemData.createdById)}
                                                     </a>
                                                 </div>

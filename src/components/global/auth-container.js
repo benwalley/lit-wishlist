@@ -38,7 +38,7 @@ export class AuthContainer extends observeState(LitElement) {
             height: 100vh;
         }
 
-        @media (min-width: 768px) {
+        @media (min-width: 1200px) {
             :host {
                 display: grid;
                 grid-template-rows: 1fr;

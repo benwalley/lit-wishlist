@@ -3,6 +3,7 @@ import buttonStyles from "../../../css/buttons";
 import '../../../svg/edit.js';
 import '../../../svg/delete.js';
 import '../../../svg/check.js';
+import '../../../svg/stopwatch.js';
 import '../../global/custom-input.js';
 import {messagesState} from "../../../state/messagesStore.js";
 import '../../loading/skeleton-loader.js';
@@ -34,6 +35,7 @@ export class QAItem extends observeState(LitElement) {
             css`
                 :host {
                     display: block;
+                    overflow: visible;
                 }
 
                 .item-container {
@@ -46,7 +48,6 @@ export class QAItem extends observeState(LitElement) {
                     margin: 0;
                     padding: var(--spacing-small);
                     border-bottom: 1px solid var(--border-color);
-                    overflow: hidden;
                     height: auto;
                     cursor: pointer;
                     
@@ -74,8 +75,8 @@ export class QAItem extends observeState(LitElement) {
 
                 .actions {
                     position: absolute;
-                    right: 0;
-                    top: 0;
+                    right: var(--spacing-x-small);
+                    top: var(--spacing-x-small);
                     opacity: 1;
                     transform: translateX(0);
                     pointer-events: auto;
@@ -130,6 +131,28 @@ export class QAItem extends observeState(LitElement) {
                 
                 .qa-item-asker {
                     font-size: var(--font-size-x-small);
+                }
+                
+                .due-soon-indicator {
+                    color: var(--green-normal);
+                    font-size: var(--font-size-medium);
+                    cursor: help;
+                    
+                    &.due-week {
+                        color: var(--delete-red);
+                    }
+                    
+                    &.due-month {
+                        color: var(--info-yellow);
+                    }
+                }
+                
+                .top-row {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: flex-start;
+                    gap: var(--spacing-small);
+                    padding-right: 70px;
                 }
             `
         ];
@@ -256,19 +279,48 @@ export class QAItem extends observeState(LitElement) {
         this.editedAnswer = e.target.value;
     }
 
+    _getDueStatus() {
+        if (!this.item.dueDate) return null;
+
+        const dueDate = new Date(this.item.dueDate);
+        const today = new Date();
+        const oneWeekFromNow = new Date();
+        oneWeekFromNow.setDate(today.getDate() + 7);
+        const oneMonthFromNow = new Date();
+        oneMonthFromNow.setMonth(today.getMonth() + 1);
+
+        if (dueDate < today) return null; // Past due, don't show indicator
+        if (dueDate <= oneWeekFromNow) return 'due-week'; // Red - due within a week
+        if (dueDate <= oneMonthFromNow) return 'due-month'; // Yellow - due within a month
+        return 'due-future'; // Green - due beyond a month
+    }
+
+    _formatDueDate() {
+        if (!this.item.dueDate) return '';
+
+        const dueDate = new Date(this.item.dueDate);
+        return `Due: ${dueDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+    }
+
     _renderViewMode() {
         const hasEmptyAnswer = this.item.answers?.length === 0 || !this.item.answers[0]?.answerText?.trim();
+        const dueStatus = this._getDueStatus();
 
         return html`
-            <h3 class="question" style="cursor: pointer;">${this.item.questionText}</h3>
+            <div class="top-row">
+                <h3 class="question" style="cursor: pointer;">${this.item.questionText}</h3>
+                ${dueStatus ? html`<div class="due-soon-indicator tooltip ${dueStatus}">
+                    <stopwatch-icon></stopwatch-icon>
+                    <custom-tooltip>${this._formatDueDate()}</custom-tooltip>
+                </div>` : ''}
+            </div>
+            
             <div class="answer-container editable">
                 ${hasEmptyAnswer
                         ? html`<span class="missing-info">Needs an answer</span>`
                         : html`<p class="answer">${this.item.answers[0]?.answerText}</p>`
                 }
                <div class="qa-item-asker">
-                    
-                    
                     ${userState.userData?.id !== this.item.askedById ? html`
                         <span>Asked by</span>
                         <custom-avatar
@@ -306,30 +358,6 @@ export class QAItem extends observeState(LitElement) {
         `;
     }
 
-    _renderEditMode() {
-        return html`
-            ${this._isQuestionCreator() ? html`
-                <custom-input
-                        label="Question"
-                        .value="${this.editedQuestion}"
-                        @value-changed="${this._onQuestionChange}"
-                ></custom-input>
-            ` : html`
-                <h3 class="question display-only">${this.item.questionText}</h3>
-            `}
-            
-            <custom-input
-                    label="Answer"
-                    .value="${this.editedAnswer}"
-                    @value-changed="${this._onAnswerChange}"
-            ></custom-input>
-            
-            <div class="edit-actions">
-                <button class="secondary" @click="${this._toggleEdit}">Cancel</button>
-                <button class="primary" @click="${this._saveEdit}">Save</button>
-            </div>
-        `;
-    }
 
     _renderLoading() {
         return html`<div class="loader-container">
@@ -354,7 +382,6 @@ export class QAItem extends observeState(LitElement) {
 
     render() {
         const hasEmptyAnswer = this._hasEmptyAnswer();
-
         return html`
             <div class="item-container ${hasEmptyAnswer ? 'empty-answer' : ''}" @click="${this._openEditPopup}">
                 ${this._renderContent()}

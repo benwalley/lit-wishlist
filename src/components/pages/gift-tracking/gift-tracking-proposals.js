@@ -119,6 +119,7 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                 .proposal-title {
                     font-size: var(--font-size-medium);
                     font-weight: 600;
+                    max-width: calc(100% - 140px);
                     color: var(--text-color-dark);
                     margin-bottom: var(--spacing-x-small);
                     line-height: 1.3;

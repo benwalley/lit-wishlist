@@ -4,6 +4,7 @@
     =========================================== */
     font-family: "Inter", Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
+    letter-spacing: 0.3px;
     font-size: 16px;
     font-weight: 400;
     font-synthesis: none;
@@ -49,13 +50,15 @@
 
     /* -- Background */
     --background-light-light: #ffffff;
-    --background-light-dark: #f9fafb;
+    --background-light-medium: #fafafa;
+    --background-light-dark: #f3f5f9;
     --background-dark-light: #1f2937;
+    --background-dark-medium: #18202d;
     --background-dark-dark: #111827;
 
     --background-light: var(--background-light-light);
+    --background-medium: var(--background-light-medium);
     --background-dark: var(--background-light-dark);
-
 
 
     /* ===========================================
@@ -179,6 +182,14 @@
     --spacing-small: 10px;
     --spacing-x-small: 5px;
 
+    --spacing-normal-variable: var(--spacing-small);
+    --spacing-small-variable: var(--spacing-x-small);
+
+    @media only screen and (min-width: 600px) {
+        --spacing-normal-variable: var(--spacing-normal);
+        --spacing-small-variable: var(--spacing-small);
+    }
+
     --max-content-width: 1400px;
     --small-breakpoint: 450px;
     --medium-breakpoint: 768px;
@@ -263,6 +274,7 @@ body {
 body[data-mode="dark"] {
     --background-color: var(--background-dark-dark);
     --background-light: var(--background-dark-light);
+    --background-medium: var(--background-dark-medium);
     --background-dark: var(--background-dark-dark);
     --border-color: var(--border-color-dark);
     --modal-background-color: var(--background-dark-light);

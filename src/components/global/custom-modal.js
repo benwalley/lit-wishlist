@@ -35,7 +35,7 @@ class CustomModal extends LitElement {
             background: var(--modal-background-color, #fff);
             border-radius: var(--border-radius-large, 8px);
             border: none;
-            width: 90%;
+            width: calc(100% - var(--spacing-normal));
             color: var(--text-color-dark);
             max-width: var(--max-width, 1200px);
             box-shadow: var(--shadow-2-soft, 0 2px 10px rgba(0, 0, 0, 0.1));

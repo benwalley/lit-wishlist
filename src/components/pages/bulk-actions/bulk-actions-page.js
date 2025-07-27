@@ -4,6 +4,7 @@ import buttonStyles from '../../../css/buttons.js';
 import { fetchMyItems, bulkUpdatePublicityAndPriority } from '../../../helpers/api/listItems.js';
 import {listenUpdateItem, triggerUpdateItem} from "../../../events/eventListeners.js";
 import '../../../svg/check.js';
+import '../../../svg/link.js';
 import '../../add-to-list/priority-selector.js';
 import '../account/avatar.js';
 import '../../../components/global/custom-image.js';
@@ -404,8 +405,9 @@ class BulkActionsPage extends observeState(LitElement) {
 
                 .items-grid {
                     display: grid;
-                    grid-template-columns: 40px 40px 1fr 100px 182px;
+                    grid-template-columns: 40px 40px 1fr 100px 182px 40px;
                     gap: 0;
+                    background: var(--background-medium);
                     border: 2px solid var(--border-color);
                     border-radius: var(--border-radius-normal);
                     overflow: hidden;
@@ -428,7 +430,7 @@ class BulkActionsPage extends observeState(LitElement) {
                 }
 
                 .grid-header {
-                    background-color: var(--background-dark);
+                    background-color: var(--background-light);
                     padding: 10px 8px;
                     font-weight: bold;
                     line-height: 1;
@@ -697,6 +699,7 @@ class BulkActionsPage extends observeState(LitElement) {
                             <div class="grid-header">Name</div>
                             <div class="grid-header">Public</div>
                             <div class="grid-header">Priority</div>
+                            <div class="grid-header"></div>
                             
                             <!-- Data Rows -->
                             ${this.myItems.map(item => html`
@@ -731,6 +734,11 @@ class BulkActionsPage extends observeState(LitElement) {
                                             .value=${item.priority || 0}
                                             @priority-changed=${(e) => this.updateItemPriority(item, e.detail.value)}
                                         ></priority-selector>
+                                    </div>
+                                    <div class="grid-cell">
+                                        <a href="/items/${item.id}" class="button icon-button blue-text" target="_blank" title="View item">
+                                            <link-icon></link-icon>
+                                        </a>
                                     </div>
                                 </div>
                             `)}

@@ -119,9 +119,16 @@ export class EditListForm extends LitElement {
             css`
                 .container {
                     display: grid;
-                    grid-template-columns: 1fr 1fr;
+                    grid-template-columns: 1fr;
                     gap: var(--spacing-normal);
                     padding: var(--spacing-small);
+                }
+                
+                @media screen and (min-width: 700px) {
+                    .container {
+                        gap: calc(var(--spacing-normal) * 2);
+                        grid-template-columns: 1fr 1fr;
+                    }
                 }
                 
                 h2 {
@@ -132,7 +139,6 @@ export class EditListForm extends LitElement {
                     display: flex;
                     flex-direction: column;
                     gap: var(--spacing-normal);
-                    padding: var(--spacing-normal);
                     padding-top: 0;
                 }
                 
@@ -170,8 +176,12 @@ export class EditListForm extends LitElement {
                     border: 1px solid var(--border-color);
                 }
 
-                .full-width {
-                    grid-column: 1 / span 2;
+                
+
+                @media screen and (min-width: 700px) {
+                    .full-width {
+                        grid-column: 1 / span 2;
+                    }
                 }
 
                 .section-heading {
@@ -206,11 +216,16 @@ export class EditListForm extends LitElement {
                     gap: var(--spacing-small);
                     justify-content: flex-end;
                     display: flex;
-                    grid-column: 2;
                     padding-top: var(--spacing-normal);
                     
                     button {
                         width: auto;
+                    }
+                }
+
+                @media screen and (min-width: 700px) {
+                    .button-container {
+                        grid-column: 2;
                     }
                 }
             `

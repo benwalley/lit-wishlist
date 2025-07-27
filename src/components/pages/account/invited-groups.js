@@ -78,7 +78,7 @@ export class InvitedGroups extends observeState(LitElement) {
                 }
                 
                 .empty-state {
-                    padding: 48px 24px;
+                    padding: var(--spacing-normal);
                     text-align: center;
                     color: var(--text-color-medium-dark);
                     background-color: var(--background-light);

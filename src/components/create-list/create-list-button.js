@@ -2,6 +2,7 @@ import {LitElement, html, css} from 'lit';
 import '../global/custom-modal.js';
 import buttonStyles from "../../css/buttons.js";
 import './create-list-form.js'
+import '../../svg/plus.js';
 
 export class CreateListButton extends LitElement {
     static properties = {};
@@ -30,7 +31,10 @@ export class CreateListButton extends LitElement {
 
     render() {
         return html`
-      <button class="button primary" @click="${this._openModal}">Create New List</button>
+      <button class="button primary" @click="${this._openModal}">
+          <plus-icon></plus-icon>
+          New List
+      </button>
 
       <!-- Custom Modal with a Create List Form -->
       <custom-modal class="list-modal" triggerEvent="open-create-list-modal" maxWidth="800px">

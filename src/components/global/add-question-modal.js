@@ -36,13 +36,13 @@ export class AddQuestionModal extends LitElement {
     _handleOpenModal(event) {
         const editData = event.detail.editData || {};
         const qaForm = this.shadowRoot.getElementById('qa-form');
-        
+
         if (editData && Object.keys(editData).length > 0) {
             qaForm.editQuestion(editData);
         } else {
             qaForm.clearForm();
         }
-        
+
         this.isOpen = true;
     }
 
@@ -58,6 +58,7 @@ export class AddQuestionModal extends LitElement {
                 .isOpen=${this.isOpen}
                 @modal-changed=${this._handleModalChanged}
                 maxWidth="800px"
+                noPadding
             >
                 <add-qa-popup
                     id="qa-form"

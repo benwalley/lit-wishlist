@@ -114,7 +114,11 @@ export class ConfirmModal extends LitElement {
                 }
                 
                 .submessage {
-                    color: var(--text-color-medium-dark);
+                    color: var(--delete-red);
+                    background: var(--delete-red-light);
+                    border: 1px solid var(--delete-red);
+                    padding: var(--spacing-x-small);
+                    font-weight: 500;
                     font-size: var(--font-size-x-small);
                 }
             `

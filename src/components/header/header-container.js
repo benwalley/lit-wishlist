@@ -88,7 +88,7 @@ export class HeaderContainer extends observeState(LitElement) {
                     display: flex;
                 }
                 
-                @media (min-width: 768px) {
+                @media (min-width: 1200px) {
                     :host {
                         position: relative;
                     }

@@ -246,9 +246,10 @@ class ImportWishlistContainer extends observeState(LitElement) {
 
         return html`
             <div class="import-header">
-                <h1>Import Amazon Wishlist</h1>
+                <h1>Import Wishlist</h1>
                 <p class="page-description">
-                    Import items from your Amazon wishlist to create a new list in your account.
+                    Import items from an Amazon (or other site) wishlist. This wishlist import was created specifically for Amazon wishlists, 
+                    but it should also work with other sites as long as the wishlist URL is accessible by anyone.
                 </p>
             </div>
 
@@ -264,7 +265,7 @@ class ImportWishlistContainer extends observeState(LitElement) {
 
             <form class="import-form" @submit=${this._handleSubmit}>
                 <div class="form-group">
-                    <label for="wishlist-url">Amazon Wishlist URL</label>
+                    <label for="wishlist-url">Wishlist URL</label>
                     <custom-input
                         id="wishlist-url"
                         placeholder="https://www.amazon.com/hz/wishlist/ls/..."

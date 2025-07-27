@@ -85,7 +85,7 @@ export class AddToListModal extends LitElement {
                 icon: html`<ai-icon></ai-icon>`,
                 message: 'Analyzing URL...',
                 detail: 'Fetching the product page',
-                duration: 3000
+                duration: 2000
             },
             {
                 icon: html`<ai-icon></ai-icon>`,
@@ -97,13 +97,31 @@ export class AddToListModal extends LitElement {
                 icon: html`<ai-icon></ai-icon>`,
                 message: 'Processing images...',
                 detail: 'Optimizing product photos',
-                duration: 3000
+                duration: 4000
+            },
+            {
+                icon: html`<ai-icon></ai-icon>`,
+                message: 'Extracting specifications...',
+                detail: 'Getting technical details',
+                duration: 4000
+            },
+            {
+                icon: html`<ai-icon></ai-icon>`,
+                message: 'Optimizing data...',
+                detail: 'Cleaning up information',
+                duration: 2000
+            },
+            {
+                icon: html`<ai-icon></ai-icon>`,
+                message: 'Formatting results...',
+                detail: 'Preparing for display',
+                duration: 1500
             },
             {
                 icon: html`<ai-icon></ai-icon>`,
                 message: 'Finalizing...',
                 detail: 'Almost ready',
-                duration: 2000
+                duration: 1000
             }
         ];
     }
@@ -559,7 +577,7 @@ export class AddToListModal extends LitElement {
                 <process-loading-ring
                         ?show="${this.isFetching}"
                         .phases="${this.fetchingPhases}"
-                        duration="10000"
+                        duration="20000"
                 ></process-loading-ring>
 
             </custom-modal>

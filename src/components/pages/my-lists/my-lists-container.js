@@ -69,7 +69,7 @@ class MyListsContainer extends observeState(LitElement) {
             </div>
 
             <div class="lists-container">
-                <my-lists></my-lists>
+                <my-lists lightTiles></my-lists>
             </div>
         `;
     }

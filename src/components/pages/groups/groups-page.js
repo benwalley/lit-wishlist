@@ -54,7 +54,7 @@ class GroupsPage extends LitElement {
 
     render() {
         return html`
-            <my-groups-list></my-groups-list>
+            <my-groups-list lightTiles></my-groups-list>
             
             <div class="invitations-section">
                 <invited-groups></invited-groups>

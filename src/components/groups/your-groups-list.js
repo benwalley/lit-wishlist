@@ -56,6 +56,7 @@ class GroupListComponent extends observeState(LitElement) {
                     font-size: var(--font-size-x-small);
                     color: var(--primary-color);
                     font-weight: bold;
+                    display: flex;
                 }
 
                 .action-buttons {
@@ -128,6 +129,17 @@ class GroupListComponent extends observeState(LitElement) {
                     text-align: center;
                     color: var(--text-color-medium-dark);
                     font-size: var(--font-size-small);
+                }
+                
+                .selected-label {
+                    display: none;
+                    padding-left: var(--spacing-x-small);
+                }
+                
+                @media only screen and (min-width: 600px) {
+                    .selected-label {
+                        display: inline-block;
+                    }
                 }
             `
         ];
@@ -248,7 +260,7 @@ class GroupListComponent extends observeState(LitElement) {
                 <div class="selection-info">
                     <div class="title">Groups</div>
                     ${this.selectedGroups.length > 0 ? html`
-                        <div class="selected-count">(${this.selectedGroups.length} selected)</div>
+                        <div class="selected-count">(${this.selectedGroups.length}<span class="selected-label">selected</span>)</div>
                     ` : ''}
                 </div>
 

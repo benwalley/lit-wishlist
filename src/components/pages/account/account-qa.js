@@ -52,7 +52,6 @@ export class AccountQA extends observeState(LitElement) {
             .qa-list {
                 display: flex;
                 flex-direction: column;
-                gap: var(--spacing-small);
                 max-height: 300px;
                 overflow: auto;
             }

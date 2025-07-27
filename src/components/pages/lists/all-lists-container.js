@@ -31,6 +31,10 @@ class AllListsContainer extends observeState(LitElement) {
                 gap: 16px;
                 flex-wrap: wrap;
             }
+            
+            list-item {
+                --item-background: var(--background-light);
+            }
 
             .lists-container {
                 display: grid;

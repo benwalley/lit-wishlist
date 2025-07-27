@@ -87,6 +87,8 @@ export class UserListDisplayItem extends observeState(LitElement) {
                 .user-info {
                     flex: 1;
                     display: flex;
+                    gap: var(--spacing-x-small);
+                    
                     flex-direction: column;
                     min-width: 0;
                     line-height: 1;
@@ -250,7 +252,7 @@ export class UserListDisplayItem extends observeState(LitElement) {
                 invalidateCache(`/groups/${this.groupData.id}`);
                 triggerGroupUpdated();
             } else {
-                messagesState.addMessage('Failed to remove admin privileges', 'error');
+                messagesState.addMessage('Failed to revoke admin privileges', 'error');
             }
         } catch (error) {
             console.error('Error removing admin privileges:', error);
@@ -321,11 +323,11 @@ export class UserListDisplayItem extends observeState(LitElement) {
                     ${isGroupAdmin(this.groupData, userState?.userData?.id) ? html`
                         ${this.canRemoveAdmin() ? html`
                             <button class="icon-button danger-text large"
-                                    aria-label="Remove admin privileges"
+                                    aria-label="Revoke admin privileges"
                                     @click=${this._handleRemoveAdmin}>
                                 <remove-admin-icon></remove-admin-icon>
                             </button>
-                            <custom-tooltip style="min-width: 200px;">Remove Admin Privileges</custom-tooltip>
+                            <custom-tooltip style="min-width: 200px;">Revoke Admin Privileges</custom-tooltip>
                         ` : ''}
 
                         ${this.canMakeAdmin() ? html`

@@ -9,14 +9,19 @@ import '../../global/custom-modal.js';
 import '../../groups/create-group-form.js';
 import {listenGroupUpdated, triggerUpdateUser} from "../../../events/eventListeners.js";
 import '../../../svg/group.js';
+import '../../../svg/plus.js';
+
+
 export class MyGroupsList extends observeState(LitElement) {
     static properties = {
         isCreateModalOpen: { type: Boolean },
+        lightTiles: { type: Boolean },
     };
 
     constructor() {
         super();
         this.isCreateModalOpen = false;
+        this.lightTiles = false;
     }
 
     connectedCallback() {
@@ -38,19 +43,28 @@ export class MyGroupsList extends observeState(LitElement) {
                     display: flex;
                     flex-wrap: wrap;
                     justify-content: space-between;
+                    padding: 0 0 var(--spacing-normal-variable) 0;
                 }
                 
                 .title {
                     font-weight: bold;
+                    margin: 0;
                 }
                 
                 .groups-container {
                     display: flex;
                     flex-direction: column;
-                    gap: var(--spacing-normal);
-                    margin-top: var(--spacing-small);
+                    gap: var(--spacing-normal-variable);
                     max-height: 250px;
                     overflow: auto;
+                }
+                
+                group-list-display-item {
+                    --item-background: var(--background-dark);
+                }
+                
+                group-list-display-item.light-tiles {
+                    --item-background: var(--background-light);
                 }
                 
                 .empty-state {
@@ -118,7 +132,8 @@ export class MyGroupsList extends observeState(LitElement) {
                     class="primary new-group-button"
                     @click="${this._handleOpenNewGroupPopup}"
                 >
-                    Create new group
+                    <plus-icon></plus-icon>
+                    New Group
                 </button>
             </div>
             
@@ -160,6 +175,7 @@ export class MyGroupsList extends observeState(LitElement) {
             <div class="groups-container">
                 ${groups.map(group => html`
                     <group-list-display-item 
+                        class="${this.lightTiles ? 'light-tiles' : ''}"
                         .group=${group}
                     ></group-list-display-item>
                 `)}

@@ -36,7 +36,7 @@ export class CustomElement extends observeState(LitElement) {
             buttonStyles,
             css`
                 :host {
-                    
+                    --item-background: var(--background-dark);
                 }
                 
                 .list-name-avatar {
@@ -45,7 +45,7 @@ export class CustomElement extends observeState(LitElement) {
                 
                 .container {
                     transition: var(--transition-normal);
-                    background: var(--background-dark);
+                    background: var(--item-background);
                     display: flex;
                     position: relative;
                     flex-direction: row;

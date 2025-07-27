@@ -13,6 +13,7 @@ import {deleteGroup, leaveGroup} from "../../../helpers/api/groups.js";
 import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
 import {messagesState} from "../../../state/messagesStore.js";
 import {triggerGroupUpdated, triggerBulkAddToGroupModal, triggerUpdateList} from "../../../events/eventListeners.js";
+import {getUserImageIdByUserId, getUsernameById} from "../../../helpers/generalHelpers.js";
 
 /**
  * Group details component that displays group information and admin actions
@@ -78,7 +79,7 @@ export class GroupDetails extends observeState(LitElement) {
                     top: var(--spacing-small);
                     right: var(--spacing-small);
                     display: flex;
-                    gap: var(--spacing-small);
+                    gap: var(--spacing-x-small);
                 }
                 
                 .icon-button {
@@ -95,6 +96,12 @@ export class GroupDetails extends observeState(LitElement) {
 
                 .group-title {
                     margin: var(--spacing-normal) 0 0 0;
+                }
+                
+                .created-by {
+                    font-size: var(--font-size-small);
+                    color: var(--text-color-medium-dark);
+                    margin-top: var(--spacing-small);
                 }
                 
                 .username-edit-button.icon-button {
@@ -131,6 +138,16 @@ export class GroupDetails extends observeState(LitElement) {
                     &:hover {
                         transform: scale(1.1);
                     }
+                }
+                
+                .created-by-label {
+                    padding-right: var(--spacing-x-small);
+                }
+                
+                .created-by-name {
+                    font-weight: 600;
+                    color: var(--text-color-dark);
+                    text-decoration: none;
                 }
             `
         ];
@@ -236,6 +253,16 @@ export class GroupDetails extends observeState(LitElement) {
             ></custom-avatar>
             <h1 class="group-title">${this.groupData?.groupName}</h1>
             <p class="group-description">${this.groupData?.groupDescription}</p>
+            ${this.groupData?.ownerId ? html`
+                <p class="created-by">
+                    <span class="created-by-label">Created By:</span>
+                    <custom-avatar size="20"
+                                  username="${getUsernameById(this.groupData.ownerId)}"
+                                   imageId="${getUserImageIdByUserId(this.groupData.ownerId)}"
+                    ></custom-avatar>
+                    <a href="/user/${this.groupData.ownerId}" class="created-by-name" >${getUsernameById(this.groupData.ownerId)}</a>
+                </p>
+            ` : ''}
             
             <div class="action-buttons">
                 ${isAdmin ? html`
@@ -248,13 +275,15 @@ export class GroupDetails extends observeState(LitElement) {
                     </button>
                 ` : ''}
                 
-                <button aria-label="leave-group"
-                        class="icon-button button leave-button"
-                        @click="${this._handleLeaveGroup}"
-                        title="Leave Group"
-                >
-                    <leave-icon></leave-icon>
-                </button>
+                ${!isOwner ? html`
+                    <button aria-label="leave-group"
+                            class="icon-button button leave-button"
+                            @click="${this._handleLeaveGroup}"
+                            title="Leave Group"
+                    >
+                        <leave-icon></leave-icon>
+                    </button>
+                ` : ''}
                 
                 ${isOwner ? html`
                     <button aria-label="delete-group"

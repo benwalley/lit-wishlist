@@ -30,6 +30,7 @@ export class UserDetails extends observeState(LitElement) {
                 :host {
                     display: flex;
                     flex-direction: column;
+                    gap: var(--spacing-small);
                 }
                 
                 .username-section {
@@ -129,7 +130,7 @@ export class UserDetails extends observeState(LitElement) {
             ></custom-avatar>
             <account-username .username="${this._getUsername()}"></account-username>
             <em>${this._getEmail()}</em>
-            <p>${this._getPublicDescription()}</p>
+            ${this._getPublicDescription() ? html`<p>${this._getPublicDescription()}</p>` : ''}
             ${this._showEditButton() ? html`
                 <button aria-label="edit-button"
                         class="icon-button button username-edit-button"

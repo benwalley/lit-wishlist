@@ -80,6 +80,7 @@ export class Avatar extends LitElement {
             .join('');
     }
 
+
     render() {
         // If there's an image URL, show the image.
         if (this.imageId > 0) {

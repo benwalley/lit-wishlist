@@ -31,18 +31,19 @@ export class AccountContainer extends observeState(LitElement) {
                 .account-container {
                     display: grid;
                     gap: var(--spacing-normal);
-                    padding: var(--spacing-normal);
+                    padding: var(--spacing-normal-variable);
                     max-width: 1200px;
+                    padding-bottom: 100px;
                 }
 
-                @media (min-width: 768px) {
+                @media (min-width: 900px) {
                     .account-container {
                         grid-template-columns: 400px 1fr;
                     }
                 }
 
                 section {
-                    padding: 1rem;
+                    padding: var(--spacing-normal-variable);
                     box-shadow: var(--shadow-1-soft);
                     border-radius: var(--border-radius-large);
                     background: var(--background-light);

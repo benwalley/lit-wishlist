@@ -46,7 +46,7 @@ export class AccountPrivateNotes extends observeState(LitElement) {
                 }
                 
                 .notes-display {
-                    background: #f8f9fa;
+                    background: var(--background-dark);
                     border: 1px solid #ddd;
                     border-radius: 4px;
                     padding: 1rem;

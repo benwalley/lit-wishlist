@@ -1,6 +1,5 @@
 import { LitElement, html, css } from 'lit';
 import Cropper from 'cropperjs';
-import 'cropperjs/dist/cropper.min.css';
 import { listenImageSelected, triggerImageCropConfirmed } from '../../../events/eventListeners.js';
 import { uploadImageToDB } from '../../../helpers/imageHelpers.js';
 import {observeState} from 'lit-element-state';
@@ -31,12 +30,25 @@ class ImageCropper extends observeState(LitElement) {
       }
   
       .image-container {
-        max-width: 640px;
+        width: calc(100vw - (var(--spacing-normal) * 2));
+        height: calc(100vw - (var(--spacing-normal) * 2));
+        max-width: 600px;
+        max-height: 600px;
         margin: 0 auto 1rem;
       }
   
       img {
-        max-width: 100%;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      cropper-canvas {
+        height: 100% !important;
+      }
+      
+      cropper-handle {
+        background: none;
       }
       
       .controls {
@@ -76,12 +88,6 @@ class ImageCropper extends observeState(LitElement) {
   }
 
   firstUpdated() {
-    // If you're not already globally including cropper.min.css, you can append it here:
-    const cropperStyles = document.createElement('link');
-    cropperStyles.rel = 'stylesheet';
-    cropperStyles.href = '/node_modules/cropperjs/dist/cropper.min.css';
-    this.shadowRoot.appendChild(cropperStyles);
-
     // Listen for an image-selected event (expects an object with rawImage)
     listenImageSelected(this._handleImageSelected.bind(this));
   }
@@ -99,9 +105,8 @@ class ImageCropper extends observeState(LitElement) {
     if (changedProps.has('rawImage') && this.rawImage) {
       const img = this.shadowRoot.getElementById('image');
       if (img) {
-        // Destroy any existing Cropper instance
+        // Clear any existing Cropper instance
         if (this.cropper) {
-          this.cropper.destroy();
           this.cropper = null;
         }
         // Initialize Cropper when the image loads (or immediately if already loaded)
@@ -118,79 +123,102 @@ class ImageCropper extends observeState(LitElement) {
   }
 
   _initializeCropper(img) {
-    if (this.cropper) {
-      this.cropper.destroy();
+    // Clear any existing Cropper instance
+    this.cropper = null;
+
+    // CropperJS v2 simplified initialization
+    this.cropper = new Cropper(img);
+
+    // Set up fixed 1x1 selection that covers full container
+    const selection = this.cropper.getCropperSelection();
+    if (selection) {
+      selection.aspectRatio = 1;
+      selection.initialCoverage = 1;
+      selection.movable = false;
+      selection.resizable = false;
+      selection.zoomable = false;
     }
 
-    this.cropper = new Cropper(img, {
-      aspectRatio: 1, // Enforce a square crop area
-      viewMode: 3,
-      dragMode: 'move',
-      autoCropArea: 1,
-      restore: false,
-      modal: false,
-      guides: false,
-      highlight: false,
-      cropBoxMovable: false,
-      cropBoxResizable: false,
-      toggleDragModeOnDblclick: false,
-    });
+    // Allow image to be moved within the fixed selection
+    const cropperImage = this.cropper.getCropperImage();
+    if (cropperImage) {
+      cropperImage.movable = true;
+      cropperImage.rotatable = false;
+      cropperImage.scalable = true;
+      cropperImage.zoomable = true;
+    }
   }
 
   _handleCancel() {
     this.modalOpen = false;
     this.rawImage = null;
-    if (this.cropper) {
-      this.cropper.destroy();
-      this.cropper = null;
-    }
+    this.cropper = null;
   }
 
-  _handleChoose() {
+  async _handleChoose() {
     if (!this.cropper) {
       alert('Please upload and crop an image first.');
       return;
     }
-    const canvas = this.cropper.getCroppedCanvas({
-      width: this.size,
-      height: this.size,
-      imageSmoothingQuality: 'high',
-    });
 
-    canvas.toBlob(async (blob) => {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const croppedDataUrl = reader.result;
-        try {
-          const response = await uploadImageToDB(croppedDataUrl);
-          if (!response.success) {
-            throw new Error('Upload failed');
-          }
-          this.imageId = parseInt(response.imageId);
-          triggerImageCropConfirmed({imageId: this.imageId, uniqueId: this.uniqueId});
-        } catch (error) {
-          console.error('Image upload failed:', error);
-          alert('Failed to upload image.');
-        } finally {
-          this.modalOpen = false;
-          this.rawImage = null;
-          if (this.cropper) {
-            this.cropper.destroy();
-            this.cropper = null;
-          }
-        }
-      };
-      reader.readAsDataURL(blob);
-    }, 'image/jpeg', 0.85); // Slightly increased quality
+    // CropperJS v2 - get selection and create cropped canvas
+    const selection = this.cropper.getCropperSelection();
+    if (!selection) {
+      alert('Please make a selection first.');
+      return;
+    }
+
+    // CropperJS v2 - get canvas data directly
+    let croppedDataUrl;
+    try {
+      const canvas = selection.$toCanvas({
+        width: this.size,
+        height: this.size,
+      });
+      
+      // Check if it's a promise (async operation)
+      if (canvas && typeof canvas.then === 'function') {
+        const resolvedCanvas = await canvas;
+        croppedDataUrl = resolvedCanvas.toDataURL('image/jpeg', 0.85);
+      } else if (canvas && typeof canvas.toDataURL === 'function') {
+        // Standard canvas element
+        croppedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      } else {
+        // Fallback - try to get data URL from selection directly
+        croppedDataUrl = selection.$toDataURL({
+          width: this.size,
+          height: this.size,
+          type: 'image/jpeg',
+          quality: 0.85
+        });
+      }
+    } catch (canvasError) {
+      console.error('Canvas generation failed:', canvasError);
+      alert('Failed to process cropped image.');
+      return;
+    }
+    
+    try {
+      const response = await uploadImageToDB(croppedDataUrl);
+      if (!response.success) {
+        throw new Error('Upload failed');
+      }
+      this.imageId = parseInt(response.imageId);
+      triggerImageCropConfirmed({imageId: this.imageId, uniqueId: this.uniqueId});
+    } catch (error) {
+      console.error('Image upload failed:', error);
+      alert('Failed to upload image.');
+    } finally {
+      this.modalOpen = false;
+      this.rawImage = null;
+      this.cropper = null;
+    }
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    // Clean up cropper instance if it exists
-    if (this.cropper) {
-      this.cropper.destroy();
-      this.cropper = null;
-    }
+    // Clean up cropper instance
+    this.cropper = null;
   }
 }
 

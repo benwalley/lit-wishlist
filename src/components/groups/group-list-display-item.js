@@ -5,6 +5,7 @@ import '../../svg/delete.js';
 import '../../svg/chevron-left.js';
 import {observeState} from "lit-element-state";
 import {userState} from "../../state/userStore.js";
+import {screenSizeState} from "../../state/screenSizeStore.js";
 
 class GroupItemComponent extends observeState(LitElement) {
     static properties = {
@@ -16,6 +17,7 @@ class GroupItemComponent extends observeState(LitElement) {
         :host {
             display: block;
             color: var(--text-color-dark);
+            --item-background: var(--background-dark);
         }
         
         .group-item-container {
@@ -27,7 +29,7 @@ class GroupItemComponent extends observeState(LitElement) {
             align-items: center;
             padding: var(--spacing-x-small);
             transition: var(--transition-200);
-            background: var(--background-dark);
+            background: var(--item-background);
             border: 1px solid var(--border-color);
             border-radius: 10px;
             
@@ -38,6 +40,7 @@ class GroupItemComponent extends observeState(LitElement) {
         }
         
         .arrow-icon {
+            display: none;
             transform: rotate(180deg);
             font-size: var(--font-size-xx-large);
             color: var(--text-color-medium-dark);
@@ -53,13 +56,25 @@ class GroupItemComponent extends observeState(LitElement) {
         .group-name {
             font-size: var(--font-size-large);
             font-weight: bold;
+            line-height: 1;
             color: var(--text-color-dark);
         }
         
         .group-header-row {
             display: flex;
             flex-direction: row;
+            flex-wrap: wrap;
             gap: var(--spacing-small);
+        }
+        
+        .group-members-row {
+            padding-top: var(--spacing-x-small);
+        }
+
+        @media (min-width: 600px) {
+            .arrow-icon {
+                display: block;
+            }
         }
         
         .badge {
@@ -67,9 +82,17 @@ class GroupItemComponent extends observeState(LitElement) {
             color: white;
             font-weight: bold;
             line-height: 1;
-            padding: var(--spacing-x-small) var(--spacing-small);
+            padding: 2px var(--spacing-x-small);
             margin: auto 0;
-            font-size: var(--font-size-small);
+            margin-right: auto;
+            font-size: var(--font-size-x-small);
+        }
+        
+        @media only screen and (min-width: 600px) {
+            .badge {
+                font-size: var(--font-size-small);
+                padding: var(--spacing-x-small) var(--spacing-small);
+            }
         }
         
         .owner-badge {
@@ -103,7 +126,7 @@ class GroupItemComponent extends observeState(LitElement) {
     render() {
         return html`
             <a href="/group/${this.group.id}" class="group-item-container">
-                <custom-avatar size="75" 
+                <custom-avatar size="${screenSizeState.isSmallMobile() ? '40' : '60'}"
                     username="${this.group?.groupName}" 
                     borderradius="var(--border-radius-normal)"
                     imageId="${this.group?.groupImage}"
@@ -115,7 +138,7 @@ class GroupItemComponent extends observeState(LitElement) {
                         ${this._isOwner() ? html`<span class="badge owner-badge">Owner</span>` : 
                           this._isAdmin() ? html`<span class="badge admin-badge">Admin</span>` : ''}
                     </div>
-                    <div>
+                    <div class="group-members-row">
                         <span>${this.group?.members?.length || 1}</span>
                         <span>${this.group?.members?.length === 1 ? 'member' : 'members'}</span>
                     </div>

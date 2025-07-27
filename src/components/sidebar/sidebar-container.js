@@ -236,9 +236,13 @@ export class CustomElement extends observeState(LitElement) {
                     font-size: var(--font-size-x-small);
                     font-style: italic;
                 }
+                
+                .nav-element {
+                    overflow: auto;
+                }
 
                 /* On mobile, slide the nav from the left, show/hide overlay */
-                @media (max-width: 767px) {
+                @media (max-width: 1200px) {
                     :host {
                         position: absolute;
                     }
@@ -291,7 +295,7 @@ export class CustomElement extends observeState(LitElement) {
                 <a href="${globalState.landingPage}">
                     <img src="${logo}" alt="Logo" width="40px">
                 </a>
-                <nav>
+                <nav class="nav-element">
                     <h2 class="menu-section-heading">Main Menu</h2>
                     <ul class="menu-section-list">
                         <li><a href="/account" class="menu-item-link ${this._isActive('/account') ? 'active' : ''}">
@@ -345,7 +349,7 @@ export class CustomElement extends observeState(LitElement) {
                         </a></li>
                         <li><a href="/import" class="menu-item-link ${this._isActive('/import') ? 'active' : ''}">
                             <cloud-upload-icon class="icon"></cloud-upload-icon>
-                            <span>Import Amazon Wishlist</span>
+                            <span>Import Wishlist</span>
                         </a></li>
                     </ul>
 

@@ -58,8 +58,8 @@ export class CustomElement extends observeState(LitElement) {
                 }
                 
                 .modal-contents {
-                    padding: var(--spacing-normal);
                     display: flex;
+                    padding: var(--spacing-normal-variable);
                     flex-direction: column;
                     gap: var(--spacing-normal);
                 }
@@ -81,10 +81,10 @@ export class CustomElement extends observeState(LitElement) {
                 .modal-footer {
                     position: sticky;
                     bottom: 0;
+                    background: var(--background-light);
                     border-top: 1px solid var(--border-color);
                     padding: var(--spacing-normal);
                     text-align: right;
-                    background-color: var(--background-dark);
                     display: flex;
                     flex-direction: row;
                     align-items: center;
@@ -132,6 +132,19 @@ export class CustomElement extends observeState(LitElement) {
                     font-weight: bold;
                     font-size: var(--font-size-normal);
                     cursor: pointer;
+                }
+                
+                .sharing-container {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    gap: var(--spacing-normal);
+                }
+                
+                @media only screen and (min-width: 800px) {
+                    .sharing-container {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                    }
                 }
             `
         ];
@@ -295,26 +308,28 @@ export class CustomElement extends observeState(LitElement) {
                     ></due-date-picker>
                 </div>
 
-                <div>
-                    <h3 class="section-label">Ask everyone in groups</h3>
-                    <div class="container">
-                        <your-groups-list 
-                                class="full-width"
-                                .selectedGroups ="${this.sharedWithGroupIds}"
-                                @selection-changed="${this._handleGroupSelectionChanged}"
-                        ></your-groups-list>
+                <div class="sharing-container">
+                    <div>
+                        <h3 class="section-label">Ask everyone in groups</h3>
+                        <div class="container">
+                            <your-groups-list
+                                    class="full-width"
+                                    .selectedGroups="${this.sharedWithGroupIds}"
+                                    @selection-changed="${this._handleGroupSelectionChanged}"
+                            ></your-groups-list>
+                        </div>
                     </div>
-                </div>
 
-                <div>
-                    <h3 class="section-label">Ask Users</h3>
-                    <div class="container">
-                        <your-users-list 
-                                apiEndpoint="/users/accessible"
-                                .selectedUsers="${this.sharedWithUserIds}"
-                                @selection-changed="${this._handleUserSelectionChanged}"
-                                requireCurrentUser
-                        ></your-users-list>
+                    <div>
+                        <h3 class="section-label">Ask Users</h3>
+                        <div class="container">
+                            <your-users-list
+                                    apiEndpoint="/users/accessible"
+                                    .selectedUsers="${this.sharedWithUserIds}"
+                                    @selection-changed="${this._handleUserSelectionChanged}"
+                                    requireCurrentUser
+                            ></your-users-list>
+                        </div>
                     </div>
                 </div>` : ''}
               

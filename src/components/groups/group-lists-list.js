@@ -30,13 +30,14 @@ export class GroupListsList extends LitElement {
 
       .no-lists {
         text-align: center;
-        padding: 24px;
+        padding: var(--spacing-normal-variable);
         font-style: italic;
-        color: var(--color-text-secondary);
+        color: var(--medium-text-color);
       }
 
       h2 {
-        margin-bottom: 16px;
+        margin: 0;
+        padding-bottom: var(--spacing-normal-variable);
       }
     `;
   }

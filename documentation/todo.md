@@ -22,6 +22,8 @@
  - handle edit proposals in proposals page
  - add notification if a proposal you accepted has been deleted
  - add an indicator of who a list is shared with
+   - Why would anyone care about this?
+   - The user would want to make sure certain people couldn't see it.
  - update contributing top bar when user gets or doesn't get.
  - Add getting indicator on sidebar list on item page
  - Add item page not related to list.
@@ -29,4 +31,6 @@
  - Make admin page for me.
    - all users
    - All items
-   - ...
+  - sort qas by date due and not answered
+ - Update settings to work such as reset password
+  - ensure that only admins can invite users on both FE and BE

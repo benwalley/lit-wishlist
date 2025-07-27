@@ -14,9 +14,14 @@ export class AccountUsername extends observeState(LitElement) {
 
     static styles = css`
         :host {
-            display: inline-block;
+            display: flex;
             font-weight: bold;
             font-size: var(--font-size-x-large);
+            
+            span {
+                display: flex;
+                line-height: 1;
+            }
         }
     `;
 

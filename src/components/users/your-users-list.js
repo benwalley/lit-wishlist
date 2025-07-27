@@ -37,13 +37,7 @@ class UserListComponent extends observeState(LitElement) {
             font-weight: bold;
             font-size: var(--font-size-small);
             color: var(--text-color-dark);
-            display: none;
-        }
-        
-        @media only screen and (min-width: 500px) {
-            .title {
-                display: block;
-            }
+            display: block;
         }
 
         .selection-info {
@@ -56,6 +50,18 @@ class UserListComponent extends observeState(LitElement) {
             font-size: var(--font-size-x-small);
             color: var(--primary-color);
             font-weight: bold;
+            display: flex;
+        }
+        
+        .selected-label {
+            display: none;
+            padding-left: var(--spacing-x-small);
+        }
+
+        @media screen and (min-width: 600px) {
+            .selected-label {
+                display: block;
+            }
         }
 
         .action-buttons {
@@ -218,7 +224,7 @@ class UserListComponent extends observeState(LitElement) {
                 <div class="selection-info">
                     <div class="title">Users</div>
                     ${this.selectedUserIds.length > 0 ? html`
-                        <div class="selected-count">(${this.selectedUserIds.length} selected)</div>
+                        <div class="selected-count">(${this.selectedUserIds.length}<span class="selected-label"> selected</span>)</div>
                     ` : ''}
                 </div>
 

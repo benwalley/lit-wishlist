@@ -68,8 +68,9 @@ export class GroupViewContainer extends observeState(LitElement) {
                 .group-container {
                     display: grid;
                     gap: var(--spacing-normal);
-                    padding: var(--spacing-normal);
+                    padding: var(--spacing-normal-variable);
                     max-width: 1200px;
+                    padding-bottom: 100px;
                 }
 
                 @media (min-width: 768px) {
@@ -79,7 +80,7 @@ export class GroupViewContainer extends observeState(LitElement) {
                 }
 
                 section {
-                    padding: 1rem;
+                    padding: var(--spacing-normal-variable);
                     box-shadow: var(--shadow-1-soft);
                     border-radius: var(--border-radius-large);
                     background: var(--background-light);

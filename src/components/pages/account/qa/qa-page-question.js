@@ -174,6 +174,7 @@ export class CustomElement extends observeState(LitElement) {
                                     <li>
                                         <span>${getGroupNameById(groupId)}</span>
                                         <custom-avatar size="20"
+                                                       round
                                                        username="${getGroupNameById(groupId)}"
                                                        imageId="${getGroupImageIdByGroupId(groupId)}"
                                         ></custom-avatar>
@@ -189,6 +190,7 @@ export class CustomElement extends observeState(LitElement) {
                                     <li>
                                         <span>${getUsernameById(userId)}</span>
                                         <custom-avatar size="20"
+                                                       round
                                                        username="${getUsernameById(userId)}"
                                                        imageId="${getUserImageIdByUserId(userId)}"
                                         ></custom-avatar>
@@ -224,6 +226,7 @@ export class CustomElement extends observeState(LitElement) {
                     <span class="created-by-user">
                         <custom-avatar
                             size="18"
+                            round
                             username="${getUsernameById(this.question.askedById)}"
                             imageId="${getUserImageIdByUserId(this.question.askedById)}"
                             shadow
@@ -243,6 +246,7 @@ export class CustomElement extends observeState(LitElement) {
                                                      username="${getUsernameById(answer.answererId)}"
                                                      imageId="${getUserImageIdByUserId(answer.answererId)}"
                                                        shadow
+                                                       round
                                         ></custom-avatar>
                                         <span class="user-name">${getUsernameById(answer.answererId)}</span>
                                     </a>

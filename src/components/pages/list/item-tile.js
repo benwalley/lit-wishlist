@@ -199,6 +199,7 @@ export class ItemTile extends observeState(LitElement) {
 
                 .item-link {
                     transition: var(--transition-normal);
+                    background: var(--background-light);
                     cursor: pointer;
                     display: flex;
                     flex-direction: column;
