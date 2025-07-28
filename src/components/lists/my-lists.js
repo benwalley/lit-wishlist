@@ -63,7 +63,13 @@ export class CustomElement extends observeState(LitElement) {
                     flex-direction: row;
                     justify-content: space-between;
                     align-items: center;
-                    padding: 0 0 var(--spacing-normal-variable) 0;
+                    padding: var(--spacing-small) 0 var(--spacing-normal) 0;
+                }
+
+                @media (min-width: 600px) {
+                    .section-header {
+                        padding: 0 0 var(--spacing-normal) 0;
+                    }
                 }
                 
                 .unassigned-link {

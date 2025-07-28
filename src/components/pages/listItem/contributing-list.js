@@ -22,7 +22,9 @@ export class CustomElement extends observeState(LitElement) {
             buttonStyles,
             css`
                 :host {
-                    display: block;
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-small);
                     padding: 0 var(--spacing-normal);
                 }
                 
@@ -98,7 +100,7 @@ export class CustomElement extends observeState(LitElement) {
     connectedCallback() {
         super.connectedCallback();
         // Try to set data immediately if both are available
-        if (this.itemData && userState?.myUsers) {
+        if (this.itemData && userState?.userData) {
             this._setUserData();
         }
         listenInitialUserLoaded(this._setUserData.bind(this))
@@ -106,7 +108,7 @@ export class CustomElement extends observeState(LitElement) {
 
     updated(changedProperties) {
         if (changedProperties.has('itemData')) {
-            if (this.itemData && userState?.myUsers) {
+            if (this.itemData && userState?.userData) {
                 this._setUserData();
             }
         }
@@ -126,7 +128,7 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     _setUserData() {
-        if(!userState?.myUsers?.length) {
+        if(!userState?.userData) {
             return;
         }
 
@@ -135,7 +137,8 @@ export class CustomElement extends observeState(LitElement) {
         }
 
         const newUserList = []
-        for(const user of userState.myUsers) {
+        const myUsers = [userState.userData, ...userState.subusers];
+        for(const user of myUsers) {
             const userData = {...user};
             let contributing = false;
 
@@ -173,7 +176,7 @@ export class CustomElement extends observeState(LitElement) {
                         <custom-avatar
                                 size="32"
                                 username="${userData.name}"
-                                imageId="${userData.imageId}"
+                                imageId="${userData.image}"
                         ></custom-avatar>
                         <div class="user-info">
                             <div class="user-name">${userData.name}</div>

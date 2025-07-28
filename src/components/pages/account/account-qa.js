@@ -42,6 +42,7 @@ export class AccountQA extends observeState(LitElement) {
                 flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
+                padding: var(--spacing-small) 0 0 0;
             }
 
             .header h2 {

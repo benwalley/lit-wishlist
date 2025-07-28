@@ -10,6 +10,7 @@ import '../../users/user-list-display-item.js';
 import { inviteUserToGroup, cancelGroupInvitation, getInvitedUsers } from '../../../helpers/api/groups.js';
 import buttonStyles from '../../../css/buttons.js';
 import '../../global/custom-input.js';
+import '../../global/loading-screen.js';
 import { triggerGroupUpdated } from "../../../events/eventListeners.js";
 import { messagesState } from "../../../state/messagesStore.js";
 
@@ -17,6 +18,7 @@ export class InvitesSection extends observeState(LitElement) {
     static properties = {
         groupData: { type: Object },
         _loading: { type: Boolean, state: true }, // Renamed to indicate internal state
+        _initialLoadDone: { type: Boolean, state: true },
         _inviteEmail: { type: String, state: true },
         _inviteProcessing: { type: Boolean, state: true },
         _inviteError: { type: String, state: true },
@@ -28,6 +30,7 @@ export class InvitesSection extends observeState(LitElement) {
         super();
         this.groupData = {};
         this._loading = false;
+        this._initialLoadDone = false;
         this._inviteEmail = '';
         this._inviteProcessing = false;
         this._inviteError = '';
@@ -39,13 +42,16 @@ export class InvitesSection extends observeState(LitElement) {
         buttonStyles,
         css`
             :host {
-                display: grid;
+                display: flex;
                 gap: var(--spacing-normal);
+                height: 100%;
+                flex-direction: column;
             }
 
             .invite-list {
                 display: grid;
                 gap: var(--spacing-small);
+                margin-bottom: auto;
             }
 
             .section-header {
@@ -143,6 +149,10 @@ export class InvitesSection extends observeState(LitElement) {
                 font-size: var(--font-size-small);
                 margin: 0;
             }
+            
+            loading-screen {
+                margin: auto 0;
+            }
         `
     ];
 
@@ -156,6 +166,7 @@ export class InvitesSection extends observeState(LitElement) {
 
     // Use willUpdate for reacting to property changes before rendering
     willUpdate(changedProperties) {
+        if(this._initialLoadDone) return;
         if (changedProperties.has('groupData') && this.groupData?.id) {
             this._fetchInvitedUsers();
             // Reset form visibility if group changes
@@ -170,9 +181,8 @@ export class InvitesSection extends observeState(LitElement) {
         try {
             const result = await getInvitedUsers(this.groupData.id);
             this._invitedUsers = result.success ? result.data : [];
-            if (!result.success) {
-                console.error('Failed to fetch invited users:', result.error);
-                // Optionally show user message via messagesState
+            if(result.success) {
+                this._initialLoadDone = true;
             }
         } catch (error) {
             console.error('Error fetching invited users:', error);
@@ -192,6 +202,7 @@ export class InvitesSection extends observeState(LitElement) {
     }
 
     async _submitInvite() {
+        this._loading = true;
         const emailInput = this.shadowRoot?.querySelector('custom-input');
         // Use optional chaining and nullish coalescing for safety
         if (!emailInput?.validate()) {
@@ -228,11 +239,12 @@ export class InvitesSection extends observeState(LitElement) {
     }
 
     async _cancelInvite(userId) {
+        this._loading = true;
         try {
             const result = await cancelGroupInvitation(this.groupData.id, userId);
 
             if (result.success) {
-                await this._fetchInvitedUsers(); // Refresh list
+                await this._fetchInvitedUsers();
                 messagesState.addMessage('Invitation canceled successfully', 'success');
             } else {
                 messagesState.addMessage(result.message || 'Failed to cancel invitation', 'error');
@@ -345,8 +357,7 @@ export class InvitesSection extends observeState(LitElement) {
 
     render() {
         if (this._loading) {
-            // Consider a more specific loading indicator (e.g., spinner)
-            return html`<p>Loading invites...</p>`;
+            return html`<loading-screen size="medium"></loading-screen>`;
         }
 
         const isAdmin = isGroupAdmin(this.groupData, userState?.userData?.id);

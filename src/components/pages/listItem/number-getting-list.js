@@ -1,6 +1,5 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../../css/buttons";
-import {cachedFetch} from "../../../helpers/caching.js";
 import '../../../svg/plus.js';
 import '../../../svg/minus.js';
 import {listenInitialUserLoaded, listenUpdateItem} from "../../../events/eventListeners.js";
@@ -26,8 +25,11 @@ export class CustomElement extends observeState(LitElement) {
             buttonStyles,
             css`
                 :host {
-                    display: block;
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-small);
                     padding: 0 var(--spacing-normal);
+                    
                 }
                 
                 .user-container {
@@ -48,7 +50,7 @@ export class CustomElement extends observeState(LitElement) {
     connectedCallback() {
         super.connectedCallback();
         // Try to set data immediately if both are available
-        if (this.itemData && userState?.myUsers) {
+        if (this.itemData && userState?.subusers) {
             this._setUserData();
         }
         listenInitialUserLoaded(this._setUserData.bind(this))
@@ -56,7 +58,7 @@ export class CustomElement extends observeState(LitElement) {
 
     updated(changedProperties) {
         if (changedProperties.has('itemData')) {
-            if (this.itemData && userState?.myUsers) {
+            if (this.itemData && userState?.userData) {
                 this._setUserData();
             }
         }
@@ -65,16 +67,16 @@ export class CustomElement extends observeState(LitElement) {
     triggerDataChangedEvent() {
         // Calculate total from current user selection
         const userListTotal = this.userList.reduce((acc, user) => acc + (user.qty || 0), 0);
-        
+
         // Calculate total from all other users not in the current user's group
         const myUserIds = this.userList.map(user => user.id);
         const othersTotal = (this.itemData?.getting || [])
             .filter(getter => !myUserIds.includes(getter.giverId))
             .reduce((acc, getter) => acc + (getter.numberGetting || 0), 0);
-        
+
         // Total is user selection + others getting it
         const total = userListTotal + othersTotal;
-        
+
         this.dispatchEvent(new CustomEvent('data-changed', {
             bubbles: true,
             composed: true,
@@ -86,7 +88,7 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     _setUserData() {
-        if(!userState?.myUsers) {
+        if(!userState?.userData) {
             return;
         }
 
@@ -95,7 +97,8 @@ export class CustomElement extends observeState(LitElement) {
         }
 
         const newUserList = []
-        for(const user of userState.myUsers) {
+        const myUsers = [userState.userData, ...userState.subusers];
+        for(const user of myUsers) {
             const userData = {...user}; // Create a copy to avoid mutating original
             let qty = 0;
             for(const getter of this.itemData?.getting || []) {
@@ -146,7 +149,7 @@ export class CustomElement extends observeState(LitElement) {
                             <custom-avatar
                                     size="32"
                                     username="${userData.name}"
-                                    imageId="${userData.imageId}"
+                                    imageId="${userData.image}"
                             ></custom-avatar>
                             <div class="user-info">
                                 <div class="user-name">${userData.name}</div>

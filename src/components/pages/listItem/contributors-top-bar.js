@@ -16,8 +16,9 @@ import {deleteItem} from "../../../helpers/api/listItems.js";
 import '../../global/contributor-stack/contributor-stack-container.js'
 import {canUserContribute} from "../../../helpers/userHelpers.js";
 import {userState} from "../../../state/userStore.js";
+import {observeState} from "lit-element-state";
 
-export class ContributorsTopBar extends LitElement {
+export class ContributorsTopBar extends observeState(LitElement) {
     static properties = {
         itemData: {type: Object},
         contributors: {type: Array},

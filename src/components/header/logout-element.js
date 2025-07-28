@@ -76,8 +76,8 @@ export class LogoutElement extends observeState(LitElement) {
         setJwt(undefined);
         setRefreshToken(undefined);
         userState.userData = undefined;
-        userState.myUsers = [];
         userState.myGroups = [];
+        userState.subusers = [];
         messagesState.addMessage('Successfully logged out', 'success')
         invalidateCache()
         navigate(globalState.landingPage);

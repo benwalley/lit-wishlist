@@ -27,6 +27,7 @@ export class AccountPrivateNotes extends observeState(LitElement) {
 
                 h2 {
                     margin: 0;
+                    padding: var(--spacing-small) 0;
                 }
                 
                 p {
@@ -139,14 +140,14 @@ export class AccountPrivateNotes extends observeState(LitElement) {
                     
                     <div class="button-group">
                         <button 
-                            class="button button-primary" 
+                            class="button primary" 
                             @click="${this.saveNotes}"
                             ?disabled="${this.isSaving}"
                         >
                             ${this.isSaving ? 'Saving...' : 'Save'}
                         </button>
                         <button 
-                            class="button button-secondary" 
+                            class="button secondary" 
                             @click="${this.cancelEditing}"
                             ?disabled="${this.isSaving}"
                         >
@@ -156,7 +157,7 @@ export class AccountPrivateNotes extends observeState(LitElement) {
                 </div>
             ` : html`
                 <div class="notes-display" .innerHTML="${this.notes}"></div>
-                <button class="button button-primary edit-button" @click="${this.startEditing}">
+                <button class="button primary edit-button" @click="${this.startEditing}">
                     Edit Notes
                 </button>
             `}

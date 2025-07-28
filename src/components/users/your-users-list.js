@@ -192,8 +192,9 @@ class UserListComponent extends observeState(LitElement) {
     }
 
     _dispatchSelectionChangedEvent() {
+        const myUsers = [userState.userData, ...userState.subusers]
         const selectedUsers = this.selectedUserIds
-            .map(id => userState.myUsers.find(user => user && user.id === id))
+            .map(id => myUsers.find(user => user && user.id === id))
             .filter(Boolean);
 
         this.dispatchEvent(new CustomEvent('selection-changed', {

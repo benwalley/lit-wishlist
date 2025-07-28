@@ -80,7 +80,7 @@ class SubuserLoginItem extends LitElement {
 
     _handleClick() {
         if (this.isCurrent) return;
-        
+
         this.dispatchEvent(new CustomEvent('user-selected', {
             detail: { userData: this.userData },
             bubbles: true,
@@ -101,7 +101,7 @@ class SubuserLoginItem extends LitElement {
                 <custom-avatar
                     size="40"
                     username="${this.userData.name}"
-                    imageId="${this.userData.imageId || this.userData.image || 0}"
+                    imageId="${this.userData.image || 0}"
                 ></custom-avatar>
                 
                 <div class="user-info">

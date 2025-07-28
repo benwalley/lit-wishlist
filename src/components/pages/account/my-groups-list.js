@@ -43,7 +43,13 @@ export class MyGroupsList extends observeState(LitElement) {
                     display: flex;
                     flex-wrap: wrap;
                     justify-content: space-between;
-                    padding: 0 0 var(--spacing-normal-variable) 0;
+                    padding: var(--spacing-small) 0 var(--spacing-normal) 0;
+                }
+
+                @media (min-width: 600px) {
+                    .section-header {
+                        padding: 0 0 var(--spacing-normal) 0;
+                    }
                 }
                 
                 .title {

@@ -60,6 +60,7 @@ class AllListsContainer extends observeState(LitElement) {
                 position: relative;
                 width: 100%;
                 max-width: 300px;
+                --input-background-color: var(--background-light);
             }
 
             .search-input custom-input {

@@ -71,11 +71,12 @@ export class GroupViewContainer extends observeState(LitElement) {
                     padding: var(--spacing-normal-variable);
                     max-width: 1200px;
                     padding-bottom: 100px;
+                    transition: var(--transition-200);
                 }
 
-                @media (min-width: 768px) {
+                @media (min-width: 700px) {
                     .group-container {
-                        grid-template-columns: 400px 1fr;
+                        grid-template-columns: 1fr 1fr;
                     }
                 }
 

@@ -9,6 +9,7 @@ import '../../svg/add-admin.js';
 import '../../svg/remove-admin.js';
 import '../../svg/owner.js';
 import '../../svg/dot.js';
+import '../../svg/info.js';
 
 import '../global/custom-tooltip.js';
 import {
@@ -172,8 +173,10 @@ export class UserListDisplayItem extends observeState(LitElement) {
      */
     canMakeAdmin() {
         // Any admin can make another user an admin, if the user is not already an admin and not the owner
+        // Cannot make subusers admin - only their parent can manage them
         return isGroupAdmin(this.groupData, userState?.userData?.id) &&
-               !isGroupAdmin(this.groupData, this.userId);
+               !isGroupAdmin(this.groupData, this.userId) &&
+               !isSubuser(this.userId);
     }
 
     /**
@@ -182,9 +185,11 @@ export class UserListDisplayItem extends observeState(LitElement) {
      */
     canRemoveAdmin() {
         // Only the owner can remove admin privileges, and can't remove owner's admin privileges
+        // Cannot remove admin from subusers - only their parent can manage them
         return isGroupOwner(this.groupData, userState?.userData?.id) &&
                isGroupAdmin(this.groupData, this.userId) &&
-               !isGroupOwner(this.groupData, this.userId);
+               !isGroupOwner(this.groupData, this.userId) &&
+               !isSubuser(this.userId);
     }
 
     isCurrentUser(userId) {
@@ -198,6 +203,11 @@ export class UserListDisplayItem extends observeState(LitElement) {
     canRemoveFromGroup() {
         // Can't remove the owner
         if (isGroupOwner(this.groupData, this.userId)) {
+            return false;
+        }
+
+        // Cannot remove subusers - only their parent can manage them
+        if (isSubuser(this.userId)) {
             return false;
         }
 
@@ -286,6 +296,13 @@ export class UserListDisplayItem extends observeState(LitElement) {
         }
     }
 
+    _handleSubuserInfo(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        // The tooltip already displays the information, so this is just a placeholder
+        // The actual info is shown via the tooltip on hover
+    }
+
 
     render() {
         if (!userState?.userData?.id) {
@@ -346,6 +363,15 @@ export class UserListDisplayItem extends observeState(LitElement) {
                                 <leave-icon></leave-icon>
                             </button>
                             <custom-tooltip style="min-width: 150px;">Remove from Group</custom-tooltip>
+                        ` : ''}
+
+                        ${isSubuser(this.userId) ? html`
+                            <button class="icon-button blue-text large"
+                                   aria-label="Subuser information"
+                                   @click=${this._handleSubuserInfo}>
+                                <info-icon></info-icon>
+                            </button>
+                            <custom-tooltip style="min-width: 200px;">Only the subuser's parent user can manage a subuser's groups</custom-tooltip>
                         ` : ''}
                     ` : ''}
                 </a>

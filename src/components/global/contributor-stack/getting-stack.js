@@ -118,6 +118,19 @@ export class GettingStack extends observeState(LitElement) {
                 font-size: 0.875rem;
                 color: var(--medium-text-color);
                 cursor: pointer;
+                display: flex;
+                flex-direction: row;
+                gap: 3px;
+                
+                .mobile-hidden {
+                    display: none;
+                }
+            }
+            
+            @media (min-width: 600px) {
+                .getting-text .mobile-hidden {
+                    display: block;
+                }
             }
             
             .getting-text:hover {
@@ -208,7 +221,9 @@ export class GettingStack extends observeState(LitElement) {
                 ` : ''}
                 
                 <div class="getting-text">
-                    ${this.numberPeopleGetting} ${this.numberPeopleGetting === 1 ? 'person' : 'people'} getting
+                    <span>${this.numberPeopleGetting}</span>
+                    <span class="mobile-hidden">${this.numberPeopleGetting === 1 ? 'person' : 'people'}</span>
+                    <span class="mobile-hidden">getting</span>
                 </div>
             </div>
             

@@ -15,6 +15,7 @@ import '../../../svg/calendar.js';
 import '../../../svg/cart.js';
 import '../../../svg/edit.js';
 import './list-sidebar.js';
+import '../../global/loading-screen.js'
 import {cachedFetch, invalidateCache} from "../../../helpers/caching.js";
 import {formatDate, getUserImageIdByUserId, getUsernameById} from "../../../helpers/generalHelpers.js";
 import {listenUpdateItem, triggerUpdateItem} from "../../../events/eventListeners.js";
@@ -237,6 +238,10 @@ export class CustomElement extends observeState(LitElement) {
                     flex-direction: column;
                     gap: var(--spacing-normal);
                 }
+                
+                loading-screen {
+                    grid-column: 1 / -1;
+                }
 
             `,
         ];
@@ -289,7 +294,7 @@ export class CustomElement extends observeState(LitElement) {
                 <main class="main-content ${this.sidebarExpanded ? 'expanded' : 'collapsed'} ${!this.listId ? 'no-sidebar' : ''}"
                       aria-busy="${this.loading ? 'true' : 'false'}">
                     ${this.loading
-                            ? html`<p>Loading item data…</p>`
+                            ? html`<loading-screen></loading-screen>`
                             : html`
                                 <div class="main-content-wrapper">
                                     <div class="left-column">

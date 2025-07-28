@@ -327,6 +327,7 @@ export class QAItem extends observeState(LitElement) {
                                 .username="${getUsernameById(this.item.askedById)}"
                                 imageId="${getUserImageIdByUserId(this.item.askedById)}"
                                 size="16"
+                                shadow
                         >
                         </custom-avatar>
                         <span>${getUsernameById(this.item.askedById)}</span>

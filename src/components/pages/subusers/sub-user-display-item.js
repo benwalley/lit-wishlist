@@ -142,7 +142,7 @@ class SubUserDisplayItem extends observeState(LitElement) {
                 <custom-avatar
                     size="40"
                     username="${this.userData.name}"
-                    imageId="${this.userData.imageId}"
+                    imageId="${this.userData.image}"
                 ></custom-avatar>
                 
                 <div class="subuser-info">

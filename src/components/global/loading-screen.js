@@ -5,6 +5,7 @@ export class LoadingScreen extends LitElement {
     static properties = {
         version: {},
         fullScreen: { type: Boolean },
+        size: { type: String }, // 'small', 'medium', 'large'
     };
 
     static get styles() {
@@ -18,6 +19,21 @@ export class LoadingScreen extends LitElement {
                 color: var(--text-color-dark);
                 gap: var(--spacing-normal);
                 min-height: 200px;
+            }
+
+            :host([size="small"]) {
+                min-height: 80px;
+                gap: var(--spacing-small);
+            }
+
+            :host([size="medium"]) {
+                min-height: 120px;
+                gap: var(--spacing-small);
+            }
+
+            :host([size="large"]) {
+                min-height: 200px;
+                gap: var(--spacing-normal);
             }
 
             :host([fullScreen]) {
@@ -44,6 +60,21 @@ export class LoadingScreen extends LitElement {
                 animation: spin 4s linear infinite;
             }
 
+            :host([size="small"]) .logo-spinner {
+                width: 32px;
+                height: 32px;
+            }
+
+            :host([size="medium"]) .logo-spinner {
+                width: 48px;
+                height: 48px;
+            }
+
+            :host([size="large"]) .logo-spinner {
+                width: 96px;
+                height: 96px;
+            }
+
             @keyframes spin {
                 0% { transform: rotate(0deg); }
                 100% { transform: rotate(360deg); }
@@ -54,6 +85,18 @@ export class LoadingScreen extends LitElement {
                 font-weight: 500;
                 color: var(--text-color-dark);
                 text-align: center;
+            }
+
+            :host([size="small"]) .loading-text {
+                font-size: var(--font-size-small);
+            }
+
+            :host([size="medium"]) .loading-text {
+                font-size: var(--font-size-normal);
+            }
+
+            :host([size="large"]) .loading-text {
+                font-size: var(--font-size-large);
             }
 
             .loading-subtext {
@@ -69,17 +112,23 @@ export class LoadingScreen extends LitElement {
             }
 
             @keyframes dots {
-                0%, 20% {
+                0%, 16.66% {
                     content: '';
                 }
-                40% {
+                33.33% {
                     content: '.';
                 }
-                60% {
+                50% {
                     content: '..';
                 }
-                80%, 100% {
+                66.66% {
                     content: '...';
+                }
+                83.33% {
+                    content: '..';
+                }
+                100% {
+                    content: '.';
                 }
             }
 
@@ -105,6 +154,7 @@ export class LoadingScreen extends LitElement {
         super();
         this.version = 'STARTING';
         this.fullScreen = false;
+        this.size = 'large';
     }
 
     render() {

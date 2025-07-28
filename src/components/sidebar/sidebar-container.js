@@ -119,7 +119,7 @@ export class CustomElement extends observeState(LitElement) {
                     height: 100%;
                     box-sizing: border-box;
                     border-right: 1px solid var(--border-color);
-                    padding: var(--spacing-normal);
+                    padding: var(--spacing-normal-variable);
                     background: var(--header-background);
                     max-width: 300px;
                     flex-direction: column;
@@ -159,6 +159,10 @@ export class CustomElement extends observeState(LitElement) {
                     background-color: var(--primary-color);
                     color: white;
                     font-weight: 600;
+                }
+                
+                .logo-container {
+                    padding-left: var(--spacing-small);
                 }
 
                 .menu-section-heading {
@@ -292,7 +296,7 @@ export class CustomElement extends observeState(LitElement) {
                 <button @click="${this._closeMenu}" class="button icon-button close-button">
                     <x-icon></x-icon>
                 </button>
-                <a href="${globalState.landingPage}">
+                <a class="logo-container" href="${globalState.landingPage}">
                     <img src="${logo}" alt="Logo" width="40px">
                 </a>
                 <nav class="nav-element">

@@ -37,17 +37,22 @@ export class AuthContainer extends observeState(LitElement) {
             flex-direction: column;
             height: 100vh;
         }
+        
+        loading-screen {
+            margin-top: auto;
+            margin-bottom: auto;
+            grid-row: 1 / -1;
+        }
 
         @media (min-width: 1200px) {
             :host {
                 display: grid;
-                grid-template-rows: 1fr;
+                grid-template-rows: auto 1fr;
             }
             
             /* When user is authenticated, show sidebar layout */
             :host(.authenticated) {
                 grid-template-columns: 275px 1fr;
-                grid-template-rows: auto 1fr;
             }
             
             /* When user is not authenticated, full width layout */
@@ -100,12 +105,8 @@ export class AuthContainer extends observeState(LitElement) {
     async fetchUserData() {
         try {
             const userData = await getCurrentUser();
-            const myUsers = await getYourUsers();
             const myGroups = await getUserGroups();
             userState.userData = userData;
-            if(myUsers?.success) {
-                userState.myUsers = myUsers.data;
-            }
             if(myGroups?.length) {
                 userState.myGroups = myGroups;
             }

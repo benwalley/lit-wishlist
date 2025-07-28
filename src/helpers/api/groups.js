@@ -106,8 +106,7 @@ export async function cancelGroupInvitation(groupId, userId) {
             },
         };
 
-        const result = await customFetch(`/groups/${groupId}/invited/${userId}`, options, true);
-        return { success: true, data: result };
+        return await customFetch(`/groups/${groupId}/invited/${userId}`, options, true);
     } catch (error) {
         console.error('Error canceling group invitation:', error);
         return { success: false, error };

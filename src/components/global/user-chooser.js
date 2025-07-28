@@ -153,7 +153,7 @@ export class UserChooser extends LitElement {
         }
 
         const searchTerm = this.value.toLowerCase();
-        const myUsers = userState.myUsers || [];
+        const myUsers = [userState.userData, ...userState.subusers] || [];
         this.filteredUsers = myUsers.filter(user =>
             user.name && user.name.toLowerCase().includes(searchTerm)
         ).slice(0, 10); // Limit to 10 results
