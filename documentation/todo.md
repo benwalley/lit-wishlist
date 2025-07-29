@@ -34,3 +34,5 @@
   - sort qas by date due and not answered
  - Update settings to work such as reset password
   - ensure that only admins can invite users on both FE and BE
+  - fix eye icon on subusers page
+  - make notifications use popover

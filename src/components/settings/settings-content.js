@@ -1,7 +1,9 @@
 import {LitElement, html, css} from 'lit';
 import {observeState} from 'lit-element-state';
 import {userState} from "../../state/userStore.js";
+import {messagesState} from "../../state/messagesStore.js";
 import {getParentUserName, getParentUserId, getUserImageIdByUserId} from "../../helpers/generalHelpers.js";
+import {changePassword} from "../../helpers/api/users.js";
 import '../global/custom-input.js';
 import '../global/custom-toggle.js';
 import '../pages/account/avatar.js';
@@ -16,7 +18,11 @@ export class SettingsContent extends observeState(LitElement) {
     static get properties() {
         return {
             activeTab: { type: String },
-            selectedTheme: { type: String }
+            selectedTheme: { type: String },
+            currentPassword: { type: String },
+            newPassword: { type: String },
+            confirmPassword: { type: String },
+            isChangingPassword: { type: Boolean }
         };
     }
 
@@ -24,6 +30,10 @@ export class SettingsContent extends observeState(LitElement) {
         super();
         this.activeTab = 'general';
         this.selectedTheme = 'regular';
+        this.currentPassword = '';
+        this.newPassword = '';
+        this.confirmPassword = '';
+        this.isChangingPassword = false;
 
         this.themes = [
             {
@@ -384,6 +394,44 @@ export class SettingsContent extends observeState(LitElement) {
         }));
     }
 
+    _handlePasswordInput(field, event) {
+        this[field] = event.target.value;
+    }
+
+    async _handleChangePassword() {
+        if (this.isChangingPassword) return;
+
+        // Validate passwords
+        if (!this.currentPassword || !this.newPassword || !this.confirmPassword) {
+            messagesState.addMessage('Please fill in all password fields', 'error');
+            return;
+        }
+
+        if (this.newPassword !== this.confirmPassword) {
+            messagesState.addMessage('New passwords do not match', 'error');
+            return;
+        }
+
+        this.isChangingPassword = true;
+
+        try {
+            const response = await changePassword(this.currentPassword, this.newPassword);
+
+            if (response.success) {
+                messagesState.addMessage('Password changed successfully');
+                this.currentPassword = '';
+                this.newPassword = '';
+                this.confirmPassword = '';
+            } else {
+                messagesState.addMessage(response.error || response.message || 'Failed to change password', 'error');
+            }
+        } catch (error) {
+            messagesState.addMessage('An error occurred while changing password', 'error');
+        } finally {
+            this.isChangingPassword = false;
+        }
+    }
+
     _renderGeneralTab() {
         return html`
             <div class="settings-section">
@@ -428,19 +476,34 @@ export class SettingsContent extends observeState(LitElement) {
                     <custom-input 
                         type="password" 
                         label="Current Password" 
-                        placeholder="Enter current password">
+                        placeholder="Enter current password"
+                        .value="${this.currentPassword}"
+                        @input="${(e) => this._handlePasswordInput('currentPassword', e)}">
                     </custom-input>
                     <custom-input 
                         type="password" 
                         label="New Password" 
-                        placeholder="Enter new password">
+                        placeholder="Enter new password"
+                        .value="${this.newPassword}"
+                        @input="${(e) => this._handlePasswordInput('newPassword', e)}">
                     </custom-input>
                     <custom-input 
                         type="password" 
                         label="Confirm New Password" 
-                        placeholder="Confirm new password">
+                        placeholder="Confirm new password"
+                        .value="${this.confirmPassword}"
+                        @input="${(e) => this._handlePasswordInput('confirmPassword', e)}">
                     </custom-input>
-                    <button type="button" class="button secondary">Update Password</button>
+                    <div class="password-requirements">
+                        Password must be at least 6 characters long
+                    </div>
+                    <button 
+                        type="button" 
+                        class="button secondary" 
+                        @click="${this._handleChangePassword}"
+                        ?disabled="${this.isChangingPassword}">
+                        ${this.isChangingPassword ? 'Updating...' : 'Update Password'}
+                    </button>
                 </div>
             </div>
 

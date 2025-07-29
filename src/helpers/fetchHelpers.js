@@ -37,7 +37,7 @@ async function prepareRequestOptions(options, useAuth) {
             headers['Authorization'] = `Bearer ${token}`;
         }
     }
-    return { ...options, headers };
+    return { ...options, headers, credentials: 'include' };
 }
 
 /**
@@ -171,7 +171,7 @@ async function performTokenRefresh(refreshToken) {
 
         const token = tokenData?.data?.jwtToken || tokenData?.jwtToken;
         console.log('New token received:', token ? 'Yes' : 'No');
-        
+
         if (token) {
             // Save the new JWT
             setJwt(token);

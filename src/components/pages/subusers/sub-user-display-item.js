@@ -8,7 +8,7 @@ import buttonStyles from '../../../css/buttons.js';
 import '../../../svg/user.js';
 import '../../../svg/delete.js';
 import '../../../svg/gear.js';
-import '../../../svg/eye.js';
+import '../../../svg/link.js';
 
 class SubUserDisplayItem extends observeState(LitElement) {
     static get properties() {
@@ -164,7 +164,7 @@ class SubUserDisplayItem extends observeState(LitElement) {
                         ?disabled="${this.deleting}"
                         aria-label="View profile"
                     >
-                        <eye-icon></eye-icon>
+                        <link-icon></link-icon>
                     </button>
                     <button 
                         class="icon-button danger-text large"

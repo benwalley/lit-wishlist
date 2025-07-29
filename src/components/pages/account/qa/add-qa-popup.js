@@ -195,21 +195,19 @@ export class CustomElement extends observeState(LitElement) {
             messagesState.addMessage('Please enter a question.', 'error');
             return false;
         }
-        if (this.sharedWithUserIds.length === 0 && this.sharedWithGroupIds.length === 0) {
-            messagesState.addMessage('Please select at least one user or group to share with.', 'error');
-            return false;
-        }
+
         return true;
     }
 
     async _handleSubmit() {
+        const userIds = this.sharedWithUserIds?.length ? this.sharedWithUserIds : [userState.userData.id];
         // Gather the data
         if (!this._validateInput()) return;
         const questionData = {
             questionText: this.questionText,
             answerText: this.answerText,
             dueDate: this.dueDate,
-            sharedWithUserIds: this.sharedWithUserIds,
+            sharedWithUserIds: userIds,
             sharedWithGroupIds: this.sharedWithGroupIds,
             isAnonymous: this.isAnonymous,
             isEditMode: this.isEditMode,
@@ -267,9 +265,6 @@ export class CustomElement extends observeState(LitElement) {
         this.dueDate = event.detail.value;
     }
 
-
-    // --- Render Method ---
-
     render() {
         return html`
             <h2 class="modal-header">
@@ -291,7 +286,7 @@ export class CustomElement extends observeState(LitElement) {
                 </div>
 
                 <div class="form-group">
-                    <label class="section-label" style="margin: 0;">Answer:</label>
+                    <label class="section-label" style="margin: 0;">Your answer:</label>
                     <custom-input
                             .value=${this.answerText || ''}
                             @value-changed="${(e) => this.answerText = e.detail.value}"
@@ -340,7 +335,7 @@ export class CustomElement extends observeState(LitElement) {
                 <button class="button secondary" @click=${this._handleCancel}>Cancel</button>
                 <button class="button primary" @click=${this._handleSubmit}>
                     <message-icon></message-icon>
-                    Save Question
+                    Save
                 </button>
             </div>
         `;

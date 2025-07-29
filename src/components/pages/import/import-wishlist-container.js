@@ -29,8 +29,7 @@ class ImportWishlistContainer extends observeState(LitElement) {
                 }
 
                 .import-header {
-                    text-align: center;
-                    margin-bottom: 32px;
+                    padding: var(--spacing-normal);
                 }
 
                 h1 {
@@ -40,7 +39,7 @@ class ImportWishlistContainer extends observeState(LitElement) {
                 }
 
                 .page-description {
-                    color: var(--text-color-medium-dark);
+                    color: var(--medium-text-color);
                     line-height: 1.5;
                     margin-bottom: var(--spacing-normal);
                 }

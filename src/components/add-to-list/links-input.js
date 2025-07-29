@@ -155,7 +155,7 @@ class LinksInput extends LitElement {
                             <custom-input
                                 type="text"
                                 size="small"
-                                placeholder="Label"
+                                placeholder="Label - eg. Amazon"
                                 .value=${link.label || ''}
                                 @input=${(e) => this._updateLabel(index, e)}
                             ></custom-input>

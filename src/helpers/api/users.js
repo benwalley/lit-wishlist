@@ -164,3 +164,21 @@ export async function saveNote(notes) {
         return { success: false, error: error.message };
     }
 }
+
+export async function changePassword(currentPassword, newPassword) {
+    try {
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ currentPassword, newPassword }),
+        };
+
+        const response = await customFetch('/auth/changePassword', options, true);
+        return response;
+    } catch (error) {
+        console.error('Error changing password:', error);
+        return { success: false, error: error.message };
+    }
+}

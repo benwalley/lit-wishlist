@@ -529,14 +529,22 @@ export class AddToListModal extends LitElement {
                         </div>
 
                         <div class="right-column">
-                            <select-my-lists 
-                                    @change="${this._handleSelectedListsChange}"
-                                    .selectedListIds="${this.selectedListIds}"
-                            ></select-my-lists>
-                            <wysiwyg-editor
-                                    @content-changed=${(e) => this.notes = e.detail.content}
-                                    content="${this.notes}"
-                            ></wysiwyg-editor>
+                            <div>
+                                <strong>Add to list(s)</strong>
+                                <select-my-lists
+                                        @change="${this._handleSelectedListsChange}"
+                                        .selectedListIds="${this.selectedListIds}"
+                                ></select-my-lists>
+                            </div>
+                            
+                            <div>
+                                <strong>Notes</strong>
+                                <wysiwyg-editor
+                                        @content-changed=${(e) => this.notes = e.detail.content}
+                                        content="${this.notes}"
+                                ></wysiwyg-editor>
+                            </div>
+                            
                             <amount-you-want
                                     .amount="${this.amount}"
                                     .min="${this.minAmount}"
