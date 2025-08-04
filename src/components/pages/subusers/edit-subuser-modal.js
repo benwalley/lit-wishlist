@@ -45,7 +45,6 @@ class EditSubuserModal extends LitElement {
     }
 
     _handleModalChanged(e) {
-        // Reset data when modal is closed
         if (!e.detail.isOpen) {
             this.subuserData = null;
         }

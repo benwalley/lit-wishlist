@@ -59,7 +59,8 @@ export class FractionalLoader extends LitElement {
         cancelAnimationFrame(this._raf);
         this._raf = 0;
         this._progress = 0;
-        this.requestUpdate();
+        // Defer update to avoid scheduling during current update cycle
+        requestAnimationFrame(() => this.requestUpdate());
     }
 
     _tick() {

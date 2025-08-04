@@ -12,7 +12,8 @@ export class CustomElement extends observeState(LitElement) {
     static properties = {
         lists: {type: Array},
         selectedListIds: {type: Array},
-        loading: {type: Boolean}
+        loading: {type: Boolean},
+        includeSubuserLists: {type: Boolean}
     };
 
     constructor() {
@@ -20,6 +21,7 @@ export class CustomElement extends observeState(LitElement) {
         this.lists = []; // Initialize lists
         this.selectedListIds = [];
         this.loading = true;
+        this.includeSubuserLists = false;
     }
 
     static get styles() {
@@ -37,11 +39,9 @@ export class CustomElement extends observeState(LitElement) {
     connectedCallback() {
         super.connectedCallback();
 
-        // Only fetch data if user is authenticated
         if (userState.userData?.id) {
             this.fetchLists();
         } else {
-            this.loading = false;
             listenInitialUserLoaded(() => {
                 this.fetchLists()
             })
@@ -52,15 +52,14 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     async fetchLists() {
-        // Don't fetch if user is not authenticated
         if (!userState.userData?.id) {
-            this.loading = false;
             return;
         }
 
         try {
             this.loading = true;
-            const response = await fetchMyLists();
+
+            const response = await fetchMyLists(this.includeSubuserLists);
 
             if (response.success) {
                 this.lists = response.data;

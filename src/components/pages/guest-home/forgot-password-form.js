@@ -124,27 +124,11 @@ export class ForgotPasswordForm extends LitElement {
             if (data.success) {
                 messagesState.addMessage('Password reset email sent. Please check your inbox.', 'success', 5000);
                 emailInput.value = '';
-                
-                // Dispatch standardized success event
-                this.dispatchEvent(new CustomEvent('auth-success', {
-                    bubbles: true,
-                    composed: true,
-                    detail: {
-                        type: 'password-reset',
-                        email,
-                        message: 'Password reset email sent successfully'
-                    }
-                }));
-                
-                this.dispatchEvent(new CustomEvent('password-reset-sent', {
-                    bubbles: true,
-                    composed: true,
-                    detail: { email }
-                }));
+
             } else {
                 const errorMessage = data.message || 'Failed to send password reset email. Please try again.';
                 messagesState.addMessage(errorMessage, 'error', 5000);
-                
+
                 // Dispatch standardized error event
                 this.dispatchEvent(new CustomEvent('auth-error', {
                     bubbles: true,
@@ -159,7 +143,7 @@ export class ForgotPasswordForm extends LitElement {
         } catch (error) {
             const errorMessage = 'An error occurred. Please try again.';
             messagesState.addMessage(errorMessage, 'error', 5000);
-            
+
             // Dispatch standardized error event
             this.dispatchEvent(new CustomEvent('auth-error', {
                 bubbles: true,

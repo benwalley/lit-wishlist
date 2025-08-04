@@ -1,9 +1,7 @@
 # TODO:
 
- - groups are showing deleted users
  - add account configuration
  - handle public pages
- - add import amazon wishlist
  - add gifts your giving management
  - add sub-user functionality
  - Test all admin permissions for group users.
@@ -36,3 +34,8 @@
   - ensure that only admins can invite users on both FE and BE
   - fix eye icon on subusers page
  - Update select-my-lists to get subusers if includeSubuserLists is true, and do that for all exept for bulk-add-to-group-modal
+ - update all lists display to include all subusers even if they are not in any groups.
+ - on your own lists, so which groups they are shared with?
+ - when loggin in the subusers aren't always loaded because update users event happens and then navigation
+ - make sure that the number of items only includes non deleted items that are visible to the user
+ - show list of shared with for all lists and such

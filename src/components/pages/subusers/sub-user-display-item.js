@@ -9,6 +9,7 @@ import '../../../svg/user.js';
 import '../../../svg/delete.js';
 import '../../../svg/gear.js';
 import '../../../svg/link.js';
+import {getGroupImageIdByGroupId} from "../../../helpers/userHelpers.js";
 
 class SubUserDisplayItem extends observeState(LitElement) {
     static get properties() {
@@ -40,11 +41,6 @@ class SubUserDisplayItem extends observeState(LitElement) {
                     background: var(--background-light);
                 }
 
-                .subuser-card:hover {
-                    box-shadow: var(--shadow-1-soft);
-                    border-color: var(--primary-color);
-                }
-
                 .subuser-info {
                     flex: 1;
                     display: flex;
@@ -56,7 +52,7 @@ class SubUserDisplayItem extends observeState(LitElement) {
                     font-size: var(--font-size-medium);
                     font-weight: bold;
                     color: var(--text-color-dark);
-                    margin: 0 0 2px 0;
+                    margin: 0 0 var(--spacing-x-small) 0;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -72,6 +68,30 @@ class SubUserDisplayItem extends observeState(LitElement) {
                     text-transform: uppercase;
                     letter-spacing: 0.5px;
                     line-height: 1;
+                }
+
+                .group-chips {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: var(--spacing-x-small);
+                }
+
+                .group-chip {
+                    background: var(--purple-normal);
+                    border: 1px solid var(--purple-normal);
+                    color: var(--light-text-color);
+                    background: none;
+                    border: 1px solid var(--border-color);
+                    color: var(--purple-normal);
+                    padding: 0 8px 0 2px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 3px;
+                    border-radius: 12px;
+                    font-size: var(--font-size-x-small);
+                    font-weight: 500;
+                    white-space: nowrap;
                 }
 
                 .subuser-actions {
@@ -148,6 +168,23 @@ class SubUserDisplayItem extends observeState(LitElement) {
                 
                 <div class="subuser-info">
                     <h3 class="subuser-username">${this.userData.name}</h3>
+                    <div class="group-chips">
+                        ${this.userData.groups?.length ? 
+                            this.userData.groups.map(group => html`
+                                <span class="group-chip">
+                                    <custom-avatar 
+                                            username="${group.groupName}"
+                                            imageId="${getGroupImageIdByGroupId(group.id)}"
+                                            round
+                                            shadow
+                                            size="16"
+                                    ></custom-avatar>
+                                    ${group.groupName}
+                                </span>
+                            `) : 
+                            html`<span class="group-chip">No groups</span>`
+                        }
+                    </div>
                 </div>
                 
                 <div class="subuser-actions">

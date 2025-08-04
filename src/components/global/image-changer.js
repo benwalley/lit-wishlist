@@ -1,8 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import buttonStyles from '../../css/buttons.js';
-import { customFetch } from '../../helpers/fetchHelpers.js';
-import { cropperState } from '../../state/cropperStore.js';
-import {uploadImageToDB} from "../../helpers/imageHelpers.js";
+import '../../svg/x.js';
 import {listenImageCropConfirmed, triggerImageSelected} from "../../events/eventListeners.js";
 import {getUniqueId} from "../../helpers/generalHelpers.js";
 
@@ -32,6 +30,18 @@ class ImageChanger extends LitElement {
                 #fileInput {
                     display: none;
                 }
+                
+                .remove-image-button {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    background: var(--background-dark-gradient);
+                    border-radius: 50%;
+                    padding: var(--spacing-x-small);
+                    font-size: var(--font-size-small);
+                    color: var(--text-color-dark);
+                    cursor: pointer;
+                }
             `
         ];
     }
@@ -43,6 +53,11 @@ class ImageChanger extends LitElement {
         this.uniqueId = getUniqueId();
     }
 
+    _handleClearImage() {
+        this.imageId = 0;
+        this._dispatchImageUpdatedEvent(0)
+    }
+
     render() {
         return html`
       <button
@@ -51,6 +66,9 @@ class ImageChanger extends LitElement {
       >
         <camera-icon></camera-icon>
       </button>
+      ${this.imageId ? html`<button class="remove-image-button" @click="${this._handleClearImage}">
+          <x-icon></x-icon>
+      </button>` : ''}
       <input
         type="file"
         id="fileInput"

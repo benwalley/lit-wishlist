@@ -55,6 +55,7 @@ export function triggerUpdateUser() {
 }
 
 export function listenUpdateUser(callback) {
+    console.log('heard an update user')
     return listenToCustomEvent(UPDATE_USER_EVENT, callback);
 }
 
@@ -72,11 +73,6 @@ export function triggerUserListLoaded() {
 
 export function listenUserListLoaded(callback) {
     return listenToCustomEvent(USER_LIST_LOADED_EVENT, callback);
-}
-
-
-export function listenUserUpdated(callback) {
-    return listenToCustomEvent(USER_UPDATED_EVENT, callback);
 }
 
 export function triggerGroupUpdated() {

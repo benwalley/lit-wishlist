@@ -15,6 +15,7 @@ import '../../global/custom-image.js'
 import '../../lists/my-lists.js'
 import '../../lists/edit-list-modal.js'
 import './my-groups-list.js'
+import './my-subusers.js'
 import '../../../svg/edit.js'
 import buttonStyles from '../../../css/buttons.js'
 import '../../users/edit-user-form.js';
@@ -38,7 +39,7 @@ export class AccountContainer extends observeState(LitElement) {
 
                 @media (min-width: 900px) {
                     .account-container {
-                        grid-template-columns: 400px 1fr;
+                        grid-template-columns: 1fr 1fr;
                     }
                 }
 
@@ -75,6 +76,11 @@ export class AccountContainer extends observeState(LitElement) {
                 <section>
                     <my-groups-list></my-groups-list>
                 </section>
+
+                ${!isCurrentUserSubuser() ? html`<section>
+                    <my-subusers></my-subusers>
+                </section>` : ''}
+
                 <section>
                     <my-lists></my-lists>
                 </section>

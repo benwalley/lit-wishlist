@@ -369,9 +369,15 @@ export class AddToListModal extends LitElement {
 
         const response = await customFetch('/listItems/create', options, true)
 
-        triggerUpdateList()
-        triggerUpdateItem()
-        this.closeModal();
+        if(response.success) {
+            messagesState.addMessage('Item added to list successfully!', 'success');
+            triggerUpdateList()
+            triggerUpdateItem()
+            this.closeModal();
+            return;
+        }
+
+        messagesState.addMessage(response.publicMessage || 'Failed to add item to list. Please try again.', 'error');
     }
 
     async _handleFetchItem() {
@@ -537,6 +543,7 @@ export class AddToListModal extends LitElement {
                                 <strong>Add to list(s)</strong>
                                 <select-my-lists
                                         @change="${this._handleSelectedListsChange}"
+                                        includeSubuserLists
                                         .selectedListIds="${this.selectedListIds}"
                                 ></select-my-lists>
                             </div>

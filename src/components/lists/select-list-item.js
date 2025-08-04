@@ -104,7 +104,7 @@ export class CustomElement extends LitElement {
                 <custom-avatar 
                     size="24" 
                     username="${this.itemData.listName}" 
-                    imageId="${this.itemData.image}"
+                    imageId="${this.itemData.imageId}"
                 ></custom-avatar>
                 <div class="list-info">
                     <div class="list-name">${this.itemData.listName}</div>

@@ -10,8 +10,7 @@ import {createProposal, updateProposal} from '../../helpers/api/proposals.js';
 import {
     listenProposalModal,
     triggerProposalCreated,
-    listenUserUpdated,
-    triggerUpdateItem
+    triggerUpdateItem, listenUpdateUser
 } from '../../events/eventListeners.js';
 import {observeState} from 'lit-element-state';
 import {userState} from '../../state/userStore.js';
@@ -284,7 +283,7 @@ export class AddProposalModal extends observeState(LitElement) {
     connectedCallback() {
         super.connectedCallback();
         this._unsubscribeProposalModal = listenProposalModal(this._handleOpenModal.bind(this));
-        this._unsubscribeUserUpdated = listenUserUpdated(this._handleUserUpdated.bind(this));
+        this._unsubscribeUserUpdated = listenUpdateUser(this._handleUserUpdated.bind(this));
         this._initializeIfUserReady();
     }
 

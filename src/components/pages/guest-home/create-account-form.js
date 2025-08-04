@@ -122,13 +122,13 @@ export class CreateAccountForm extends LitElement {
             };
 
             const userData = await customFetch('/auth/create', options, false);
-            
+
             if (userData?.success && userData?.user?.id) {
                 this.handleSuccess(userData);
             } else {
                 this.handleError(userData);
             }
-            
+
             return userData;
         } catch(e) {
             this.handleError({ message: 'Network error occurred. Please try again.' });
@@ -150,25 +150,14 @@ export class CreateAccountForm extends LitElement {
         setRefreshToken(refreshToken)
 
         messagesState.addMessage('Account created successfully!', 'success', 5000);
-        
-        // Dispatch standardized success event
-        this.dispatchEvent(new CustomEvent('auth-success', {
-            bubbles: true,
-            composed: true,
-            detail: {
-                type: 'create-account',
-                userData,
-                redirectTo: '/account'
-            }
-        }));
-        
+
         navigate(`/account`)
     }
-    
+
     handleError(data) {
         const errorMessage = data?.message || 'Failed to create account. Please try again.';
         messagesState.addMessage(errorMessage, 'error', 5000);
-        
+
         // Dispatch standardized error event
         this.dispatchEvent(new CustomEvent('auth-error', {
             bubbles: true,

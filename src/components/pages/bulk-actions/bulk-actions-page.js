@@ -444,8 +444,8 @@ class BulkActionsPage extends observeState(LitElement) {
 
                 .grid-cell {
                     padding: 0;
-                    border-right: 1px solid #eee;
-                    border-bottom: 1px solid #eee;
+                    border-right: 1px solid var(--border-color);
+                    border-bottom: 1px solid var(--border-color);
                     display: flex;
                     justify-content: center;
                     align-items: center;
@@ -475,8 +475,8 @@ class BulkActionsPage extends observeState(LitElement) {
                 }
                 
                 .image-cell {
-                    width: 40px;
-                    height: 40px;
+                    width: 39px;
+                    height: 39px;
                     background: var(--background-dark);
                     cursor: pointer;
                 }
@@ -510,8 +510,8 @@ class BulkActionsPage extends observeState(LitElement) {
                 }
 
                 .item-image {
-                    width: 40px;
-                    height: 40px;
+                    width: 39px;
+                    height: 39px;
                     border-radius: 4px;
                     overflow: hidden;
                     display: flex;
@@ -714,8 +714,8 @@ class BulkActionsPage extends observeState(LitElement) {
                                     <div class="grid-cell image-cell" @click=${() => this.toggleItemSelection(item.id)}>
                                         <custom-image 
                                                 imageId="${item.imageIds[0] || 0}"
-                                                width="40"
-                                                height="40"
+                                                width="39"
+                                                height="39"
                                         ></custom-image>
                                     </div>
                                     <div class="grid-cell align-left clickable" @click=${() => this.toggleItemSelection(item.id)}>
@@ -827,9 +827,11 @@ class BulkActionsPage extends observeState(LitElement) {
                     <h3 style="margin: 0 0 var(--spacing-normal) 0;">Assign to Lists</h3>
                     <p style="margin: 0 0 var(--spacing-normal) 0; color: var(--text-color-medium-dark);">
                         Select which lists to assign these ${this.selectedItems.size} item${this.selectedItems.size !== 1 ? 's' : ''} to.
+                        These items will only be assigned to the selected lists, and unassign to any unselected lists.
                     </p>
                     <select-my-lists
                         @change="${this._handleListSelectionChanged}"
+                        includeSubuserLists
                     ></select-my-lists>
                     
                     <div style="display: flex; gap: var(--spacing-small); justify-content: flex-end; margin-top: var(--spacing-normal); padding-top: var(--spacing-normal); border-top: 1px solid var(--border-color);">

@@ -92,6 +92,18 @@ class SwitchUserElement extends observeState(LitElement) {
         this.isModalOpen = false;
     }
 
+    hideSubuserSwitcher() {
+        if(isCurrentUserSubuser()) {
+            return true;
+        }
+
+        if (userState?.subusers?.length) {
+            return false;
+        }
+
+        return true;
+    }
+
     async _handleUserSelected(event) {
         const { userData } = event.detail;
 
@@ -129,9 +141,10 @@ class SwitchUserElement extends observeState(LitElement) {
     }
 
     render() {
-        if (isCurrentUserSubuser()) {
+        if (this.hideSubuserSwitcher()) {
             return html``;
         }
+
 
         return html`
             <button 

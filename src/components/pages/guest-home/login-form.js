@@ -158,18 +158,6 @@ export class LoginForm extends LitElement {
         setRefreshToken(refreshToken)
         triggerUpdateUser();
         messagesState.addMessage('Successfully logged in.', 'success', 5000);
-
-        // Dispatch standardized success event
-        this.dispatchEvent(new CustomEvent('auth-success', {
-            bubbles: true,
-            composed: true,
-            detail: {
-                type: 'login',
-                userData,
-                redirectTo: '/account'
-            }
-        }));
-
         navigate(`/account`)
     }
 }

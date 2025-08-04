@@ -48,8 +48,6 @@
 ### re-fetching data
  - There is a list of event listeners in src/events/eventListeners.js such as:
    - triggerUpdateUser
-   - listenUserUpdated
- - Any data that uses user data, should listen for user updated with "listenUserUpdated"
  - When the user is updated, call triggerUseUpdated to update any usages of the user data.
  - The same approach should be done for other types of data
 

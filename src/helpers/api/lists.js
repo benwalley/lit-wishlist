@@ -139,9 +139,10 @@ export async function deleteList(listId) {
  * Fetch all lists that belong to the current user
  * @returns {Promise<{success: boolean, data: Array}|{success: boolean, error: Error}>}
  */
-export async function fetchMyLists() {
+export async function fetchMyLists(includeSubuserLists = false) {
     try {
-        const response = await cachedFetch('/lists/mine', {}, true);
+        const url = includeSubuserLists ? '/lists/mineAndSubusers' : '/lists/mine';
+        const response = await cachedFetch(url, {}, true);
 
         if (response?.responseData?.error) {
             throw new Error(response?.responseData?.error);

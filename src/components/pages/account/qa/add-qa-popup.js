@@ -160,7 +160,10 @@ export class CustomElement extends observeState(LitElement) {
     updated(changedProperties) {
         if (changedProperties.has('preSelectedUsers')) {
             if (this.preSelectedUsers.length > 0 && !this.sharedWithUserIds.length) {
-                this.sharedWithUserIds = [...this.preSelectedUsers];
+                // Defer the update to avoid scheduling during current update cycle
+                requestAnimationFrame(() => {
+                    this.sharedWithUserIds = [...this.preSelectedUsers];
+                });
             }
         }
     }

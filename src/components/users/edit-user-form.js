@@ -12,7 +12,7 @@ import {customFetch} from "../../helpers/fetchHelpers.js";
 import {updateUserData} from "../../helpers/api/users.js";
 import {messagesState} from "../../state/messagesStore.js";
 import '../global/image-changer.js';
-import {listenUserUpdated, triggerUpdateUser} from "../../events/eventListeners.js";
+import {triggerUpdateUser} from "../../events/eventListeners.js";
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
@@ -21,7 +21,6 @@ export class CustomElement extends observeState(LitElement) {
         username: { type: String },
         description: { type: String },
         errorMessage: { type: String }, // New property to hold error messages
-        isModalOpen: { type: Boolean }
     };
 
     constructor() {
@@ -31,7 +30,6 @@ export class CustomElement extends observeState(LitElement) {
         this.username = '';
         this.description = '';
         this.errorMessage = '';
-        this.isModalOpen = false;
     }
 
     connectedCallback() {
@@ -42,9 +40,13 @@ export class CustomElement extends observeState(LitElement) {
         super.disconnectedCallback();
     }
 
+    _getModal() {
+        return this.shadowRoot.querySelector('#edit-user-modal')
+    }
+
     editCurrentUser() {
         this.setUserData()
-        this.isModalOpen = true;
+        this._getModal().openModal();
     }
 
     setUserData = () => {
@@ -76,7 +78,7 @@ export class CustomElement extends observeState(LitElement) {
             this.username = userState.userData.name || '';
             this.imageId = userState.userData?.imageId || 0;
         }
-        this.isModalOpen = false;
+        this._getModal().closeModal();
     }
 
     async _handleSubmit(e) {
@@ -158,7 +160,10 @@ export class CustomElement extends observeState(LitElement) {
 
     render() {
         return html`
-            <custom-modal id="edit-user-modal" maxWidth="500px" noPadding .isOpen="${this.isModalOpen}">
+            <custom-modal id="edit-user-modal" 
+                          maxWidth="500px" 
+                          noPadding 
+                          @modal-changed="${this._handleModalChanged}">
                 <div class="header">
                     <h2>Edit Profile</h2>
                 </div>

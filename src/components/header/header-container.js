@@ -37,6 +37,7 @@ export class HeaderContainer extends observeState(LitElement) {
                 :host {
                     position: sticky;
                     top: 0;
+                    z-index: 1;
                 }
                 
                 /* When parent has authenticated class (sidebar visible), header is in column 2 */
@@ -57,7 +58,7 @@ export class HeaderContainer extends observeState(LitElement) {
                     gap: 8px;
                     border-bottom: 1px solid var(--border-color);
                     justify-content: flex-end;
-                    box-shadow: var(--shadow-1-soft);
+                    box-shadow: var(--shadow-2-soft);
                 }
 
                 .divider {

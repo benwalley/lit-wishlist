@@ -41,6 +41,7 @@ export class Avatar extends LitElement {
             justify-content: center;
             color: #fff; /* for initials */
             overflow: hidden;
+            font-weight: 600;
 
             &.round {
                 border-radius: 50% !important;

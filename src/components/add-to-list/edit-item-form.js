@@ -431,6 +431,7 @@ export class EditItemForm extends LitElement {
                         <select-my-lists 
                             .selectedListIds="${this.selectedListIds}" 
                             @change="${this._handleListSelectionChange}"
+                            includeSubuserLists
                         ></select-my-lists>
                         <wysiwyg-editor
                                 @content-changed=${(e) => this.notes = e.detail.content}

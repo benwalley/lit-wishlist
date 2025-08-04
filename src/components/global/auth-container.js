@@ -63,14 +63,6 @@ export class AuthContainer extends observeState(LitElement) {
     `;
 
     async firstUpdated() {
-        if(!getRefreshToken()) {
-            userState.loadingUser = false;
-            return;
-        }
-        await this.fetchUserData();
-        await this.fetchAccessibleUsers();
-        await this.fetchViewedItems();
-        triggerInitialUserLoaded();
         listenUpdateUser(() => {
             this.fetchUserData();
             this.fetchAccessibleUsers();
@@ -80,6 +72,15 @@ export class AuthContainer extends observeState(LitElement) {
             this.fetchAccessibleUsers();
         })
         initializeProposalHelpers();
+        if(!getRefreshToken()) {
+            userState.loadingUser = false;
+            return;
+        }
+        await this.fetchUserData();
+        await this.fetchAccessibleUsers();
+        await this.fetchViewedItems();
+        triggerInitialUserLoaded();
+
     }
 
     updated(changedProperties) {
@@ -104,13 +105,14 @@ export class AuthContainer extends observeState(LitElement) {
 
     async fetchUserData() {
         try {
+            console.log('got here')
             const userData = await getCurrentUser();
+            console.log('second')
             const myGroups = await getUserGroups();
             userState.userData = userData;
             if(myGroups?.length) {
                 userState.myGroups = myGroups;
             }
-
             // Fetch subusers if user is authenticated
             if (userData?.id) {
                 const subusers = await getSubusers();

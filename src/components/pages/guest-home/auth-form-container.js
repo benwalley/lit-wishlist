@@ -54,10 +54,6 @@ export class AuthFormContainer extends LitElement {
         super();
         this.activeTab = 'login';
         this.isLoading = false;
-
-        this.addEventListener('password-reset-sent', this._showLogin);
-        this.addEventListener('auth-success', this._handleAuthSuccess);
-        this.addEventListener('auth-error', this._handleAuthError);
         this.addEventListener('form-switch', this._handleFormSwitch);
     }
 

@@ -199,6 +199,7 @@ class MyTextInput extends LitElement {
             .value="${this.value}"
             placeholder="${this.placeholder}"
             @input="${this._handleInput}"
+            @keydown="${this._handleKeydown}"
             ?required="${this.required}"
             min="${this.min || ''}"
             max="${this.max || ''}"
@@ -221,6 +222,24 @@ class MyTextInput extends LitElement {
                 detail: {value: this.value},
             })
         );
+    }
+
+    _handleKeydown(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            
+            // Find the closest form element
+            const form = this.closest('form');
+            if (form) {
+                // Use requestSubmit() for modern browsers with proper validation
+                if (form.requestSubmit) {
+                    form.requestSubmit();
+                } else {
+                    // Fallback for older browsers
+                    form.submit();
+                }
+            }
+        }
     }
 
     /**

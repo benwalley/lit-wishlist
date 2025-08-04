@@ -232,6 +232,7 @@ class ImportContainer extends observeState(LitElement) {
                         </div>
                         <select-my-lists
                             @change="${this._handleWishlistSelected}"
+                            includeSubuserLists
                         ></select-my-lists>
                         <button
                             class="button primary import-button"
