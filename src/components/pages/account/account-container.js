@@ -44,10 +44,11 @@ export class AccountContainer extends observeState(LitElement) {
 
                 section {
                     padding: var(--spacing-normal-variable);
-                    box-shadow: var(--shadow-1-soft);
+                    box-shadow: var(--shadow-2-soft);
                     border-radius: var(--border-radius-large);
                     background: var(--background-light);
                     position: relative;
+                    
                 }
 
                 

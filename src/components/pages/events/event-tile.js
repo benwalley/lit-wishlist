@@ -53,7 +53,8 @@ export class EventTile extends LitElement {
         try {
             const confirmed = await showConfirmation({
                 heading: 'Delete Event',
-                message: `Are you sure you want to delete "${this.eventData.name}"? This action cannot be undone.`,
+                message: `Are you sure you want to delete "${this.eventData.name}"?`,
+                submessage: ' This action cannot be undone.',
                 confirmLabel: 'Delete',
                 cancelLabel: 'Cancel'
             });

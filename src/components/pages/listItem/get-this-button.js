@@ -175,6 +175,7 @@ export class CustomElement extends LitElement {
                     <span>I'll get This</span>
                 </button>
             `}
+            <custom-tooltip>Say that you'll get this</custom-tooltip>
             <custom-modal 
                 maxWidth="400px" 
                 noPadding="true"

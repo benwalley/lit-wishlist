@@ -71,7 +71,7 @@ export class PublicQA extends observeState(LitElement) {
         this.userId = '';
         this.qaItems = [];
         this.isLoading = false;
-        
+
         // Bind event handlers
         this._handleEditQuestion = this._handleEditQuestion.bind(this);
         this._handleDeleteQuestion = this._handleDeleteQuestion.bind(this);
@@ -82,12 +82,12 @@ export class PublicQA extends observeState(LitElement) {
         super.connectedCallback();
         this._fetchQAItems();
         listenUpdateQa(this._fetchQAItems);
-        
+
         // Add event listener for edit-question
         this.addEventListener('edit-question', this._handleEditQuestion);
         this.addEventListener('qa-item-deleted', this._handleDeleteQuestion);
     }
-    
+
     disconnectedCallback() {
         super.disconnectedCallback();
         this.removeEventListener('edit-question', this._handleEditQuestion);
@@ -128,11 +128,11 @@ export class PublicQA extends observeState(LitElement) {
     _handleAskQuestion() {
         triggerAddQuestionEvent({sharedWithUserIds: [parseInt(this.userId)] });
     }
-    
+
     _handleEditQuestion(event) {
         triggerAddQuestionEvent(event.detail.question);
     }
-    
+
     _handleDeleteQuestion(event) {
         this.dispatchEvent(new CustomEvent('delete-question', {
             detail: event.detail,
@@ -161,7 +161,7 @@ export class PublicQA extends observeState(LitElement) {
                             @qa-item-deleted="${this._handleDeleteQuestion}"
                         ></qa-item>`)}
             </div>
-            <button class="primary" @click=${this._handleAskQuestion}>Ask a question</button>
+            <button class="primary fancy-alt" @click=${this._handleAskQuestion}>Ask a question</button>
         `;
     }
 }

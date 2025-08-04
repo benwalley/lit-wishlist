@@ -27,7 +27,7 @@ export class Avatar extends LitElement {
         this.round = false;
         this.border = false;
         this.borderradius = '25%';
-        this.shadow = false;
+        this.shadow = true;
     }
 
     static styles = css`

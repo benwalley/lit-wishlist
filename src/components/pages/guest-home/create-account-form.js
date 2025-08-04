@@ -1,7 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import '../../global/custom-input.js';
 import buttonStyles from '../../../css/buttons.js';
-import { login } from '../../../helpers/api/users.js';
 import {customFetch} from "../../../helpers/fetchHelpers.js";
 import {userState} from "../../../state/userStore.js";
 import {setJwt, setRefreshToken} from "../../../localStorage/tokens.js";
@@ -117,25 +116,32 @@ export class CreateAccountForm extends LitElement {
             const options = {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json', // Set the content type to JSON
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data), // Add username and password to the body
+                body: JSON.stringify(data),
             };
 
             const userData = await customFetch('/auth/create', options, false);
-            this.handleSuccess(userData);
+            
+            if (userData?.success && userData?.user?.id) {
+                this.handleSuccess(userData);
+            } else {
+                this.handleError(userData);
+            }
+            
             return userData;
         } catch(e) {
+            this.handleError({ message: 'Network error occurred. Please try again.' });
             return {error: e}
         }
     }
 
     handleSuccess(userData) {
-        console.log(userData?.user);
         const id = userData?.user?.id;
         const jwt = userData?.jwtToken
         const refreshToken = userData?.refreshToken
         if(!id || !jwt || !refreshToken) {
+            this.handleError({ message: 'Invalid response from server.' });
             return;
         }
         userState.userData = userData.user;
@@ -143,8 +149,36 @@ export class CreateAccountForm extends LitElement {
         setJwt(jwt)
         setRefreshToken(refreshToken)
 
-        messagesState.addMessage('Successfully logged in.', 'success', 5000);
+        messagesState.addMessage('Account created successfully!', 'success', 5000);
+        
+        // Dispatch standardized success event
+        this.dispatchEvent(new CustomEvent('auth-success', {
+            bubbles: true,
+            composed: true,
+            detail: {
+                type: 'create-account',
+                userData,
+                redirectTo: '/account'
+            }
+        }));
+        
         navigate(`/account`)
+    }
+    
+    handleError(data) {
+        const errorMessage = data?.message || 'Failed to create account. Please try again.';
+        messagesState.addMessage(errorMessage, 'error', 5000);
+        
+        // Dispatch standardized error event
+        this.dispatchEvent(new CustomEvent('auth-error', {
+            bubbles: true,
+            composed: true,
+            detail: {
+                type: 'create-account',
+                message: errorMessage,
+                data
+            }
+        }));
     }
 }
 

@@ -16,6 +16,10 @@ export default css`
         gap: 7px;
         transition: var(--transition-normal);
         
+        &.bold {
+            font-weight: 600;
+        }
+        
         &.shadow {
             box-shadow: var(--button-box-shadow);
             &:hover,
@@ -42,7 +46,10 @@ export default css`
 
             &.fancy {
                 background-image: linear-gradient(to right, #4f46e5, #9333ea);
-
+            }
+            
+            &.fancy-alt {
+                background-image: var(--fancy-purple-gradient);
             }
         }
 
@@ -192,7 +199,7 @@ export default css`
 
         &.large {
             padding: 0.75rem 1.5rem;
-            font-size: 1.25rem;
+            font-size: var(--font-size-medium);
         }
 
         &.icon-button,

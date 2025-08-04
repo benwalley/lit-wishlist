@@ -371,7 +371,7 @@ export class UserListDisplayItem extends observeState(LitElement) {
                                    @click=${this._handleSubuserInfo}>
                                 <info-icon></info-icon>
                             </button>
-                            <custom-tooltip style="min-width: 200px;">Only the subuser's parent user can manage a subuser's groups</custom-tooltip>
+                            <custom-tooltip style="min-width: 200px;">A subusers groups can only be managed by the parent user in the Subusers page.</custom-tooltip>
                         ` : ''}
                     ` : ''}
                 </a>

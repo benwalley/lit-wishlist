@@ -59,9 +59,9 @@ class MyTextInput extends LitElement {
                 align-items: center;
                 position: relative;
                 width: 100%;
-                border: 1px solid var(--border-color);
-                border-radius: var(--border-radius-small);
-                background: var(--input-background-color);
+                border: 2px solid var(--border-color);
+                border-radius: var(--border-radius-normal);
+                //background: var(--input-background-color);
                 transition: border-color 0.2s ease;
             }
 
@@ -74,6 +74,10 @@ class MyTextInput extends LitElement {
                 margin: 0 8px;
                 display: flex;
                 align-items: center;
+            }
+            
+            .label {
+                font-size: var(--font-size-x-small);
             }
 
             input {
@@ -153,7 +157,7 @@ class MyTextInput extends LitElement {
             `;
         }
         return html`
-            <strong>${this.label}</strong>
+            <strong class="label">${this.label}</strong>
         `;
     }
 

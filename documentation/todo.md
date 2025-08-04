@@ -35,4 +35,4 @@
  - Update settings to work such as reset password
   - ensure that only admins can invite users on both FE and BE
   - fix eye icon on subusers page
-  - make notifications use popover
+ - Update select-my-lists to get subusers if includeSubuserLists is true, and do that for all exept for bulk-add-to-group-modal

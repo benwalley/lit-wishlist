@@ -10,6 +10,7 @@ import {messagesState} from "../../../state/messagesStore.js";
 import {listenGroupUpdated, triggerGroupUpdated, triggerBulkAddToGroupModal, triggerUpdateList} from "../../../events/eventListeners.js";
 import {observeState} from 'lit-element-state';
 import {groupInvitationsState} from '../../../state/groupInvitationsStore.js';
+import scrollbarStyles from "../../../css/scrollbars.js";
 
 export class InvitedGroups extends observeState(LitElement) {
     connectedCallback() {
@@ -53,6 +54,7 @@ export class InvitedGroups extends observeState(LitElement) {
     static get styles() {
         return [
             buttonStyles,
+            scrollbarStyles,
             css`
                 :host {
                     display: block;
@@ -186,7 +188,7 @@ export class InvitedGroups extends observeState(LitElement) {
         }
 
         return html`
-            <div class="groups-container">
+            <div class="groups-container custom-scrollbar">
                 ${groupInvitationsState.invitations.map(group => html`
                     <a class="compact-group-item" href="/group/${group.id}">
                         <custom-avatar 

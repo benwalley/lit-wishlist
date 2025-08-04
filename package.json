@@ -13,8 +13,7 @@
     "@vaadin/router": "^2.0.0",
     "cropperjs": "^2.0.1",
     "lit": "^3.2.1",
-    "lit-element-state": "^1.7.0",
-    "posthog-js": "^1.231.3"
+    "lit-element-state": "^1.7.0"
   },
   "devDependencies": {
     "@vite-pwa/assets-generator": "^0.2.4",

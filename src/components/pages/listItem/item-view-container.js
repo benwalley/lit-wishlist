@@ -296,7 +296,7 @@ export class CustomElement extends observeState(LitElement) {
                     ${this.loading
                             ? html`<loading-screen></loading-screen>`
                             : html`
-                                <div class="main-content-wrapper">
+                                <div class="main-content-wrapper custom-scrollbar">
                                     <div class="left-column">
                                         <all-images-display .itemData="${this.itemData}"></all-images-display>
                                         <shared-with .itemData="${this.itemData}"></shared-with>

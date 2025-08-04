@@ -10,6 +10,7 @@ import '../../groups/create-group-form.js';
 import {listenGroupUpdated, triggerUpdateUser} from "../../../events/eventListeners.js";
 import '../../../svg/group.js';
 import '../../../svg/plus.js';
+import scrollbarStyles from "../../../css/scrollbars.js";
 
 
 export class MyGroupsList extends observeState(LitElement) {
@@ -33,6 +34,8 @@ export class MyGroupsList extends observeState(LitElement) {
         return [
             buttonStyles,
             helperStyles,
+            scrollbarStyles,
+
             css`
                 :host {
                     display: block;
@@ -178,7 +181,7 @@ export class MyGroupsList extends observeState(LitElement) {
         }
 
         return html`
-            <div class="groups-container">
+            <div class="groups-container custom-scrollbar">
                 ${groups.map(group => html`
                     <group-list-display-item 
                         class="${this.lightTiles ? 'light-tiles' : ''}"

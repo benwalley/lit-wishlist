@@ -143,6 +143,7 @@ class SubUserDisplayItem extends observeState(LitElement) {
                     size="40"
                     username="${this.userData.name}"
                     imageId="${this.userData.image}"
+                    shadow
                 ></custom-avatar>
                 
                 <div class="subuser-info">

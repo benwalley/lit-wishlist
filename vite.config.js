@@ -17,7 +17,7 @@ export default defineConfig({
       name: 'wishlist',
       short_name: 'wishlist',
       description: 'wishlist website for sharing withlist with lots of people',
-      theme_color: '#ffffff',
+      theme_color: '#4f46e5',
     },
 
     workbox: {

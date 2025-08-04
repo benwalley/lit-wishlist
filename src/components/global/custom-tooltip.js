@@ -60,14 +60,14 @@ export class CustomTooltip extends LitElement {
 
     connectedCallback() {
         super.connectedCallback();
-        
+
         // Set up popover attributes
-        this.setAttribute('popover', 'manual');
+        this.setAttribute('popover', 'hint');
         this.id = this._tooltipId;
-        
+
         // Find reference element (previous sibling)
         this._referenceEl = this.previousElementSibling;
-        
+
         if (!this._referenceEl) {
             console.warn(
                 'No reference element found for <custom-tooltip>. ' +
@@ -78,7 +78,7 @@ export class CustomTooltip extends LitElement {
 
         // Set up popover target relationship
         this._referenceEl.setAttribute('popovertarget', this._tooltipId);
-        
+
         // Set up event handlers
         this._setupEventHandlers();
     }
@@ -86,7 +86,7 @@ export class CustomTooltip extends LitElement {
     disconnectedCallback() {
         super.disconnectedCallback();
         this._removeEventHandlers();
-        
+
         // Clean up reference element attributes
         if (this._referenceEl) {
             this._referenceEl.removeAttribute('popovertarget');

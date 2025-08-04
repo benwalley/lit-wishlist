@@ -133,9 +133,12 @@ export class ConfirmModal extends LitElement {
                     <p>
                         ${this.message}
                     </p>
-                    <p class="submessage">
-                        ${this.submessage}
-                    </p>
+                    ${this.submessage ? html`
+                        <p class="submessage">
+                            ${this.submessage}
+                        </p>
+                    ` : ''}
+                    
                     
                     
                 </div>

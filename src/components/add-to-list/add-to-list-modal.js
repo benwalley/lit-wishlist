@@ -332,6 +332,10 @@ export class AddToListModal extends LitElement {
 
     async _submitHandler(e) {
         e.preventDefault();
+        if(!this.itemName.trim()) {
+            messagesState.addMessage('Please enter an item name', 'error');
+            return;
+        }
         const formData = {
             name: this.itemName,
             price: this.singlePrice,

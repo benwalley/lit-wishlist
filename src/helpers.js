@@ -37,20 +37,35 @@ function hslToHex(h, s, l) {
 export function generateTwoSimilarColorsFromString(str) {
     // Deterministic hue from the string
     const hash = generateHashFromString(str);
-    const hue = Math.abs(hash) % 360; // 0 <= hue < 360
+    const hue = Math.abs(hash) % 360;
 
-    // Adjust these to shift darkness/brightness to taste
-    // - Too bright => white text can wash out.
-    // - Too dark => loses “fun” vibrancy.
-    const saturation = 80;        // Vibrant without being neon
-    const baseLightness = 45;     // Mid-dark; helps white text stand out
-    const secondLightness = 60;   // Slightly lighter for the second color
+    // Tunables
+    const saturation = 75;     // vibrant but not neon
+    const baseLightness = 46;  // mid-dark for good white-text contrast
+    const lightnessDelta = 18; // separation between the two colors
+    const hueJitter = 14;      // small hue offset for clearer distinction
 
-    const color1 = hslToHex(hue, saturation, baseLightness);
-    const color2 = hslToHex(hue, saturation, secondLightness);
+    // Deterministic direction so not all strings lean the same way
+    const dir = ((hash >>> 1) & 1) ? 1 : -1;
 
-    return [color1, color2];
+    const l1 = clamp(baseLightness - Math.ceil(lightnessDelta / 2), 28, 72);
+    const l2 = clamp(baseLightness + Math.floor(lightnessDelta / 2), 28, 72);
+
+    const s1 = saturation;
+    const s2 = clamp(saturation - 6, 0, 100); // slightly less saturated
+
+    const h1 = hue;
+    const h2 = wrapHue(hue + dir * hueJitter);
+
+    const color1 = hslToHex(h1, s1, l1);
+    const color2 = hslToHex(h2, s2, l2);
+    return [color2, color1];
 }
+
+// helpers (add if you don't already have them)
+function clamp(n, min, max) { return Math.min(max, Math.max(min, n)); }
+function wrapHue(h) { return (h % 360 + 360) % 360; }
+
 
 export function currencyHelper(price) {
     const number = parseFloat(price);

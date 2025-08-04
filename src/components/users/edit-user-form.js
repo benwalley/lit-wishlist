@@ -3,6 +3,8 @@ import buttonStyles from "../../css/buttons";
 import '../../svg/x.js';
 import '../../svg/camera.js';
 import '../global/custom-input.js';
+import '../global/custom-modal.js';
+import '../pages/account/avatar.js';
 import {observeState} from 'lit-element-state';
 import {userState} from "../../state/userStore.js";
 import {listenToCustomEvent} from "../../events/custom-events.js";
@@ -18,7 +20,8 @@ export class CustomElement extends observeState(LitElement) {
         imageId: {type: Number},
         username: { type: String },
         description: { type: String },
-        errorMessage: { type: String } // New property to hold error messages
+        errorMessage: { type: String }, // New property to hold error messages
+        isModalOpen: { type: Boolean }
     };
 
     constructor() {
@@ -28,16 +31,20 @@ export class CustomElement extends observeState(LitElement) {
         this.username = '';
         this.description = '';
         this.errorMessage = '';
+        this.isModalOpen = false;
     }
 
     connectedCallback() {
         super.connectedCallback();
-        this.setUserData();
-        listenUserUpdated(this.setUserData)
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
+    }
+
+    editCurrentUser() {
+        this.setUserData()
+        this.isModalOpen = true;
     }
 
     setUserData = () => {
@@ -46,7 +53,6 @@ export class CustomElement extends observeState(LitElement) {
             this.username = userState.userData.name || '';
             this.description = userState.userData.publicDescription || '';
         }
-        console.log(userState?.userData)
     }
 
     _onUsernameChanged(e) {
@@ -70,7 +76,7 @@ export class CustomElement extends observeState(LitElement) {
             this.username = userState.userData.name || '';
             this.imageId = userState.userData?.imageId || 0;
         }
-        this.dispatchEvent(new CustomEvent('close-edit-user-modal'));
+        this.isModalOpen = false;
     }
 
     async _handleSubmit(e) {
@@ -152,51 +158,53 @@ export class CustomElement extends observeState(LitElement) {
 
     render() {
         return html`
-            <div class="header">
-                <h2>Edit Profile</h2>
-            </div>
-            <form @submit="${this._handleSubmit}">
-                <div class="content">
-                    
-                    <div class="user-image">
-                        <!-- Use the component's username property -->
-                        <custom-avatar size="120" 
-                                       shadow 
-                                       username="${this.username}" 
-                                       imageId="${this.imageId}">
-                        </custom-avatar>
-                        <image-changer  
-                                        imageId="${this.imageId}"
-                                        @image-updated="${this._onImageChanged}"></image-changer>
+            <custom-modal id="edit-user-modal" maxWidth="500px" noPadding .isOpen="${this.isModalOpen}">
+                <div class="header">
+                    <h2>Edit Profile</h2>
+                </div>
+                <form @submit="${this._handleSubmit}">
+                    <div class="content">
+                        
+                        <div class="user-image">
+                            <!-- Use the component's username property -->
+                            <custom-avatar size="120" 
+                                           shadow 
+                                           username="${this.username}" 
+                                           imageId="${this.imageId}">
+                            </custom-avatar>
+                            <image-changer  
+                                            imageId="${this.imageId}"
+                                            @image-updated="${this._onImageChanged}"></image-changer>
+                        </div>
+                        <span>Click the camera to change your profile picture</span>
+
+                        <!-- Listen for value-changed events to update properties -->
+                        <custom-input
+                                placeholder="Username"
+                                showLabel
+                                value="${this.username}"
+                                @value-changed="${this._onUsernameChanged}"
+                        ></custom-input>
+                        <custom-input
+                                placeholder="Description"
+                                showLabel
+                                value="${this.description}"
+                                @value-changed="${this._onDescriptionChanged}"
+                        ></custom-input>
+
+                        <!-- Error message -->
+                        ${this.errorMessage ? html`<div class="error">${this.errorMessage}</div>` : ''}
                     </div>
-                    <span>Click the camera to change your profile picture</span>
-
-                    <!-- Listen for value-changed events to update properties -->
-                    <custom-input
-                            placeholder="Username"
-                            showLabel
-                            value="${this.username}"
-                            @value-changed="${this._onUsernameChanged}"
-                    ></custom-input>
-                    <custom-input
-                            placeholder="Description"
-                            showLabel
-                            value="${this.description}"
-                            @value-changed="${this._onDescriptionChanged}"
-                    ></custom-input>
-
-                    <!-- Error message -->
-                    ${this.errorMessage ? html`<div class="error">${this.errorMessage}</div>` : ''}
-                </div>
-                <div class="footer">
-                    <button type="button" class="button ghost shadow" @click="${() => this._close(true)}">
-                        Cancel
-                    </button>
-                    <button type="submit" class="button primary shadow">
-                        Save Changes
-                    </button>
-                </div>
-            </form>
+                    <div class="footer">
+                        <button type="button" class="button ghost shadow" @click="${() => this._close(true)}">
+                            Cancel
+                        </button>
+                        <button type="submit" class="button primary shadow">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </custom-modal>
         `;
     }
 }

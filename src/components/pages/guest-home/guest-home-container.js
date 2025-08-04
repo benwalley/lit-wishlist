@@ -2,12 +2,13 @@ import {LitElement, html, css} from 'lit';
 import {observeState} from 'lit-element-state';
 import {userState} from "../../../state/userStore.js";
 import {globalState} from "../../../state/globalStore.js";
-import './login-account.js';
+import './auth-form-container.js';
 import '../../global/loading-screen.js'
 import '../../global/custom-input.js'
 import {navigate} from "../../../router/main-router.js";
 import buttonStyles from "../../../css/buttons.js";
-import posthog from 'posthog-js'
+import '../../../svg/empty-heart.js';
+import '../../../svg/star.js';
 
 
 export class GuestHomeContainer extends observeState(LitElement) {
@@ -17,96 +18,70 @@ export class GuestHomeContainer extends observeState(LitElement) {
             css`
                 :host {
                     display: block;
-                    font-family: var(--font-family, Arial, sans-serif);
                     height: 100%;
+                }
+                
+                h1 {
+                    font-size: var(--font-size-xx-large);
+                    margin: 0;
+                }
+                
+                .left {
+                    max-width: 500px;
+                }
+                
+                .form-container {
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-normal);
+                }
+                
+                .details {
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-normal);
+                    padding-left: 0;
+                    margin: 0;
+                    
+                    li {
+                        display: flex;
+                        flex-direction: row;
+                        gap: var(--spacing-small);
+                        align-items: center;
+                        
+                        h3 {
+                            margin: 0;
+                        }
+                        
+                        p {
+                            margin: 0;
+                        }
+                        
+                        .display-icon {
+                            background: var(--fancy-purple-gradient);
+                            width: 40px;
+                            height: 40px;
+                            border-radius: var(--border-radius-normal);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: var(--light-text-color);
+                            font-size: var(--font-size-large);
+                        }
+                    }
                 }
 
                 .container {
                     display: flex;
-                    height: 100%;
-                }
-
-                .left,
-                .right {
-                    flex: 1;
-                    display: flex;
-                    justify-content: center;
+                    flex-direction: row;
+                    flex-wrap: wrap-reverse;
+                    gap: var(--spacing-large);
                     align-items: center;
-                }
-
-                .left {
-                    background: var(--background-color);
-                    color: var(--text-color-dark);
-                }
-
-                .right {
-                    background: linear-gradient(135deg, var(--primary-color) 0%, var(--purple-darker, #6b46c1) 100%);
-                    position: relative;
-                    color: white;
-                }
-
-                .form-container {
-                    width: 80%;
-                    max-width: 400px;
-                    padding: var(--spacing-large) 0;
-                    z-index: 1;
-                    position: relative;
-                }
-
-                h2 {
-                    margin: 0 0 var(--spacing-normal) 0;
-                    font-size: var(--font-size-xx-large);
-                    font-weight: 700;
-                    color: inherit;
-                }
-
-                .right h2 {
-                    color: white;
-                    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                }
-
-                .details {
-                    font-size: var(--font-size-normal);
-                    line-height: 1.6;
-                    color: var(--text-color-medium-dark);
-                    margin-bottom: var(--spacing-normal);
-                }
-
-                .details ul {
-                    margin: var(--spacing-small) 0;
-                    padding-left: var(--spacing-normal);
-                }
-
-                .details li {
-                    margin-bottom: var(--spacing-x-small);
-                }
-
-                form {
-                    display: flex;
-                    flex-direction: column;
-                    gap: var(--spacing-normal);
-                    margin-top: var(--spacing-normal);
-                }
-
-                .search-description {
-                    font-size: var(--font-size-small);
-                    color: rgba(255, 255, 255, 0.9);
-                    margin-bottom: var(--spacing-normal);
-                    line-height: 1.5;
-                }
-
-                /* Responsive design */
-                @media (max-width: 768px) {
-                    .container {
-                        flex-direction: column;
-                    }
-                    
-                    .form-container,
-                    .right .form-container {
-                        width: 90%;
-                        max-width: none;
-                        padding: var(--spacing-normal);
-                    }
+                    justify-content: center;
+                    padding: var(--spacing-large) var(--spacing-normal-variable);
+                    height: 100%;
+                    box-sizing: border-box;
+                    background: var(--background-dark-gradient);
                 }
             `
         ];
@@ -114,15 +89,6 @@ export class GuestHomeContainer extends observeState(LitElement) {
 
     firstUpdated() {
         this._checkAuthentication();
-
-        console.log('running')
-        posthog.init('phc_aEi6XYV0q46bbooESvEozRA2sU59b3STJDlui1McYt4',
-            {
-                api_host: 'https://us.i.posthog.com',
-                person_profiles: 'identified_only' // or 'always' to create profiles for anonymous users as well
-            }
-        )
-        posthog.capture('my event', { property: 'value' })
     }
 
     // Lifecycle method called whenever the component updates
@@ -150,43 +116,59 @@ export class GuestHomeContainer extends observeState(LitElement) {
                         <!-- Left Section -->
                         <div class="left">
                             <div class="form-container">
-                                <h2>Welcome!</h2>
-                                <p class="details">Log in or create an account to experience all of the features:</p>
+                                <h1>Welcome!</h1>
+                                <p class="details">Log in or create an account to experience all of the amazing features we have to offer.</p>
                                 <ul class="details">
-                                    <li>Save your wishlist online</li>
-                                    <li>Create or join groups with your family and friends</li>
-                                    <li>Track what you're giving everyone</li>
-                                    <li>And many more features!</li>
+                                    <li>
+                                        <div class="display-icon">
+                                            <empty-heart-icon></empty-heart-icon>
+                                        </div>
+                                        <div class="right-side">
+                                            <h3>Save your wishlist online</h3>
+                                            <p>Never lose track of what you want</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="display-icon">
+                                            <group-icon></group-icon>
+                                        </div>
+                                        <div class="right-side">
+                                            <h3>Create or join groups</h3>
+                                            <p>Connect with family and friends</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="display-icon">
+                                            <gift-icon></gift-icon>
+                                        </div>
+                                        <div class="right-side">
+                                            <h3>Track gift giving</h3>
+                                            <p>Know what you're giving everyone</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="display-icon">
+                                            <star-icon></star-icon>
+                                        </div>
+                                        <div class="right-side">
+                                            <h3>And many more features!</h3>
+                                            <p>Discover all our amazing tools</p>
+                                        </div>
+                                    </li>
                                 </ul>
 
-                                <login-account-tabs></login-account-tabs>
+                                
                             </div>
                         </div>
 
                         <!-- Right Section -->
                         <div class="right">
-                            <div class="form-container">
-                                <h2>Discover Lists</h2>
-                                <p class="search-description">
-                                    Find and explore public wishlists from friends, family, and the community. 
-                                    Search by name or username to discover what others are wishing for.
-                                </p>
-                                <form @submit=${this._handleSearchSubmit}>
-                                    <custom-input type="text"
-                                                  placeholder="Search for a list or user..."
-                                                  required></custom-input>
-                                    <button class="button primary shadow full-width" type="submit">Search Lists</button>
-                                </form>
-                            </div>
+                            <auth-form-container></auth-form-container>
                         </div>
                     </div>
             `;
     }
 
-    _handleSearchSubmit(event) {
-        event.preventDefault();
-        console.log('Search submitted');
-    }
 }
 
 customElements.define('guest-home', GuestHomeContainer);

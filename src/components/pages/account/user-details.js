@@ -112,13 +112,8 @@ export class UserDetails extends observeState(LitElement) {
     }
 
     _handleEditUser() {
-        const editModal = this.shadowRoot.querySelector('#edit-user-modal');
-        editModal.openModal();
-    }
-
-    _closeEditUserModal() {
-        const editModal = this.shadowRoot.querySelector('#edit-user-modal');
-        editModal.closeModal();
+        const editForm = this.shadowRoot.querySelector('edit-user-form');
+        editForm.editCurrentUser();
     }
 
     render() {
@@ -140,9 +135,7 @@ export class UserDetails extends observeState(LitElement) {
                 </button>
             ` : ''}
             ${this._showLogoutButton() ? html`<logout-button></logout-button>` : ''}
-            <custom-modal id="edit-user-modal" maxWidth="500px" noPadding>
-                <edit-user-form @close-edit-user-modal="${this._closeEditUserModal}"></edit-user-form>
-            </custom-modal>
+            <edit-user-form></edit-user-form>
         `;
     }
 }

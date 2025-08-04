@@ -156,6 +156,7 @@ export class CustomElement extends LitElement {
                     <span>Contribute</span>
                 </button>
             `}
+            <custom-tooltip>Say that you want to go in on this</custom-tooltip>
             <custom-modal 
                 maxWidth="400px" 
                 noPadding="true"

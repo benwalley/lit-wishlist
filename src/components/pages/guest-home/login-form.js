@@ -8,6 +8,7 @@ import {navigate} from "../../../router/main-router.js";
 import {userState} from "../../../state/userStore.js";
 import {setJwt, setRefreshToken} from "../../../localStorage/tokens.js";
 import {triggerUpdateUser} from "../../../events/eventListeners.js";
+import '../../../svg/arrow-long.js';
 
 
 export class LoginForm extends LitElement {
@@ -61,20 +62,9 @@ export class LoginForm extends LitElement {
                     color: var(--text-color-dark);
                     font-weight: 500;
                 }
-
-                .forgot-password-link {
-                    background: none;
-                    border: none;
-                    color: var(--primary-color);
-                    cursor: pointer;
-                    text-decoration: underline;
-                    font-size: var(--font-size-small);
-                    align-self: flex-end;
-                    margin-top: -10px;
-                }
-
-                .forgot-password-link:hover {
-                    color: var(--primary-color);
+                
+                arrow-long-icon {
+                    font-size: var(--font-size-large);
                 }
             `
         ];
@@ -101,10 +91,9 @@ export class LoginForm extends LitElement {
                 <custom-input id="password" type="password" placeholder="Password" required
                               label="Password"></custom-input>
                 
-                <button type="submit" class="full-width secondary button">Login</button>
-                
-                <button type="button" class="forgot-password-link" @click=${this._showForgotPassword}>
-                    Forgot Password?
+                <button type="submit" class="full-width primary button large fancy-alt bold">
+                    <span>Sign in</span>
+                    <arrow-long-icon></arrow-long-icon>
                 </button>
             </form>
         `;
@@ -119,7 +108,7 @@ export class LoginForm extends LitElement {
             bubbles: true,
             composed: true
         }));
-}
+    }
 
     async _handleSubmit(event) {
         event.preventDefault();
@@ -140,7 +129,19 @@ export class LoginForm extends LitElement {
     }
 
     handleError(data) {
-        messagesState.addMessage(data.message || 'Login failed. Please check your credentials.', 'error', 5000);
+        const errorMessage = data?.message || 'Login failed. Please check your credentials.';
+        messagesState.addMessage(errorMessage, 'error', 5000);
+
+        // Dispatch standardized error event
+        this.dispatchEvent(new CustomEvent('auth-error', {
+            bubbles: true,
+            composed: true,
+            detail: {
+                type: 'login',
+                message: errorMessage,
+                data
+            }
+        }));
     }
 
     handleSuccess(userData) {
@@ -157,6 +158,18 @@ export class LoginForm extends LitElement {
         setRefreshToken(refreshToken)
         triggerUpdateUser();
         messagesState.addMessage('Successfully logged in.', 'success', 5000);
+
+        // Dispatch standardized success event
+        this.dispatchEvent(new CustomEvent('auth-success', {
+            bubbles: true,
+            composed: true,
+            detail: {
+                type: 'login',
+                userData,
+                redirectTo: '/account'
+            }
+        }));
+
         navigate(`/account`)
     }
 }

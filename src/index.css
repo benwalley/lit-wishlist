@@ -37,6 +37,8 @@
     --purple-normal-rgb: 79, 70, 229;
     --purple-light: #4f46e514;
     --purple-darker: #4338ca;
+    --fancy-purple-gradient: linear-gradient(to right bottom, var(--blue-normal), var(--purple-normal));
+
 
     --green-normal: #059669;
     --green-normal-rgb: 5, 150, 105;
@@ -55,10 +57,14 @@
     --background-dark-light: #1f2937;
     --background-dark-medium: #18202d;
     --background-dark-dark: #111827;
+    --background-light-dark-gradient: linear-gradient(to right bottom,rgb(248, 250, 252), rgb(239, 246, 255), rgb(224, 231, 255));
+
 
     --background-light: var(--background-light-light);
     --background-medium: var(--background-light-medium);
     --background-dark: var(--background-light-dark);
+    --background-dark-gradient: var(--background-light-dark-gradient);
+
 
 
     /* ===========================================
@@ -178,14 +184,17 @@
     --border-radius-large: 16px;
 
     --spacing-large: 60px;
+    --spacing-medium: 40px;
     --spacing-normal: 20px;
     --spacing-small: 10px;
     --spacing-x-small: 5px;
 
+    --spacing-medium-variable: var(--spacing-normal);
     --spacing-normal-variable: var(--spacing-small);
     --spacing-small-variable: var(--spacing-x-small);
 
     @media only screen and (min-width: 600px) {
+        --spacing-medium-variable: var(--spacing-medium);
         --spacing-normal-variable: var(--spacing-normal);
         --spacing-small-variable: var(--spacing-small);
     }
@@ -211,44 +220,21 @@
     --color-shadow-umbra: 0deg 0% 0% / 0.20;    /* Black @ 20% opacity */
     --color-shadow-penumbra: 0deg 0% 0% / 0.06; /* Black @ 6% opacity */
 
-    --shadow-0-soft:
-            0 1px 2px -1px rgba(0, 0, 0, 0.08),
-            0 1px 3px -1px rgba(0, 0, 0, 0.05);
-
-        /* Level 1 – Subtle, low elevation */
-    --shadow-1-soft:
-            0 1px 3px -1px rgba(0, 0, 0, 0.1),
-            0 2px 4px -1px rgba(0, 0, 0, 0.08),
-            0 4px 8px -2px rgba(0, 0, 0, 0.06);
+    --shadow-0-soft: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 
     /* Level 2 – A bit more depth with extra layers */
-    --shadow-2-soft:
-            0 2px 4px -1px rgba(0, 0, 0, 0.1),
-            0 4px 6px -2px rgba(0, 0, 0, 0.09),
-            0 6px 8px -3px rgba(0, 0, 0, 0.08),
-            0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-1-soft: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
 
     /* Level 3 – Noticeable elevation with refined layering */
-    --shadow-3-soft:
-            0 3px 5px -1px rgba(0, 0, 0, 0.11),
-            0 6px 8px -2px rgba(0, 0, 0, 0.10),
-            0 10px 12px -3px rgba(0, 0, 0, 0.11),
-            0 14px 18px -4px rgba(0, 0, 0, 0.12);
+    --shadow-2-soft: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 
     /* Level 4 – Elevated, with extra nuance and softness */
-    --shadow-4-soft:
-            0 4px 6px -1px rgba(0, 0, 0, 0.12),
-            0 8px 10px -2px rgba(0, 0, 0, 0.11),
-            0 12px 16px -3px rgba(0, 0, 0, 0.12),
-            0 16px 20px -4px rgba(0, 0, 0, 0.13);
+    --shadow-3-soft: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 
     /* Level 5 – The highest elevation with complex, multi-layered depth */
-    --shadow-5-soft:
-            0 6px 8px -1px rgba(0, 0, 0, 0.13),
-            0 10px 14px -2px rgba(0, 0, 0, 0.12),
-            0 14px 18px -3px rgba(0, 0, 0, 0.13),
-            0 18px 24px -4px rgba(0, 0, 0, 0.14),
-            0 22px 28px -5px rgba(0, 0, 0, 0.12);
+    --shadow-4-soft: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+    --shadow-5-soft:  0 25px 50px -12px rgb(0 0 0 / 0.25);
 
 
 
@@ -265,6 +251,7 @@ body {
     margin: 0;
     overflow-x: hidden;
     background: var(--background-color);
+    /*background: var(--background-dark-gradient);*/
     color: var(--text-color-dark);
 }
 
@@ -278,6 +265,12 @@ body[data-mode="dark"] {
     --background-dark: var(--background-dark-dark);
     --border-color: var(--border-color-dark);
     --modal-background-color: var(--background-dark-light);
+    --background-dark-gradient: linear-gradient(
+            to right bottom,
+            rgb(2, 6, 23),   /* deep blue-black */
+            rgb(13, 23, 42), /* slate/indigo mix */
+            rgb(30, 41, 59)  /* muted blue slate */
+    );
 
     --option-select-background: #000000;
     --option-select-background-hover: #4a4a4a;

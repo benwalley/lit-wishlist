@@ -60,7 +60,9 @@ export class GiftTrackingRow extends observeState(LitElement) {
                 }
                 
                 .item-name {
-                    //font-weight: bold;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
                 
                 :host([compact]) .item-name {
