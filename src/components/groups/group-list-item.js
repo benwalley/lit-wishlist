@@ -97,7 +97,7 @@ class GroupItemComponent extends LitElement {
                 </div>
                 <custom-avatar size="24" 
                     username="${this.group?.groupName}" 
-                    imageId="${this.group?.image}"
+                    imageId="${this.group?.groupImage}"
                 ></custom-avatar>
 
                 <div class="group-info">

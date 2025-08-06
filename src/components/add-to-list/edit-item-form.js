@@ -8,7 +8,6 @@ import './wysiwyg-editor.js';
 import './amount-you-want.js';
 import './priority-selector.js';
 import './images-selector.js';
-import './delete-automatically-selector.js';
 import './visibility-selector/visibility-selector-container.js';
 import {customFetch} from "../../helpers/fetchHelpers.js";
 import {triggerUpdateItem, triggerUpdateList} from "../../events/eventListeners.js";
@@ -34,10 +33,8 @@ export class EditItemForm extends LitElement {
         maxAmount: {type: Number},
         priority: {type: Number},
         isPublic: {type: Boolean},
-        autoDelete: {type: Boolean},
         visibleToUsers: {type: Array},
         visibleToGroups: {type: Array},
-        deleteOnData: {type: String},
         visibility: {type: String},
         matchListVisibility: {type: Boolean},
         saving: {type: Boolean},
@@ -64,7 +61,6 @@ export class EditItemForm extends LitElement {
         this.maxAmount = 0;
         this.priority = 1;
         this.isPublic = false;
-        this.autoDelete = false;
         this.matchListVisibility = true;
         this.visibleToUsers = [];
         this.visibleToGroups = [];
@@ -143,7 +139,6 @@ export class EditItemForm extends LitElement {
         // Set other properties
         this.priority = this.itemData.priority || 1;
         this.isPublic = this.itemData.isPublic || false;
-        this.autoDelete = this.itemData.autoDelete || false;
         this.matchListVisibility = this.itemData.matchListVisibility !== false;
         this.visibleToUsers = this.itemData.visibleToUsers || [];
         this.visibleToGroups = this.itemData.visibleToGroups || [];
@@ -306,6 +301,26 @@ export class EditItemForm extends LitElement {
                 .save-button {
                     min-width: 120px;
                 }
+                
+                .public-disclaimer {
+                    padding: var(--spacing-small);
+                    background-color: var(--background-dark);
+                    border-radius: var(--border-radius-normal);
+                    border: 1px solid var(--border-color);
+                    text-align: left;
+                }
+                
+                .public-disclaimer p {
+                    margin: 0 0 var(--spacing-x-small) 0;
+                    font-size: var(--font-size-small);
+                    color: var(--text-color-dark);
+                }
+                
+                .public-disclaimer p:last-child {
+                    margin-bottom: 0;
+                    color: var(--text-color-medium-dark);
+                    font-size: var(--font-size-x-small);
+                }
             `
         ];
     }
@@ -313,16 +328,19 @@ export class EditItemForm extends LitElement {
     renderAdvancedOptions() {
         return html`
             <div class="advanced-options-content">
-                <delete-automatically-selector
-                    .value="${this.autoDelete}"
-                    @change="${(e) => this.autoDelete = e.detail.value}"
-                ></delete-automatically-selector>
-                <visibility-selector-container
-                    .matchListVisibility="${this.matchListVisibility}"
-                    .selectedGroups="${this.visibleToGroups}"
-                    .selectedUsers="${this.visibleToUsers}"
-                    @visibility-changed="${this._handleVisibilityChanged}"
-                ></visibility-selector-container>
+                ${this.isPublic ? html`
+                    <div class="public-disclaimer">
+                        <p><strong>Publicly Visible</strong></p>
+                        <p>This item is set to be publicly visible. The "who is this item visible to" section is not applicable for public items.</p>
+                    </div>
+                ` : html`
+                    <visibility-selector-container
+                        .matchListVisibility="${this.matchListVisibility}"
+                        .selectedGroups="${this.visibleToGroups}"
+                        .selectedUsers="${this.visibleToUsers}"
+                        @visibility-changed="${this._handleVisibilityChanged}"
+                    ></visibility-selector-container>
+                `}
             </div>
         `;
     }
@@ -351,7 +369,6 @@ export class EditItemForm extends LitElement {
             maxAmountWanted: this.maxAmount,
             priority: this.priority,
             isPublic: this.isPublic,
-            autoDelete: this.autoDelete,
             visibleToUsers: this.visibleToUsers,
             visibleToGroups: this.visibleToGroups,
             matchListVisibility: this.matchListVisibility,
@@ -431,7 +448,6 @@ export class EditItemForm extends LitElement {
                         <select-my-lists 
                             .selectedListIds="${this.selectedListIds}" 
                             @change="${this._handleListSelectionChange}"
-                            includeSubuserLists
                         ></select-my-lists>
                         <wysiwyg-editor
                                 @content-changed=${(e) => this.notes = e.detail.content}
@@ -453,7 +469,7 @@ export class EditItemForm extends LitElement {
                                     .checked="${this.isPublic}"
                                 ></custom-toggle>
                                 <label for="is-public-toggle" class="public-toggle-description">
-                                    Set whether a non logged in user can see this item. Item will only be publicly visible if the user is viewing it from a publicly visible list.
+                                    Set whether a non logged in user can see this item. If this is selected, all users who can view this list will also be able to view the item.
                                 </label>
                             </div>
                         </div>

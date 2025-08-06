@@ -7,6 +7,7 @@ import '../../../svg/dots.js';
 import '../../pages/account/avatar.js';
 import '../../global/action-dropdown.js';
 import {messagesState} from "../../../state/messagesStore.js";
+import {copyCurrentPageUrl} from "../../../helpers/shareHelpers.js";
 import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
 import '../../../svg/edit.js';
 import '../../../svg/delete.js';
@@ -79,15 +80,7 @@ export class ContributorsTopBar extends observeState(LitElement) {
     }
 
     handleCopyLink() {
-        const url = window.location.href;
-        navigator.clipboard.writeText(url)
-            .then(() => {
-                messagesState.addMessage('Link copied to clipboard!');
-            })
-            .catch(err => {
-                console.error('Could not copy text: ', err);
-                messagesState.addMessage('Failed to copy link', 'error');
-            });
+        copyCurrentPageUrl('Link copied to clipboard!');
     }
 
     async handleDeleteItem() {

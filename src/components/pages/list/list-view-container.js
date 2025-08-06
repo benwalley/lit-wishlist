@@ -7,16 +7,21 @@ import '../../../svg/edit.js'
 import '../../../svg/delete.js'
 import '../../../svg/user.js'
 import '../../../svg/dots.js'
+import '../../../svg/world.js'
+import '../../../svg/lock.js'
 import '../../../svg/share.js'
 import '../../global/action-dropdown.js'
 import '../../global/loading-screen.js'
+import '../../global/custom-modal.js'
 import {openEditListModal} from '../../lists/edit-list-modal.js'
 import {listenUpdateItem, listenUpdateList, triggerDeleteList} from "../../../events/eventListeners.js";
 import buttonStyles from '../../../css/buttons.js';
 import {messagesState} from "../../../state/messagesStore.js";
+import {copyCurrentPageUrl} from "../../../helpers/shareHelpers.js";
 import {getUsernameById, redirectToDefaultPage} from "../../../helpers/generalHelpers.js";
 import {observeState} from "lit-element-state";
 import {userState} from "../../../state/userStore.js";
+import {screenSizeState} from "../../../state/screenSizeStore.js";
 import {cachedFetch} from "../../../helpers/caching.js";
 
 export class ListViewContainer extends observeState(LitElement) {
@@ -24,7 +29,8 @@ export class ListViewContainer extends observeState(LitElement) {
         listId: { type: String },
         listData: {type: Object},
         loading: {type: Boolean},
-        selectedItem: {type: String}
+        selectedItem: {type: String},
+        showPublicityModal: {type: Boolean}
     };
 
     constructor() {
@@ -33,6 +39,7 @@ export class ListViewContainer extends observeState(LitElement) {
         this.listData = {};
         this.loading = true;
         this.selectedItem = '';
+        this.showPublicityModal = false;
     }
 
     connectedCallback() {
@@ -82,6 +89,14 @@ export class ListViewContainer extends observeState(LitElement) {
                     h1 {
                         margin: 0;
                         line-height: 1;
+                    }
+                }
+                
+                .public-section {
+                    font-size: var(--font-size-medium);
+                    
+                    world-icon {
+                        color: var(--purple-normal);
                     }
                 }
                 
@@ -141,6 +156,23 @@ export class ListViewContainer extends observeState(LitElement) {
                     width: 18px;
                     height: 18px;
                 }
+                
+                .user-details {
+                    display: flex;
+                    flex-direction: row;
+                    gap: var(--spacing-small);
+                    align-items: center;
+                    color: var(--text-color-medium-dark);
+                    
+                    a {
+                        text-decoration: none;
+                        color: var(--text-color-medium-dark);
+                        
+                        &:hover {
+                            text-decoration: underline;
+                        }
+                    }
+                }
 
                 .list-items {
                     display: grid;
@@ -173,6 +205,27 @@ export class ListViewContainer extends observeState(LitElement) {
                         grid-template-columns: repeat(5, 1fr);
                     }
                 }
+                
+                .publicity-modal-content {
+                    text-align: center;
+                }
+                
+                .publicity-modal-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: var(--spacing-small);
+                    margin-bottom: var(--spacing-normal);
+                    font-size: var(--font-size-large);
+                    font-weight: 600;
+                    border-bottom: 1px solid var(--border-color);
+                    padding-bottom: var(--spacing-small);
+                }
+                
+                .publicity-modal-text {
+                    line-height: 1.5;
+                    color: var(--text-color-medium-dark);
+                }
             `
         ];
     }
@@ -194,8 +247,7 @@ export class ListViewContainer extends observeState(LitElement) {
     }
 
     _handleShareList() {
-        // You can implement share functionality here
-        messagesState.addMessage('Share functionality coming soon!');
+        copyCurrentPageUrl('List link copied to clipboard!');
     }
 
     _getActionDropdownItems() {
@@ -237,6 +289,14 @@ export class ListViewContainer extends observeState(LitElement) {
         return [...baseActions, ...editActions];
     }
 
+    _handlePublicityClick() {
+        this.showPublicityModal = true;
+    }
+
+    _closePublicityModal() {
+        this.showPublicityModal = false;
+    }
+
 
     render() {
         // If this.loading is true, show a loading message
@@ -247,7 +307,7 @@ export class ListViewContainer extends observeState(LitElement) {
         // Otherwise, show the list data
         return html`
             <div class="list-header">
-                <custom-avatar size="100" 
+                <custom-avatar size="${screenSizeState.width < 500 ? '50' : '100'}" 
                     username="${this.listData?.listName}"
                    imageId="${this.listData?.imageId || ''}"
                 ></custom-avatar>
@@ -255,12 +315,21 @@ export class ListViewContainer extends observeState(LitElement) {
                     <div class="header-top">
                         <div class="name-section">
                             <h1>${this.listData?.listName}</h1>
-                            <p>
+                            <div class="user-details">
                                 <user-icon></user-icon>
-                                <span>Owner: 
+                                <span>
+                                    <span>Owner:</span>
                                     <a href="/user/${this.listData?.ownerId}">${getUsernameById(this.listData?.ownerId)}</a>
                                 </span>
-                            </p>
+                                <button class="public-section icon-button" @click="${this._handlePublicityClick}">
+                                    ${this.listData.public ? html`
+                                        <world-icon></world-icon>
+                                    ` : html`
+                                        <lock-icon></lock-icon>
+                                    `}
+                                    <custom-tooltip>This list is ${this.listData.public ? 'public' : 'private'} (click for details)</custom-tooltip>
+                                </button>
+                            </div>
                         </div>
                         
                         ${this.listId > 0 ? html`
@@ -290,6 +359,29 @@ export class ListViewContainer extends observeState(LitElement) {
                     : html`<p>No items in this list yet.</p>`
                 }
             </div>
+            <custom-modal 
+                .isOpen="${this.showPublicityModal}" 
+                maxWidth="400px"
+                @modal-closed="${this._closePublicityModal}"
+            >
+                <div class="publicity-modal-content">
+                    <div class="publicity-modal-header">
+                        ${this.listData.public ? html`
+                            <world-icon></world-icon>
+                            <span>Public List</span>
+                        ` : html`
+                            <lock-icon></lock-icon>
+                            <span>Private List</span>
+                        `}
+                    </div>
+                    <div class="publicity-modal-text">
+                        ${this.listData.public ? 
+                            'This list is public, which means it can be seen by anyone, even if they are not logged in. Only items marked as public within the list can be seen by non-logged-in users.' : 
+                            'This list is private, which means it can only be seen by you and users or groups you have shared it with.'
+                        }
+                    </div>
+                </div>
+            </custom-modal>
             
         `;
     }

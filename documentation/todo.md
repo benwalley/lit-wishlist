@@ -39,3 +39,8 @@
  - when loggin in the subusers aren't always loaded because update users event happens and then navigation
  - make sure that the number of items only includes non deleted items that are visible to the user
  - show list of shared with for all lists and such
+ - get notifications to work
+ - make sure permissions work.
+ - when a user leaves a group or a subuser is removed, 
+   - give a notification that all lists and items will stop being shared with the group. 
+   - Then stop sharing them with the group.

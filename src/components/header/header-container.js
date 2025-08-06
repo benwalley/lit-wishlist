@@ -1,7 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import '../global/custom-tooltip.js'
 import './login-account-link.js'
-import './notifications.js'
+import '../notifications/notifications.js'
 import './logout-element.js'
 import './switch-user-element.js'
 import './dark-mode-toggle.js'

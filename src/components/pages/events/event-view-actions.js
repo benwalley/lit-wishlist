@@ -3,6 +3,7 @@ import '../../global/action-dropdown.js';
 import '../../../svg/dots.js';
 import '../../../svg/edit.js';
 import '../../../svg/delete.js';
+import '../../../svg/share.js';
 import {messagesState} from "../../../state/messagesStore.js";
 
 export class EventViewActions extends LitElement {

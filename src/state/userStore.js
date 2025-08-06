@@ -5,6 +5,7 @@ class UserState extends LitState {
         return {
             userData: false,
             myGroups: [],
+            myLists: [],
             subusers: [],
             loadingUser: true,
         };

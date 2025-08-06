@@ -2,6 +2,7 @@ import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../css/buttons.js";
 import '../pages/account/avatar.js'
 import '../global/custom-input.js'
+import '../global/custom-toggle.js'
 import '../groups/your-groups-list.js'
 import '../users/your-users-list.js'
 import '../global/image-changer.js'
@@ -21,6 +22,7 @@ export class CreateListForm extends LitElement {
         groups: {type: Array},
         users: {type: Array},
         imageId: {type: Number},
+        isPublic: {type: Boolean},
     };
 
     constructor() {
@@ -30,6 +32,7 @@ export class CreateListForm extends LitElement {
         this.groups = [];
         this.users = [];
         this.imageId = 0;
+        this.isPublic = false;
     }
 
     async _handleSubmit(e) {
@@ -41,10 +44,9 @@ export class CreateListForm extends LitElement {
             description: this.description,
             visibleToGroups: this.groups,
             visibleToUsers: this.users,
-            imageId: this.imageId
+            imageId: this.imageId,
+            public: this.isPublic
         }
-
-        console.log('Submitting Form Data:', formData);
 
         const response = await createList(formData);
 
@@ -68,6 +70,7 @@ export class CreateListForm extends LitElement {
         this.groups = [];
         this.users = [];
         this.imageId = 0;
+        this.isPublic = false;
         const modal = this.closest('custom-modal');
         if (modal && typeof modal.closeModal === 'function') {
             modal.closeModal();
@@ -192,6 +195,33 @@ export class CreateListForm extends LitElement {
                         width: auto;
                     }
                 }
+                
+                .public-toggle-section {
+                    margin-top: var(--spacing-normal);
+                    padding: var(--spacing-small);
+                    background-color: var(--background-dark);
+                    border-radius: var(--border-radius-normal);
+                    border: 1px solid var(--border-color);
+                }
+                
+                .public-toggle-section h3 {
+                    margin: 0 0 var(--spacing-small) 0;
+                    font-size: var(--font-size-small);
+                    font-weight: 600;
+                    color: var(--text-color-dark);
+                }
+                
+                .toggle-wrapper {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: var(--spacing-small);
+                }
+                
+                .public-toggle-description {
+                    font-size: var(--font-size-x-small);
+                    color: var(--text-color-medium-dark);
+                    line-height: 1.4;
+                }
             `
         ];
     }
@@ -223,37 +253,55 @@ export class CreateListForm extends LitElement {
                                     placeholder="Group Description (optional)"
                                   @value-changed="${(e) => this.description = e.detail.value}"
                     ></custom-input>
-                </div>
-                <div class="right-column">
-                    <div class="groups-section">
-                        <div class="full-width section-subheading">
-                            <em class="full-width section-subheading-description">This list will be visible to anyone who is a part of the selected groups</em>
+                    
+                    <div class="public-toggle-section">
+                        <h3>Public Visibility</h3>
+                        <div class="toggle-wrapper">
+                            <custom-toggle
+                                id="is-public-toggle"
+                                @change="${(e) => this.isPublic = e.detail.checked}"
+                                .checked="${this.isPublic}"
+                            ></custom-toggle>
+                            <label for="is-public-toggle" class="public-toggle-description">
+                                If enabled, all users including non logged in users will be able to see this list. Individual items in the list can be marked as not public.
+                            </label>
                         </div>
+                    </div>
+                </div>
+                ${!this.isPublic ? html`
+                    <div class="right-column">
+                        <div class="groups-section">
+                            <div class="full-width section-subheading">
+                                <em class="full-width section-subheading-description">This list will be visible to anyone who is a part of the selected groups</em>
+                            </div>
 
-                        <div class="select-section">
-                            <your-groups-list
-                                    class="full-width"
-                                    @selection-changed="${this._handleGroupChange}"
-                            ></your-groups-list>
+                            <div class="select-section">
+                                <your-groups-list
+                                        class="full-width"
+                                        .selectedGroups="${this.groups}"
+                                        @selection-changed="${this._handleGroupChange}"
+                                ></your-groups-list>
+                            </div>
+                            
                         </div>
-                        
+                        <div class="users-section">
+                            <div class="full-width section-subheading">
+                                <em class="full-width section-subheading-description">
+                                    In addition to users in the selected groups, any selected users will be able to see this list.
+                                </em>
+                            </div>
+                            <div class="select-section">
+                                <your-users-list
+                                        class="full-width"
+                                        apiEndpoint="/users/accessible"
+                                        .selectedUsers="${this.users}"
+                                        requireCurrentUser
+                                        @selection-changed="${this._handleUserSelectionChanged}"
+                                ></your-users-list>
+                            </div>
+                        </div>
                     </div>
-                    <div class="users-section">
-                        <div class="full-width section-subheading">
-                            <em class="full-width section-subheading-description">
-                                In addition to users in the selected groups, any selected users will be able to see this list.
-                            </em>
-                        </div>
-                        <div class="select-section">
-                            <your-users-list
-                                    class="full-width"
-                                    apiEndpoint="/users/accessible"
-                                    .selectedUsers="${this.users}"
-                                    @selection-changed="${this._handleUserSelectionChanged}"
-                            ></your-users-list>
-                        </div>
-                    </div>
-                </div>
+                ` : html`<div></div>`}
                 
 
                 <div class="save-button-container fullWidth">

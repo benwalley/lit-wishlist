@@ -585,6 +585,7 @@ export class AddProposalModal extends observeState(LitElement) {
                                     apiEndpoint="/users/accessible"
                                     .selectedUserIds=${this.selectedUserIds}
                                     @selection-changed=${this._handleUsersSelectionChanged}
+                                    requireCurrentUser
                                     multiSelect="true"
                                 ></your-users-list>
                             </div>

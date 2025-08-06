@@ -7,6 +7,7 @@ import buttonStyles from "../../../css/buttons.js";
 import '../../../svg/chevron-down.js';
 import '../../../svg/chevron-up.js';
 import {observeState} from "lit-element-state";
+import {userState} from "../../../state/userStore.js";
 
 class VisibilitySelectorContainer extends observeState(LitElement) {
     static get styles() {
@@ -113,8 +114,14 @@ class VisibilitySelectorContainer extends observeState(LitElement) {
                 
                 .select-group-list-section {
                     display: grid;
-                    grid-template-columns: 1fr 1fr;
+                    grid-template-columns: 1fr;
                     gap: var(--spacing-normal);
+                }
+                
+                @media only screen and (min-width: 800px) {
+                    .select-group-list-section {
+                        grid-template-columns: 1fr 1fr;
+                    }
                 }
             `
         ];
@@ -156,7 +163,7 @@ class VisibilitySelectorContainer extends observeState(LitElement) {
         this.matchListVisibility = !this.matchListVisibility;
 
         this.selectedGroups = [];
-        this.selectedUsers = [];
+        this.selectedUsers = [userState.userData.id];
 
         this.dispatchVisibilityChangedEvent();
     }
@@ -244,6 +251,7 @@ class VisibilitySelectorContainer extends observeState(LitElement) {
                                 apiEndpoint="/users/accessible"
                                 .selectedUserIds="${this.selectedUsers}"
                                 @selection-changed="${this.handleUserSelectionChanged}"
+                                requireCurrentUser
                         ></your-users-list>
                     </div>
                 </div>

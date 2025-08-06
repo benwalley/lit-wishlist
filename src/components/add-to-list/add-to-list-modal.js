@@ -10,7 +10,6 @@ import './wysiwyg-editor.js'
 import './amount-you-want.js'
 import './priority-selector.js'
 import './images-selector.js'
-import './delete-automatically-selector.js'
 import './visibility-selector/visibility-selector-container.js'
 import '../lists/select-my-lists.js'
 import '../../svg/ai.js'
@@ -39,10 +38,8 @@ export class AddToListModal extends LitElement {
         maxAmount: {type: Number},
         priority: {type: Number},
         isPublic: {type: Boolean},
-        autoDelete: {type: Boolean},
         visibleToUsers: {type: Array},
         visibleToGroups: {type: Array},
-        deleteOnData: {type: String},
         visibility: {type: String},
         matchListVisibility: {type: Boolean},
         fetchUrl: {type: String},
@@ -70,7 +67,6 @@ export class AddToListModal extends LitElement {
         this.maxAmount = 0;
         this.priority = 1;
         this.isPublic = false;
-        this.autoDelete = false;
         this.matchListVisibility = true;
         this.visibleToUsers = [];
         this.visibleToGroups = [];
@@ -304,6 +300,26 @@ export class AddToListModal extends LitElement {
                     text-align: right;
                     width: 100%;
                 }
+                
+                .public-disclaimer {
+                    padding: var(--spacing-small);
+                    background-color: var(--background-dark);
+                    border-radius: var(--border-radius-normal);
+                    border: 1px solid var(--border-color);
+                    text-align: left;
+                }
+                
+                .public-disclaimer p {
+                    margin: 0 0 var(--spacing-x-small) 0;
+                    font-size: var(--font-size-small);
+                    color: var(--text-color-dark);
+                }
+                
+                .public-disclaimer p:last-child {
+                    margin-bottom: 0;
+                    color: var(--text-color-medium-dark);
+                    font-size: var(--font-size-x-small);
+                }
             `
         ];
     }
@@ -311,12 +327,16 @@ export class AddToListModal extends LitElement {
     renderAdvancedOptions() {
         return html`
             <div class="advanced-options-content">
-                <delete-automatically-selector
-                    @change="${(e) => this.autoDelete = e.detail.value}"
-                ></delete-automatically-selector>
-                <visibility-selector-container
-                    @visibility-changed="${this._handleVisibilityChanged}"
-                ></visibility-selector-container>
+                ${this.isPublic ? html`
+                    <div class="public-disclaimer">
+                        <p><strong>Publicly Visible</strong></p>
+                        <p>This item is set to be publicly visible. The "who is this item visible to" section is not applicable for public items.</p>
+                    </div>
+                ` : html`
+                    <visibility-selector-container
+                        @visibility-changed="${this._handleVisibilityChanged}"
+                    ></visibility-selector-container>
+                `}
             </div>
         `
     }
@@ -350,7 +370,6 @@ export class AddToListModal extends LitElement {
             maxAmountWanted: this.maxAmount,
             priority: this.priority,
             isPublic: this.isPublic,
-            autoDelete: this.autoDelete,
             visibleToUsers: this.visibleToUsers,
             visibleToGroups: this.visibleToGroups,
             matchListVisibility: this.matchListVisibility,
@@ -447,7 +466,6 @@ export class AddToListModal extends LitElement {
         this.maxAmount = 0;
         this.priority = 1;
         this.isPublic = false;
-        this.autoDelete = false;
         this.matchListVisibility = true;
         this.visibleToUsers = [];
         this.visibleToGroups = [];
@@ -543,7 +561,6 @@ export class AddToListModal extends LitElement {
                                 <strong>Add to list(s)</strong>
                                 <select-my-lists
                                         @change="${this._handleSelectedListsChange}"
-                                        includeSubuserLists
                                         .selectedListIds="${this.selectedListIds}"
                                 ></select-my-lists>
                             </div>
@@ -572,7 +589,7 @@ export class AddToListModal extends LitElement {
                                         .checked="${this.isPublic}"
                                     ></custom-toggle>
                                     <label for="is-public-toggle" class="public-toggle-description">
-                                        Set whether a non logged in user can see this item. Item will only be publicly visible if the user is viewing it from a publicly visible list.
+                                        Set whether a non logged in user can see this item. If this is selected, all users who can view this list will also be able to view the item.
                                     </label>
                                 </div>
                             </div>

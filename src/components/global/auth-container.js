@@ -9,11 +9,13 @@ import './loading-screen.js';
 import {initRouter, navigate} from "../../router/main-router.js";
 import {getAccessibleUsers, getCurrentUser, getYourUsers} from "../../helpers/api/users.js";
 import {getUserGroups} from "../../helpers/api/groups.js";
+import {fetchMyLists} from "../../helpers/api/lists.js";
 import {getSubusers} from "../../helpers/api/subusers.js";
 import {getViewedItems, startQueueProcessor, stopQueueProcessor} from "../../helpers/viewedItems/index.js";
 import {
     listenGroupUpdated,
     listenUpdateUser,
+    listenUpdateList,
     triggerInitialUserLoaded,
     triggerUpdateUser,
     triggerUserListLoaded,
@@ -67,10 +69,14 @@ export class AuthContainer extends observeState(LitElement) {
             this.fetchUserData();
             this.fetchAccessibleUsers();
             this.fetchViewedItems();
+            this.fetchUserLists();
         });
         listenGroupUpdated(() => {
             this.fetchAccessibleUsers();
-        })
+        });
+        listenUpdateList(() => {
+            this.fetchUserLists();
+        });
         initializeProposalHelpers();
         if(!getRefreshToken()) {
             userState.loadingUser = false;
@@ -112,6 +118,16 @@ export class AuthContainer extends observeState(LitElement) {
             userState.userData = userData;
             if(myGroups?.length) {
                 userState.myGroups = myGroups;
+            }
+            
+            // Fetch user lists if user is authenticated
+            if (userData?.id) {
+                const listsResponse = await fetchMyLists();
+                if (listsResponse?.success) {
+                    userState.myLists = listsResponse.data || [];
+                } else {
+                    userState.myLists = [];
+                }
             }
             // Fetch subusers if user is authenticated
             if (userData?.id) {
@@ -167,6 +183,24 @@ export class AuthContainer extends observeState(LitElement) {
         } catch (e) {
             console.error('Error fetching viewed items:', e);
             viewedItemsState.viewedItems = [];
+        }
+    }
+
+    async fetchUserLists() {
+        if (!userState.userData?.id) {
+            return;
+        }
+
+        try {
+            const listsResponse = await fetchMyLists();
+            if (listsResponse?.success) {
+                userState.myLists = listsResponse.data || [];
+            } else {
+                userState.myLists = [];
+            }
+        } catch (e) {
+            console.error('Error fetching user lists:', e);
+            userState.myLists = [];
         }
     }
 

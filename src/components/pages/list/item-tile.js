@@ -8,6 +8,9 @@ import '../../../svg/edit.js';
 import '../../../svg/delete.js';
 import '../../../svg/dollar.js';
 import '../../../svg/group.js';
+import '../../../svg/info.js';
+import '../../../svg/world.js';
+import '../../../svg/lock.js';
 import '../../global/custom-tooltip.js'
 import '../listItem/price-display.js'
 import './gotten-contributing-badges.js';
@@ -18,7 +21,7 @@ import {deleteItem} from "../../../helpers/api/listItems.js";
 import {messagesState} from "../../../state/messagesStore.js";
 import {userState} from "../../../state/userStore.js";
 import {observeState} from "lit-element-state";
-import {canUserContribute} from "../../../helpers/userHelpers.js";
+import {canUserContribute, isParentUserItem} from "../../../helpers/userHelpers.js";
 import {addItemToQueue} from "../../../helpers/viewedItems/index.js";
 import {viewedItemsState} from "../../../state/viewedItemsStore.js";
 import {listenInitialUserLoaded, listenUpdateItem, listenViewedItemsLoaded, listenUpdateViewedItems} from "../../../events/eventListeners.js";
@@ -101,11 +104,13 @@ export class ItemTile extends observeState(LitElement) {
      * Checks if the current user is the owner of the list
      * @returns {boolean} True if current user is list owner, false otherwise
      */
-    isListOwner() {
+    canUserEdit() {
         const currentUser = userState.userData;
         if(!currentUser) return false;
-        if(!this.itemData?.createdById) return false
-        return currentUser.id === this.itemData?.createdById;
+        if(this.itemData?.createdById && this.itemData?.createdById === currentUser.id) {
+            return true;
+        }
+        return false;
     }
 
     static get styles() {
@@ -235,6 +240,22 @@ export class ItemTile extends observeState(LitElement) {
                         background: var(--lavender-300);
                     }
                 }
+                
+                .privacy-icon {
+                    position: absolute;
+                    top: var(--spacing-x-small);
+                    left: var(--spacing-x-small);
+                    font-size: var(--font-size-medium);
+                    z-index: 5;
+                    
+                    world-icon {
+                        color: var(--purple-normal);
+                    }
+                    
+                    lock-icon {
+                        color: var(--text-color-medium-dark);
+                    }
+                }
             `
         ];
     }
@@ -282,6 +303,15 @@ export class ItemTile extends observeState(LitElement) {
 
     render() {
         return html`<a class="item-link ${this.small ? 'small' : ''} ${this.isNew() ? 'new-item' : ''}" href="/list/${this.listId}/item/${this.itemData?.id}">
+            <div class="privacy-icon">
+                ${this.itemData?.isPublic ? html`
+                    <world-icon></world-icon>
+                    <custom-tooltip>This item is visible to non logged-in users</custom-tooltip>
+                ` : html`
+                    <lock-icon></lock-icon>
+                    <custom-tooltip>This item is not visible to non logged-in users</custom-tooltip>
+                `}
+            </div>
             ${canUserContribute(userState.userData, this.itemData) ? html`
                 <gotten-contributing-badges
                     .itemData="${this.itemData}"
@@ -311,7 +341,7 @@ export class ItemTile extends observeState(LitElement) {
             </div>
         </a>
         <div class="item-actions">
-            ${this.isListOwner() ? html`
+            ${this.canUserEdit() ? html`
                         <button
                                 class="button icon-button delete-button danger-text"
                                 aria-label="Delete item"
@@ -331,6 +361,12 @@ export class ItemTile extends observeState(LitElement) {
                         <get-this-button .itemId="${this.itemData?.id}" .itemData="${this.itemData}" compact></get-this-button>
                         <contribute-button .itemId="${this.itemData?.id}" .itemData="${this.itemData}" compact></contribute-button>
                     ` : ''}
+            ${isParentUserItem(userState.userData, this.itemData) ? html`
+                <button class="icon-button blue-text large">
+                    <info-icon style="font-size: var(--font-size-large)"></info-icon>
+                </button>
+                <custom-tooltip>Subusers can't see who has gotten gifts or mark gifts as gotten.</custom-tooltip>
+            ` : ''}
         </div>
         `;
     }

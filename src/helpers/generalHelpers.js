@@ -25,9 +25,11 @@ export function getUniqueId () {
  * @returns {string} - The username, or userId as fallback if not found
  */
 export function getUsernameById(userId) {
+    console.log(userId)
     if (!userId) return '';
 
     const user = userListState.users.find(user => user.id === userId);
+    console.log({user})
     return user ? user.name : '';
 }
 

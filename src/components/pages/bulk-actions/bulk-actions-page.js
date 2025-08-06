@@ -10,13 +10,12 @@ import '../account/avatar.js';
 import '../../../components/global/custom-image.js';
 import '../../global/process-loading-ring.js';
 import '../../global/custom-modal.js';
-import '../../add-to-list/delete-automatically-selector.js';
 import '../../add-to-list/visibility-selector/visibility-selector-container.js';
 import '../../lists/select-my-lists.js';
 import '../../global/custom-toggle.js';
 import {messagesState} from "../../../state/messagesStore.js";
 import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
-import {bulkDeleteItems, bulkUpdateDeleteDate, bulkUpdateVisibility, bulkUpdateLists} from "../../../helpers/api/bulkActions.js";
+import {bulkDeleteItems, bulkUpdateVisibility, bulkUpdateLists} from "../../../helpers/api/bulkActions.js";
 import {invalidateCache} from "../../../helpers/caching.js";
 import {customFetch} from "../../../helpers/fetchHelpers.js";
 
@@ -26,9 +25,6 @@ class BulkActionsPage extends observeState(LitElement) {
             myItems: { type: Array },
             loading: { type: Boolean },
             selectedItems: { type: Set },
-            isAutoDeleteModalOpen: { type: Boolean },
-            selectedAutoDeleteDate: { type: String },
-            autoDeleteSaving: { type: Boolean },
             isVisibilityModalOpen: { type: Boolean },
             visibilitySaving: { type: Boolean },
             isAssignToListsModalOpen: { type: Boolean },
@@ -45,9 +41,6 @@ class BulkActionsPage extends observeState(LitElement) {
         this.myItems = [];
         this.loading = false;
         this.selectedItems = new Set();
-        this.isAutoDeleteModalOpen = false;
-        this.selectedAutoDeleteDate = null;
-        this.autoDeleteSaving = false;
         this.isVisibilityModalOpen = false;
         this.visibilitySaving = false;
         this.isAssignToListsModalOpen = false;
@@ -335,49 +328,6 @@ class BulkActionsPage extends observeState(LitElement) {
         }
     }
 
-    handleSetAutoDelete() {
-        if (this.selectedItems.size === 0) return;
-        this.shadowRoot.querySelector('delete-automatically-selector').reset();
-        this.isAutoDeleteModalOpen = true;
-    }
-
-    _handleCloseAutoDeleteModal() {
-        this.isAutoDeleteModalOpen = false;
-        this.selectedAutoDeleteDate = null;
-    }
-
-    _handleAutoDeleteDateChanged(event) {
-        const { enabled, date } = event.detail;
-        if (enabled && date) {
-            // Convert date to ISO string format expected by API
-            const isoDate = new Date(date).toISOString();
-            this.selectedAutoDeleteDate = isoDate;
-        } else {
-            this.selectedAutoDeleteDate = null;
-        }
-    }
-
-    async _handleSaveAutoDeleteDate() {
-        const itemIds = Array.from(this.selectedItems);
-
-        this.autoDeleteSaving = true;
-        try {
-            const result = await bulkUpdateDeleteDate(itemIds, this.selectedAutoDeleteDate);
-            if (result.success) {
-                messagesState.addMessage(result.message || 'Auto-delete date set successfully');
-                this._handleCloseAutoDeleteModal();
-                // Trigger items refresh to show updated data
-                await this.loadMyItems();
-            } else {
-                messagesState.addMessage(result.error || 'Failed to set auto-delete date', 'error');
-            }
-        } catch (error) {
-            console.error('Error setting auto-delete date:', error);
-            messagesState.addMessage('Failed to set auto-delete date', 'error');
-        } finally {
-            this.autoDeleteSaving = false;
-        }
-    }
 
     canSaveChanges() {
         if(this._haveItemsChanged() && !this.isSavingChanges) return true;
@@ -675,13 +625,6 @@ class BulkActionsPage extends observeState(LitElement) {
                         >
                             Set Visibility
                         </button>
-                        <button 
-                            class="button ghost" 
-                            @click=${this.handleSetAutoDelete}
-                            ?disabled=${this.selectedItems.size === 0}
-                        >
-                            Set Auto-Delete Date
-                        </button>
                         <button
                                 class="button ghost delete-button danger-text"
                                 @click=${this.handleDeleteSelected}
@@ -749,38 +692,6 @@ class BulkActionsPage extends observeState(LitElement) {
                 </div>
             `}
             
-            <!-- Auto-Delete Date Modal -->
-            <custom-modal
-                ?isOpen="${this.isAutoDeleteModalOpen}"
-                maxWidth="500px"
-                @modal-changed="${(e) => this.isAutoDeleteModalOpen = e.detail.isOpen}"
-                @modal-closed="${this._handleCloseAutoDeleteModal}"
-            >
-                <div style="padding: var(--spacing-normal);">
-                    <h3 style="margin: 0 0 var(--spacing-normal) 0;">Set Auto-Delete Date</h3>
-                    <p style="margin: 0 0 var(--spacing-normal) 0; color: var(--text-color-medium-dark);">
-                        Select when these ${this.selectedItems.size} item${this.selectedItems.size !== 1 ? 's' : ''} should be automatically deleted.
-                    </p>
-                    <delete-automatically-selector
-                        @delete-settings-changed="${this._handleAutoDeleteDateChanged}"
-                    ></delete-automatically-selector>
-                    
-                    <div style="display: flex; gap: var(--spacing-small); justify-content: flex-end; margin-top: var(--spacing-normal); padding-top: var(--spacing-normal); border-top: 1px solid var(--border-color);">
-                        <button 
-                            class="button ghost"
-                            @click="${this._handleCloseAutoDeleteModal}"
-                        >
-                            Cancel
-                        </button>
-                        <button 
-                            class="button primary"
-                            @click="${this._handleSaveAutoDeleteDate}"
-                        >
-                            ${this.autoDeleteSaving ? 'Saving...' : 'Save Auto-Delete Date'}
-                        </button>
-                    </div>
-                </div>
-            </custom-modal>
             
             <!-- Visibility Settings Modal -->
             <custom-modal
@@ -831,7 +742,6 @@ class BulkActionsPage extends observeState(LitElement) {
                     </p>
                     <select-my-lists
                         @change="${this._handleListSelectionChanged}"
-                        includeSubuserLists
                     ></select-my-lists>
                     
                     <div style="display: flex; gap: var(--spacing-small); justify-content: flex-end; margin-top: var(--spacing-normal); padding-top: var(--spacing-normal); border-top: 1px solid var(--border-color);">

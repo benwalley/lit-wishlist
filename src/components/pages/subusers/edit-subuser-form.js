@@ -11,6 +11,7 @@ class EditSubuserForm extends observeState(LitElement) {
         return {
             subuserData: { type: Object },
             selectedGroups: { type: Array },
+            originalGroupIds: { type: Array },
             loading: { type: Boolean }
         };
     }
@@ -69,6 +70,22 @@ class EditSubuserForm extends observeState(LitElement) {
                     gap: 12px;
                     justify-content: flex-end;
                 }
+                
+                .warning-message {
+                    background: var(--delete-red-light);
+                    border: 1px solid var(--delete-red);
+                    padding: var(--spacing-small);
+                    margin: var(--spacing-normal);
+                    color: var(--delete-red-darker);
+                    font-size: var(--font-size-small);
+                    line-height: 1.4;
+                }
+                
+                .warning-message strong {
+                    display: block;
+                    margin-bottom: var(--spacing-x-small);
+                    font-weight: 600;
+                }
 
             `
         ];
@@ -78,15 +95,18 @@ class EditSubuserForm extends observeState(LitElement) {
         super();
         this.subuserData = null;
         this.selectedGroups = [];
+        this.originalGroupIds = [];
         this.loading = false;
     }
 
     updated(changedProperties) {
         if (changedProperties.has('subuserData') && this.subuserData) {
             // Initialize with subuser's current group IDs if available
-            this.selectedGroups = this.subuserData.groups 
-                ? this.subuserData.groups.map(group => group.id) 
+            const groupIds = this.subuserData.groups
+                ? this.subuserData.groups.map(group => group.id)
                 : [];
+            this.selectedGroups = [...groupIds];
+            this.originalGroupIds = [...groupIds];
         }
     }
 
@@ -123,6 +143,17 @@ class EditSubuserForm extends observeState(LitElement) {
         }));
     }
 
+    _getDeselectedGroups() {
+        if (!this.subuserData?.groups) return [];
+
+        // Find groups that were originally selected but are no longer selected
+        const deselectedGroups = this.subuserData.groups.filter(group =>
+            this.originalGroupIds.includes(group.id) && !this.selectedGroups.includes(group.id)
+        );
+
+        return deselectedGroups;
+    }
+
     render() {
         if (!this.subuserData) {
             return html``;
@@ -143,6 +174,17 @@ class EditSubuserForm extends observeState(LitElement) {
                             .selectedGroups="${this.selectedGroups}"
                             @selection-changed="${this.handleGroupSelectionChange}"
                         ></your-groups-list>
+                        ${this._getDeselectedGroups().length > 0 ? html`
+                            <div class="warning-message">
+                                <strong>Warning:</strong>
+                                Removing this subuser from the following group(s) will unshare any lists and items that were shared with these groups:
+                                <ul>
+                                    ${this._getDeselectedGroups().map(group => html`
+                                        <li><strong>${group.groupName}</strong></li>
+                                    `)}
+                                </ul>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
                 

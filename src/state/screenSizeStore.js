@@ -11,7 +11,6 @@ class ScreenSizeState extends LitState {
 
     constructor() {
         super();
-        console.log('ami here')
         this.resizeDebounceTimer = null;
         this.initialize();
     }

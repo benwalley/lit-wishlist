@@ -5,15 +5,22 @@ export function canUserContribute(user, item) {
         return false;
     }
 
-    if(user.id === item.createdById) {
-        return false;
-    }
-
-    if(!isSubuserSecure()) {
+    // if item is owned by the parent user or a subuser of the parent user, you can't contribute
+    const parentId = user.parentId;
+    // if you are the creator or your parent is the creator, you can't contribute
+    if(item.createdById === parentId || item.createdById === user.id) {
         return false;
     }
 
     return true;
+}
+
+export function isParentUserItem(user, item) {
+    if(!user || !item) {
+        return false;
+    }
+    const parentId = user.parentId;
+    return item.createdById === parentId
 }
 
 export function canUserEditList(user, list) {

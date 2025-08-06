@@ -37,8 +37,22 @@ class AmountSelector extends LitElement {
                 
                 .inputs-row {
                     display: grid;
-                    grid-template-columns: 1fr 100px 100px;
+                    grid-template-columns: 1fr 1fr;
                     gap: var(--spacing-small);
+                }
+
+                .single-input {
+                    grid-column: 1 / -1;
+                }
+
+                @media only screen and (min-width: 500px) {
+                    .inputs-row {
+                        grid-template-columns: 1fr 100px 100px;
+                    }
+                    
+                    .single-input {
+                        grid-column: span 1
+                    }
                 }
             `
         ];

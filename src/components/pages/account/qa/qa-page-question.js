@@ -85,7 +85,7 @@ export class CustomElement extends observeState(LitElement) {
                     
                     .created-by-user {
                         display: flex;
-                        gap: var(--spacing-small);
+                        gap: var(--spacing-x-small);
                         flex-direction: row;
                         align-items: center;
                     }

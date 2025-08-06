@@ -7,7 +7,8 @@ import {computePosition, flip, shift, offset} from '@floating-ui/dom';
 export class ActionDropdown extends LitElement {
     static properties = {
         open: {type: Boolean, reflect: true},
-        items: {type: Array}
+        items: {type: Array},
+        info: {type: Boolean}
     };
 
     static styles = [
@@ -61,6 +62,7 @@ export class ActionDropdown extends LitElement {
         .dropdown-item {
             display: flex;
             align-items: center;
+            box-sizing: border-box;
             padding: var(--spacing-small) var(--spacing-normal);
             cursor: pointer;
             color: var(--text-color-dark);
@@ -92,7 +94,8 @@ export class ActionDropdown extends LitElement {
         super();
         this.open = false;
         this.items = [];
-        
+        this.info = false;
+
         // Binding methods
         this._handlePopoverToggle = this._handlePopoverToggle.bind(this);
     }
@@ -112,7 +115,7 @@ export class ActionDropdown extends LitElement {
         if (popoverElement) {
             popoverElement.addEventListener('toggle', this._handlePopoverToggle);
         }
-        
+
         // Set up click handlers for slotted toggle elements
         const slot = this.shadowRoot.querySelector('slot[name="toggle"]');
         slot.addEventListener('slotchange', () => {
@@ -130,7 +133,7 @@ export class ActionDropdown extends LitElement {
     async _updatePosition() {
         const referenceElement = this.shadowRoot.querySelector('.dropdown-toggle');
         const floatingElement = this.shadowRoot.querySelector('.dropdown-content');
-        
+
         if (!referenceElement || !floatingElement) return;
 
         const {x, y} = await computePosition(referenceElement, floatingElement, {
@@ -151,12 +154,12 @@ export class ActionDropdown extends LitElement {
     _handlePopoverToggle(e) {
         // Update the open state to match the popover state
         this.open = e.newState === 'open';
-        
+
         // Update position when opening
         if (this.open) {
             this._updatePosition();
         }
-        
+
         // Dispatch event for any components that need to know about state changes
         this.dispatchEvent(new CustomEvent('dropdown-toggle', {
             detail: { open: this.open },
@@ -189,12 +192,12 @@ export class ActionDropdown extends LitElement {
 
     _handleItemClick(item, e) {
         e.stopPropagation();
-        
+
         // Execute the item's action if defined
         if (item.action) {
             item.action();
         }
-        
+
         // Dispatch event for parent components
         this.dispatchEvent(new CustomEvent('action-selected', {
             detail: {
@@ -204,7 +207,7 @@ export class ActionDropdown extends LitElement {
             bubbles: true,
             composed: true
         }));
-        
+
         this.hide();
     }
 
@@ -242,7 +245,11 @@ export class ActionDropdown extends LitElement {
                             classes += ` ${item.classes}`;
                         }
                         
-                        return html`
+                        return this.info ? html`
+                            <div class="${classes}">
+                                ${item.content}
+                            </div>
+                        ` : html`
                             <button 
                                 class="${classes}"
                                 @click=${(e) => this._handleItemClick(item, e)}
