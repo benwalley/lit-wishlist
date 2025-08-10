@@ -2,7 +2,7 @@ import { LitElement, html, css } from 'lit';
 import { observeState } from 'lit-element-state';
 import buttonStyles from '../../../css/buttons.js';
 import { userState } from '../../../state/userStore.js';
-import '../../lists/my-lists.js';
+import '../../lists/user-lists.js';
 
 class MyListsContainer extends observeState(LitElement) {
     static get properties() {
@@ -43,7 +43,7 @@ class MyListsContainer extends observeState(LitElement) {
                     font-size: var(--font-size-normal);
                 }
 
-                my-lists {
+                user-lists {
                     --max-height: none;
                 }
             `
@@ -69,7 +69,7 @@ class MyListsContainer extends observeState(LitElement) {
             </div>
 
             <div class="lists-container">
-                <my-lists lightTiles></my-lists>
+                <user-lists lightTiles></user-lists>
             </div>
         `;
     }

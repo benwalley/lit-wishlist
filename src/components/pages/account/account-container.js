@@ -12,7 +12,7 @@ import './logout-button.js'
 import './invited-groups.js'
 import '../../global/image-upload/image-uploader.js'
 import '../../global/custom-image.js'
-import '../../lists/my-lists.js'
+import '../../lists/user-lists.js'
 import '../../lists/edit-list-modal.js'
 import './my-groups-list.js'
 import './my-subusers.js'
@@ -82,7 +82,7 @@ export class AccountContainer extends observeState(LitElement) {
                 </section>` : ''}
 
                 <section>
-                    <my-lists></my-lists>
+                    <user-lists></user-lists>
                 </section>
 
                 <section>

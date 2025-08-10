@@ -7,7 +7,7 @@ import '../../../svg/dots.js';
 import '../../pages/account/avatar.js';
 import '../../global/action-dropdown.js';
 import {messagesState} from "../../../state/messagesStore.js";
-import {copyCurrentPageUrl} from "../../../helpers/shareHelpers.js";
+import {copyCurrentPageUrl, copyUrlToClipboard} from "../../../helpers/shareHelpers.js";
 import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
 import '../../../svg/edit.js';
 import '../../../svg/delete.js';
@@ -80,7 +80,7 @@ export class ContributorsTopBar extends observeState(LitElement) {
     }
 
     handleCopyLink() {
-        copyCurrentPageUrl('Link copied to clipboard!');
+        copyUrlToClipboard(`/public/item/${this.itemId}`,)
     }
 
     async handleDeleteItem() {

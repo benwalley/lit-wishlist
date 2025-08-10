@@ -12,7 +12,7 @@ import '../account/logout-button.js'
 import '../account/invited-groups.js'
 import '../../global/image-upload/image-uploader.js'
 import '../../global/custom-image.js'
-import '../../lists/my-lists.js'
+import '../../lists/user-lists.js'
 import '../../lists/edit-list-modal.js'
 import '../../global/loading-screen.js'
 import '../account/my-groups-list.js'
@@ -111,7 +111,7 @@ export class UserViewContainer extends LitElement {
                 </section>
 
                 <section>
-                    <my-lists .userId="${this.userId}" .isUser="${false}"></my-lists>
+                    <user-lists .userId="${this.userId}" .isUser="${false}"></user-lists>
                 </section>
                 
                 <section>

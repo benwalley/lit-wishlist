@@ -102,7 +102,6 @@ export class CustomElement extends observeState(LitElement) {
                 main.main-content {
                     display: grid;
                     overflow: hidden;
-                    padding: 0 var(--spacing-normal);
                     box-sizing: border-box;
                     width: 100%;
                     max-width: 1600px;
@@ -139,7 +138,7 @@ export class CustomElement extends observeState(LitElement) {
                     grid-template-columns: 1fr 1fr;
                     gap: var(--spacing-normal);
                     overflow: auto;
-                    padding-bottom: var(--spacing-large);
+                    padding: var(--spacing-normal) var(--spacing-normal-variable) var(--spacing-large) var(--spacing-normal-variable);
                     max-width: 1000px;
                 }
 
@@ -165,15 +164,7 @@ export class CustomElement extends observeState(LitElement) {
                     gap: var(--spacing-normal);
                     margin-bottom: auto;
                 }
-
-                @media only screen and (min-width: 1000px) {
-                    .details-section {
-                        padding-top: calc(var(--spacing-normal));
-                    }
-                }
-
-                /* Sidebar styles */
-
+                
                 aside.right-column {
                     width: 300px;
                     display: none;

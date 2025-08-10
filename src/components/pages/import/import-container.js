@@ -7,7 +7,7 @@ import { messagesState } from '../../../state/messagesStore.js';
 import { navigate } from '../../../router/main-router.js';
 import { triggerUpdateList } from '../../../events/eventListeners.js';
 import './import-items-display.js';
-import '../../lists/select-my-lists.js';
+import "../../lists/user-lists.js";
 
 class ImportContainer extends observeState(LitElement) {
     static get properties() {

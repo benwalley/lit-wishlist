@@ -9,15 +9,18 @@ import '../../loading/skeleton-loader.js'
 export class CustomElement extends LitElement {
     static properties = {
         itemData: { type: Object },
+        publicView: { type: Boolean },
     };
 
     constructor() {
         super();
         this.itemData = {};
+        this.publicView = false;
     }
 
     _getAmountGotten() {
         let total = 0;
+        if(!this.itemData.getting || !Array.isArray(this.itemData.getting)) return 0;
         for(const contributor of this.itemData.getting) {
             total += parseFloat(contributor.numberGetting || 0);
         }
@@ -89,15 +92,17 @@ export class CustomElement extends LitElement {
                     <span>${this.itemData?.maxAmountWanted || '--'}</span>
                 </div>` : ''}
             </div>
-            <div class="amount-gotten-section">
-                ${this.loading ? html`
-                            <skeleton-loader width="100%" height="20px"></skeleton-loader>
-                        ` : html`
-                            <success-icon></success-icon>
-                            <span>${this._getAmountGotten()}</span>
-                            <span>gotten</span>
-                        `}
-            </div>
+            ${!this.publicView ? html`
+                <div class="amount-gotten-section">
+                    ${this.loading ? html`
+                                <skeleton-loader width="100%" height="20px"></skeleton-loader>
+                            ` : html`
+                                <success-icon></success-icon>
+                                <span>${this._getAmountGotten()}</span>
+                                <span>gotten</span>
+                            `}
+                </div>
+            ` : ''}
             
         `;
     }

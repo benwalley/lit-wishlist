@@ -14,7 +14,7 @@ import {userState} from "../../state/userStore.js";
 
 export class HeaderContainer extends observeState(LitElement) {
     static properties = {
-        showBackButton: { type: Boolean }
+        showBackButton: {type: Boolean}
     };
 
     constructor() {
@@ -39,16 +39,19 @@ export class HeaderContainer extends observeState(LitElement) {
                     top: 0;
                     z-index: 1;
                 }
-                
+
                 /* When parent has authenticated class (sidebar visible), header is in column 2 */
+
                 :host-context(.authenticated) {
                     grid-column: 2;
                 }
-                
+
                 /* When parent has unauthenticated class (no sidebar), header spans full width */
+
                 :host-context(.unauthenticated) {
                     grid-column: 1;
                 }
+
                 header {
                     padding: 10px;
                     display: flex;
@@ -66,42 +69,46 @@ export class HeaderContainer extends observeState(LitElement) {
                     background: var(--border-color);
                     height: var(--font-size-large);
                 }
-                
+
                 .mobile-sidebar-toggle {
                     display: flex;
                     margin-right: 16px;
                     font-size: var(--font-size-large);
                 }
-                
+
                 .back-button {
                     font-size: var(--font-size-large);
                     margin-right: auto;
                     display: none;
                 }
-                
+
                 .back-button:hover {
                     color: var(--primary-color);
                 }
-                
+
                 .header-left {
                     align-items: center;
                     margin-right: auto;
                     display: flex;
                 }
-                
+
                 @media (min-width: 1200px) {
                     :host {
                         position: relative;
                     }
+
                     .header-left .back-button {
                         display: flex;
                     }
+
                     header {
                         gap: 10px;
                     }
+
                     .mobile-sidebar-toggle {
                         display: none;
                     }
+
                     .back-button {
                         margin-right: 0;
                     }
@@ -119,26 +126,42 @@ export class HeaderContainer extends observeState(LitElement) {
         return html`
             <header class="header">
                 ${this.loggedIn() ? html`
-                <div class="header-left">
-                    <button @click="${this._handleToggleMobile}" class="mobile-sidebar-toggle button icon-button">
-                        <hamburger-icon></hamburger-icon>
-                    </button>
-                    ${this.showBackButton ? html`
-                        <button @click="${this.goBack}" 
-                            class="back-button button icon-button" 
-                            title="Go back"
-                                style="--icon-color: var(--blue-normal); 
+                    <div class="header-left">
+                        <button @click="${this._handleToggleMobile}" class="mobile-sidebar-toggle button icon-button">
+                            <hamburger-icon></hamburger-icon>
+                        </button>
+                        ${this.showBackButton ? html`
+                            <button @click="${this.goBack}"
+                                    class="back-button button icon-button"
+                                    title="Go back"
+                                    style="--icon-color: var(--blue-normal); 
                                 --icon-color-hover: var(--blue-darker); 
                                 --icon-hover-background: var(--blue-light)"
-                        >
-                            <arrow-long-left-icon></arrow-long-left-icon>
-                        </button>
+                            >
+                                <arrow-long-left-icon></arrow-long-left-icon>
+                            </button>
+                        ` : ''}
+                    </div>` : html`
+                    ${this.showBackButton ? html`
+                        <div class="header-left">
+                            <button @click="${this.goBack}"
+                                    class="back-button button icon-button"
+                                    title="Go back"
+                                    style="--icon-color: var(--blue-normal); 
+                                    --icon-color-hover: var(--blue-darker); 
+                                    --icon-hover-background: var(--blue-light)"
+                            >
+                                <arrow-long-left-icon></arrow-long-left-icon>
+                            </button>
+                        </div>
                     ` : ''}
-                </div>` : ''}
+                `}
                 <dark-mode-toggle></dark-mode-toggle>
-                ${this.loggedIn() ? html`<notifications-element></notifications-element>` : ''}
+                ${this.loggedIn() ? html`
+                    <notifications-element></notifications-element>` : ''}
                 <logout-element></logout-element>
-                 ${this.loggedIn() ? html`<switch-user-element></switch-user-element>` : ''}
+                ${this.loggedIn() ? html`
+                    <switch-user-element></switch-user-element>` : ''}
                 <div class="divider"></div>
                 <login-account-link></login-account-link>
             </header>

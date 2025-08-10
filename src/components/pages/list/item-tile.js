@@ -33,6 +33,7 @@ export class ItemTile extends observeState(LitElement) {
         itemData: {type: Object},
         listId: {type: String},
         small: {type: Boolean},
+        publicView: {type: Boolean},
     };
 
     constructor() {
@@ -40,6 +41,7 @@ export class ItemTile extends observeState(LitElement) {
         this.itemData = {};
         this.listId = '';
         this.small = false;
+        this.publicView = false;
         this.intersectionObserver = null;
     }
 
@@ -302,7 +304,11 @@ export class ItemTile extends observeState(LitElement) {
     }
 
     render() {
-        return html`<a class="item-link ${this.small ? 'small' : ''} ${this.isNew() ? 'new-item' : ''}" href="/list/${this.listId}/item/${this.itemData?.id}">
+        const itemUrl = this.publicView ? 
+            `/public/item/${this.itemData?.id}` : 
+            `/list/${this.listId}/item/${this.itemData?.id}`;
+            
+        return html`<a class="item-link ${this.small ? 'small' : ''} ${this.isNew() ? 'new-item' : ''}" href="${itemUrl}">
             <div class="privacy-icon">
                 ${this.itemData?.isPublic ? html`
                     <world-icon></world-icon>
@@ -340,34 +346,36 @@ export class ItemTile extends observeState(LitElement) {
                
             </div>
         </a>
-        <div class="item-actions">
-            ${this.canUserEdit() ? html`
-                        <button
-                                class="button icon-button delete-button danger-text"
-                                aria-label="Delete item"
-                                @click="${this._handleDeleteClick}"
-                        >
-                            <delete-icon></delete-icon>
-                        </button>
-                        <button 
-                            class="button icon-button edit-button blue-text" 
-                            aria-label="Edit item"
-                            @click="${this._handleEditClick}"
-                        >
-                            <edit-icon></edit-icon>
-                        </button>
-                    ` : ''}
-            ${canUserContribute(userState.userData, this.itemData) ? html`
-                        <get-this-button .itemId="${this.itemData?.id}" .itemData="${this.itemData}" compact></get-this-button>
-                        <contribute-button .itemId="${this.itemData?.id}" .itemData="${this.itemData}" compact></contribute-button>
-                    ` : ''}
-            ${isParentUserItem(userState.userData, this.itemData) ? html`
-                <button class="icon-button blue-text large">
-                    <info-icon style="font-size: var(--font-size-large)"></info-icon>
-                </button>
-                <custom-tooltip>Subusers can't see who has gotten gifts or mark gifts as gotten.</custom-tooltip>
-            ` : ''}
-        </div>
+        ${!this.publicView ? html`
+            <div class="item-actions">
+                ${this.canUserEdit() ? html`
+                            <button
+                                    class="button icon-button delete-button danger-text"
+                                    aria-label="Delete item"
+                                    @click="${this._handleDeleteClick}"
+                            >
+                                <delete-icon></delete-icon>
+                            </button>
+                            <button 
+                                class="button icon-button edit-button blue-text" 
+                                aria-label="Edit item"
+                                @click="${this._handleEditClick}"
+                            >
+                                <edit-icon></edit-icon>
+                            </button>
+                        ` : ''}
+                ${canUserContribute(userState.userData, this.itemData) ? html`
+                            <get-this-button .itemId="${this.itemData?.id}" .itemData="${this.itemData}" compact></get-this-button>
+                            <contribute-button .itemId="${this.itemData?.id}" .itemData="${this.itemData}" compact></contribute-button>
+                        ` : ''}
+                ${isParentUserItem(userState.userData, this.itemData) ? html`
+                    <button class="icon-button blue-text large">
+                        <info-icon style="font-size: var(--font-size-large)"></info-icon>
+                    </button>
+                    <custom-tooltip>Subusers can't see who has gotten gifts or mark gifts as gotten.</custom-tooltip>
+                ` : ''}
+            </div>
+        ` : ''}
         `;
     }
 }

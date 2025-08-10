@@ -23,12 +23,14 @@ export class CustomElement extends observeState(LitElement) {
         itemData: {type: Object},
         isSelectList: {type: Boolean},
         showOwner: {type: Boolean},
+        publicOnly: {type: Boolean},
     };
 
     constructor() {
         super();
         this.itemData = {};
         this.showOwner = false;
+        this.publicOnly = false;
     }
 
     static get styles() {
@@ -176,8 +178,10 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     render() {
+        const listUrl = this.publicOnly ? `/public/list/${this.itemData.id}` : `/list/${this.itemData.id}`;
+        
         return html`
-            <a class="container" href="${`/list/${this.itemData.id}`}">
+            <a class="container" href="${listUrl}">
                <custom-avatar 
                        classs="list-name-avatar"
                     size="65" 
@@ -218,7 +222,7 @@ export class CustomElement extends observeState(LitElement) {
                     
                 </div>
                 <div class="actions-section">
-                    ${this.canEdit ? html`
+                    ${this.canEdit && !this.publicOnly ? html`
                             <div style="position: relative;">
                                 <button class="edit-button icon-button"
                                         aria-label="Edit List Details"

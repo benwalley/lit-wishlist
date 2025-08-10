@@ -16,7 +16,7 @@ export async function getGroupLists(groupId) {
         return lists;
     } catch (error) {
         console.error('Error fetching group lists:', error);
-        return { success: false, error };
+        return {success: false, error};
     }
 }
 
@@ -36,10 +36,10 @@ export async function createList(listData) {
         };
 
         const result = await customFetch('/lists/create', options, true);
-        return { success: true, data: result };
+        return {success: true, data: result};
     } catch (error) {
         console.error('Error creating list:', error);
-        return { success: false, error };
+        return {success: false, error};
     }
 }
 
@@ -50,10 +50,10 @@ export async function createList(listData) {
 export async function getUserLists() {
     try {
         const lists = await cachedFetch('/lists/current', {}, true);
-        return { success: true, data: lists };
+        return {success: true, data: lists};
     } catch (error) {
         console.error('Error fetching user lists:', error);
-        return { success: false, error };
+        return {success: false, error};
     }
 }
 
@@ -67,7 +67,7 @@ export async function getAllAccessibleLists() {
         return lists
     } catch (error) {
         console.error('Error fetching accessible lists:', error);
-        return { success: false, error };
+        return {success: false, error};
     }
 }
 
@@ -79,10 +79,10 @@ export async function getAllAccessibleLists() {
 export async function getListById(listId) {
     try {
         const list = await cachedFetch(`/lists/${listId}`, {}, true);
-        return { success: true, data: list };
+        return {success: true, data: list};
     } catch (error) {
         console.error('Error fetching list:', error);
-        return { success: false, error };
+        return {success: false, error};
     }
 }
 
@@ -109,7 +109,7 @@ export async function updateList(listData) {
         return result;
     } catch (error) {
         console.error('Error updating list:', error);
-        return { success: false, error };
+        return {success: false, error};
     }
 }
 
@@ -128,10 +128,10 @@ export async function deleteList(listId) {
         };
 
         const result = await customFetch(`/lists/${listId}`, options, true);
-        return { success: true, data: result };
+        return {success: true, data: result};
     } catch (error) {
         console.error('Error deleting list:', error);
-        return { success: false, error };
+        return {success: false, error};
     }
 }
 
@@ -156,10 +156,10 @@ export async function fetchMyLists(includeSubuserLists = false) {
             };
         }
 
-        return { success: false, error: 'Failed to fetch lists' };
+        return {success: false, error: 'Failed to fetch lists'};
     } catch (error) {
         console.error('Error fetching lists:', error);
-        return { success: false, error };
+        return {success: false, error};
     }
 }
 
@@ -168,13 +168,15 @@ export async function fetchMyLists(includeSubuserLists = false) {
  * @param {number} userId - The ID of the user whose lists to fetch
  * @returns {Promise<{success: boolean, data: Array}|{success: boolean, error: Error}>}
  */
-export async function fetchUserLists(userId) {
+export async function fetchUserLists(userId, publicOnly = false) {
     try {
         if (!userId) {
             throw new Error('User ID is required');
         }
 
-        const response = await cachedFetch(`/lists/user/${userId}`, {}, true);
+        const url = publicOnly ? `/lists/user/${userId}/public` : `/lists/user/${userId}`;
+        const useAuth = !publicOnly;
+        const response = await cachedFetch(url, {}, useAuth);
 
         if (response?.responseData?.error) {
             throw new Error(response?.responseData?.error);
@@ -188,9 +190,36 @@ export async function fetchUserLists(userId) {
             };
         }
 
-        return { success: false, error: 'Failed to fetch user lists' };
+        return response;
     } catch (error) {
         console.error('Error fetching user lists:', error);
-        return { success: false, error };
+        return {success: false, error};
+    }
+}
+
+/**
+ * Get a public list by its ID (no authentication required)
+ * @param {string} listId - The ID of the list to fetch
+ * @returns {Promise<{success: boolean, data: Object}|{success: boolean, error: Error}>}
+ */
+export async function getPublicListById(listId) {
+    try {
+        if (!listId) {
+            throw new Error('List ID is required');
+        }
+
+        const response = await cachedFetch(`/lists/public/${listId}`, {}, false);
+        
+        if (response?.success) {
+            return {
+                success: true,
+                data: response.data
+            };
+        }
+
+        return response;
+    } catch (error) {
+        console.error('Error fetching public list:', error);
+        return {success: false, error};
     }
 }

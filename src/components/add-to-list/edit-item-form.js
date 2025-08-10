@@ -14,7 +14,7 @@ import {triggerUpdateItem, triggerUpdateList} from "../../events/eventListeners.
 import {invalidateCache} from "../../helpers/caching.js";
 import {messagesState} from "../../state/messagesStore.js";
 import '../../svg/gear.js';
-import '../lists/select-my-lists.js';
+import "../lists/user-lists.js";
 
 export class EditItemForm extends LitElement {
     static properties = {

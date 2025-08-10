@@ -11,14 +11,13 @@ import './amount-you-want.js'
 import './priority-selector.js'
 import './images-selector.js'
 import './visibility-selector/visibility-selector-container.js'
-import '../lists/select-my-lists.js'
+import "../lists/user-lists.js";
 import '../../svg/ai.js'
 import '../global/custom-tooltip.js'
 import '../../svg/gear.js'
 import '../global/process-loading-ring.js'
 import {customFetch} from "../../helpers/fetchHelpers.js";
 import {triggerUpdateItem, triggerUpdateList} from "../../events/eventListeners.js";
-import {invalidateCache} from "../../helpers/caching.js";
 import {messagesState} from "../../state/messagesStore.js";
 
 export class AddToListModal extends LitElement {

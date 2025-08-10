@@ -111,15 +111,13 @@ export class AuthContainer extends observeState(LitElement) {
 
     async fetchUserData() {
         try {
-            console.log('got here')
             const userData = await getCurrentUser();
-            console.log('second')
             const myGroups = await getUserGroups();
             userState.userData = userData;
             if(myGroups?.length) {
                 userState.myGroups = myGroups;
             }
-            
+
             // Fetch user lists if user is authenticated
             if (userData?.id) {
                 const listsResponse = await fetchMyLists();

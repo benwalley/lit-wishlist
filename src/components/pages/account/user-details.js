@@ -4,10 +4,12 @@ import {userState} from "../../../state/userStore.js";
 import './account-username.js';
 import './avatar.js';
 import '../../../svg/edit.js';
+import '../../../svg/share.js';
 import './logout-button.js'
 import '../../../svg/edit.js'
 import buttonStyles from '../../../css/buttons.js'
 import '../../users/edit-user-form.js';
+import {copyCurrentPageUrl, copyTextToClipboard, copyUrlToClipboard} from '../../../helpers/shareHelpers.js';
 
 export class UserDetails extends observeState(LitElement) {
     static properties = {
@@ -32,7 +34,7 @@ export class UserDetails extends observeState(LitElement) {
                     flex-direction: column;
                     gap: var(--spacing-small);
                 }
-                
+
                 .username-section {
                     display: flex;
                     flex-direction: column;
@@ -56,19 +58,16 @@ export class UserDetails extends observeState(LitElement) {
                     margin-top: var(--spacing-small);
                 }
 
-                .username-edit-button.icon-button {
+                .actions-container {
                     position: absolute;
                     top: var(--spacing-small);
                     right: var(--spacing-small);
+                    display: flex;
+                    gap: var(--spacing-x-small);
                     font-size: var(--font-size-large);
-                    transition: var(--transition-normal);
-                    border-radius: 50%;
-                    --icon-color: var(--blue-normal);
-                    --icon-color-hover: var(--blue-normal);
-                    --icon-hover-background: var(--purple-light);
 
-                    &:hover {
-                        transform: rotate(-45deg) scale(1.1);
+                    .icon-button {
+                        font-size: inherit;
                     }
                 }
             `
@@ -76,28 +75,28 @@ export class UserDetails extends observeState(LitElement) {
     }
 
     _getUsername() {
-        if(this.isUser) {
+        if (this.isUser) {
             return userState?.userData?.name;
         }
         return this.userData?.name || '';
     }
 
     _getEmail() {
-        if(this.isUser) {
+        if (this.isUser) {
             return userState?.userData?.email;
         }
         return this.userData?.email || '';
     }
 
     _getImageId() {
-        if(this.isUser) {
+        if (this.isUser) {
             return userState?.userData?.image;
         }
         return this.userData?.image || '';
     }
 
     _getPublicDescription() {
-        if(this.isUser) {
+        if (this.isUser) {
             return userState?.userData?.publicDescription;
         }
         return this.userData?.publicDescription || '';
@@ -116,6 +115,12 @@ export class UserDetails extends observeState(LitElement) {
         editForm.editCurrentUser();
     }
 
+    _handleShareUser() {
+        copyUrlToClipboard(`/public/user/${userState.userData?.id}`,
+            'Public url copied to clipboard',
+            'Failed to copy public url');
+    }
+
     render() {
         return html`
             <custom-avatar size="150"
@@ -126,15 +131,25 @@ export class UserDetails extends observeState(LitElement) {
             <account-username .username="${this._getUsername()}"></account-username>
             <em>${this._getEmail()}</em>
             ${this._getPublicDescription() ? html`<p>${this._getPublicDescription()}</p>` : ''}
-            ${this._showEditButton() ? html`
-                <button aria-label="edit-button"
-                        class="icon-button button username-edit-button"
-                        @click="${this._handleEditUser}"
+
+            <div class="actions-container">
+                <button aria-label="share-button"
+                        class="icon-button purple-text"
+                        @click="${this._handleShareUser}"
                 >
-                    <edit-icon></edit-icon>
+                    <share-icon></share-icon>
                 </button>
-            ` : ''}
-            ${this._showLogoutButton() ? html`<logout-button></logout-button>` : ''}
+                ${this._showEditButton() ? html`
+                    <button aria-label="edit-button"
+                            class="icon-button blue-text"
+                            @click="${this._handleEditUser}"
+                    >
+                        <edit-icon></edit-icon>
+                    </button>
+                ` : ''}
+            </div>
+            ${this._showLogoutButton() ? html`
+                <logout-button></logout-button>` : ''}
             <edit-user-form></edit-user-form>
         `;
     }

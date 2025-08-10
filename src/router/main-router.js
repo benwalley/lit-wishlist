@@ -21,6 +21,10 @@ import '../components/pages/bulk-actions/bulk-actions-page.js';
 import '../components/pages/my-lists/my-lists-container.js';
 import '../components/pages/money-tracking/money-tracking-page.js';
 import '../components/pages/password-reset/password-reset-container.js';
+import '../components/pages/public/public-user-view.js';
+import '../components/pages/public/public-list-view.js';
+import '../components/pages/public/public-item-view.js';
+import '../components/pages/users/all-users-container.js';
 
 // Authentication guard function
 const requireAuth = (context, commands) => {
@@ -49,6 +53,18 @@ const routes = [
         component: 'password-reset-container',
     },
     {
+        path: '/public/user/:userId',
+        component: 'public-user-view',
+    },
+    {
+        path: '/public/list/:listId',
+        component: 'public-list-view',
+    },
+    {
+        path: '/public/item/:itemId',
+        component: 'public-item-view',
+    },
+    {
         path: '/account',
         component: 'account-container',
         action: requireAuth,
@@ -66,6 +82,11 @@ const routes = [
     {
         path: '/lists',
         component: 'all-lists-container',
+        action: requireAuth,
+    },
+    {
+        path: '/users',
+        component: 'all-users-container',
         action: requireAuth,
     },
     {

@@ -1,45 +1,35 @@
 import { LitElement, html, css } from 'lit';
-import {customFetch} from "../../../helpers/fetchHelpers.js";
 import '../../pages/account/avatar.js'
-import './item-tile.js'
-import '../../lists/edit-list-modal.js'
-import '../../../svg/edit.js'
-import '../../../svg/delete.js'
+import '../list/item-tile.js'
 import '../../../svg/user.js'
-import '../../../svg/dots.js'
 import '../../../svg/world.js'
 import '../../../svg/lock.js'
-import '../../../svg/share.js'
-import '../../global/action-dropdown.js'
 import '../../global/loading-screen.js'
 import '../../global/custom-modal.js'
-import {openEditListModal} from '../../lists/edit-list-modal.js'
-import {listenUpdateItem, listenUpdateList, triggerDeleteList} from "../../../events/eventListeners.js";
 import buttonStyles from '../../../css/buttons.js';
-import {messagesState} from "../../../state/messagesStore.js";
-import {copyCurrentPageUrl, copyUrlToClipboard} from "../../../helpers/shareHelpers.js";
-import {getUsernameById, redirectToDefaultPage} from "../../../helpers/generalHelpers.js";
-import {observeState} from "lit-element-state";
-import {userState} from "../../../state/userStore.js";
 import {screenSizeState} from "../../../state/screenSizeStore.js";
-import {cachedFetch} from "../../../helpers/caching.js";
+import {getPublicListById} from "../../../helpers/api/lists.js";
 
-export class ListViewContainer extends observeState(LitElement) {
+export class PublicListView extends LitElement {
     static properties = {
         listId: { type: String },
         listData: {type: Object},
+        items: {type: Array},
+        owner: {type: Object},
         loading: {type: Boolean},
-        selectedItem: {type: String},
-        showPublicityModal: {type: Boolean}
+        showPublicityModal: {type: Boolean},
+        listNotFound: {type: Boolean}
     };
 
     constructor() {
         super();
         this.listId = '';
         this.listData = {};
+        this.items = [];
+        this.owner = {};
         this.loading = true;
-        this.selectedItem = '';
         this.showPublicityModal = false;
+        this.listNotFound = false;
     }
 
     connectedCallback() {
@@ -49,24 +39,23 @@ export class ListViewContainer extends observeState(LitElement) {
             return;
         }
         this.fetchListData();
-        listenUpdateList(this.fetchListData.bind(this))
-        listenUpdateItem(this.fetchListData.bind(this))
     }
 
     async fetchListData() {
         try {
-            const response = await cachedFetch(`/lists/${this.listId}`, {}, true);
+            const response = await getPublicListById(this.listId);
             if(response?.success) {
-                this.listData = response.data;
+                const {items, list, owner} = response.data;
+                this.items = items || [];
+                this.listData = list || {};
+                this.owner = owner || {};
+                this.listNotFound = false;
             } else {
-                if(response.message === "List not found") {
-                    redirectToDefaultPage();
-                    return;
-                }
-                messagesState.addMessage(response.message || 'Error fetching list', 'error');
+                this.listNotFound = true;
             }
         } catch (error) {
-            messagesState.addMessage('error fetching list', 'error');
+            console.error('Error fetching public list:', error);
+            this.listNotFound = true;
         } finally {
             this.loading = false;
         }
@@ -85,6 +74,8 @@ export class ListViewContainer extends observeState(LitElement) {
                     gap: 1rem;
                     padding: 1rem;
                     position: relative;
+                    max-width: 1400px;
+                    margin: 0 auto;
                     
                     h1 {
                         margin: 0;
@@ -110,17 +101,6 @@ export class ListViewContainer extends observeState(LitElement) {
                     align-items: flex-start;
                 }
                 
-                .kebab-menu {
-                    font-size: var(--font-size-large);
-                    color: var(--text-color-medium-dark);
-                }
-                
-                .header-actions {
-                    display: flex;
-                    gap: var(--spacing-small);
-                    margin-top: var(--spacing-x-small);
-                }
-                
                 .name-section {
                     p {
                         margin: 0;
@@ -138,23 +118,6 @@ export class ListViewContainer extends observeState(LitElement) {
                             }
                         }
                     }
-                }
-                
-                .edit-button {
-                    font-size: var(--font-size-large);;
-                }
-
-                .delete-button {
-                    font-size: var(--font-size-large);
-                }
-                
-                .action-icon {
-                    margin-right: var(--spacing-small);
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 18px;
-                    height: 18px;
                 }
                 
                 .user-details {
@@ -180,6 +143,7 @@ export class ListViewContainer extends observeState(LitElement) {
                     gap: var(--spacing-normal);
                     padding: 0 var(--spacing-normal);
                     max-width: 1400px;
+                    margin: 0 auto;
                 }
 
                 @media (min-width: 350px) {
@@ -226,67 +190,33 @@ export class ListViewContainer extends observeState(LitElement) {
                     line-height: 1.5;
                     color: var(--text-color-medium-dark);
                 }
+
+                .not-found-container {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    padding: var(--spacing-large);
+                    text-align: center;
+                    min-height: 400px;
+                }
+
+                .not-found-message {
+                    font-size: var(--font-size-large);
+                    color: var(--text-color-medium-dark);
+                    margin-bottom: var(--spacing-normal);
+                }
+
+                .not-found-subtitle {
+                    font-size: var(--font-size-medium);
+                    color: var(--text-color-light);
+                }
             `
         ];
     }
 
     onBeforeEnter(location, commands, router) {
         this.listId = location.params.listId;
-    }
-
-    _navigateToItem(event) {
-        const { itemId } = event.detail;
-    }
-
-    _handleEditList() {
-        openEditListModal(this.listData);
-    }
-
-    _handleDeleteList() {
-        triggerDeleteList(this.listData);
-    }
-
-    _handleShareList() {
-        copyUrlToClipboard('/public/list/' + this.listId);
-    }
-
-    _getActionDropdownItems() {
-        const { ownerId } = this.listData;
-        const userId = userState?.userData?.id;
-
-        // Always available
-        const baseActions = [
-            {
-                id: 'share',
-                label: 'Share List',
-                icon: html`<share-icon class="action-icon"></share-icon>`,
-                classes: 'purple-text',
-                action: () => this._handleShareList()
-            }
-        ];
-
-        // If user isn’t the owner, we’re done
-        if (ownerId !== userId) return baseActions;
-
-        // Extra owner-only actions
-        const editActions = [
-            {
-                id: 'edit',
-                label: 'Edit List',
-                icon: html`<edit-icon class="action-icon"></edit-icon>`,
-                classes: 'blue-text',
-                action: () => this._handleEditList()
-            },
-            {
-                id: 'delete',
-                label: 'Delete List',
-                icon: html`<delete-icon class="action-icon"></delete-icon>`,
-                classes: 'danger-text',
-                action: () => this._handleDeleteList()
-            }
-        ];
-
-        return [...baseActions, ...editActions];
     }
 
     _handlePublicityClick() {
@@ -297,14 +227,20 @@ export class ListViewContainer extends observeState(LitElement) {
         this.showPublicityModal = false;
     }
 
-
     render() {
-        // If this.loading is true, show a loading message
         if (this.loading) {
             return html`<loading-screen></loading-screen>`;
         }
 
-        // Otherwise, show the list data
+        if (this.listNotFound) {
+            return html`
+                <div class="not-found-container">
+                    <h2 class="not-found-message">Public List Not Found</h2>
+                    <p class="not-found-subtitle">This list does not exist or is not publicly accessible.</p>
+                </div>
+            `;
+        }
+
         return html`
             <div class="list-header">
                 <custom-avatar size="${screenSizeState.width < 500 ? '50' : '100'}" 
@@ -319,7 +255,7 @@ export class ListViewContainer extends observeState(LitElement) {
                                 <user-icon></user-icon>
                                 <span>
                                     <span>Owner:</span>
-                                    <a href="/user/${this.listData?.ownerId}">${getUsernameById(this.listData?.ownerId)}</a>
+                                    <a href="/public/user/${this.owner?.id}">${this.owner?.name}</a>
                                 </span>
                                 <button class="public-section icon-button" @click="${this._handlePublicityClick}">
                                     ${this.listData.public ? html`
@@ -331,30 +267,15 @@ export class ListViewContainer extends observeState(LitElement) {
                                 </button>
                             </div>
                         </div>
-                        
-                        ${this.listId > 0 ? html`
-                            <action-dropdown
-                                .items="${this._getActionDropdownItems()}"
-                                placement="bottom-end"
-                            >
-                                <button
-                                    slot="toggle"
-                                    class="kebab-menu icon-button"
-                                    aria-label="List actions"
-                                >
-                                    <dots-icon></dots-icon>
-                                </button>
-                            </action-dropdown>
-                        ` : ''}
                     </div>
                     
                     <div>${this.listData?.description}</div>
                 </div>
             </div>
             <div class="list-items">
-                ${this.listData.listItems?.length 
-                    ? this.listData.listItems.map(item => html`
-                        <item-tile .itemData="${item}" .listId="${this.listId}" @navigate="${this._navigateToItem}"></item-tile>
+                ${this.items?.length 
+                    ? this.items.map(item => html`
+                        <item-tile .itemData="${item}" .listId="${this.listId}" .publicView="${true}"></item-tile>
                     `)
                     : html`<p>No items in this list yet.</p>`
                 }
@@ -387,4 +308,4 @@ export class ListViewContainer extends observeState(LitElement) {
     }
 }
 
-customElements.define('list-view-container', ListViewContainer);
+customElements.define('public-list-view', PublicListView);

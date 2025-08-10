@@ -14,6 +14,7 @@ export class CustomElement extends observeState(LitElement) {
         userId: { type: Number },
         lists: { type: Array },
         lightTiles: { type: Boolean },
+        publicOnly: { type: Boolean },
     };
 
     constructor() {
@@ -21,6 +22,7 @@ export class CustomElement extends observeState(LitElement) {
         this.userId = 0;
         this.lists = [];
         this.lightTiles = false;
+        this.publicOnly = false;
     }
 
     static get styles() {
@@ -82,7 +84,7 @@ export class CustomElement extends observeState(LitElement) {
 
     _isListOwner() {
         if(!this.userId) return true;
-        const userId = userState.userData?.id;
+        const userId = userState?.userData?.id;
         if(this.userId === userId) {
             return true;
         }
@@ -91,7 +93,6 @@ export class CustomElement extends observeState(LitElement) {
 
     connectedCallback() {
         super.connectedCallback();
-        // Fetch lists when the component is added to the DOM.
         this.fetchLists();
         listenUpdateList(this.fetchLists.bind(this));
     }
@@ -99,7 +100,7 @@ export class CustomElement extends observeState(LitElement) {
     async fetchLists() {
         try {
             const response = this.userId ?
-                await fetchUserLists(this.userId) :
+                await fetchUserLists(this.userId, this.publicOnly) :
                 await fetchMyLists();
 
             if(response.success) {
@@ -114,11 +115,12 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     render() {
+
         return html`
             <div>
                 <div class="section-header">
                     <h2 class="title">Lists</h2>
-                    ${this._isListOwner() ? html`<create-list-button></create-list-button>` : ''}
+                    ${this._isListOwner() && !this.publicOnly ? html`<create-list-button></create-list-button>` : ''}
 
                 </div>
                 ${this.lists.length > 0
@@ -128,16 +130,17 @@ export class CustomElement extends observeState(LitElement) {
                                     <list-item
                                         class="${this.lightTiles ? 'light-tiles' : ''}"
                                         .itemData=${list}
+                                        .publicOnly="${this.publicOnly}"
                                     ></list-item>`
                                 )}
                             </ul>
                         `
-                        : html`<p>No lists available.</p>`}
-                ${this._isListOwner() ? html`<a class="unassigned-link" href="/list/0">unassigned items</a>` : ''}
+                        : html`<p>No ${this.publicOnly ? 'public ' : ''}lists available.</p>`}
+                ${this._isListOwner() && !this.publicOnly ? html`<a class="unassigned-link" href="/list/0">unassigned items</a>` : ''}
 
             </div>
         `;
     }
 }
 
-customElements.define('my-lists', CustomElement);
+customElements.define('user-lists', CustomElement);

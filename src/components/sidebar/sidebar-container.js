@@ -310,6 +310,10 @@ export class CustomElement extends observeState(LitElement) {
                             <thick-list-icon class="icon" active="false"></thick-list-icon>
                             <span>All Lists</span>
                         </a></li>
+                        <li><a href="/users" class="menu-item-link ${this._isActive('/users') ? 'active' : ''}">
+                            <user-icon class="icon"></user-icon>
+                            <span>All Users</span>
+                        </a></li>
                         <li><a href="/my-lists" class="menu-item-link ${this._isActive('/my-lists') ? 'active' : ''}">
                             <user-list-icon class="icon" active="false"></user-list-icon>
                             <span>My Lists</span>

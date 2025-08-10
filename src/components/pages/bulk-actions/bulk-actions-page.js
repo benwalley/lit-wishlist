@@ -11,7 +11,7 @@ import '../../../components/global/custom-image.js';
 import '../../global/process-loading-ring.js';
 import '../../global/custom-modal.js';
 import '../../add-to-list/visibility-selector/visibility-selector-container.js';
-import '../../lists/select-my-lists.js';
+import "../../lists/user-lists.js";
 import '../../global/custom-toggle.js';
 import {messagesState} from "../../../state/messagesStore.js";
 import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";

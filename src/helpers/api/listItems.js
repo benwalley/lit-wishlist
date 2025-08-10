@@ -2,6 +2,25 @@ import {customFetch} from "../fetchHelpers.js";
 import {cachedFetch} from "../caching.js";
 
 /**
+ * Get a public list item by its ID (no authentication required)
+ * @param {string} itemId - The ID of the item to fetch
+ * @returns {Promise<Object>} - Returns the response directly from the API
+ */
+export async function getPublicListItemById(itemId) {
+    try {
+        if (!itemId) {
+            throw new Error('Item ID is required');
+        }
+
+        const response = await cachedFetch(`/listItems/public/${itemId}`, {}, false);
+        return response;
+    } catch (error) {
+        console.error('Error fetching public list item:', error);
+        return {success: false, error};
+    }
+}
+
+/**
  * Delete a list item
  * @param {string} itemId - The ID of the item to delete
  * @returns {Promise<{success: boolean, data: Object}|{success: boolean, error: Error}>}
