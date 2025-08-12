@@ -80,6 +80,7 @@ export class EventViewActions extends LitElement {
 
     render() {
         return html`
+            ${this._eventActions.length > 0 ? html`
             <div class="event-actions">
                 <action-dropdown .items="${this._eventActions}" placement="bottom-end">
                     <button slot="toggle" aria-label="Event actions">
@@ -87,6 +88,7 @@ export class EventViewActions extends LitElement {
                     </button>
                 </action-dropdown>
             </div>
+            ` : ''}
         `;
     }
 }

@@ -5,7 +5,6 @@ import '../account/account-public-description.js';
 import '../account/qa/public-qa.js';
 import '../account/account-notifications.js';
 import '../account/account-private-notes.js';
-import '../account/account-comments.js';
 import '../account/user-details.js';
 import '../account/account-lists.js';
 import '../account/logout-button.js'
@@ -89,6 +88,11 @@ export class UserViewContainer extends LitElement {
                     border-radius: var(--border-radius-large);
                     background: var(--background-light);
                     position: relative;
+                    overflow: hidden;
+                    
+                    &.no-padding {
+                        padding: 0;
+                    }
                 }
             `
         ];
@@ -102,7 +106,7 @@ export class UserViewContainer extends LitElement {
 
         return html`
             <main class="account-container">
-                <section>
+                <section class="no-padding">
                     <user-details .userData="${this.userData}" .isUser="${false}"></user-details>
                 </section>
 
@@ -112,10 +116,6 @@ export class UserViewContainer extends LitElement {
 
                 <section>
                     <user-lists .userId="${this.userId}" .isUser="${false}"></user-lists>
-                </section>
-                
-                <section>
-                    <account-comments .userId="${this.userId}"></account-comments>
                 </section>
             </main>
         `;

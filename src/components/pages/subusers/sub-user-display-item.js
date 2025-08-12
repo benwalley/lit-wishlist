@@ -9,6 +9,8 @@ import '../../../svg/user.js';
 import '../../../svg/delete.js';
 import '../../../svg/gear.js';
 import '../../../svg/link.js';
+import '../../../svg/world.js';
+import '../../../svg/lock.js';
 import {getGroupImageIdByGroupId} from "../../../helpers/userHelpers.js";
 
 class SubUserDisplayItem extends observeState(LitElement) {
@@ -30,7 +32,7 @@ class SubUserDisplayItem extends observeState(LitElement) {
 
                 .subuser-card {
                     display: flex;
-                    align-items: center;
+                    flex-direction: column;
                     gap: var(--spacing-small);
                     background: var(--background-dark);
                     border: 1px solid var(--border-color);
@@ -41,10 +43,16 @@ class SubUserDisplayItem extends observeState(LitElement) {
                     background: var(--background-light);
                 }
 
+                .subuser-main-content {
+                    display: flex;
+                    align-items: center;
+                    gap: var(--spacing-small);
+                }
+
                 .subuser-info {
                     flex: 1;
                     display: flex;
-                    flex-direction: column;
+                    align-items: center;
                     min-width: 0;
                 }
 
@@ -52,10 +60,39 @@ class SubUserDisplayItem extends observeState(LitElement) {
                     font-size: var(--font-size-medium);
                     font-weight: bold;
                     color: var(--text-color-dark);
-                    margin: 0 0 var(--spacing-x-small) 0;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                    margin: 0;
+                }
+
+                .username-row {
+                    display: flex;
+                    flex-direction: column;
+                    width: 100%;
+                }
+
+                .publicity-indicator {
+                    border-radius: var(--border-radius-normal);
+                    font-size: var(--font-size-normal);
+                    font-weight: 500;
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    flex-shrink: 0;
+                    
+                    span {
+                        color: var(--medium-text-color);
+                        font-size: var(--font-size-small);
+                    }
+                }
+
+                .public-indicator {
+                    color: var(--primary-color);
+                }
+
+                .private-indicator {
+                    color: var(--text-color-medium-dark);
                 }
 
                 .subuser-badge {
@@ -77,13 +114,11 @@ class SubUserDisplayItem extends observeState(LitElement) {
                 }
 
                 .group-chip {
-                    background: var(--purple-normal);
-                    border: 1px solid var(--purple-normal);
-                    color: var(--light-text-color);
-                    background: none;
+                    background: var(--blue-light);
                     border: 1px solid var(--border-color);
-                    color: var(--purple-normal);
-                    padding: 0 8px 0 2px;
+                    color: var(--blue-darker);
+                    text-decoration: none;
+                    padding: 2px 7px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -92,6 +127,11 @@ class SubUserDisplayItem extends observeState(LitElement) {
                     font-size: var(--font-size-x-small);
                     font-weight: 500;
                     white-space: nowrap;
+                    transition: var(--transition-200);
+                    
+                    &:hover {
+                        background: var(--background-dark);
+                    }
                 }
 
                 .subuser-actions {
@@ -159,59 +199,79 @@ class SubUserDisplayItem extends observeState(LitElement) {
 
         return html`
             <div class="subuser-card">
-                <custom-avatar
-                    size="40"
-                    username="${this.userData.name}"
-                    imageId="${this.userData.image}"
-                    shadow
-                ></custom-avatar>
-                
-                <div class="subuser-info">
-                    <h3 class="subuser-username">${this.userData.name}</h3>
-                    <div class="group-chips">
-                        ${this.userData.groups?.length ? 
-                            this.userData.groups.map(group => html`
-                                <span class="group-chip">
-                                    <custom-avatar 
-                                            username="${group.groupName}"
-                                            imageId="${getGroupImageIdByGroupId(group.id)}"
-                                            round
-                                            shadow
-                                            size="16"
-                                    ></custom-avatar>
-                                    ${group.groupName}
-                                </span>
-                            `) : 
-                            html`<span class="group-chip">No groups</span>`
-                        }
+                <div class="subuser-main-content">
+                    <custom-avatar
+                        size="40"
+                        round
+                        username="${this.userData.name}"
+                        imageId="${this.userData.image}"
+                        shadow
+                    ></custom-avatar>
+                    
+                    <div class="subuser-info">
+                        <div class="username-row">
+                            <h3 class="subuser-username">${this.userData.name}</h3>
+                            ${this.userData.isPublic ? html`
+                                <div class="publicity-indicator public-indicator">
+                                    <world-icon></world-icon>
+                                    <span>Public</span>
+
+                                </div>
+                                <custom-tooltip>This subuser's public details will be visible to non-logged in users</custom-tooltip>
+                            ` : html`
+                                <div class="publicity-indicator private-indicator">
+                                    <lock-icon></lock-icon>
+                                    <span>Private</span>
+                                </div>
+                                <custom-tooltip>This subuser's public details will not be visible to non-logged in users</custom-tooltip>
+                            `}
+                        </div>
+                    </div>
+                    
+                    <div class="subuser-actions">
+                        <button 
+                            class="icon-button blue-text large"
+                            @click="${this.handleManage}"
+                            ?disabled="${this.deleting}"
+                            aria-label="Manage groups"
+                        >
+                            <gear-icon></gear-icon>
+                        </button>
+                        <button 
+                            class="icon-button blue-text large"
+                            @click="${this.handleView}"
+                            ?disabled="${this.deleting}"
+                            aria-label="View profile"
+                        >
+                            <link-icon></link-icon>
+                        </button>
+                        <button 
+                            class="icon-button danger-text large"
+                            @click="${this.handleDelete}"
+                            ?disabled="${this.deleting}"
+                            aria-label="${this.deleting ? 'Deleting...' : 'Delete subuser'}"
+                        >
+                            <delete-icon></delete-icon>
+                        </button>
                     </div>
                 </div>
-                
-                <div class="subuser-actions">
-                    <button 
-                        class="icon-button blue-text large"
-                        @click="${this.handleManage}"
-                        ?disabled="${this.deleting}"
-                        aria-label="Manage groups"
-                    >
-                        <gear-icon></gear-icon>
-                    </button>
-                    <button 
-                        class="icon-button blue-text large"
-                        @click="${this.handleView}"
-                        ?disabled="${this.deleting}"
-                        aria-label="View profile"
-                    >
-                        <link-icon></link-icon>
-                    </button>
-                    <button 
-                        class="icon-button danger-text large"
-                        @click="${this.handleDelete}"
-                        ?disabled="${this.deleting}"
-                        aria-label="${this.deleting ? 'Deleting...' : 'Delete subuser'}"
-                    >
-                        <delete-icon></delete-icon>
-                    </button>
+
+                <div class="group-chips">
+                    ${this.userData.groups?.length ? 
+                        this.userData.groups.map(group => html`
+                            <a href="/group/${group.id}" class="group-chip">
+                                <custom-avatar 
+                                        username="${group.groupName}"
+                                        imageId="${getGroupImageIdByGroupId(group.id)}"
+                                        round
+                                        shadow
+                                        size="16"
+                                ></custom-avatar>
+                                ${group.groupName}
+                            </a>
+                        `) : 
+                        html`<span class="group-chip">No groups</span>`
+                    }
                 </div>
             </div>
         `;

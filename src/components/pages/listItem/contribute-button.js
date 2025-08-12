@@ -1,6 +1,6 @@
 import {css, html, LitElement} from 'lit';
 import buttonStyles from "../../../css/buttons";
-import {triggerUpdateItem} from "../../../events/eventListeners.js";
+import {triggerUpdateItem, triggerUpdateNotifications} from "../../../events/eventListeners.js";
 import {bulkUpdateGoInOn} from "../../../helpers/api/gifts.js";
 import '../../../svg/contribute.js';
 import '../../global/custom-modal.js';
@@ -127,6 +127,7 @@ export class CustomElement extends LitElement {
             const response = await bulkUpdateGoInOn(data);
             if(response.success) {
                 triggerUpdateItem();
+                triggerUpdateNotifications();
                 this._closeModal();
                 messagesState.addMessage('Successfully updated contributing data.', 'success');
             } else {

@@ -335,25 +335,18 @@ export async function removeUserGroupAdmin(groupId, userId, currentAdminIds = []
  * Remove a user from a group
  * @param {string|number} groupId - The ID of the group
  * @param {string|number} userId - The ID of the user to remove
- * @param {Array} currentMembers - Current members array
- * @param {Array} currentAdminIds - Current admin IDs array
  * @returns {Promise<{success: boolean, data: Object}|{success: boolean, error: Error}>}
  */
-export async function removeUserFromGroup(groupId, userId, currentMembers = [], currentAdminIds = []) {
+export async function removeUserFromGroup(groupId, userId) {
     try {
-        // Filter out the userId from members and adminIds
-        const members = (currentMembers || []).filter(id => parseInt(id) !== parseInt(userId));
-        const adminIds = (currentAdminIds || []).filter(id => parseInt(id) !== parseInt(userId));
-
         const options = {
-            method: 'PUT',
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ members, adminIds }),
+            }
         };
 
-        const result = await customFetch(`/groups/${groupId}`, options, true);
+        const result = await customFetch(`/groups/${groupId}/members/${userId}`, options, true);
         return { success: !!result.success, data: result };
     } catch (error) {
         console.error('Error removing user from group:', error);

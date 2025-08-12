@@ -148,6 +148,7 @@ export class EventTile extends LitElement {
     render() {
         return html`
             <div class="event-card" @click="${this.handleEventClick}">
+                ${this.getEventActionItems().length > 0 ? html`
                 <div class="event-actions" @click="${(e) => e.stopPropagation()}">
                     <action-dropdown .items="${this.getEventActionItems()}" placement="bottom-end">
                         <button slot="toggle" aria-label="Event actions">
@@ -155,6 +156,7 @@ export class EventTile extends LitElement {
                         </button>
                     </action-dropdown>
                 </div>
+                ` : ''}
                 <h3 class="event-title">${this.eventData.name || 'Untitled Event'}</h3>
                 ${this.eventData.date ? html`
                     <div class="event-date">

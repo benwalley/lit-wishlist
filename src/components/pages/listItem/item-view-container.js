@@ -14,6 +14,9 @@ import '../../../svg/arrow-long-left.js';
 import '../../../svg/calendar.js';
 import '../../../svg/cart.js';
 import '../../../svg/edit.js';
+import '../../../svg/world.js';
+import '../../../svg/lock.js';
+import '../../global/custom-tooltip.js';
 import './list-sidebar.js';
 import '../../global/loading-screen.js'
 import {cachedFetch, invalidateCache} from "../../../helpers/caching.js";
@@ -83,8 +86,30 @@ export class CustomElement extends observeState(LitElement) {
                     }
                 }
 
-                .gift-for .owner-name {
-                    
+                .gift-for .right-side {
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-x-small);
+                }
+
+                .gift-for-header {
+                    display: flex;
+                    align-items: center;
+                    gap: var(--spacing-x-small);
+                }
+
+                .privacy-icon {
+                    font-size: var(--font-size-medium);
+                    position: relative;
+                    cursor: help;
+                }
+
+                .privacy-icon world-icon {
+                    color: var(--purple-normal);
+                }
+
+                .privacy-icon lock-icon {
+                    color: var(--text-color-medium-dark);
                 }
 
                 /* Use a grid layout for the overall container */
@@ -303,10 +328,21 @@ export class CustomElement extends observeState(LitElement) {
                                                     imageId="${getUserImageIdByUserId(this.itemData.createdById)}"
                                                 ></custom-avatar>
                                                 <div class="right-side">
-                                                    <div class="gift-for-label">Gift for</div>
+                                                    <div class="gift-for-header">
+                                                        <div class="gift-for-label">Gift for</div>
+                                                    </div>
                                                     <a href="/user/${this.itemData.createdById}">
                                                         ${getUsernameById(this.itemData.createdById)}
                                                     </a>
+                                                </div>
+                                                <div class="privacy-icon">
+                                                    ${this.itemData.isPublic ? html`
+                                                                <world-icon></world-icon>
+                                                                <custom-tooltip>This item is public and can be seen by anyone</custom-tooltip>
+                                                            ` : html`
+                                                                <lock-icon></lock-icon>
+                                                                <custom-tooltip>This item is private and can only be seen by users and groups it's been shared with</custom-tooltip>
+                                                            `}
                                                 </div>
                                             </div>
                                         ` : ''}

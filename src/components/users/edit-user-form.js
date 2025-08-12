@@ -12,6 +12,7 @@ import {customFetch} from "../../helpers/fetchHelpers.js";
 import {updateUserData} from "../../helpers/api/users.js";
 import {messagesState} from "../../state/messagesStore.js";
 import '../global/image-changer.js';
+import '../global/custom-toggle.js';
 import {triggerUpdateUser} from "../../events/eventListeners.js";
 
 export class CustomElement extends observeState(LitElement) {
@@ -20,6 +21,7 @@ export class CustomElement extends observeState(LitElement) {
         imageId: {type: Number},
         username: { type: String },
         description: { type: String },
+        isPublic: { type: Boolean },
         errorMessage: { type: String }, // New property to hold error messages
     };
 
@@ -29,6 +31,7 @@ export class CustomElement extends observeState(LitElement) {
         this.value = '';
         this.username = '';
         this.description = '';
+        this.isPublic = false;
         this.errorMessage = '';
     }
 
@@ -54,6 +57,7 @@ export class CustomElement extends observeState(LitElement) {
             this.imageId = userState.userData.image || 0;
             this.username = userState.userData.name || '';
             this.description = userState.userData.publicDescription || '';
+            this.isPublic = userState.userData.isPublic || false;
         }
     }
 
@@ -72,11 +76,17 @@ export class CustomElement extends observeState(LitElement) {
         this.errorMessage = '';
     }
 
+    _onPublicToggleChanged(e) {
+        this.isPublic = e.detail.checked;
+        this.errorMessage = '';
+    }
+
     _close(clear) {
         if (clear) {
             this.description = userState.userData.publicDescription || '';
             this.username = userState.userData.name || '';
             this.imageId = userState.userData?.imageId || 0;
+            this.isPublic = userState.userData.isPublic || false;
         }
         this._getModal().closeModal();
     }
@@ -88,6 +98,7 @@ export class CustomElement extends observeState(LitElement) {
             image: this.imageId,
             name: this.username,
             publicDescription: this.description,
+            isPublic: this.isPublic,
             userId: userState.userData.id,
         };
         const response = await updateUserData(data);
@@ -196,6 +207,12 @@ export class CustomElement extends observeState(LitElement) {
                                 value="${this.description}"
                                 @value-changed="${this._onDescriptionChanged}"
                         ></custom-input>
+
+                        <custom-toggle
+                                label="Make Profile Public"
+                                ?checked="${this.isPublic}"
+                                @change="${this._onPublicToggleChanged}"
+                        ></custom-toggle>
 
                         <!-- Error message -->
                         ${this.errorMessage ? html`<div class="error">${this.errorMessage}</div>` : ''}

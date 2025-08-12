@@ -13,7 +13,8 @@ import '../../../svg/dots.js';
 import '../../../svg/edit.js';
 import '../../../svg/delete.js';
 import {formatDate} from "../../../helpers.js";
-import {getUserImageIdByUserId, getUsernameById} from "../../../helpers/generalHelpers.js";
+import {getUserImageIdByUserId, getUsernameById, maxLength} from "../../../helpers/generalHelpers.js";
+import {envVars} from "../../../config.js";
 import {triggerEditProposalModal, triggerDeleteProposal, listenProposalDeleted, listenUpdateItem} from "../../../events/eventListeners.js";
 
 export class GiftTrackingProposals extends observeState(LitElement) {
@@ -339,7 +340,7 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                                 ></custom-image>
                             ` : ''}
                             <div class="proposal-info">
-                                <div class="proposal-title">${proposal.itemData?.name || 'Unknown Item'}</div>
+                                <div class="proposal-title">${maxLength(proposal.itemData?.name || 'Unknown Item', envVars.LIST_ITEM_MAX_LENGTH)}</div>
                                 <span class="proposal-status status-${proposal.proposalStatus}">
                                     ${proposal.proposalStatus}
                                 </span>
@@ -364,6 +365,7 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                                 </div>
                             </div>
                         </div>
+                        ${this._getProposalActions(proposal).length > 0 ? html`
                         <div class="proposal-actions">
                             <div class="actions-container">
                                 <action-dropdown .items=${this._getProposalActions(proposal)}>
@@ -377,6 +379,7 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                                 </action-dropdown>
                             </div>
                         </div>
+                        ` : ''}
 
                         <proposal-participants
                             .participants=${proposal.proposalParticipants}

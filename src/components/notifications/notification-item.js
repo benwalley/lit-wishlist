@@ -1,6 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../css/buttons.js";
 import '../../svg/x.js';
+import {renderNotification} from '../../helpers/notificationRenderer.js';
 
 export class NotificationItem extends LitElement {
     static properties = {
@@ -10,6 +11,29 @@ export class NotificationItem extends LitElement {
     constructor() {
         super();
         this.notification = {};
+    }
+
+    /**
+     * Maps notification types to color schemes
+     * @param {string} notificationType - The notification type
+     * @returns {string} The color name to use for styling
+     */
+    getColorFromType(notificationType) {
+        const colorMap = {
+            someone_go_in_on: 'green',
+            proposal_created: 'blue',
+            proposal_accepted: 'green',
+            gotten_item_deleted: 'red',
+            item_shared: 'purple',
+            list_shared: 'purple',
+            group_invite: 'yellow',
+            item_gotten: 'green',
+            question_asked: 'green',
+            removed_from_group: 'yellow',
+            subuser_added: 'blue'
+        };
+
+        return colorMap[notificationType] || 'blue'; // Default to blue
     }
 
     static get styles() {
@@ -22,18 +46,33 @@ export class NotificationItem extends LitElement {
                 
                 .notification-item {
                     padding: var(--spacing-small);
+                    padding-right: 30px;
                     border: 1px solid var(--blue-normal);
                     background: var(--blue-light);
                     color: var(--blue-normal);
                     border-radius: var(--border-radius-normal);
                     box-sizing: border-box;
-                    width: 240px;
+                    width: 260px;
+                    line-height: 1.4;
                     position: relative;
                     
-                    &.success {
+                    &.success,
+                    &.green{
                         border-color: var(--green-normal);
                         background: var(--green-light);
                         color: var(--green-normal);
+                    }
+                    
+                    &.red {
+                        border-color: var(--delete-red);
+                        background: var(--delete-red-light);
+                        color: var(--delete-red);
+                    }
+                    
+                    &.yellow {
+                        border-color: var(--info-yellow);
+                        background: var(--info-yellow-light);
+                        color: var(--text-color-dark);
                     }
 
                     .close-button {
@@ -60,6 +99,16 @@ export class NotificationItem extends LitElement {
                 .notification-message {
                     margin: 0;
                 }
+                
+                .notification-message a {
+                    color: inherit;
+                    text-decoration: underline;
+                }
+                
+                .notification-message a:hover {
+                    color: inherit;
+                    text-decoration: underline;
+                }
             `
         ];
     }
@@ -76,8 +125,8 @@ export class NotificationItem extends LitElement {
         if (!this.notification) return html``;
 
         return html`
-            <div class="notification-item ${this.notification.notificationType}">
-                <p class="notification-message">${this.notification.message}</p>
+            <div class="notification-item ${this.getColorFromType(this.notification.notificationType)}">
+                <p class="notification-message">${renderNotification(this.notification)}</p>
                 <button class="close-button icon-button small" @click="${this._handleDismiss}">
                     <x-icon></x-icon>
                 </button>

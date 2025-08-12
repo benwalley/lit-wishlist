@@ -11,7 +11,7 @@ import '../../../global/due-date-picker.js';
 import { observeState } from 'lit-element-state';
 import { userState } from "../../../../state/userStore.js";
 import {createQA, updateQuestion} from "./qa-helpers.js";
-import {triggerUpdateQa} from "../../../../events/eventListeners.js";
+import {triggerUpdateNotifications, triggerUpdateQa} from "../../../../events/eventListeners.js";
 
 
 export class CustomElement extends observeState(LitElement) {

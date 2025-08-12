@@ -22,6 +22,7 @@ const EDIT_EVENT_EVENT = 'edit-event';
 const VIEWED_ITEMS_UPDATED_EVENT = 'viewed-items-updated';
 const VIEWED_ITEMS_LOADED_EVENT = 'viewed-items-loaded';
 const UPDATE_MONEY_EVENT = 'update-money';
+const UPDATE_NOTIFICATIONS_EVENT = 'update-notifications';
 const imageUploadEvents = {
     imageSelected: 'image-selected',
     cropConfirmed: 'crop-confirmed'
@@ -213,4 +214,14 @@ export function triggerUpdateMoney() {
 
 export function listenUpdateMoney(callback) {
     return listenToCustomEvent(UPDATE_MONEY_EVENT, callback);
+}
+
+export function triggerUpdateNotifications() {
+    invalidateCache('/notifications');
+    invalidateCache('/notifications/*');
+    triggerCustomEvent(UPDATE_NOTIFICATIONS_EVENT);
+}
+
+export function listenUpdateNotifications(callback) {
+    return listenToCustomEvent(UPDATE_NOTIFICATIONS_EVENT, callback);
 }

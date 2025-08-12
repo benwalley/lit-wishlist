@@ -25,7 +25,8 @@ import {canUserContribute, isParentUserItem} from "../../../helpers/userHelpers.
 import {addItemToQueue} from "../../../helpers/viewedItems/index.js";
 import {viewedItemsState} from "../../../state/viewedItemsStore.js";
 import {listenInitialUserLoaded, listenUpdateItem, listenViewedItemsLoaded, listenUpdateViewedItems} from "../../../events/eventListeners.js";
-import {isItemViewed} from "../../../helpers/generalHelpers.js";
+import {isItemViewed, maxLength} from "../../../helpers/generalHelpers.js";
+import {envVars} from "../../../config.js";
 
 
 export class ItemTile extends observeState(LitElement) {
@@ -330,7 +331,7 @@ export class ItemTile extends observeState(LitElement) {
                     height="200"
             ></custom-image>
             <div class="right-side-container">
-                <h3 class="item-name">${this.itemData?.name}</h3>
+                <h3 class="item-name">${maxLength(this.itemData?.name, envVars.LIST_ITEM_MAX_LENGTH)}</h3>
                 <div class="middle-row">
                     ${!this.small ? html`<div>
                         <price-display .itemData="${this.itemData}"></price-display>

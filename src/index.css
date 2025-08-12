@@ -38,6 +38,10 @@
     --purple-light: #4f46e514;
     --purple-darker: #4338ca;
     --fancy-purple-gradient: linear-gradient(to right bottom, var(--blue-normal), var(--purple-normal));
+    --transparent-fancy-purple-gradient: linear-gradient(to right bottom, color-mix(in srgb, var(--blue-normal) 50%, transparent), color-mix(in srgb, var(--purple-normal) 50%, transparent));
+    --fancy-gradient-two: linear-gradient(to right, #4f46e5, #9333ea);
+    --transparent-fancy-gradient-two: linear-gradient(to right bottom, color-mix(in srgb, #4f46e5 80%, transparent), color-mix(in srgb, #9333ea 80%, transparent));
+
 
 
     --green-normal: #059669;
@@ -104,7 +108,7 @@
     --success-green: #22c55e;
     --info-yellow: #f59e0b;
     --info-yellow-rgb: 245, 158, 11;
-    --info-yellow-light: #fef3c7;
+    --info-yellow-light: #f59e0b1c;
     --placeholder-color: var(--grayscale-500);
     --changed-outline-color: #7bd0b6;
 

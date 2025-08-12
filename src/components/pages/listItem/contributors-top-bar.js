@@ -35,40 +35,6 @@ export class ContributorsTopBar extends observeState(LitElement) {
         this.listId = '';
         this.itemId = '';
         this.amountPledged = 0;
-        this.actionItems = [
-            {
-                id: 'edit',
-                label: 'Edit Item',
-                icon: html`
-                    <edit-icon></edit-icon>`,
-                classes: 'blue-text',
-                action: () => this.handleEditItem()
-            },
-            {
-                id: 'share',
-                label: 'Copy Link',
-                icon: html`
-                    <share-icon></share-icon>`,
-                classes: 'purple-text',
-                action: () => this.handleCopyLink()
-            },
-            {
-                id: 'delete',
-                label: 'Delete Item',
-                icon: html`
-                    <delete-icon></delete-icon>`,
-                classes: 'danger-text',
-                action: () => this.handleDeleteItem()
-            },
-            {
-                id: 'proposal',
-                label: 'Create Proposal',
-                icon: html`
-                    <group-icon></group-icon>`,
-                classes: 'green-text',
-                action: () => triggerProposalModal(this.itemData)
-            }
-        ];
     }
 
     handleEditItem() {
@@ -338,6 +304,49 @@ export class ContributorsTopBar extends observeState(LitElement) {
         return this.itemData?.goInOn || [];
     }
 
+    get actionItems() {
+        const baseActions = [
+            {
+                id: 'edit',
+                label: 'Edit Item',
+                icon: html`<edit-icon></edit-icon>`,
+                classes: 'blue-text',
+                action: () => this.handleEditItem()
+            }
+        ];
+
+        // Only add share action if item is public
+        if (this.itemData?.isPublic) {
+            baseActions.push({
+                id: 'share',
+                label: 'Copy public link',
+                icon: html`<share-icon></share-icon>`,
+                classes: 'purple-text',
+                action: () => this.handleCopyLink()
+            });
+        }
+
+        // Add remaining actions
+        baseActions.push(
+            {
+                id: 'delete',
+                label: 'Delete Item',
+                icon: html`<delete-icon></delete-icon>`,
+                classes: 'danger-text',
+                action: () => this.handleDeleteItem()
+            },
+            {
+                id: 'proposal',
+                label: 'Create Proposal',
+                icon: html`<group-icon></group-icon>`,
+                classes: 'green-text',
+                action: () => triggerProposalModal(this.itemData)
+            }
+        );
+
+        return baseActions;
+    }
+
     render() {
         return html`
             <div class="top-row fade-in">
@@ -396,6 +405,7 @@ export class ContributorsTopBar extends observeState(LitElement) {
                 </div>` : ''}
 
                 <!-- Action Buttons -->
+                ${this.actionItems.length > 0 ? html`
                 <div class="actions-container">
                     <action-dropdown .items=${this.actionItems} placement="bottom-start">
                         <button
@@ -407,6 +417,7 @@ export class ContributorsTopBar extends observeState(LitElement) {
                         </button>
                     </action-dropdown>
                 </div>
+                ` : ''}
             </div>
         `;
     }

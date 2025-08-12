@@ -53,6 +53,7 @@ export class UserListDisplayItem extends observeState(LitElement) {
                     color: var(--text-color-dark);
                     border-radius: var(--border-radius-normal);
                     transition: var(--transition-200);
+                    --item-background: var(--background-dark);
                 }
 
                 .user-container {
@@ -62,7 +63,7 @@ export class UserListDisplayItem extends observeState(LitElement) {
                     padding: var(--spacing-small);
                     gap: var(--spacing-small);
                     border-radius: var(--border-radius-normal);
-                    background-color: var(--background-dark);
+                    background-color: var(--item-background);
                     transition: var(--transition-normal);
                     border: 1px solid var(--border-color);
                     text-decoration: none;
@@ -278,9 +279,7 @@ export class UserListDisplayItem extends observeState(LitElement) {
         try {
             const result = await removeUserFromGroup(
                 this.groupData.id,
-                this.userId,
-                this.groupData.members,
-                this.groupData.adminIds
+                this.userId
             );
 
             if (result.success) {

@@ -36,7 +36,7 @@ export class ActionDropdown extends LitElement {
         }
 
         .dropdown-content {
-            background: var(--background-color-light, white);
+            background: var(--background-light, white);
             min-width: 180px;
             border-radius: var(--border-radius-normal);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);

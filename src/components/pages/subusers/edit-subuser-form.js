@@ -1,9 +1,12 @@
 import { LitElement, html, css } from 'lit';
 import { observeState } from 'lit-element-state';
-import { updateSubuserGroups } from '../../../helpers/api/subusers.js';
+import { updateSubuser } from '../../../helpers/api/subusers.js';
 import { messagesState } from '../../../state/messagesStore.js';
 import { triggerUpdateUser } from '../../../events/eventListeners.js';
 import '../../groups/your-groups-list.js';
+import '../../global/custom-toggle.js';
+import '../../../svg/world.js';
+import '../../../svg/lock.js';
 import buttonStyles from '../../../css/buttons.js';
 
 class EditSubuserForm extends observeState(LitElement) {
@@ -12,6 +15,7 @@ class EditSubuserForm extends observeState(LitElement) {
             subuserData: { type: Object },
             selectedGroups: { type: Array },
             originalGroupIds: { type: Array },
+            isPublic: { type: Boolean },
             loading: { type: Boolean }
         };
     }
@@ -87,6 +91,40 @@ class EditSubuserForm extends observeState(LitElement) {
                     font-weight: 600;
                 }
 
+                .subuser-header {
+                    display: flex;
+                    align-items: center;
+                    gap: var(--spacing-small);
+                    margin-bottom: var(--spacing-normal);
+                }
+
+                .subuser-name {
+                    font-size: var(--font-size-large);
+                    font-weight: 600;
+                    color: var(--text-color-dark);
+                    margin: 0;
+                }
+
+                .publicity-indicator {
+                    padding: var(--spacing-x-small) var(--spacing-small);
+                    background: var(--background-dark);
+                    border: 1px solid var(--border-color);
+                    border-radius: var(--border-radius-large);
+                    display: flex;
+                    align-items: center;
+                    gap: var(--spacing-x-small);
+                    font-size: var(--font-size-small);
+                    font-weight: 500;
+                }
+
+                .public-indicator {
+                    color: var(--primary-color);
+                }
+
+                .private-indicator {
+                    color: var(--text-color-dark);
+                }
+
             `
         ];
     }
@@ -96,6 +134,7 @@ class EditSubuserForm extends observeState(LitElement) {
         this.subuserData = null;
         this.selectedGroups = [];
         this.originalGroupIds = [];
+        this.isPublic = false;
         this.loading = false;
     }
 
@@ -107,6 +146,7 @@ class EditSubuserForm extends observeState(LitElement) {
                 : [];
             this.selectedGroups = [...groupIds];
             this.originalGroupIds = [...groupIds];
+            this.isPublic = this.subuserData.isPublic || false;
         }
     }
 
@@ -115,22 +155,31 @@ class EditSubuserForm extends observeState(LitElement) {
         this.selectedGroups = e.detail.selectedGroups.map(group => group.id);
     }
 
+    _onPublicToggleChanged(e) {
+        this.isPublic = e.detail.checked;
+    }
+
     async handleSubmit(e) {
         e.preventDefault();
 
         this.loading = true;
 
-        const response = await updateSubuserGroups(this.subuserData.id, this.selectedGroups);
+        const subuserData = {
+            groupIds: this.selectedGroups,
+            isPublic: this.isPublic
+        };
+
+        const response = await updateSubuser(this.subuserData.id, subuserData);
 
         if (response.success) {
-            messagesState.addMessage('Subuser groups updated successfully', 'success');
+            messagesState.addMessage('Subuser updated successfully', 'success');
             triggerUpdateUser();
             this.dispatchEvent(new CustomEvent('subuser-updated', {
                 bubbles: true,
                 composed: true
             }));
         } else {
-            messagesState.addMessage(response.error || 'Failed to update subuser groups', 'error');
+            messagesState.addMessage(response.error || 'Failed to update subuser', 'error');
         }
 
         this.loading = false;
@@ -161,14 +210,26 @@ class EditSubuserForm extends observeState(LitElement) {
 
         return html`
             <div class="form-header">
-                <h2 class="form-title">Manage Subuser Groups</h2>
+                <h2 class="form-title">Manage Subuser Details</h2>
                 <p class="form-description">
-                    Select which groups this subuser should have access to.
+                    Configure the subuser's profile visibility and select which groups they should have access to.
                 </p>
+            </div>
+
+            <div class="subuser-header">
+                <h3 class="subuser-name">${this.subuserData.name}</h3>
             </div>
 
             <form @submit="${this.handleSubmit}">
                 <div class="form-grid">
+                    <div class="form-group">
+                        <custom-toggle
+                            label="Make Profile Public"
+                            ?checked="${this.isPublic}"
+                            @change="${this._onPublicToggleChanged}"
+                        ></custom-toggle>
+                    </div>
+                    
                     <div class="form-group">
                         <your-groups-list
                             .selectedGroups="${this.selectedGroups}"
@@ -202,7 +263,7 @@ class EditSubuserForm extends observeState(LitElement) {
                         class="button primary"
                         ?disabled="${this.loading}"
                     >
-                        ${this.loading ? 'Updating...' : 'Update Groups'}
+                        ${this.loading ? 'Updating...' : 'Update Subuser'}
                     </button>
                 </div>
             </form>

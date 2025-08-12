@@ -5,7 +5,7 @@ import './notification-item.js'
 import buttonStyles from "../../css/buttons.js";
 import {observeState} from "lit-element-state";
 import {userState} from "../../state/userStore.js";
-import {listenInitialUserLoaded} from "../../events/eventListeners.js";
+import {listenInitialUserLoaded, listenUpdateNotifications} from "../../events/eventListeners.js";
 import {getMyNotifications, markNotificationAsRead} from "../../helpers/api/notifications.js";
 
 export class NotificationsElement extends observeState(LitElement) {
@@ -28,6 +28,9 @@ export class NotificationsElement extends observeState(LitElement) {
             })
         }
 
+        listenUpdateNotifications(() => {
+            this._fetchNotifications();
+        });
     }
 
      async _fetchNotifications() {
@@ -78,12 +81,12 @@ export class NotificationsElement extends observeState(LitElement) {
 
     async _handleDismiss(event) {
         const notificationId = event.detail.notificationId;
-        
+
         // Remove the notification from the array immediately
         this.notifications = this.notifications.filter(
             notification => notification.id !== notificationId
         );
-        
+
         // Make API call to mark notification as read (fire and forget)
         try {
             await markNotificationAsRead(notificationId);
@@ -94,7 +97,7 @@ export class NotificationsElement extends observeState(LitElement) {
 
 
     render() {
-        const notificationItems = this.notifications.length > 0 
+        const notificationItems = this.notifications.length > 0
             ? this.notifications.map(notification => ({
                 id: notification.id,
                 content: this._getContent(notification),
@@ -102,7 +105,7 @@ export class NotificationsElement extends observeState(LitElement) {
             : [{
                 id: 'no-notifications',
                 content: html`
-                    <div style="padding: var(--spacing-normal); text-align: center; color: var(--text-color-medium-dark);">
+                    <div style="width: 260px; max-width: 100%;">
                         You're all caught up! 📢
                     </div>
                 `

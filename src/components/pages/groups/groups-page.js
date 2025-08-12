@@ -1,8 +1,11 @@
 import { LitElement, html, css } from 'lit';
+import { observeState } from 'lit-element-state';
+import { userState } from '../../../state/userStore.js';
+import { isSubuser } from '../../../helpers/generalHelpers.js';
 import '../account/my-groups-list.js';
 import '../account/invited-groups.js';
 
-class GroupsPage extends LitElement {
+class GroupsPage extends observeState(LitElement) {
     static get styles() {
         return css`
             :host {
@@ -56,9 +59,11 @@ class GroupsPage extends LitElement {
         return html`
             <my-groups-list lightTiles></my-groups-list>
             
-            <div class="invitations-section">
-                <invited-groups></invited-groups>
-            </div>
+            ${!isSubuser(userState?.userData?.id) ? html`
+                <div class="invitations-section">
+                    <invited-groups></invited-groups>
+                </div>
+            ` : ''}
         `;
     }
 }

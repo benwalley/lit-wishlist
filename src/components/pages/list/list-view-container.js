@@ -251,21 +251,22 @@ export class ListViewContainer extends observeState(LitElement) {
     }
 
     _getActionDropdownItems() {
-        const { ownerId } = this.listData;
+        const { ownerId, public: isPublic } = this.listData;
         const userId = userState?.userData?.id;
 
-        // Always available
-        const baseActions = [
-            {
+        // Base actions - only include share if list is public
+        const baseActions = [];
+        if (isPublic) {
+            baseActions.push({
                 id: 'share',
-                label: 'Share List',
+                label: 'Copy public link',
                 icon: html`<share-icon class="action-icon"></share-icon>`,
                 classes: 'purple-text',
                 action: () => this._handleShareList()
-            }
-        ];
+            });
+        }
 
-        // If user isn’t the owner, we’re done
+        // If user isn't the owner, we're done
         if (ownerId !== userId) return baseActions;
 
         // Extra owner-only actions
@@ -332,7 +333,7 @@ export class ListViewContainer extends observeState(LitElement) {
                             </div>
                         </div>
                         
-                        ${this.listId > 0 ? html`
+                        ${this.listId > 0 && this._getActionDropdownItems().length > 0 ? html`
                             <action-dropdown
                                 .items="${this._getActionDropdownItems()}"
                                 placement="bottom-end"

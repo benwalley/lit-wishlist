@@ -8,6 +8,7 @@ import {navigate} from "../../../router/main-router.js";
 import {messagesState} from "../../../state/messagesStore.js";
 import buttonStyles from "../../../css/buttons.js";
 import {invalidateCache} from "../../../helpers/caching.js";
+import '../../../svg/leave.js';
 import {triggerUpdateUser} from "../../../events/eventListeners.js";
 
 export class LogoutButton extends observeState(LitElement) {
@@ -60,7 +61,10 @@ export class LogoutButton extends observeState(LitElement) {
 
     render() {
         return html`
-            <button @click=${this._handleClick} class="button secondary">Log Out</button>
+            <button @click=${this._handleClick} class="button danger bold large fullWidth">
+                <leave-icon></leave-icon>
+                <span>Log Out</span>
+            </button>
         `;
     }
 }

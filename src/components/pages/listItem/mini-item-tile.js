@@ -13,6 +13,8 @@ import '../../../svg/group.js'
 import {canUserContribute} from "../../../helpers/userHelpers.js";
 import {observeState} from "lit-element-state";
 import {userState} from "../../../state/userStore.js";
+import {maxLength} from "../../../helpers/generalHelpers.js";
+import {envVars} from "../../../config.js";
 
 export class MiniItemTile extends observeState(LitElement) {
     static properties = {
@@ -209,7 +211,7 @@ export class MiniItemTile extends observeState(LitElement) {
                 </div>
 
                 <div class="right-side-container">
-                    <h3 class="item-name">${this.itemData?.name}</h3>
+                    <h3 class="item-name">${maxLength(this.itemData?.name, envVars.LIST_ITEM_MAX_LENGTH)}</h3>
                     <div class="row">
                         <priority-display
                                 .value="${this.itemData.priority}"

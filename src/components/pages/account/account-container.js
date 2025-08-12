@@ -5,7 +5,6 @@ import './account-public-description.js';
 import './account-qa.js';
 import './account-notifications.js';
 import './account-private-notes.js';
-import './account-comments.js';
 import './user-details.js';
 import './account-lists.js';
 import './logout-button.js'
@@ -49,7 +48,12 @@ export class AccountContainer extends observeState(LitElement) {
                     border-radius: var(--border-radius-large);
                     background: var(--background-light);
                     position: relative;
+                    overflow: hidden;
                     
+                    
+                    &.no-padding {
+                        padding: 0;
+                    }
                 }
 
                 
@@ -61,7 +65,7 @@ export class AccountContainer extends observeState(LitElement) {
     render() {
         return html`
             <main class="account-container">
-                <section>
+                <section class="no-padding">
                     <user-details></user-details>
                 </section>
 

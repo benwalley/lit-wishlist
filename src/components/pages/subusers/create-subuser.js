@@ -44,6 +44,13 @@ class CreateSubuser extends observeState(LitElement) {
                     margin: 0;
                 }
 
+                .create-subuser-subtext {
+                    font-size: var(--font-size-small);
+                    color: var(--text-color-medium-dark);
+                    margin: var(--spacing-x-small) 0 0 0;
+                    line-height: 1.4;
+                }
+
                 .create-subuser-form {
                     padding: 24px;
                 }
@@ -69,7 +76,7 @@ class CreateSubuser extends observeState(LitElement) {
                 .form-label {
                     font-weight: 600;
                     color: var(--text-color-dark);
-                    font-size: var(--font-size-medium);
+                    font-size: var(--font-size-small);
                 }
 
                 .form-actions {
@@ -152,6 +159,7 @@ class CreateSubuser extends observeState(LitElement) {
             <div class="create-subuser-container">
                 <div class="create-subuser-header">
                     <h3 class="create-subuser-title">Create New Subuser</h3>
+                    <p class="create-subuser-subtext">You must create a password for the subuser. They can log in using this password or you can log in through your parent account.</p>
                 </div>
                 
                 <div class="create-subuser-form">

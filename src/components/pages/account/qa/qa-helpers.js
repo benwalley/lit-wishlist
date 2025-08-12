@@ -113,6 +113,7 @@ export async function updateAnswer(answerData) {
 
 export async function getQAItems(userId) {
     try {
+        console.log({userId});
         const response = await cachedFetch(`/qa/user/${userId}`, {}, true);
         return response;
     } catch (e) {

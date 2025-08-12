@@ -2,6 +2,8 @@ import {LitElement, html, css} from 'lit';
 import '../../pages/account/avatar.js';
 import '../../../svg/check.js';
 import '../../global/custom-image.js';
+import {maxLength} from "../../../helpers/generalHelpers.js";
+import {envVars} from "../../../config.js";
 
 export class SelectItem extends LitElement {
     static properties = {
@@ -139,7 +141,7 @@ export class SelectItem extends LitElement {
                 ></custom-avatar>
                 
                 <div class="item-info">
-                    <div class="item-name">${this.itemData.name}</div>
+                    <div class="item-name">${maxLength(this.itemData.name, envVars.LIST_ITEM_MAX_LENGTH)}</div>
                 </div>
             </button>
         `;

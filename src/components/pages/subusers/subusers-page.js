@@ -16,7 +16,7 @@ class SubusersPage extends observeState(LitElement) {
         return css`
             :host {
                 display: block;
-                padding: var(--spacing-normal);
+                padding: var(--spacing-normal-variable);
                 padding-bottom: 100px;
             }
 

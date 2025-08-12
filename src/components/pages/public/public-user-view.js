@@ -79,6 +79,11 @@ export class PublicUserView extends LitElement {
                 border-radius: var(--border-radius-large);
                 background: var(--background-light);
                 position: relative;
+                overflow: hidden;
+                
+                &.no-padding {
+                    padding: 0;
+                }
             }
 
             .not-found-container {
@@ -120,7 +125,7 @@ export class PublicUserView extends LitElement {
 
         return html`
             <main class="account-container">
-                <section>
+                <section class="no-padding">
                     <user-details .userData="${this.userData}" .isUser="${false}"></user-details>
                 </section>
 

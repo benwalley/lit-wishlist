@@ -45,7 +45,7 @@ export default css`
             }
 
             &.fancy {
-                background-image: linear-gradient(to right, #4f46e5, #9333ea);
+                background-image: var(--fancy-gradient-two);
             }
             
             &.fancy-alt {
@@ -120,6 +120,17 @@ export default css`
                 &:focus,
                 &:active {
                     background: var(--purple-light);
+                }
+            }
+
+            &.white-text {
+                color: var(--light-text-color);
+                border-color: var(--light-text-color);
+
+                &:hover,
+                &:focus,
+                &:active {
+                    background: var(--dark-text-color);
                 }
             }
         }
@@ -238,6 +249,11 @@ export default css`
             &.purple-text {
                 --icon-color: var(--purple-normal);
                 --icon-hover-background: var(--purple-light);
+            }
+            
+            &.white-text {
+                --icon-color: var(--background-light-light);
+                --icon-hover-background: var(--background-light-dark);
             }
         }
         

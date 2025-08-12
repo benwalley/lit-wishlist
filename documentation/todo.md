@@ -44,3 +44,5 @@
  - when a user leaves a group or a subuser is removed, 
    - give a notification that all lists and items will stop being shared with the group. 
    - Then stop sharing them with the group.
+ - after joining a group, if you join a new group, it gives you the option to share questions you didn't ask.
+ - subusers are getting the same notifications as eachother when creating question, and also see the same question content.

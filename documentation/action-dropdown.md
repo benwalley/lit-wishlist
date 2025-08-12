@@ -63,7 +63,7 @@ _getActionDropdownItems() {
     },
     {
       id: 'share',
-      label: 'Share List',
+      label: 'Copy public link',
       icon: html`<share-icon class="action-icon"></share-icon>`,
       classes: 'purple-text',  // Special feature - purple
       action: () => this._handleShareList()
