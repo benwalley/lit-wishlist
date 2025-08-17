@@ -1,13 +1,6 @@
 name = "wishlist-website-lit"
 compatibility_date = "2025-08-17"
-main = "./src/worker.js"
 
 [assets]
 directory = "./dist"
-binding = "ASSETS"
-
-[env.production]
-name = "wishlist-website-lit"
-
-[env.staging]
-name = "wishlist-website-lit-staging"
+not_found_handling = "single-page-application"
