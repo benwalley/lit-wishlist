@@ -4,7 +4,8 @@
       "Bash(grep:*)",
       "WebFetch(domain:www.npmjs.com)",
       "Bash(find:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "WebFetch(domain:developers.cloudflare.com)"
     ],
     "deny": []
   }
