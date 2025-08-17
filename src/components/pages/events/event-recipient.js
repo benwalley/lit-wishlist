@@ -1,35 +1,43 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../../css/buttons.js";
 import formStyles from "../../../css/forms.js";
+import modalSections from "../../../css/modal-sections.js";
 import '../../global/custom-input.js';
 import '../../global/custom-modal.js';
 import '../gift-tracking/gift-tracking-row.js';
 import {getUserImageIdByUserId, getUsernameById} from "../../../helpers/generalHelpers.js";
 import {observeState} from "lit-element-state";
 import {eventStatuses} from './event-statuses.js';
+import {updateEventRecipientNote} from '../../../helpers/api/events.js';
+import {messagesState} from '../../../state/messagesStore.js';
 
 export class EventRecipient extends observeState(LitElement) {
     static properties = {
         recipient: {type: Object},
+        eventId: {type: String},
         isEditingNote: {type: Boolean},
         noteText: {type: String},
         originalStatus: {type: String, state: true},
-        hasStatusChanged: {type: Boolean, state: true}
+        hasStatusChanged: {type: Boolean, state: true},
+        saving: {type: Boolean}
     };
 
     constructor() {
         super();
         this.recipient = {};
+        this.eventId = '';
         this.isEditingNote = false;
         this.noteText = '';
         this.originalStatus = '';
         this.hasStatusChanged = false;
+        this.saving = false;
     }
 
     static get styles() {
         return [
             buttonStyles,
             formStyles,
+            modalSections,
             css`
                 :host {
                     display: block;
@@ -103,14 +111,6 @@ export class EventRecipient extends observeState(LitElement) {
                     font-style: italic;
                 }
 
-                .note-modal-content {
-                    padding: var(--spacing-normal);
-                }
-
-                .note-modal-content h3 {
-                    margin: 0 0 var(--spacing-normal) 0;
-                    color: var(--text-color-dark);
-                }
 
                 .note-textarea {
                     width: 100%;
@@ -129,15 +129,9 @@ export class EventRecipient extends observeState(LitElement) {
                 .note-textarea:focus {
                     outline: none;
                     border-color: var(--primary-color);
-                    box-shadow: 0 0 0 2px var(--primary-color-light);
+                    box-shadow: 0 0 0 2px var(--purple-light);
                 }
 
-                .note-modal-actions {
-                    display: flex;
-                    gap: var(--spacing-small);
-                    justify-content: flex-end;
-                    margin-top: var(--spacing-normal);
-                }
 
                 .created-date {
                     color: var(--medium-text-color);
@@ -204,6 +198,16 @@ export class EventRecipient extends observeState(LitElement) {
     _openNoteModal() {
         this.noteText = this.recipient.note || '';
         this.isEditingNote = true;
+        
+        // Focus the textarea after the modal renders
+        this.updateComplete.then(() => {
+            const textarea = this.shadowRoot.querySelector('.note-textarea');
+            if (textarea) {
+                textarea.focus();
+                // Move cursor to the end of the text
+                textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+            }
+        });
     }
 
     _closeNoteModal() {
@@ -211,8 +215,50 @@ export class EventRecipient extends observeState(LitElement) {
         this.noteText = '';
     }
 
+    async _handleNoteSubmit(event) {
+        event.preventDefault();
+
+        console.log(this)
+        if (!this.eventId || !this.recipient.userId) {
+            messagesState.addMessage('Missing event or recipient information', 'error');
+            return;
+        }
+
+        this.saving = true;
+
+        try {
+            const response = await updateEventRecipientNote(
+                this.eventId,
+                this.recipient.userId,
+                this.noteText
+            );
+
+            if (response.success) {
+                // Update the local recipient data
+                this.recipient = { ...this.recipient, note: this.noteText };
+                messagesState.addMessage('Note saved successfully');
+                this._closeNoteModal();
+            } else {
+                messagesState.addMessage(response.error || 'Failed to save note', 'error');
+            }
+        } catch (error) {
+            console.error('Error saving note:', error);
+            messagesState.addMessage('An error occurred while saving the note', 'error');
+        } finally {
+            this.saving = false;
+        }
+    }
+
     _handleNoteChange(event) {
-        this.recipient.note = event.target.value;
+        this.noteText = event.target.value;
+    }
+
+    _handleTextareaKeydown(event) {
+        // Submit form on Enter (without Shift), allow Shift+Enter for new lines
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            this._handleNoteSubmit(event);
+        }
     }
 
     _handleStatusChange(event) {
@@ -288,23 +334,36 @@ export class EventRecipient extends observeState(LitElement) {
             <custom-modal 
                 ?isOpen=${this.isEditingNote}
                 maxWidth="500px"
+                noPadding
                 @modal-closed=${this._closeNoteModal}
             >
-                <div class="note-modal-content">
-                    <h3>Edit Note for ${getUsernameById(this.recipient?.userId)}</h3>
-                    <textarea 
-                        class="note-textarea"
-                        .value=${this.noteText}
-                        @input=${this._handleNoteChange}
-                        placeholder="Add a note..."
-                        rows="4"
-                    ></textarea>
-                    <div class="note-modal-actions">
-                        <button class="primary-button" @click=${this._closeNoteModal}>
-                            Done
-                        </button>
+                <form @submit=${this._handleNoteSubmit}>
+                    <div class="modal-container">
+                        <div class="modal-header">
+                            <h2>Edit Note for ${getUsernameById(this.recipient?.userId)}</h2>
+                        </div>
+                        
+                        <div class="modal-content">
+                            <textarea 
+                                class="note-textarea"
+                                .value=${this.noteText}
+                                @input=${this._handleNoteChange}
+                                @keydown=${this._handleTextareaKeydown}
+                                placeholder="Add a note..."
+                                rows="6"
+                            ></textarea>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="secondary" @click=${this._closeNoteModal}>
+                                Cancel
+                            </button>
+                            <button type="submit" class="primary" ?disabled=${this.saving}>
+                                ${this.saving ? 'Saving...' : 'Save Note'}
+                            </button>
+                        </div>
                     </div>
-                </div>
+                </form>
             </custom-modal>
         `;
     }

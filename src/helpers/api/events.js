@@ -104,3 +104,32 @@ export async function deleteEvent(eventId) {
         };
     }
 }
+
+/**
+ * Updates a note for a recipient in an event
+ * @param {string} eventId - The ID of the event
+ * @param {string} recipientUserId - The user ID of the recipient
+ * @param {string} note - The note text to save
+ * @returns {Promise<Object>} Object containing success status or error
+ */
+export async function updateEventRecipientNote(eventId, recipientUserId, note) {
+    try {
+        const options = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                note: note
+            }),
+        };
+
+        return await customFetch(`/events/${eventId}/recipients/${recipientUserId}/note`, options, true);
+    } catch (error) {
+        console.error('Error updating recipient note:', error);
+        return {
+            success: false,
+            error: 'An error occurred while updating the recipient note.'
+        };
+    }
+}

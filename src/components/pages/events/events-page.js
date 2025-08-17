@@ -6,9 +6,12 @@ import {listenUpdateEvents} from "../../../events/eventListeners.js";
 import '../../loading/skeleton-loader.js';
 import '../../../svg/calendar.js';
 import '../../../svg/plus.js';
+import '../../../svg/info.js';
 import './create-event-modal.js';
 import './edit-event-modal.js';
 import './event-tile.js';
+import '../../instructions/info-tooltip.js';
+import '../../instructions/event-instructions.js';
 
 export class EventsPage extends LitElement {
     static properties = {
@@ -78,6 +81,12 @@ export class EventsPage extends LitElement {
                     justify-content: space-between;
                     align-items: center;
                     margin-bottom: var(--spacing-large);
+                }
+
+                .title-section {
+                    display: flex;
+                    align-items: center;
+                    gap: var(--spacing-small);
                 }
 
                 .page-title {
@@ -152,7 +161,15 @@ export class EventsPage extends LitElement {
     render() {
         return html`
             <div class="page-header">
-                <h1 class="page-title">Events</h1>
+                <div class="title-section">
+                    <h1 class="page-title">Events</h1>
+                    <info-tooltip 
+                        buttonClasses="large blue-text"
+                    >
+                        <info-icon slot="icon"></info-icon>
+                        <event-instructions slot="modal-content"></event-instructions>
+                    </info-tooltip>
+                </div>
                 <button class="button primary create-event-button" @click="${this.handleCreateEventClick}">
                     <plus-icon></plus-icon>
                     <span>Create Event</span>

@@ -9,7 +9,7 @@ import {formatDate, getUsernameById} from "../../../helpers/generalHelpers.js";
 import './event-recipient.js';
 import './event-view-actions.js';
 import {bulkUpdateGiftStatus} from "../../../helpers/api/gifts.js";
-import {listenUpdateItem, triggerUpdateItem} from "../../../events/eventListeners.js";
+import {listenUpdateEvents, listenUpdateItem, triggerUpdateItem} from "../../../events/eventListeners.js";
 import {observeState} from "lit-element-state";
 
 export class EventViewContainer extends observeState(LitElement) {
@@ -40,6 +40,7 @@ export class EventViewContainer extends observeState(LitElement) {
             this.fetchEventData();
         }
         listenUpdateItem(() => this.fetchEventData())
+        listenUpdateEvents(() => this.fetchEventData())
     }
 
 
@@ -376,6 +377,7 @@ export class EventViewContainer extends observeState(LitElement) {
                         ${this._sortRecipients(this.event.recipients).map(recipient => html`
                             <event-recipient 
                                 .recipient=${recipient}
+                                .eventId="${this.event.id}"    
                             ></event-recipient>
                         `)}
                     </div>

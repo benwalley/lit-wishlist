@@ -5,6 +5,7 @@ import '../../../svg/edit.js';
 import '../../../svg/delete.js';
 import '../../../svg/share.js';
 import {messagesState} from "../../../state/messagesStore.js";
+import {triggerEditEvent} from "../../../events/eventListeners.js";
 
 export class EventViewActions extends LitElement {
     static properties = {
@@ -46,15 +47,10 @@ export class EventViewActions extends LitElement {
     }
 
     _handleEditEvent() {
-        const modal = this.shadowRoot.querySelector('edit-event-modal');
-        if (modal) {
-            modal.openModal(this.event);
-        }
+        triggerEditEvent(this.event);
     }
 
     _handleDeleteEvent() {
-        console.log('Delete event:', this.event.id);
-        // TODO: Implement delete functionality
         messagesState.addMessage('Delete event functionality not yet implemented');
     }
 

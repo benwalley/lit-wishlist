@@ -124,8 +124,8 @@ export class CreateEventModal extends observeState(LitElement) {
     }
 
     _handleModalChanged(event) {
-        this.isOpen = event.detail.isOpen;
-        if (!this.isOpen) {
+        if (!event.detail.isOpen) {
+            this.isOpen = false;
             this._resetForm();
         }
     }
@@ -184,7 +184,7 @@ export class CreateEventModal extends observeState(LitElement) {
 
             if (response.success) {
                 messagesState.addMessage('Event created successfully!');
-                this.isOpen = false;
+                this.closeModal();
                 triggerUpdateEvents();
             } else {
                 messagesState.addMessage(response.error || 'Failed to create event', 'error');
@@ -197,14 +197,14 @@ export class CreateEventModal extends observeState(LitElement) {
     }
 
     _handleCancel() {
-        this.isOpen = false;
+        this.closeModal();
     }
 
     render() {
         return html`
             <custom-modal 
                 ?isOpen=${this.isOpen}
-                @modal-changed=${this._handleModalChanged}
+                @modal-closed=${this.closeModal}
                 maxWidth="600px"
                 noPadding
             >
