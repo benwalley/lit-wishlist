@@ -58,7 +58,8 @@ export class EditListModal extends LitElement {
                 level="2"
                 triggerEvent="none"
                 @modal-changed="${this._handleModalChanged}"
-                maxWidth="800px">
+                maxWidth="800px"
+                noPadding>
                 ${this.listData ? html`
                     <edit-list-form .listData="${this.listData}"></edit-list-form>
                 ` : html``}

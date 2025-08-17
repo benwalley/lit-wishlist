@@ -3,6 +3,7 @@ import '../global/custom-input.js';
 import '../global/custom-toggle.js';
 import './price-input.js';
 import buttonStyles from "../../css/buttons.js";
+import modalSections from "../../css/modal-sections.js";
 import './links-input.js';
 import './wysiwyg-editor.js';
 import './amount-you-want.js';
@@ -154,31 +155,15 @@ export class EditItemForm extends LitElement {
     static get styles() {
         return [
             buttonStyles,
+            modalSections,
             css`
                 :host {
                     display: block;
                 }
                 
-                form {
-                    display: flex;
-                    flex-direction: column;
-                    height: 100%;
-                    border-radius: var(--border-radius-large);
-                    overflow: hidden;
-                }
-                
-                .modal-header {
-                    position: sticky;
-                    top: 0;
-                    z-index: 10;
-                    background-color: var(--background-dark);
-                    border-bottom: 1px solid var(--border-color);
-                }
                 
                 h2 {
-                    padding: var(--spacing-normal);
                     background-color: light-dark(var(--mint-300), var(--mint-800));
-                    margin: 0;
                     text-align: center;
                 }
                 
@@ -186,23 +171,8 @@ export class EditItemForm extends LitElement {
                     display: grid;
                     gap: var(--spacing-normal);
                     grid-template-columns: 1fr;
-                    padding: var(--spacing-normal);
-                    overflow-y: auto;
-                    overflow-x: hidden;
-                    width: 100%;
-                    box-sizing: border-box;
-                    flex: 1;
-                    max-height: calc(80vh - 120px); /* Subtract header and footer heights */
                 }
                 
-                .modal-footer {
-                    position: sticky;
-                    bottom: 0;
-                    z-index: 10;
-                    background-color: var(--modal-background-color);
-                    padding: var(--spacing-normal);
-                    border-top: 1px solid var(--border-color);
-                }
                 
                 @media (min-width: 768px) {
                     .form-contents {
@@ -291,12 +261,6 @@ export class EditItemForm extends LitElement {
                     border: 1px solid var(--border-color);
                 }
                 
-                .button-container {
-                    display: flex;
-                    justify-content: flex-end;
-                    gap: var(--spacing-normal);
-                    width: 100%;
-                }
                 
                 .save-button {
                     min-width: 120px;
@@ -407,12 +371,14 @@ export class EditItemForm extends LitElement {
 
     render() {
         return html`
-            <form @submit=${this._submitHandler}>
+            <div class="modal-container">
                 <div class="modal-header">
                     <h2>Edit Item</h2>
                 </div>
                 
-                <div class="form-contents">
+                <form @submit=${this._submitHandler}>
+                    <div class="modal-content">
+                        <div class="form-contents">
                     <div class="column">
                         <div>
                             <custom-input .value="${this.itemName}"
@@ -482,17 +448,17 @@ export class EditItemForm extends LitElement {
                         </button>
                         ${this.advancedOpen ? this.renderAdvancedOptions() : ''}
                     </div>
-                </div>
+                        </div>
+                    </div>
+                </form>
                 
                 <div class="modal-footer">
-                    <div class="button-container">
-                        <button type="button" class="button" @click=${this._handleCancel}>Cancel</button>
-                        <button type="submit" class="button primary save-button" ?disabled=${this.saving}>
-                            ${this.saving ? 'Saving...' : 'Save Changes'}
-                        </button>
-                    </div>
+                    <button type="button" class="secondary" @click=${this._handleCancel}>Cancel</button>
+                    <button type="submit" class="primary" ?disabled=${this.saving}>
+                        ${this.saving ? 'Saving...' : 'Save Changes'}
+                    </button>
                 </div>
-            </form>
+            </div>
         `;
     }
 

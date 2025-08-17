@@ -11,6 +11,7 @@ import {observeState} from 'lit-element-state';
 import {userState} from '../../../state/userStore.js';
 import buttonStyles from '../../../css/buttons.js';
 import formStyles from '../../../css/forms.js';
+import modalSections from '../../../css/modal-sections.js';
 
 export class CreateEventModal extends observeState(LitElement) {
     static properties = {
@@ -36,35 +37,13 @@ export class CreateEventModal extends observeState(LitElement) {
         return [
             buttonStyles,
             formStyles,
+            modalSections,
             css`
-                .modal-content {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0;
-                    max-height: 85vh;
-                    overflow: hidden;
-                }
-
-                .modal-header {
-                    text-align: left;
-                    border-bottom: 1px solid var(--border-color);
-                    padding: var(--spacing-normal);
-                }
-
-                .modal-title {
-                    font-size: 1.3em;
-                    font-weight: bold;
-                    color: var(--text-color-dark);
-                    margin: 0;
-                }
 
                 .form-content {
-                    padding: var(--spacing-normal);
                     display: flex;
                     flex-direction: column;
                     gap: var(--spacing-normal);
-                    flex: 1;
-                    overflow-y: auto;
                 }
 
                 .form-section {
@@ -110,13 +89,6 @@ export class CreateEventModal extends observeState(LitElement) {
                     font-weight: 500;
                 }
 
-                .modal-actions {
-                    display: flex;
-                    justify-content: flex-end;
-                    gap: var(--spacing-small);
-                    padding: var(--spacing-normal);
-                    border-top: 1px solid var(--border-color);
-                }
 
                 .form-row {
                     display: grid;
@@ -236,12 +208,13 @@ export class CreateEventModal extends observeState(LitElement) {
                 maxWidth="600px"
                 noPadding
             >
-                <div class="modal-content">
+                <div class="modal-container">
                     <div class="modal-header">
-                        <h2 class="modal-title">Create New Event</h2>
+                        <h2>Create New Event</h2>
                     </div>
 
-                    <div class="form-content">
+                    <div class="modal-content">
+                        <div class="form-content">
                         <div class="form-row">
                             <div class="form-section">
                                 <label>Event Name</label>
@@ -294,10 +267,12 @@ export class CreateEventModal extends observeState(LitElement) {
                                 </div>
                             ` : ''}
                         </div>
+                        </div>
                     </div>
 
-                    <div class="modal-actions">
+                    <div class="modal-footer">
                         <button
+                            type="button"
                             class="secondary"
                             @click=${this._handleCancel}
                             ?disabled=${this.loading}
@@ -305,6 +280,7 @@ export class CreateEventModal extends observeState(LitElement) {
                             Cancel
                         </button>
                         <button
+                            type="button"
                             class="primary"
                             @click=${this._handleSubmit}
                             ?disabled=${this.loading}

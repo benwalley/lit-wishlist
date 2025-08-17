@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import buttonStyles from "../../css/buttons.js";
 import formStyles from "../../css/forms.js";
+import modalSections from "../../css/modal-sections.js";
 import { createGroup } from '../../helpers/api/groups.js';
 import { messagesState } from '../../state/messagesStore.js';
 import '../global/custom-input.js';
@@ -31,29 +32,17 @@ export class CreateGroupForm extends LitElement {
         return [
             buttonStyles,
             formStyles,
+            modalSections,
             css`
                 :host {
                     display: block;
                     width: 100%;
                 }
                 
-                .form-container {
-                    display: flex;
-                    flex-direction: column;
-                    gap: var(--spacing-normal);
-                    padding: var(--spacing-normal);
-                }
-                
-                .form-title {
-                    font-size: var(--font-size-large);
-                    font-weight: bold;
-                    margin: 0;
-                    color: var(--text-color-dark);
-                }
                 
                 .form-description {
                     color: var(--text-color-medium);
-                    margin: 0 0 var(--spacing-normal) 0;
+                    margin: 0;
                     font-size: var(--font-size-small);
                 }
                 
@@ -78,12 +67,6 @@ export class CreateGroupForm extends LitElement {
                     flex-direction: column;
                 }
                 
-                .actions {
-                    display: flex;
-                    justify-content: flex-end;
-                    gap: var(--spacing-small);
-                    margin-top: var(--spacing-normal);
-                }
                 
                 .error-message {
                     color: var(--error-color);
@@ -171,14 +154,14 @@ export class CreateGroupForm extends LitElement {
 
     render() {
         return html`
-            <div class="form-container">
-            <div class="modal-header">
-                <h2 class="form-title">Create a New Group</h2>
-                <p class="form-description">Create a group to share lists with friends, family, or co-workers.</p>
-            </div>
-               
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h2>Create a New Group</h2>
+                    <p class="form-description">Create a group to share lists with friends, family, or co-workers.</p>
+                </div>
                 
-                <form class="form-fields" @submit="${this._handleSubmit}">
+                <div class="modal-content">
+                    <div class="form-fields">
                     <div class="image-container">
                         <div class="user-image">
                             <custom-avatar size="120"
@@ -211,25 +194,27 @@ export class CreateGroupForm extends LitElement {
                     ></custom-input>
                     
                     ${this.createError ? html`<p class="error-message">${this.createError}</p>` : ''}
-                    
-                    <div class="actions">
-                        <button 
-                            type="button" 
-                            class="secondary" 
-                            @click="${this._handleCancel}"
-                            ?disabled="${this.isCreatingGroup}"
-                        >
-                            Cancel
-                        </button>
-                        <button 
-                            type="submit" 
-                            class="primary" 
-                            ?disabled="${this.isCreatingGroup || !this.groupName.trim()}"
-                        >
-                            ${this.isCreatingGroup ? 'Creating...' : 'Create Group'}
-                        </button>
                     </div>
-                </form>
+                </div>
+                
+                <div class="modal-footer">
+                    <button 
+                        type="button" 
+                        class="secondary" 
+                        @click="${this._handleCancel}"
+                        ?disabled="${this.isCreatingGroup}"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        type="button" 
+                        @click="${this._handleSubmit}" 
+                        class="primary" 
+                        ?disabled="${this.isCreatingGroup || !this.groupName.trim()}"
+                    >
+                        ${this.isCreatingGroup ? 'Creating...' : 'Create Group'}
+                    </button>
+                </div>
             </div>
         `;
     }

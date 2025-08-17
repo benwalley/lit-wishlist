@@ -153,6 +153,7 @@ export class MyGroupsList extends observeState(LitElement) {
             <custom-modal
                 ?isOpen="${this.isCreateModalOpen}"
                 maxWidth="600px"
+                noPadding
                 @modal-changed="${(e) => this.isCreateModalOpen = e.detail.isOpen}"
                 @modal-closed="${(e) => this.isCreateModalOpen = false}"
             >

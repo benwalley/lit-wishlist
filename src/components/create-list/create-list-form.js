@@ -1,5 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../css/buttons.js";
+import modalSections from "../../css/modal-sections.js";
 import '../pages/account/avatar.js'
 import '../global/custom-input.js'
 import '../global/custom-toggle.js'
@@ -98,15 +99,15 @@ export class CreateListForm extends LitElement {
     static get styles() {
         return [
             buttonStyles,
+            modalSections,
             css`
-                form {
+                .form-grid {
                     display: grid;
                     gap: var(--spacing-medium);
-                    padding: var(--spacing-small);
                 }
 
                 @media only screen and (min-width: 700px) {
-                    form {
+                    .form-grid {
                         grid-template-columns: 1fr 1fr;
                     }
                 }
@@ -186,23 +187,6 @@ export class CreateListForm extends LitElement {
                     line-height: 1;
                 }
                 
-                .save-button-container {
-                    box-sizing: border-box;
-                    width: 100%;
-                    gap: var(--spacing-small);
-                    justify-content: flex-end;
-                    display: flex;
-                    
-                    button {
-                        width: auto;
-                    }
-                }
-
-                @media only screen and (min-width: 700px) {
-                    .save-button-container {
-                        grid-column: 2;
-                    }
-                }
                 
                 .public-toggle-section {
                     margin-top: var(--spacing-normal);
@@ -236,8 +220,13 @@ export class CreateListForm extends LitElement {
 
     render() {
         return html`
-            <form class="container-form" action="" @submit="${this._handleSubmit}">
-                <h2  class="full-width">Create New List</h2>
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h2>Create New List</h2>
+                </div>
+                
+                <div class="modal-content">
+                    <div class="form-grid">
                 <div class="left-column">
                     <div class="image-container">
                         <div class="user-image">
@@ -310,16 +299,17 @@ export class CreateListForm extends LitElement {
                         </div>
                     </div>
                 ` : html`<div></div>`}
+                    </div>
+                </div>
                 
-
-                <div class="save-button-container fullWidth">
-                    <button @click="${this._closeModal}" class="secondary cancel-button">Cancel</button>
-                    <button class="primary save-button">
+                <div class="modal-footer">
+                    <button type="button" @click="${this._closeModal}" class="secondary">Cancel</button>
+                    <button type="button" @click="${this._handleSubmit}" class="primary">
                         <plus-icon></plus-icon>
                         Create List
                     </button>
                 </div>
-            </form>
+            </div>
         `;
     }
 

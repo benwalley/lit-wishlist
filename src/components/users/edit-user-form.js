@@ -1,5 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../css/buttons";
+import modalSections from "../../css/modal-sections.js";
 import '../../svg/x.js';
 import '../../svg/camera.js';
 import '../../svg/info.js';
@@ -125,29 +126,18 @@ export class CustomElement extends observeState(LitElement) {
     static get styles() {
         return [
             buttonStyles,
+            modalSections,
             css`
                 :host {
                     /* host styles if needed */
                 }
 
-                .header {
-                    padding: var(--spacing-normal);
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: space-between;
-                    border-bottom: 1px solid var(--border-color);
-                }
-
-                .header h2 {
-                    margin: 0;
-                }
 
                 .content {
                     align-items: center;
                     justify-content: center;
                     display: flex;
                     flex-direction: column;
-                    padding: var(--spacing-normal);
                     gap: var(--spacing-normal);
                 }
 
@@ -156,14 +146,6 @@ export class CustomElement extends observeState(LitElement) {
                     display: flex;
                 }
 
-                .footer {
-                    display: flex;
-                    padding: var(--spacing-normal);
-                    gap: var(--spacing-normal);
-                    border-top: 1px solid var(--border-color);
-                    background: var(--background-dark);
-                    justify-content: flex-end;
-                }
 
                 /* Error message styles */
 
@@ -189,11 +171,13 @@ export class CustomElement extends observeState(LitElement) {
                           maxWidth="500px"
                           noPadding
                           @modal-changed="${this._handleModalChanged}">
-                <div class="header">
-                    <h2>Edit Profile</h2>
-                </div>
-                <form @submit="${this._handleSubmit}">
-                    <div class="content">
+                <div class="modal-container">
+                    <div class="modal-header">
+                        <h2>Edit Profile</h2>
+                    </div>
+                    <form @submit="${this._handleSubmit}">
+                        <div class="modal-content">
+                            <div class="content">
 
                         <div class="user-image">
                             <!-- Use the component's username property -->
@@ -244,19 +228,21 @@ export class CustomElement extends observeState(LitElement) {
 
                         </div>
 
-                        <!-- Error message -->
-                        ${this.errorMessage ? html`
-                            <div class="error">${this.errorMessage}</div>` : ''}
-                    </div>
-                    <div class="footer">
-                        <button type="button" class="button ghost shadow" @click="${() => this._close(true)}">
+                            <!-- Error message -->
+                            ${this.errorMessage ? html`
+                                <div class="error">${this.errorMessage}</div>` : ''}
+                            </div>
+                        </div>
+                    </form>
+                    <div class="modal-footer">
+                        <button type="button" class="secondary" @click="${() => this._close(true)}">
                             Cancel
                         </button>
-                        <button type="submit" class="button primary shadow">
+                        <button type="submit" class="primary">
                             Save Changes
                         </button>
                     </div>
-                </form>
+                </div>
             </custom-modal>
         `;
     }

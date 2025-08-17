@@ -1,5 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../css/buttons.js";
+import modalSections from "../../css/modal-sections.js";
 import '../pages/account/avatar.js'
 import '../global/custom-input.js'
 import '../global/custom-toggle.js'
@@ -122,16 +123,16 @@ export class EditListForm extends LitElement {
     static get styles() {
         return [
             buttonStyles,
+            modalSections,
             css`
-                .container {
+                .form-grid {
                     display: grid;
                     grid-template-columns: 1fr;
                     gap: var(--spacing-normal);
-                    padding: var(--spacing-small);
                 }
                 
                 @media screen and (min-width: 700px) {
-                    .container {
+                    .form-grid {
                         gap: calc(var(--spacing-normal) * 2);
                         grid-template-columns: 1fr 1fr;
                     }
@@ -216,24 +217,6 @@ export class EditListForm extends LitElement {
                     line-height: 1;
                 }
                 
-                .button-container {
-                    box-sizing: border-box;
-                    width: 100%;
-                    gap: var(--spacing-small);
-                    justify-content: flex-end;
-                    display: flex;
-                    padding-top: var(--spacing-normal);
-                    
-                    button {
-                        width: auto;
-                    }
-                }
-
-                @media screen and (min-width: 700px) {
-                    .button-container {
-                        grid-column: 2;
-                    }
-                }
                 
                 .public-toggle-section {
                     margin-top: var(--spacing-normal);
@@ -267,8 +250,13 @@ export class EditListForm extends LitElement {
 
     render() {
         return html`
-            <form class="container" @submit="${this._handleSubmit}">
-                <h2 class="full-width">Edit List Details</h2>
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h2>Edit List Details</h2>
+                </div>
+                
+                <div class="modal-content">
+                    <div class="form-grid">
                 <div class="left-column">
                     <div class="image-container">
                         <div class="user-image">
@@ -341,15 +329,16 @@ ${!this.isPublic ? html`
                         </div>
                     </div>
                 ` : html`<div></div>`}
+                    </div>
+                </div>
                 
-
-                <div class="button-container fullWidth">
-                    <button type="button" @click="${this._closeModal}" class="secondary cancel-button">Cancel</button>
-                    <button type="submit" class="primary save-button">
+                <div class="modal-footer">
+                    <button type="button" @click="${this._closeModal}" class="secondary">Cancel</button>
+                    <button type="button" @click="${this._handleSubmit}" class="primary">
                         Save Changes
                     </button>
                 </div>
-            </form>
+            </div>
         `;
     }
 
