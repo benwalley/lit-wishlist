@@ -48,3 +48,4 @@
  - subusers are getting the same notifications as eachother when creating question, and also see the same question content.
  - get public qa items to work on user pages. (or remove section)
  - add publicity popup to other places, and add popup for other instrutions
+ - if you upload an image and then another, it causes issues.

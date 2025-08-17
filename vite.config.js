@@ -4,6 +4,19 @@ import { defineConfig } from 'vite'
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/',
+  build: {
+    target: 'es2020',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Separate vendor chunks for better caching
+          'lit-vendor': ['lit', 'lit-element-state'],
+          'router-vendor': ['@vaadin/router'],
+          'ui-vendor': ['@floating-ui/dom', 'cropperjs']
+        }
+      }
+    }
+  },
   plugins: [VitePWA({
     registerType: 'prompt',
     injectRegister: false,
