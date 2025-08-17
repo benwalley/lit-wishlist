@@ -13,6 +13,8 @@ import '../../../svg/share.js'
 import '../../global/action-dropdown.js'
 import '../../global/loading-screen.js'
 import '../../global/custom-modal.js'
+import '../../instructions/info-tooltip.js'
+import '../../instructions/publicity-details.js'
 import {openEditListModal} from '../../lists/edit-list-modal.js'
 import {listenUpdateItem, listenUpdateList, triggerDeleteList} from "../../../events/eventListeners.js";
 import buttonStyles from '../../../css/buttons.js';
@@ -29,8 +31,7 @@ export class ListViewContainer extends observeState(LitElement) {
         listId: { type: String },
         listData: {type: Object},
         loading: {type: Boolean},
-        selectedItem: {type: String},
-        showPublicityModal: {type: Boolean}
+        selectedItem: {type: String}
     };
 
     constructor() {
@@ -39,7 +40,6 @@ export class ListViewContainer extends observeState(LitElement) {
         this.listData = {};
         this.loading = true;
         this.selectedItem = '';
-        this.showPublicityModal = false;
     }
 
     connectedCallback() {
@@ -206,26 +206,6 @@ export class ListViewContainer extends observeState(LitElement) {
                     }
                 }
                 
-                .publicity-modal-content {
-                    text-align: center;
-                }
-                
-                .publicity-modal-header {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: var(--spacing-small);
-                    margin-bottom: var(--spacing-normal);
-                    font-size: var(--font-size-large);
-                    font-weight: 600;
-                    border-bottom: 1px solid var(--border-color);
-                    padding-bottom: var(--spacing-small);
-                }
-                
-                .publicity-modal-text {
-                    line-height: 1.5;
-                    color: var(--text-color-medium-dark);
-                }
             `
         ];
     }
@@ -290,13 +270,6 @@ export class ListViewContainer extends observeState(LitElement) {
         return [...baseActions, ...editActions];
     }
 
-    _handlePublicityClick() {
-        this.showPublicityModal = true;
-    }
-
-    _closePublicityModal() {
-        this.showPublicityModal = false;
-    }
 
 
     render() {
@@ -322,14 +295,23 @@ export class ListViewContainer extends observeState(LitElement) {
                                     <span>Owner:</span>
                                     <a href="/user/${this.listData?.ownerId}">${getUsernameById(this.listData?.ownerId)}</a>
                                 </span>
-                                <button class="public-section icon-button" @click="${this._handlePublicityClick}">
-                                    ${this.listData.public ? html`
-                                        <world-icon></world-icon>
-                                    ` : html`
-                                        <lock-icon></lock-icon>
-                                    `}
-                                    <custom-tooltip>This list is ${this.listData.public ? 'public' : 'private'} (click for details)</custom-tooltip>
-                                </button>
+                                ${this.listData.public ? html`
+                                    <info-tooltip 
+                                        tooltipText="This list is public. (Click for more details about publicity.)"
+                                        buttonClasses="public-section purple-text"
+                                    >
+                                        <world-icon slot="icon"></world-icon>
+                                        <publicity-details slot="modal-content"></publicity-details>
+                                    </info-tooltip>
+                                ` : html`
+                                    <info-tooltip 
+                                        tooltipText="This list is private. (Click for more details about publicity.)"
+                                        buttonClasses="public-section"
+                                    >
+                                        <lock-icon slot="icon"></lock-icon>
+                                        <publicity-details slot="modal-content"></publicity-details>
+                                    </info-tooltip>
+                                `}
                             </div>
                         </div>
                         
@@ -360,29 +342,6 @@ export class ListViewContainer extends observeState(LitElement) {
                     : html`<p>No items in this list yet.</p>`
                 }
             </div>
-            <custom-modal 
-                .isOpen="${this.showPublicityModal}" 
-                maxWidth="400px"
-                @modal-closed="${this._closePublicityModal}"
-            >
-                <div class="publicity-modal-content">
-                    <div class="publicity-modal-header">
-                        ${this.listData.public ? html`
-                            <world-icon></world-icon>
-                            <span>Public List</span>
-                        ` : html`
-                            <lock-icon></lock-icon>
-                            <span>Private List</span>
-                        `}
-                    </div>
-                    <div class="publicity-modal-text">
-                        ${this.listData.public ? 
-                            'This list is public, which means it can be seen by anyone, even if they are not logged in. Only items marked as public within the list can be seen by non-logged-in users.' : 
-                            'This list is private, which means it can only be seen by you and users or groups you have shared it with.'
-                        }
-                    </div>
-                </div>
-            </custom-modal>
             
         `;
     }

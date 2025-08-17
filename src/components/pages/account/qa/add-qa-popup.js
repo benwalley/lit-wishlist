@@ -26,6 +26,7 @@ export class CustomElement extends observeState(LitElement) {
         questionId: {type: Number},
         askedById: {type: Number},
         preSelectedUsers: {type: Array},
+        showOnlyAnswerMode: {type: Boolean},
     };
 
     constructor() {
@@ -40,6 +41,7 @@ export class CustomElement extends observeState(LitElement) {
         this.questionId = null;
         this.askedById = null;
         this.preSelectedUsers = [];
+        this.showOnlyAnswerMode = false;
     }
 
     static get styles() {
@@ -157,6 +159,10 @@ export class CustomElement extends observeState(LitElement) {
         return userState.userData && userState.userData.id === this.askedById;
     }
 
+    showFullEditMode() {
+        return this.isQuestionCreator() && !this.showOnlyAnswerMode;
+    }
+
     updated(changedProperties) {
         if (changedProperties.has('preSelectedUsers')) {
             if (this.preSelectedUsers.length > 0 && !this.sharedWithUserIds.length) {
@@ -169,6 +175,7 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     editQuestion(data) {
+        console.log({data})
         this.isEditMode = true;
         this.questionText = data.questionText || '';
         this.answerText = data.answerText || '';
@@ -181,6 +188,7 @@ export class CustomElement extends observeState(LitElement) {
         this.isAnonymous = data.isAnonymous || false;
         this.questionId = data.questionId || null;
         this.askedById = data.askedById || null;
+        this.showOnlyAnswerMode = data.showOnlyAnswerMode || false;
     }
 
 
@@ -277,7 +285,7 @@ export class CustomElement extends observeState(LitElement) {
             <div class="modal-contents">
                <div class="form-group">
                     <label for="questionText" class="section-label" style="margin: 0;">Question:</label>
-                     ${this.isQuestionCreator() ? html`<custom-input
+                     ${this.showFullEditMode() ? html`<custom-input
                             id="questionText"
                             .value=${this.questionText}
                             @value-changed="${(e) => this.questionText = e.detail.value}"
@@ -297,7 +305,7 @@ export class CustomElement extends observeState(LitElement) {
                     ></custom-input>
                 </div>
 
-                ${this.isQuestionCreator() ? html`
+                ${this.showFullEditMode() ? html`
                 <div style="display: flex; flex-direction: column;">
                     <h3 class="section-label">Optionally choose a due date</h3>
                     <due-date-picker 

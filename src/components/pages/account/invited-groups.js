@@ -7,10 +7,17 @@ import '../../../svg/arrow-long.js';
 import '../../../svg/bell.js';
 import '../../global/custom-tooltip.js'
 import {messagesState} from "../../../state/messagesStore.js";
-import {listenGroupUpdated, triggerGroupUpdated, triggerBulkAddToGroupModal, triggerUpdateList} from "../../../events/eventListeners.js";
+import {
+    listenGroupUpdated,
+    triggerGroupUpdated,
+    triggerBulkAddToGroupModal,
+    triggerUpdateList,
+    triggerUpdateQa
+} from "../../../events/eventListeners.js";
 import {observeState} from 'lit-element-state';
 import {groupInvitationsState} from '../../../state/groupInvitationsStore.js';
 import scrollbarStyles from "../../../css/scrollbars.js";
+import {userState} from "../../../state/userStore.js";
 
 export class InvitedGroups extends observeState(LitElement) {
     connectedCallback() {
@@ -28,8 +35,8 @@ export class InvitedGroups extends observeState(LitElement) {
             messagesState.addMessage('Group invitation accepted');
             triggerGroupUpdated();
             triggerUpdateList();
+            triggerUpdateQa()
 
-            // Trigger the bulk add modal to allow adding items/lists to the newly joined group
             if (result.data) {
                 triggerBulkAddToGroupModal(group);
             }

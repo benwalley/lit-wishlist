@@ -52,10 +52,6 @@ export class CustomTooltip extends LitElement {
         this.placement = 'bottom';
         this._referenceEl = null;
         this._tooltipId = `tooltip-${Math.random().toString(36).substr(2, 9)}`;
-        this._mouseEnterHandler = null;
-        this._mouseLeaveHandler = null;
-        this._focusHandler = null;
-        this._blurHandler = null;
     }
 
     connectedCallback() {
@@ -96,26 +92,27 @@ export class CustomTooltip extends LitElement {
     _setupEventHandlers() {
         if (!this._referenceEl) return;
 
-        // Create bound handlers for easier removal
-        this._mouseEnterHandler = () => this._showTooltip();
-        this._mouseLeaveHandler = () => this._hideTooltip();
-        this._focusHandler = () => this._showTooltip();
-        this._blurHandler = () => this._hideTooltip();
-
         // Attach event listeners
-        this._referenceEl.addEventListener('mouseenter', this._mouseEnterHandler);
-        this._referenceEl.addEventListener('mouseleave', this._mouseLeaveHandler);
-        this._referenceEl.addEventListener('focus', this._focusHandler, true);
-        this._referenceEl.addEventListener('blur', this._blurHandler, true);
+        this._referenceEl.addEventListener('mouseenter', () => this._showTooltip());
+        this._referenceEl.addEventListener('mouseleave', () => this._hideTooltip());
+        this._referenceEl.addEventListener('focus', () => this._showTooltip(), true);
+        this._referenceEl.addEventListener('blur', () => this._hideTooltip(), true);
+        window.addEventListener('modalOpened', () => this._handleModalEvent());
+    }
+
+    _handleModalEvent() {
+        setTimeout(() => {
+            this._hideTooltip();
+        }, 1)
     }
 
     _removeEventHandlers() {
         if (!this._referenceEl) return;
 
-        this._referenceEl.removeEventListener('mouseenter', this._mouseEnterHandler);
-        this._referenceEl.removeEventListener('mouseleave', this._mouseLeaveHandler);
-        this._referenceEl.removeEventListener('focus', this._focusHandler, true);
-        this._referenceEl.removeEventListener('blur', this._blurHandler, true);
+        this._referenceEl.removeEventListener('mouseenter', () => this._showTooltip());
+        this._referenceEl.removeEventListener('mouseleave', () => this._hideTooltip());
+        this._referenceEl.removeEventListener('focus', () => this._showTooltip(), true);
+        this._referenceEl.removeEventListener('blur', () => this._hideTooltip(), true);
     }
 
     async _showTooltip() {

@@ -26,6 +26,10 @@ export class CustomElement extends observeState(LitElement) {
             buttonStyles,
             css`
 
+                .shared-button {
+                    margin-left: auto;    
+                }
+                
                 .question-card {
                     padding: 1rem;
                     box-shadow: var(--shadow-1-soft);
@@ -37,7 +41,8 @@ export class CustomElement extends observeState(LitElement) {
                 .question-text {
                     font-size: var(--font-size-large);
                     font-weight: 500;
-                    margin: 0 auto 0 0;
+                    margin: 0;
+                    padding-right: var(--spacing-normal-variable);
                 }
 
                 .answers-list {
@@ -72,6 +77,7 @@ export class CustomElement extends observeState(LitElement) {
                 .question-header {
                     display: flex;
                     flex-direction: row;
+                    flex-wrap: wrap;
                     align-items: center;
                 }
                 
@@ -124,6 +130,12 @@ export class CustomElement extends observeState(LitElement) {
                     flex-direction: row-reverse;
                     gap: var(--spacing-x-small);
                 }
+                
+                .answer-button {
+                    margin-right: auto;
+                    padding-left: var(--spacing-small);
+                    padding-right: var(--spacing-small);
+                }
             `
         ];
     }
@@ -132,7 +144,12 @@ export class CustomElement extends observeState(LitElement) {
        return userState.userData && userState.userData.id === this.question.askedById;
     }
 
-    _handleEditQuestion() {
+    hasCurrentUserAnswered() {
+        console.log(this.question.answers)
+        return this.question.answers.some(answer => parseInt(answer.answererId) === parseInt(userState.userData?.id));
+    }
+
+    _handleEditQuestion(onlyAnswerMode = false) {
         const myAnswer = this.question.answers.find(answer => {
             return answer.answererId === userState.userData?.id;
         });
@@ -146,6 +163,7 @@ export class CustomElement extends observeState(LitElement) {
             questionId: this.question.id,
             askedById: this.question.askedById,
             isEditMode: true,
+            showOnlyAnswerMode: onlyAnswerMode,
         }
         triggerAddQuestionEvent(editData);
     }
@@ -159,6 +177,11 @@ export class CustomElement extends observeState(LitElement) {
             <div class="question-card">
                 <div class="question-header">
                     <h2 class="question-text">${this.question.questionText}</h2>
+                    ${!this.hasCurrentUserAnswered() ? html`
+                        <button class="primary fancy small answer-button"
+                                @click="${() => this._handleEditQuestion(true)}">
+                            Add your answer
+                        </button>` : ''}
                     <button class="shared-button icon-button" aria-label="Shared With"
                             style="--icon-color: var(--primary-color); 
                                             --icon-color-hover: var(--primary-color-darker); 
@@ -203,7 +226,7 @@ export class CustomElement extends observeState(LitElement) {
                     ${this.isQuestionCreator() ? html`
                         <button class="edit-button icon-button"
                                 aria-label="Edit Question"
-                                @click="${this._handleEditQuestion}"
+                                @click="${() => this._handleEditQuestion(false)}"
                                 style="--icon-color: var(--blue-normal); 
                                                 --icon-color-hover: var(--blue-darker); 
                                                 --icon-hover-background: var(--blue-light); 
@@ -234,13 +257,27 @@ export class CustomElement extends observeState(LitElement) {
                         <span class="created-by-username">${getUsernameById(this.question.askedById)}</span>
                     </span>
                 </div>
+                
                 <div class="answers-list">
                     ${this.question.answers.length === 0
                             ? html`
                                 <div class="no-answers">No answers yet.</div>`
                             : this.question.answers.map(answer => html`
                                 <div class="answer-item">
-                                    <div class="answer-text">${answer.answerText}</div>
+                                    <div class="answer-text">
+                                        ${answer.answerText}
+                                        ${parseInt(answer.answererId) === parseInt(userState.userData?.id) ? html`
+                                            <button class="icon-button" 
+                                                    aria-label="Edit Answer"
+                                                    @click="${() => this._handleEditQuestion(true)}"
+                                                    style="--icon-color: var(--blue-normal); 
+                                                            --icon-color-hover: var(--blue-darker); 
+                                                            --icon-hover-background: var(--blue-light);
+                                                            margin-left: var(--spacing-x-small);">
+                                                <edit-icon style="font-size: 14px;"></edit-icon>
+                                            </button>
+                                        ` : ''}
+                                    </div>
                                     <a href="/user/${answer.answererId}" class="user-info">
                                         <custom-avatar size="24"
                                                      username="${getUsernameById(answer.answererId)}"

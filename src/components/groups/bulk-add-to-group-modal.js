@@ -5,10 +5,14 @@ import {listenBulkAddToGroupModal, triggerGroupUpdated, triggerUpdateList} from 
 import '../../svg/check.js';
 import '../pages/account/avatar.js';
 import '../pages/account/qa/select-my-questions.js';
+import '../lists/select-my-lists.js';
 import { bulkShareWithGroup } from '../../helpers/api/groups.js';
 import { messagesState } from '../../state/messagesStore.js';
+import {userState} from "../../state/userStore.js";
+import {observeState} from "lit-element-state";
+import {navigate} from "../../router/main-router.js";
 
-export class BulkAddToGroupModal extends LitElement {
+export class BulkAddToGroupModal extends observeState(LitElement) {
     static properties = {
         isOpen: {type: Boolean},
         selectedListIds: {type: Array},
@@ -28,7 +32,7 @@ export class BulkAddToGroupModal extends LitElement {
 
     connectedCallback() {
         super.connectedCallback();
-        this.unsubscribe = listenBulkAddToGroupModal((event) => {
+        listenBulkAddToGroupModal((event) => {
             if (event && event.detail && event.detail.group) {
                 this.group = event.detail.group;
                 this.isOpen = true;
@@ -41,18 +45,17 @@ export class BulkAddToGroupModal extends LitElement {
 
     disconnectedCallback() {
         super.disconnectedCallback();
-        if (this.unsubscribe) {
-            this.unsubscribe();
-        }
     }
 
-    handleModalChange(e) {
-        this.isOpen = e.detail.isOpen;
-        if (!e.detail.isOpen) {
-            // Clear selections when modal is closed
-            this.selectedListIds = [];
-            this.selectedQuestionIds = [];
-        }
+    handleModalClose(e) {
+        this.isOpen = false;
+        this.selectedListIds = [];
+        this.selectedQuestionIds = [];
+    }
+
+    navigateToGroupPage() {
+        const url = `/group/${this.group.id}`;
+        navigate(url);
     }
 
     async handleAddToGroup() {
@@ -69,8 +72,7 @@ export class BulkAddToGroupModal extends LitElement {
 
             // Skip the API call if there's nothing to add
             if (listIds.length === 0 && questionIds.length === 0) {
-                messagesState.addMessage('Please select at least one list or question to share', 'warning');
-                this.isLoading = false;
+                this._handleCancel();
                 return;
             }
 
@@ -78,8 +80,9 @@ export class BulkAddToGroupModal extends LitElement {
             const result = await bulkShareWithGroup(this.group.id, listIds, questionIds);
 
             if (result.success) {
-                messagesState.addMessage('Items successfully shared with group');
+                messagesState.addMessage(`Successfully joined ${this.group.groupName}! You can now share items with this group.`);
                 triggerGroupUpdated(); // Trigger event to update other components
+                this.navigateToGroupPage()
                 this.isOpen = false;
             } else {
                 messagesState.addMessage(`Error sharing items with group: ${result.error || 'Unknown error'}`, 'error');
@@ -109,10 +112,18 @@ export class BulkAddToGroupModal extends LitElement {
                 }
                 
                 .modal-title {
-                    padding: var(--spacing-normal);
+                    padding: var(--spacing-normal) var(--spacing-normal) var(--spacing-small) var(--spacing-normal);
                     margin: 0;
                     text-align: center;
                     font-size: var(--font-size-large);
+                }
+                
+                .modal-subtitle {
+                    padding: 0 var(--spacing-normal) var(--spacing-normal) var(--spacing-normal);
+                    margin: 0;
+                    text-align: center;
+                    font-size: var(--font-size-small);
+                    color: var(--text-secondary);
                 }
                 
                 .group-name {
@@ -177,32 +188,37 @@ export class BulkAddToGroupModal extends LitElement {
         this.selectedQuestionIds = selectedQuestions ? selectedQuestions.map(q => q.id) : [];
     }
 
+    _handleCancel() {
+        this.isOpen = false;
+        this.navigateToGroupPage();
+    }
+
     render() {
         return html`
             <custom-modal 
                 triggerEvent="open-bulk-add-to-group-modal"
                 ?isOpen=${this.isOpen}
-                @modal-changed=${this.handleModalChange}
+                @modal-closed=${this.handleModalClose}
                 noPadding="true"
             >
                 <div class="modal-container">
                     <div class="modal-header">
                         <h2 class="modal-title">
                             ${this.group ? 
-                                html`Share with <span class="group-name">${this.group.groupName}</span>?` : 
-                                'What do you want to share with this group?'
+                                html`You've joined <span class="group-name">${this.group.groupName}</span>!` : 
+                                'Successfully joined group!'
                             }
                         </h2>
+                        <p class="modal-subtitle">You can now share your lists and questions with this group.</p>
                     </div>
                     
                     <div class="scrolling-contents">
                         <select-my-lists @change="${this._handleselectedListIdsChange}"></select-my-lists>
-                        
                         <select-my-questions @change="${this._handleSelectedQuestionsChange}"></select-my-questions>
                     </div>
                     
                     <div class="modal-footer">
-                        <button class="secondary" @click=${() => this.isOpen = false}>Cancel</button>
+                        <button class="secondary" @click=${this._handleCancel}>Cancel</button>
                         <button class="primary" 
                                 ?disabled=${this.isLoading}
                                 @click=${this.handleAddToGroup}>

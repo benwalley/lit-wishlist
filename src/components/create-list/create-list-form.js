@@ -101,21 +101,24 @@ export class CreateListForm extends LitElement {
             css`
                 form {
                     display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: var(--spacing-normal);
+                    gap: var(--spacing-medium);
                     padding: var(--spacing-small);
+                }
+
+                @media only screen and (min-width: 700px) {
+                    form {
+                        grid-template-columns: 1fr 1fr;
+                    }
                 }
                 
                 h2 {
-                    margin-top: 0;
+                    margin: 0;
                 }
                 
                 .left-column {
                     display: flex;
                     flex-direction: column;
                     gap: var(--spacing-normal);
-                    padding: var(--spacing-normal);
-                    padding-top: 0;
                 }
                 
                 .right-column {
@@ -153,8 +156,9 @@ export class CreateListForm extends LitElement {
                 }
 
                 .full-width {
-                    grid-column: 1 / span 2;
+                    grid-column: 1 / -1;
                 }
+                
 
                 .section-heading {
                     margin: 0;
@@ -188,11 +192,15 @@ export class CreateListForm extends LitElement {
                     gap: var(--spacing-small);
                     justify-content: flex-end;
                     display: flex;
-                    grid-column: 2;
-                    padding-top: var(--spacing-normal);
                     
                     button {
                         width: auto;
+                    }
+                }
+
+                @media only screen and (min-width: 700px) {
+                    .save-button-container {
+                        grid-column: 2;
                     }
                 }
                 
@@ -308,7 +316,7 @@ export class CreateListForm extends LitElement {
                     <button @click="${this._closeModal}" class="secondary cancel-button">Cancel</button>
                     <button class="primary save-button">
                         <plus-icon></plus-icon>
-                        Save List
+                        Create List
                     </button>
                 </div>
             </form>

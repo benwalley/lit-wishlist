@@ -10,18 +10,12 @@ import {observeState} from "lit-element-state";
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
-        lists: {type: Array},
         selectedListIds: {type: Array},
-        loading: {type: Boolean},
-        includeSubuserLists: {type: Boolean}
     };
 
     constructor() {
         super();
-        this.lists = []; // Initialize lists
         this.selectedListIds = [];
-        this.loading = true;
-        this.includeSubuserLists = false;
     }
 
     static get styles() {
@@ -38,53 +32,6 @@ export class CustomElement extends observeState(LitElement) {
 
     connectedCallback() {
         super.connectedCallback();
-
-        if (userState.userData?.id) {
-            this.fetchLists();
-        } else {
-            listenInitialUserLoaded(() => {
-                this.fetchLists()
-            })
-        }
-        listenUpdateList(() => {
-            this.fetchLists()
-        })
-    }
-
-    async fetchLists() {
-        if (!userState.userData?.id) {
-            return;
-        }
-
-        try {
-            this.loading = true;
-
-            const response = await fetchMyLists(this.includeSubuserLists);
-
-            if (response.success) {
-                this.lists = response.data;
-                if(this.lists.length === 1) {
-                    this.selectedListIds = [this.lists[0].id];
-                    this.dispatchEvent(new CustomEvent('change', {
-                        detail: {
-                            selectedListIds: this.selectedListIds,
-                            selectedLists: [this.lists[0]],
-                            count: 1
-                        },
-                        bubbles: true,
-                        composed: true
-                    }));
-                }
-            } else {
-                throw new Error(response.error);
-            }
-        } catch (error) {
-            console.error('Error fetching lists:', error);
-            messagesState.addMessage('Error fetching lists', 'error');
-            this.lists = []; // Reset to empty array on error
-        } finally {
-            this.loading = false;
-        }
     }
 
     _handleSelectionChange(event) {
@@ -114,11 +61,12 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     render() {
+        console.log('rendering')
         return html`
             <selectable-list
-                .items=${this.lists}
+                .items=${userState.myLists}
                 .selectedItemIds=${this.selectedListIds}
-                .loading=${this.loading}
+                .loading=${false}
                 .itemRenderer=${this._renderItem}
                 .title=${"Lists"}
                 .customEmptyMessage=${"No lists available."}

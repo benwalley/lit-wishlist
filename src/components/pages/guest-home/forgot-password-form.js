@@ -77,14 +77,6 @@ export class ForgotPasswordForm extends LitElement {
                     ?disabled=${this.isSubmitting}>
                     ${this.isSubmitting ? 'Sending...' : 'Reset Password'}
                 </button>
-                
-                <button 
-                    type="button" 
-                    class="back-to-login" 
-                    @click=${this._backToLogin}
-                    ?disabled=${this.isSubmitting}>
-                    Back to Login
-                </button>
             </form>
         `;
     }

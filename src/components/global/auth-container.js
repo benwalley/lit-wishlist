@@ -67,12 +67,14 @@ export class AuthContainer extends observeState(LitElement) {
     async firstUpdated() {
         listenUpdateUser(() => {
             this.fetchUserData();
+            this.fetchGroupData();
             this.fetchAccessibleUsers();
             this.fetchViewedItems();
             this.fetchUserLists();
         });
         listenGroupUpdated(() => {
             this.fetchAccessibleUsers();
+            this.fetchGroupData();
         });
         listenUpdateList(() => {
             this.fetchUserLists();
@@ -83,6 +85,7 @@ export class AuthContainer extends observeState(LitElement) {
             return;
         }
         await this.fetchUserData();
+        await this.fetchGroupData();
         await this.fetchAccessibleUsers();
         await this.fetchViewedItems();
         triggerInitialUserLoaded();
@@ -109,14 +112,18 @@ export class AuthContainer extends observeState(LitElement) {
         }
     }
 
+    async fetchGroupData() {
+        const myGroups = await getUserGroups();
+        userState.myGroups = myGroups;
+
+    }
+
     async fetchUserData() {
         try {
             const userData = await getCurrentUser();
-            const myGroups = await getUserGroups();
+
             userState.userData = userData;
-            if(myGroups?.length) {
-                userState.myGroups = myGroups;
-            }
+
 
             // Fetch user lists if user is authenticated
             if (userData?.id) {

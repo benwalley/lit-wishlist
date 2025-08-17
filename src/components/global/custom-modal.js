@@ -145,6 +145,7 @@ class CustomModal extends LitElement {
             if (dialog) {
                 if (this.isOpen && !dialog.open) {
                     dialog.showModal();
+                    window.dispatchEvent(new CustomEvent('modalOpened'));
                 } else if (!this.isOpen && dialog.open) {
                     dialog.close();
                 }

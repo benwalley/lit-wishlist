@@ -12,6 +12,8 @@ import './logout-button.js'
 import '../../../svg/edit.js'
 import buttonStyles from '../../../css/buttons.js'
 import '../../users/edit-user-form.js';
+import '../../global/custom-modal.js';
+import '../../instructions/publicity-details.js';
 import {copyCurrentPageUrl, copyTextToClipboard, copyUrlToClipboard} from '../../../helpers/shareHelpers.js';
 import {generateTwoSimilarColorsFromString} from '../../../helpers.js';
 
@@ -20,6 +22,7 @@ export class UserDetails extends observeState(LitElement) {
         showEditButton: {type: Boolean},
         isUser: {type: Boolean},
         userData: {type: Object},
+        isPublicityModalOpen: {type: Boolean}
     };
 
     constructor() {
@@ -27,6 +30,7 @@ export class UserDetails extends observeState(LitElement) {
         this.showEditButton = true;
         this.isUser = true;
         this.userData = {};
+        this.isPublicityModalOpen = false;
     }
 
     static get styles() {
@@ -197,6 +201,14 @@ export class UserDetails extends observeState(LitElement) {
             'Failed to copy public url');
     }
 
+    _handlePublicityClick() {
+        this.isPublicityModalOpen = true;
+    }
+
+    _handlePublicityModalClose() {
+        this.isPublicityModalOpen = false;
+    }
+
     render() {
 
 
@@ -208,28 +220,6 @@ export class UserDetails extends observeState(LitElement) {
                                shadow="true"
                 ></custom-avatar>
             </div>
-            
-            <account-username .username="${this._getUsername()}"></account-username>
-            <div class="email-container">
-                <email-icon></email-icon>
-                <em>${this._getEmail()}</em>
-            </div>
-            ${this._getPublicDescription() ? html`<p>${this._getPublicDescription()}</p>` : ''}
-            
-            ${this._isPublic() ? html`
-                <div class="public-indicator publicity-indicator">
-                    <world-icon></world-icon>
-                    <span>Public Profile</span>
-                </div>
-                <custom-tooltip>This user's public details are visible to non-logged in users</custom-tooltip>
-            ` : html`
-                <div class="private-indicator publicity-indicator">
-                    <lock-icon></lock-icon>
-                    <span>Private Profile</span>
-                    <custom-tooltip>This user's public details are <em>not</em> visible to non-logged in users</custom-tooltip>
-                </div>
-            `}
-
             <div class="actions-container">
                 ${this._isPublic() ? html`
                     <button aria-label="share-button"
@@ -249,10 +239,39 @@ export class UserDetails extends observeState(LitElement) {
                     </button>
                 ` : ''}
             </div>
+            <account-username .username="${this._getUsername()}"></account-username>
+            <div class="email-container">
+                <email-icon></email-icon>
+                <em>${this._getEmail()}</em>
+            </div>
+            ${this._getPublicDescription() ? html`<p>${this._getPublicDescription()}</p>` : ''}
+            
+            ${this._isPublic() ? html`
+                <button class="public-indicator publicity-indicator" @click=${this._handlePublicityClick}>
+                    <world-icon></world-icon>
+                    <span>Public Profile</span>
+                </button>
+                <custom-tooltip>This user's public details are visible to non-logged in users</custom-tooltip>
+            ` : html`
+                <button class="private-indicator publicity-indicator" @click=${this._handlePublicityClick}>
+                    <lock-icon></lock-icon>
+                    <span>Private Profile</span>
+                    <custom-tooltip>This user's public details are <em>not</em> visible to non-logged in users</custom-tooltip>
+                </button>
+            `}
             <edit-user-form></edit-user-form>
 
             ${this._showLogoutButton() ? html`
                 <logout-button></logout-button>` : ''}
+                
+            <custom-modal 
+                ?isOpen=${this.isPublicityModalOpen}
+                @modal-closed=${this._handlePublicityModalClose}
+                maxWidth="600px"
+                noPadding
+            >
+                <publicity-details></publicity-details>
+            </custom-modal>
         `;
     }
 }

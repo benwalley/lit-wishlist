@@ -12,12 +12,15 @@ class UserListComponent extends observeState(LitElement) {
     static properties = {
         selectedUserIds: {type: Array},
         requireCurrentUser: {type: Boolean},
+        onlySubusers: {type: Boolean},
     };
 
     constructor() {
         super();
         this.selectedUserIds = [];
         this.requireCurrentUser = false;
+        this.onlySubusers = false;
+
     }
 
     static styles = css`
@@ -192,7 +195,7 @@ class UserListComponent extends observeState(LitElement) {
     }
 
     _dispatchSelectionChangedEvent() {
-        const myUsers = [userState.userData, ...userState.subusers]
+        const myUsers = userListState.users || [];
         const selectedUsers = this.selectedUserIds
             .map(id => myUsers.find(user => user && user.id === id))
             .filter(Boolean);

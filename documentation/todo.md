@@ -46,3 +46,5 @@
    - Then stop sharing them with the group.
  - after joining a group, if you join a new group, it gives you the option to share questions you didn't ask.
  - subusers are getting the same notifications as eachother when creating question, and also see the same question content.
+ - get public qa items to work on user pages. (or remove section)
+ - add publicity popup to other places, and add popup for other instrutions

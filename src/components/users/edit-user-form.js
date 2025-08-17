@@ -2,6 +2,11 @@ import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../css/buttons";
 import '../../svg/x.js';
 import '../../svg/camera.js';
+import '../../svg/info.js';
+import '../../svg/world.js';
+import '../../svg/lock.js';
+import '../instructions/info-tooltip.js';
+import '../instructions/publicity-details.js';
 import '../global/custom-input.js';
 import '../global/custom-modal.js';
 import '../pages/account/avatar.js';
@@ -17,12 +22,12 @@ import {triggerUpdateUser} from "../../events/eventListeners.js";
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
-        value: { type: String },
+        value: {type: String},
         imageId: {type: Number},
-        username: { type: String },
-        description: { type: String },
-        isPublic: { type: Boolean },
-        errorMessage: { type: String }, // New property to hold error messages
+        username: {type: String},
+        description: {type: String},
+        isPublic: {type: Boolean},
+        errorMessage: {type: String}, // New property to hold error messages
     };
 
     constructor() {
@@ -132,6 +137,7 @@ export class CustomElement extends observeState(LitElement) {
                     justify-content: space-between;
                     border-bottom: 1px solid var(--border-color);
                 }
+
                 .header h2 {
                     margin: 0;
                 }
@@ -144,6 +150,7 @@ export class CustomElement extends observeState(LitElement) {
                     padding: var(--spacing-normal);
                     gap: var(--spacing-normal);
                 }
+
                 .content .user-image {
                     position: relative;
                     display: flex;
@@ -159,11 +166,18 @@ export class CustomElement extends observeState(LitElement) {
                 }
 
                 /* Error message styles */
+
                 .error {
                     color: red;
                     font-size: 0.9em;
                     margin: 10px 0;
                     text-align: center;
+                }
+
+                .publicity-row {
+                    display: flex;
+                    align-items: center;
+                    gap: var(--spacing-x-small);
                 }
             `
         ];
@@ -171,26 +185,26 @@ export class CustomElement extends observeState(LitElement) {
 
     render() {
         return html`
-            <custom-modal id="edit-user-modal" 
-                          maxWidth="500px" 
-                          noPadding 
+            <custom-modal id="edit-user-modal"
+                          maxWidth="500px"
+                          noPadding
                           @modal-changed="${this._handleModalChanged}">
                 <div class="header">
                     <h2>Edit Profile</h2>
                 </div>
                 <form @submit="${this._handleSubmit}">
                     <div class="content">
-                        
+
                         <div class="user-image">
                             <!-- Use the component's username property -->
-                            <custom-avatar size="120" 
-                                           shadow 
-                                           username="${this.username}" 
+                            <custom-avatar size="120"
+                                           shadow
+                                           username="${this.username}"
                                            imageId="${this.imageId}">
                             </custom-avatar>
-                            <image-changer  
-                                            imageId="${this.imageId}"
-                                            @image-updated="${this._onImageChanged}"></image-changer>
+                            <image-changer
+                                    imageId="${this.imageId}"
+                                    @image-updated="${this._onImageChanged}"></image-changer>
                         </div>
                         <span>Click the camera to change your profile picture</span>
 
@@ -208,14 +222,31 @@ export class CustomElement extends observeState(LitElement) {
                                 @value-changed="${this._onDescriptionChanged}"
                         ></custom-input>
 
-                        <custom-toggle
-                                label="Make Profile Public"
-                                ?checked="${this.isPublic}"
-                                @change="${this._onPublicToggleChanged}"
-                        ></custom-toggle>
+                        <div class="publicity-row">
+                            <custom-toggle
+                                    label="${this.isPublic ? 'Public' : 'Not public'}"
+                                    ?checked="${this.isPublic}"
+                                    @change="${this._onPublicToggleChanged}"
+                            ></custom-toggle>
+                            ${this.isPublic ? html`
+                                <info-tooltip tooltipText="This user is public. (Click for more details about publicity.)"
+                                              buttonClasses="purple-text large">
+                                    <world-icon slot="icon"></world-icon>
+                                    <publicity-details slot="modal-content"></publicity-details>
+                                </info-tooltip>
+                            ` : html`
+                                <info-tooltip tooltipText="This user is not public. (Click for more details about publicity.)"
+                                              buttonClasses="large">
+                                    <lock-icon slot="icon"></lock-icon>
+                                    <publicity-details slot="modal-content"></publicity-details>
+                                </info-tooltip>
+                            `}
+
+                        </div>
 
                         <!-- Error message -->
-                        ${this.errorMessage ? html`<div class="error">${this.errorMessage}</div>` : ''}
+                        ${this.errorMessage ? html`
+                            <div class="error">${this.errorMessage}</div>` : ''}
                     </div>
                     <div class="footer">
                         <button type="button" class="button ghost shadow" @click="${() => this._close(true)}">

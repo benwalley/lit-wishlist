@@ -27,7 +27,6 @@ export class MyGroupsList extends observeState(LitElement) {
 
     connectedCallback() {
         super.connectedCallback();
-        listenGroupUpdated(() => triggerUpdateUser())
     }
 
     static get styles() {

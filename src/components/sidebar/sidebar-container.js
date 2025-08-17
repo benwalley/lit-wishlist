@@ -73,6 +73,11 @@ export class CustomElement extends observeState(LitElement) {
         globalState.menuExpanded = false;
     }
 
+    // Closes the menu when a navigation link is clicked
+    _handleLinkClick() {
+        globalState.menuExpanded = false;
+    }
+
     _openSettings() {
         const settingsModal = this.shadowRoot.querySelector('settings-modal');
         if (settingsModal) {
@@ -302,36 +307,36 @@ export class CustomElement extends observeState(LitElement) {
                 <nav class="nav-element">
                     <h2 class="menu-section-heading">Main Menu</h2>
                     <ul class="menu-section-list">
-                        <li><a href="/account" class="menu-item-link ${this._isActive('/account') ? 'active' : ''}">
+                        <li><a href="/account" class="menu-item-link ${this._isActive('/account') ? 'active' : ''}" @click="${this._handleLinkClick}">
                             <dashboard-icon class="icon"></dashboard-icon>
                             <span>Dashboard</span>
                         </a></li>
-                        <li><a href="/lists" class="menu-item-link ${this._isActive('/lists') ? 'active' : ''}">
+                        <li><a href="/lists" class="menu-item-link ${this._isActive('/lists') ? 'active' : ''}" @click="${this._handleLinkClick}">
                             <thick-list-icon class="icon" active="false"></thick-list-icon>
                             <span>All Lists</span>
                         </a></li>
-                        <li><a href="/users" class="menu-item-link ${this._isActive('/users') ? 'active' : ''}">
+                        <li><a href="/users" class="menu-item-link ${this._isActive('/users') ? 'active' : ''}" @click="${this._handleLinkClick}">
                             <user-icon class="icon"></user-icon>
                             <span>All Users</span>
                         </a></li>
-                        <li><a href="/my-lists" class="menu-item-link ${this._isActive('/my-lists') ? 'active' : ''}">
+                        <li><a href="/my-lists" class="menu-item-link ${this._isActive('/my-lists') ? 'active' : ''}" @click="${this._handleLinkClick}">
                             <user-list-icon class="icon" active="false"></user-list-icon>
                             <span>My Lists</span>
                         </a></li>
-                        <li><a href="/events" class="menu-item-link ${this._isActive('/events') ? 'active' : ''}">
+                        <li><a href="/events" class="menu-item-link ${this._isActive('/events') ? 'active' : ''}" @click="${this._handleLinkClick}">
                             <calendar-icon class="icon"></calendar-icon>
                             <span>Events</span>
                         </a></li>
-                        <li><a href="/proposals" class="menu-item-link ${this._isActive('/proposals') ? 'active' : ''}">
+                        <li><a href="/proposals" class="menu-item-link ${this._isActive('/proposals') ? 'active' : ''}" @click="${this._handleLinkClick}">
                             <gift-icon class="icon"></gift-icon>
                             <span>Proposals</span>
                         </a></li>
-                        <li><a href="/money-tracking" class="menu-item-link ${this._isActive('/money-tracking') ? 'active' : ''}">
+                        <li><a href="/money-tracking" class="menu-item-link ${this._isActive('/money-tracking') ? 'active' : ''}" @click="${this._handleLinkClick}">
                             <dollar-icon class="icon"></dollar-icon>
                             <span>Money Tracking</span>
                         </a></li>
                         <li class="menu-item-with-badge">
-                            <a href="/groups" class="menu-item-link ${this._isActive('/groups') ? 'active' : ''}">
+                            <a href="/groups" class="menu-item-link ${this._isActive('/groups') ? 'active' : ''}" @click="${this._handleLinkClick}">
                                 <group-icon class="icon"></group-icon>
                                 <span>Groups</span>
                             </a>
@@ -339,11 +344,11 @@ export class CustomElement extends observeState(LitElement) {
                                 <div class="invitation-badge">${groupInvitationsState.invitationCount}</div>
                             ` : ''}
                         </li>
-                        ${!isCurrentUserSubuser() ? html`<li><a href="/subusers" class="menu-item-link ${this._isActive('/subusers') ? 'active' : ''}">
+                        ${!isCurrentUserSubuser() ? html`<li><a href="/subusers" class="menu-item-link ${this._isActive('/subusers') ? 'active' : ''}" @click="${this._handleLinkClick}">
                             <child-icon class="icon subuser"></child-icon>
                             <span>Subusers</span>
                         </a></li>` : ''}
-                        <li><a href="/qa" class="menu-item-link ${this._isActive('/qa') ? 'active' : ''}">
+                        <li><a href="/qa" class="menu-item-link ${this._isActive('/qa') ? 'active' : ''}" @click="${this._handleLinkClick}">
                             <question-mark-icon class="icon"></question-mark-icon>
                             <span>Questions & Answers</span>
                         </a></li>
@@ -351,11 +356,11 @@ export class CustomElement extends observeState(LitElement) {
 
                     <h2 class="menu-section-heading">Other Links</h2>
                     <ul class="menu-section-list">
-                        <li><a href="/bulk-actions" class="menu-item-link ${this._isActive('/bulk-actions') ? 'active' : ''}">
+                        <li><a href="/bulk-actions" class="menu-item-link ${this._isActive('/bulk-actions') ? 'active' : ''}" @click="${this._handleLinkClick}">
                             <dots-icon class="icon"></dots-icon>
                             <span>Bulk Actions</span>
                         </a></li>
-                        <li><a href="/import" class="menu-item-link ${this._isActive('/import') ? 'active' : ''}">
+                        <li><a href="/import" class="menu-item-link ${this._isActive('/import') ? 'active' : ''}" @click="${this._handleLinkClick}">
                             <cloud-upload-icon class="icon"></cloud-upload-icon>
                             <span>Import Wishlist</span>
                         </a></li>

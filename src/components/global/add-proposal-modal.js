@@ -311,11 +311,8 @@ export class AddProposalModal extends observeState(LitElement) {
         }
     }
 
-    _handleModalChanged(event) {
-        this.isOpen = event.detail.isOpen;
-        if (!this.isOpen) {
-            this._resetForm();
-        }
+    _handleModalClosed(event) {
+        this.isOpen = false;
     }
 
     _handleUserUpdated() {
@@ -535,7 +532,7 @@ export class AddProposalModal extends observeState(LitElement) {
         return html`
             <custom-modal 
                 ?isOpen=${this.isOpen}
-                @modal-changed=${this._handleModalChanged}
+                @modal-closed=${this._handleModalClosed}
                 maxWidth="1000px"
                 noPadding
             >
@@ -582,11 +579,9 @@ export class AddProposalModal extends observeState(LitElement) {
                             <div class="user-selector-container">
                                 <your-users-list
                                     class="full-width"
-                                    apiEndpoint="/users/accessible"
                                     .selectedUserIds=${this.selectedUserIds}
                                     @selection-changed=${this._handleUsersSelectionChanged}
                                     requireCurrentUser
-                                    multiSelect="true"
                                 ></your-users-list>
                             </div>
                         </div>

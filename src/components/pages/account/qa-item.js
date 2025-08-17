@@ -317,7 +317,7 @@ export class QAItem extends observeState(LitElement) {
             
             <div class="answer-container editable">
                 ${hasEmptyAnswer
-                        ? html`<span class="missing-info">Needs an answer</span>`
+                        ? html`<span class="missing-info">click to answer</span>`
                         : html`<p class="answer">${this.item.answers[0]?.answerText}</p>`
                 }
                <div class="qa-item-asker">

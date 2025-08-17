@@ -124,7 +124,7 @@ export async function getQAItems(userId) {
 
 export async function getAskedQAItems(userId) {
     try {
-        const response = await cachedFetch(`/qa/accessible/${userId}`, {}, true);
+        const response = await cachedFetch(`/qa/userAsked/${userId}`, {}, true);
         return response
     } catch (e) {
         handleQAError('There was an error fetching the Q&A items. Please try again.')

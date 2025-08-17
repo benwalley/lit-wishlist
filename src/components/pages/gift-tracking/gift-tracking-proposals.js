@@ -20,13 +20,15 @@ import {triggerEditProposalModal, triggerDeleteProposal, listenProposalDeleted, 
 export class GiftTrackingProposals extends observeState(LitElement) {
     static properties = {
         proposals: {type: Array, state: true},
-        loading: {type: Boolean, state: true}
+        loading: {type: Boolean, state: true},
+        activeTab: {type: String, state: true}
     };
 
     constructor() {
         super();
         this.proposals = [];
         this.loading = true;
+        this.activeTab = 'pending';
     }
 
     connectedCallback() {
@@ -51,8 +53,7 @@ export class GiftTrackingProposals extends observeState(LitElement) {
         try {
             const response = await customFetch('/proposals/for-me', {}, true);
             if (response.success) {
-                // Filter out proposals that have "accepted" status
-                this.proposals = (response.data || []).filter(proposal => proposal.proposalStatus !== 'accepted');
+                this.proposals = response.data || [];
             }
         } catch (error) {
             console.error('Failed to load proposals:', error);
@@ -71,7 +72,7 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                     width: 100%;
                     box-sizing: border-box;
                     margin: 0 auto;
-                    padding: 0 var(--spacing-normal);
+                    padding: var(--spacing-normal-variable);
                     max-width: 1200px;
                 }
 
@@ -243,7 +244,68 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                     margin-bottom: var(--spacing-small);
                 }
 
+                .tabs-container {
+                    display: flex;
+                    justify-content: center;
+                    margin-bottom: var(--spacing-normal);
+                    border-bottom: 1px solid var(--border-color-light);
+                }
+
+                .tab-button {
+                    background: none;
+                    border: none;
+                    padding: var(--spacing-small) var(--spacing-normal);
+                    font-size: var(--font-size-normal);
+                    font-weight: bold;
+                    color: var(--medium-text-color);
+                    cursor: pointer;
+                    border-bottom: 2px solid transparent;
+                    transition: var(--transition-200);
+                    position: relative;
+                    text-transform: capitalize;
+                    border-radius: 0;
+                }
+
+                .tab-button:hover {
+                    color: var(--text-color-dark);
+                    background: var(--background-light);
+                }
+
+                .tab-button.active {
+                    color: var(--primary-color);
+                    border-bottom-color: var(--primary-color);
+                }
+
+                .tab-counter {
+                    color: var(--primary-color);
+                    border-radius: 50%;
+                    font-size: var(--font-size-x-small);
+                    font-weight: 600;
+                    margin-left: var(--spacing-x-small);
+                    padding: 2px;
+                    min-width: 18px;
+                    height: 18px;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .tab-button.active .tab-counter {
+                    background: var(--primary-color);
+                    color: white;
+                }
+
                 @media (max-width: 600px) {
+                    .tabs-container {
+                        justify-content: stretch;
+                    }
+
+                    .tab-button {
+                        flex: 1;
+                        padding: var(--spacing-small);
+                        font-size: var(--font-size-small);
+                    }
+
                     .proposal-header {
                         flex-direction: column;
                         align-items: stretch;
@@ -279,6 +341,46 @@ export class GiftTrackingProposals extends observeState(LitElement) {
         ];
     }
 
+    _getFilteredProposals() {
+        return this.proposals.filter(proposal => {
+            const status = proposal.proposalStatus?.toLowerCase();
+            switch (this.activeTab) {
+                case 'accepted':
+                    return status === 'accepted';
+                case 'pending':
+                    return status === 'pending';
+                case 'rejected':
+                    return status === 'rejected' || status === 'declined';
+                default:
+                    return true;
+            }
+        });
+    }
+
+    _getProposalCounts() {
+        const counts = {
+            accepted: 0,
+            pending: 0,
+            rejected: 0
+        };
+
+        this.proposals.forEach(proposal => {
+            const status = proposal.proposalStatus?.toLowerCase();
+            if (status === 'accepted') {
+                counts.accepted++;
+            } else if (status === 'pending') {
+                counts.pending++;
+            } else if (status === 'rejected' || status === 'declined') {
+                counts.rejected++;
+            }
+        });
+
+        return counts;
+    }
+
+    _handleTabChange(tab) {
+        this.activeTab = tab;
+    }
 
     _getProposalActions(proposal) {
         return [
@@ -319,17 +421,38 @@ export class GiftTrackingProposals extends observeState(LitElement) {
             return html`<loading-screen></loading-screen>`;
         }
 
-        if (!this.proposals || this.proposals.length === 0) {
-            return html`
-                <div class="empty-state">
-                    <p>No proposals found.</p>
-                </div>
-            `;
-        }
+        const counts = this._getProposalCounts();
+        const filteredProposals = this._getFilteredProposals();
 
         return html`
-            <div class="proposals-container">
-                ${this.proposals.map(proposal => html`
+            <div class="tabs-container">
+                <button 
+                    class="tab-button ${this.activeTab === 'pending' ? 'active' : ''}"
+                    @click="${() => this._handleTabChange('pending')}">
+                    Pending
+                    <span class="tab-counter">${counts.pending}</span>
+                </button>
+                <button 
+                    class="tab-button ${this.activeTab === 'accepted' ? 'active' : ''}"
+                    @click="${() => this._handleTabChange('accepted')}">
+                    Accepted
+                    <span class="tab-counter">${counts.accepted}</span>
+                </button>
+                <button 
+                    class="tab-button ${this.activeTab === 'rejected' ? 'active' : ''}"
+                    @click="${() => this._handleTabChange('rejected')}">
+                    Rejected
+                    <span class="tab-counter">${counts.rejected}</span>
+                </button>
+            </div>
+
+            ${filteredProposals.length === 0 ? html`
+                <div class="empty-state">
+                    <p>No ${this.activeTab} proposals found.</p>
+                </div>
+            ` : html`
+                <div class="proposals-container">
+                    ${filteredProposals.map(proposal => html`
                     <div class="proposal-item">
                         <div class="proposal-header">
                             ${proposal.itemData?.imageIds?.length > 0 ? html`
@@ -389,7 +512,8 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                         ></proposal-participants>
                     </div>
                 `)}
-            </div>
+                </div>
+            `}
         `;
     }
 }

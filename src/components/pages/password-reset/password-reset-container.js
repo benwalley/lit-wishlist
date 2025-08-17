@@ -233,9 +233,6 @@ export class PasswordResetContainer extends LitElement {
                             <p>This password reset link is invalid or missing a token.</p>
                             <p>Please request a new password reset from the login page.</p>
                         </div>
-                        <div class="back-link">
-                            <button @click=${this._goToLogin}>Back to Login</button>
-                        </div>
                     </div>
                 </div>
             `;
@@ -262,9 +259,6 @@ export class PasswordResetContainer extends LitElement {
                             <p>This password reset link is invalid or has expired.</p>
                             <p>Reset tokens expire after 15 minutes for security reasons.</p>
                             <p>Please request a new password reset from the login page.</p>
-                        </div>
-                        <div class="back-link">
-                            <button @click=${this._goToLogin}>Back to Login</button>
                         </div>
                     </div>
                 </div>
@@ -312,12 +306,6 @@ export class PasswordResetContainer extends LitElement {
                             ${this.isSubmitting ? 'Resetting Password...' : 'Reset Password'}
                         </button>
                     </form>
-
-                    <div class="back-link">
-                        <button @click=${this._goToLogin} ?disabled=${this.isSubmitting}>
-                            Back to Login
-                        </button>
-                    </div>
                 </div>
             </div>
         `;

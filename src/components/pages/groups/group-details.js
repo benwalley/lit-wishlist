@@ -12,8 +12,14 @@ import {isGroupAdmin, isGroupOwner} from "../../../helpers/groupHelpers.js";
 import {deleteGroup, leaveGroup} from "../../../helpers/api/groups.js";
 import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
 import {messagesState} from "../../../state/messagesStore.js";
-import {triggerGroupUpdated, triggerBulkAddToGroupModal, triggerUpdateList} from "../../../events/eventListeners.js";
+import {
+    triggerGroupUpdated,
+    triggerBulkAddToGroupModal,
+    triggerUpdateList,
+    triggerUpdateQa
+} from "../../../events/eventListeners.js";
 import {getUserImageIdByUserId, getUsernameById} from "../../../helpers/generalHelpers.js";
+import {navigate} from "../../../router/main-router.js";
 
 /**
  * Group details component that displays group information and admin actions
@@ -113,32 +119,6 @@ export class GroupDetails extends observeState(LitElement) {
                         border-radius: 50px;
                     }
                 }
-
-                .delete-button.icon-button {
-                    --icon-color: var(--delete-red);
-                    --icon-color-hover: var(--delete-red-darker);
-                    --icon-hover-background: var(--delete-red-light);
-                }
-                
-                .leave-button.icon-button {
-                    --icon-color: var(--blue-normal);
-                    --icon-color-hover: var(--blue-darker);
-                    --icon-hover-background: var(--blue-light);
-                    
-                    &:hover {
-                        transform: translateX(3px);
-                    }
-                }
-                
-                .add-button.icon-button {
-                    --icon-color: var(--green-normal);
-                    --icon-color-hover: var(--green-darker);
-                    --icon-hover-background: var(--green-light);
-                    
-                    &:hover {
-                        transform: scale(1.1);
-                    }
-                }
                 
                 .created-by-label {
                     padding-right: var(--spacing-x-small);
@@ -221,8 +201,8 @@ export class GroupDetails extends observeState(LitElement) {
                     messagesState.addMessage('You have left the group.');
                     triggerGroupUpdated();
                     triggerUpdateList();
-                    // Navigate back to groups list or another appropriate page
-                    window.history.back();
+                    triggerUpdateQa()
+                    navigate('/groups')
                 } else {
                     messagesState.addMessage(result.error, 'error');
                 }
@@ -267,7 +247,7 @@ export class GroupDetails extends observeState(LitElement) {
             <div class="action-buttons">
                 ${isAdmin ? html`
                     <button aria-label="edit-group"
-                            class="icon-button button username-edit-button"
+                            class="icon-button button username-edit-button green-text"
                             @click="${this._handleEditGroup}"
                             title="Edit Group"
                     >
@@ -277,17 +257,18 @@ export class GroupDetails extends observeState(LitElement) {
                 
                 ${!isOwner ? html`
                     <button aria-label="leave-group"
-                            class="icon-button button leave-button"
+                            class="icon-button button leave-button blue-text"
                             @click="${this._handleLeaveGroup}"
                             title="Leave Group"
                     >
                         <leave-icon></leave-icon>
                     </button>
+                    <custom-tooltip>Leave this group</custom-tooltip>
                 ` : ''}
                 
                 ${isOwner ? html`
                     <button aria-label="delete-group"
-                            class="icon-button button delete-button"
+                            class="icon-button button delete-button danger-text"
                             @click="${this._handleDeleteGroup}"
                             title="Delete Group"
                     >
