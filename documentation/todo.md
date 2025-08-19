@@ -18,3 +18,4 @@
  - show list of shared with for all lists and such
  - make sure permissions work.
  - add publicity popup to other places, and add popup for other instrutions
+ - on list, add "use account image" button.

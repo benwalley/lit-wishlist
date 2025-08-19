@@ -153,7 +153,7 @@ export class CustomElement extends observeState(LitElement) {
         const submitter = e.submitter;
         let type = submitter?.dataset?.imageType || 'custom';
 
-        if (!this.aiPrompt.trim()) {
+        if (type === 'custom' && !this.aiPrompt.trim()) {
             type = Math.random() < 0.5 ? 'abstract' : 'animal';
         }
 
@@ -263,7 +263,7 @@ export class CustomElement extends observeState(LitElement) {
                     margin: 0;
                     padding: var(--spacing-small);
                     background-color: var(--info-yellow-light);
-                    border: 1px solid color-mix(in srgb, var(--info-yellow) 30%, transparent);
+                    border: 1px solid var(--info-yellow);
                     border-radius: var(--border-radius-small);
                     color: var(--info-yellow);
                     font-size: var(--font-size-small);
@@ -306,7 +306,7 @@ export class CustomElement extends observeState(LitElement) {
                                 <ai-icon></ai-icon>
                             </button>
                         </div>
-                        <span>Click the camera to change your profile picture</span>
+                        <span>Click the camera or AI button to change your profile picture</span>
 
                         <!-- AI Image Generation Input -->
                         ${this.showAiInput ? html`
