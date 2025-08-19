@@ -165,10 +165,7 @@ class MultiInput extends LitElement {
                         `)}
                         <button 
                                 aria-label="Delete Row"
-                                style="--icon-color: var(--delete-red);
-                                 --icon-color-hover: var(--delete-red-darker);
-                                 --icon-hover-background: var(--delete-red-light);"
-                                class="icon-button delete-button"
+                                class="icon-button delete-button danger-text"
                                 @click=${() => this._removeRow(rowIndex)}
                         >
                             <delete-icon></delete-icon>

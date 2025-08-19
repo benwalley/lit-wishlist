@@ -276,6 +276,13 @@ export class CustomElement extends observeState(LitElement) {
         this.dueDate = event.detail.value;
     }
 
+    _handleKeyDown(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            this._handleSubmit();
+        }
+    }
+
     render() {
         return html`
             <h2 class="modal-header">
@@ -289,6 +296,7 @@ export class CustomElement extends observeState(LitElement) {
                             id="questionText"
                             .value=${this.questionText}
                             @value-changed="${(e) => this.questionText = e.detail.value}"
+                            @keydown="${this._handleKeyDown}"
                             placeholder="Type your question here..."
                             required
                     ></custom-input>` : html`
@@ -301,6 +309,7 @@ export class CustomElement extends observeState(LitElement) {
                     <custom-input
                             .value=${this.answerText || ''}
                             @value-changed="${(e) => this.answerText = e.detail.value}"
+                            @keydown="${this._handleKeyDown}"
                             placeholder="Type your answer here..."
                     ></custom-input>
                 </div>

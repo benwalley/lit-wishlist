@@ -132,11 +132,8 @@ export class HeaderContainer extends observeState(LitElement) {
                         </button>
                         ${this.showBackButton ? html`
                             <button @click="${this.goBack}"
-                                    class="back-button button icon-button"
+                                    class="back-button button icon-button blue-text"
                                     title="Go back"
-                                    style="--icon-color: var(--blue-normal); 
-                                --icon-color-hover: var(--blue-darker); 
-                                --icon-hover-background: var(--blue-light)"
                             >
                                 <arrow-long-left-icon></arrow-long-left-icon>
                             </button>
@@ -145,11 +142,8 @@ export class HeaderContainer extends observeState(LitElement) {
                     ${this.showBackButton ? html`
                         <div class="header-left">
                             <button @click="${this.goBack}"
-                                    class="back-button button icon-button"
+                                    class="back-button button icon-button blue-text"
                                     title="Go back"
-                                    style="--icon-color: var(--blue-normal); 
-                                    --icon-color-hover: var(--blue-darker); 
-                                    --icon-hover-background: var(--blue-light)"
                             >
                                 <arrow-long-left-icon></arrow-long-left-icon>
                             </button>

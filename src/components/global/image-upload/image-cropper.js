@@ -126,6 +126,10 @@ class ImageCropper extends observeState(LitElement) {
     // Clear any existing Cropper instance
     this.cropper = null;
 
+    // Remove any existing cropper-canvas elements from the DOM
+    const existingCanvases = this.shadowRoot.querySelectorAll('cropper-canvas');
+    existingCanvases.forEach(canvas => canvas.remove());
+
     // CropperJS v2 simplified initialization
     this.cropper = new Cropper(img);
 

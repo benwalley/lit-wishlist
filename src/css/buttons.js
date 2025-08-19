@@ -255,6 +255,11 @@ export default css`
                 --icon-color: var(--background-light-light);
                 --icon-hover-background: var(--background-light-dark);
             }
+            
+            &.primary-text {
+                --icon-color: var(--primary-color);
+                --icon-hover-background: var(--primary-color-light);
+            }
         }
         
         &.small-link-button {

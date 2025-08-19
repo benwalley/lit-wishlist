@@ -137,25 +137,19 @@ export class CustomElement extends observeState(LitElement) {
                 <div class="question-header">
                     <h2 class="question-text">${this.question.questionText}</h2>
                  
-                    <button class="restore-button icon-button"
+                    <button class="restore-button icon-button blue-text"
                             aria-label="Restore Question"
                             @click="${this._handleRestoreQuestion}"
-                            style="--icon-color: var(--blue-normal); 
-                                            --icon-color-hover: var(--blue-darker); 
-                                            --icon-hover-background: var(--blue-light); 
-                                            font-size: var(--font-size-large)">
+                            style="font-size: var(--font-size-large)">
                         <restore-icon></restore-icon>
                     </button>
                     <custom-tooltip style="min-width: 200px;" class="restore-item-tooltip">
                         Restore item?
                     </custom-tooltip>
-                    <button class="restore-button icon-button"
+                    <button class="restore-button icon-button danger-text"
                             aria-label="Restore Question"
                             @click="${this._handleForceDeleteQuestion}"
-                            style="--icon-color: var(--delete-red); 
-                                            --icon-color-hover: var(--delete-red-darker); 
-                                            --icon-hover-background: var(--delete-red-light); 
-                                            font-size: var(--font-size-large)">
+                            style="font-size: var(--font-size-large)">
                         <delete-icon></delete-icon>
                     </button>
                 </div>

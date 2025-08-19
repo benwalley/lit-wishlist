@@ -23,6 +23,7 @@ const VIEWED_ITEMS_UPDATED_EVENT = 'viewed-items-updated';
 const VIEWED_ITEMS_LOADED_EVENT = 'viewed-items-loaded';
 const UPDATE_MONEY_EVENT = 'update-money';
 const UPDATE_NOTIFICATIONS_EVENT = 'update-notifications';
+const THEME_CHANGED_EVENT = 'theme-changed';
 const imageUploadEvents = {
     imageSelected: 'image-selected',
     cropConfirmed: 'crop-confirmed'
@@ -224,4 +225,12 @@ export function triggerUpdateNotifications() {
 
 export function listenUpdateNotifications(callback) {
     return listenToCustomEvent(UPDATE_NOTIFICATIONS_EVENT, callback);
+}
+
+export function triggerThemeChanged(theme) {
+    triggerCustomEvent(THEME_CHANGED_EVENT, { theme });
+}
+
+export function listenThemeChanged(callback) {
+    return listenToCustomEvent(THEME_CHANGED_EVENT, callback);
 }

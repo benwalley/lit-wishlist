@@ -10,7 +10,10 @@ import '../../global/action-dropdown.js';
 import '../../pages/account/avatar.js';
 import './proposal-participants.js';
 import '../../../svg/dots.js';
+import '../../instructions/info-tooltip.js'
+import '../../instructions/proposal-details.js'
 import '../../../svg/edit.js';
+import '../../../svg/info.js';
 import '../../../svg/delete.js';
 import {formatDate} from "../../../helpers.js";
 import {getUserImageIdByUserId, getUsernameById, maxLength} from "../../../helpers/generalHelpers.js";
@@ -337,6 +340,20 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                         margin-bottom: var(--spacing-small);
                     }
                 }
+
+                .top-row {
+                    display: flex;
+                    justify-content: flex-start;
+                    gap: var(--spacing-normal-variable);
+                    flex-wrap: wrap;
+                    align-items: center;
+                }
+                
+                .learn-more-button {
+                    display: flex;
+                    align-items: center;
+                    gap: var(--spacing-x-small);
+                }
             `
         ];
     }
@@ -425,6 +442,16 @@ export class GiftTrackingProposals extends observeState(LitElement) {
         const filteredProposals = this._getFilteredProposals();
 
         return html`
+            <div class="top-row">
+                <h1>Proposals</h1>
+                <info-tooltip buttonClasses="primary fancy" removeDefaultClasses>
+                    <div slot="icon" class="learn-more-button">
+                        <span>Learn more</span>
+                        <info-icon></info-icon>
+                    </div>
+                    <proposal-details slot="modal-content"></proposal-details>
+                </info-tooltip>
+            </div>
             <div class="tabs-container">
                 <button 
                     class="tab-button ${this.activeTab === 'pending' ? 'active' : ''}"

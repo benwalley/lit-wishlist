@@ -110,16 +110,6 @@ export class GroupDetails extends observeState(LitElement) {
                     margin-top: var(--spacing-small);
                 }
                 
-                .username-edit-button.icon-button {
-                    --icon-color: var(--blue-normal);
-                    --icon-color-hover: var(--blue-normal);
-                    
-                    &:hover {
-                        transform: rotate(-45deg) scale(1.1);
-                        border-radius: 50px;
-                    }
-                }
-                
                 .created-by-label {
                     padding-right: var(--spacing-x-small);
                 }
@@ -247,7 +237,7 @@ export class GroupDetails extends observeState(LitElement) {
             <div class="action-buttons">
                 ${isAdmin ? html`
                     <button aria-label="edit-group"
-                            class="icon-button button username-edit-button green-text"
+                            class="icon-button button username-edit-button blue-text"
                             @click="${this._handleEditGroup}"
                             title="Edit Group"
                     >

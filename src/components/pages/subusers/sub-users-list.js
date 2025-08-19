@@ -52,7 +52,6 @@ class SubUsersList extends observeState(LitElement) {
 
             .no-subusers-description {
                 color: var(--text-color-medium-dark);
-                font-size: var(--font-size-medium);
                 line-height: 1.5;
                 max-width: 400px;
                 margin: 0 auto;

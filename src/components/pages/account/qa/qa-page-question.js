@@ -182,11 +182,8 @@ export class CustomElement extends observeState(LitElement) {
                                 @click="${() => this._handleEditQuestion(true)}">
                             Add your answer
                         </button>` : ''}
-                    <button class="shared-button icon-button" aria-label="Shared With"
-                            style="--icon-color: var(--primary-color); 
-                                            --icon-color-hover: var(--primary-color-darker); 
-                                            --icon-hover-background: var(--primary-color-light); 
-                                            font-size: var(--font-size-large)">
+                    <button class="shared-button icon-button primary-text" aria-label="Shared With"
+                            style="font-size: var(--font-size-large)">
                         <share-icon></share-icon>
                     </button>
                     <custom-tooltip style="min-width: 200px;" class="shared-with-list">
@@ -224,23 +221,17 @@ export class CustomElement extends observeState(LitElement) {
                     </custom-tooltip>
 
                     ${this.isQuestionCreator() ? html`
-                        <button class="edit-button icon-button"
+                        <button class="edit-button icon-button blue-text"
                                 aria-label="Edit Question"
                                 @click="${() => this._handleEditQuestion(false)}"
-                                style="--icon-color: var(--blue-normal); 
-                                                --icon-color-hover: var(--blue-darker); 
-                                                --icon-hover-background: var(--blue-light); 
-                                                font-size: var(--font-size-large)">
+                                style="font-size: var(--font-size-large)">
                             <edit-icon></edit-icon>
                         </button>
     
-                        <button class="delete-button icon-button"
+                        <button class="delete-button icon-button danger-text"
                                 aria-label="Delete Question"
                                 @click="${this._handleDeleteQuestion}"
-                                style="--icon-color: var(--delete-red); 
-                                                --icon-color-hover: var(--delete-red-darker); 
-                                                --icon-hover-background: var(--delete-red-light); 
-                                                font-size: var(--font-size-large)">
+                                style="font-size: var(--font-size-large)">
                             <delete-icon></delete-icon>
                         </button>` : ''}
                 </div>
@@ -267,13 +258,10 @@ export class CustomElement extends observeState(LitElement) {
                                     <div class="answer-text">
                                         ${answer.answerText}
                                         ${parseInt(answer.answererId) === parseInt(userState.userData?.id) ? html`
-                                            <button class="icon-button" 
+                                            <button class="icon-button blue-text" 
                                                     aria-label="Edit Answer"
                                                     @click="${() => this._handleEditQuestion(true)}"
-                                                    style="--icon-color: var(--blue-normal); 
-                                                            --icon-color-hover: var(--blue-darker); 
-                                                            --icon-hover-background: var(--blue-light);
-                                                            margin-left: var(--spacing-x-small);">
+                                                    style="margin-left: var(--spacing-x-small);">
                                                 <edit-icon style="font-size: 14px;"></edit-icon>
                                             </button>
                                         ` : ''}

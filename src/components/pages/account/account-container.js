@@ -49,10 +49,27 @@ export class AccountContainer extends observeState(LitElement) {
                     background: var(--background-light);
                     position: relative;
                     overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
                     
                     
                     &.no-padding {
                         padding: 0;
+                    }
+                }
+                
+                .view-page-link {
+                    display: block;
+                    text-align: center;
+                    padding: var(--spacing-normal) 0 0 0;
+                    font-weight: 500;
+                    color: var(--purple-normal);
+                    text-decoration: none;
+                    margin-top: auto;
+                    
+                    &:hover {
+                        text-decoration: underline;
+                        color: var(--purple-darker);
                     }
                 }
 
@@ -79,14 +96,19 @@ export class AccountContainer extends observeState(LitElement) {
 
                 <section>
                     <my-groups-list></my-groups-list>
+                    <a href="/groups" class="view-page-link">Groups page</a>
                 </section>
 
                 ${!isCurrentUserSubuser() ? html`<section>
                     <my-subusers></my-subusers>
+                    <a href="/subusers" class="view-page-link">Subusers page</a>
+
                 </section>` : ''}
 
                 <section>
                     <user-lists></user-lists>
+                    <a href="/my-lists" class="view-page-link">My lists</a>
+
                 </section>
 
                 <section>

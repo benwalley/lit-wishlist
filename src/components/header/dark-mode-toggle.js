@@ -4,6 +4,7 @@ import "../../svg/moon.js";
 import "../../svg/sun.js";
 import '../global/custom-tooltip.js';
 import {getDarkLightMode, setDarkLightMode} from "../../localStorage/themeStorage.js";
+import {listenThemeChanged} from "../../events/eventListeners.js";
 
 export class DarkModeToggle extends LitElement {
     static properties = {
@@ -13,7 +14,15 @@ export class DarkModeToggle extends LitElement {
     constructor() {
         super();
         this.mode = 'light';
-        this.initMode()
+        this.initMode();
+        
+        // Listen for theme changes from other components
+        listenThemeChanged((event) => {
+            const newTheme = event.detail.theme;
+            if (this.mode !== newTheme) {
+                this.mode = newTheme;
+            }
+        });
     }
 
     static get styles() {
@@ -62,9 +71,7 @@ export class DarkModeToggle extends LitElement {
         if(this.mode === 'dark') {
             newMode = 'light';
         }
-        this.mode = newMode;
         setDarkLightMode(newMode);
-        this.setModeClass(newMode);
     }
 
     toggleMode() {

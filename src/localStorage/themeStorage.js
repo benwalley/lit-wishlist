@@ -1,4 +1,5 @@
 import {getItem, setItem} from "./helpers.js";
+import {triggerThemeChanged} from "../events/eventListeners.js";
 const DARK_LIGHT_MODE_NAME = 'darkLightMode';
 
 export function getDarkLightMode() {
@@ -24,4 +25,8 @@ function isBrowserDarkMode() {
  */
 export function setDarkLightMode(value) {
     setItem(DARK_LIGHT_MODE_NAME, value);
+    document.body.dataset.mode = value;
+    
+    // Trigger theme changed event
+    triggerThemeChanged(value);
 }

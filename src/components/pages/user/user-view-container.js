@@ -111,10 +111,6 @@ export class UserViewContainer extends LitElement {
                 </section>
 
                 <section>
-                    <public-qa .userId="${this.userId}"></public-qa>
-                </section>
-
-                <section>
                     <user-lists .userId="${this.userId}" .isUser="${false}"></user-lists>
                 </section>
             </main>

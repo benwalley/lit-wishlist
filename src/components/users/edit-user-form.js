@@ -6,6 +6,9 @@ import '../../svg/camera.js';
 import '../../svg/info.js';
 import '../../svg/world.js';
 import '../../svg/lock.js';
+import '../../svg/ai.js';
+import '../../svg/abstract.js';
+import '../../svg/dog.js';
 import '../instructions/info-tooltip.js';
 import '../instructions/publicity-details.js';
 import '../global/custom-input.js';
@@ -20,6 +23,7 @@ import {messagesState} from "../../state/messagesStore.js";
 import '../global/image-changer.js';
 import '../global/custom-toggle.js';
 import {triggerUpdateUser} from "../../events/eventListeners.js";
+import {generateCustomImage, generateImage} from "../../helpers/api/ai.js";
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
@@ -29,6 +33,9 @@ export class CustomElement extends observeState(LitElement) {
         description: {type: String},
         isPublic: {type: Boolean},
         errorMessage: {type: String}, // New property to hold error messages
+        showAiInput: {type: Boolean},
+        aiPrompt: {type: String},
+        isGeneratingImage: {type: Boolean}
     };
 
     constructor() {
@@ -39,6 +46,9 @@ export class CustomElement extends observeState(LitElement) {
         this.description = '';
         this.isPublic = false;
         this.errorMessage = '';
+        this.showAiInput = false;
+        this.aiPrompt = '';
+        this.isGeneratingImage = false;
     }
 
     connectedCallback() {
@@ -94,6 +104,10 @@ export class CustomElement extends observeState(LitElement) {
             this.imageId = userState.userData?.imageId || 0;
             this.isPublic = userState.userData.isPublic || false;
         }
+        // Reset AI state
+        this.showAiInput = false;
+        this.aiPrompt = '';
+        this.isGeneratingImage = false;
         this._getModal().closeModal();
     }
 
@@ -121,6 +135,49 @@ export class CustomElement extends observeState(LitElement) {
 
     _showError(message) {
         this.errorMessage = message;
+    }
+
+    _toggleAiInput(e) {
+        e.preventDefault();
+        this.showAiInput = !this.showAiInput;
+        this.errorMessage = '';
+    }
+
+    _onAiPromptChanged(e) {
+        this.aiPrompt = e.detail.value;
+        this.errorMessage = '';
+    }
+
+    async _generateAiImage(e) {
+        e.preventDefault();
+        const submitter = e.submitter;
+        let type = submitter?.dataset?.imageType || 'custom';
+
+        if (!this.aiPrompt.trim()) {
+            type = Math.random() < 0.5 ? 'abstract' : 'animal';
+        }
+
+        this.isGeneratingImage = true;
+        this.errorMessage = '';
+
+
+        try {
+            const result = await generateImage(type, this.aiPrompt.trim());
+
+            if (result.success && result.imageId) {
+                this.imageId = result.imageId;
+                this.showAiInput = false;
+                this.aiPrompt = '';
+                messagesState.addMessage('AI image generated successfully');
+            } else {
+                this._showError(result.error || 'Failed to generate AI image');
+            }
+        } catch (error) {
+            console.error('Error generating AI image:', error);
+            this._showError('An unexpected error occurred while generating the image');
+        } finally {
+            this.isGeneratingImage = false;
+        }
     }
 
     static get styles() {
@@ -161,6 +218,62 @@ export class CustomElement extends observeState(LitElement) {
                     align-items: center;
                     gap: var(--spacing-x-small);
                 }
+
+                .ai-generate-button {
+                    box-sizing: border-box;
+                    font-size: var(--font-size-large);
+                    position: absolute;
+                    padding: var(--spacing-small);
+                    bottom: -6px;
+                    left: -6px;
+                }
+
+                .ai-input-container {
+                    width: 100%;
+                    margin-top: var(--spacing-normal);
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-small);
+                }
+
+                .ai-generate-row {
+                    display: flex;
+                    gap: var(--spacing-small);
+                    align-items: flex-end;
+                    flex-wrap: wrap;
+                }
+
+                .ai-generate-row custom-input {
+                    flex: 1;
+                    min-width: 200px;
+                }
+
+                .ai-generate-row button.icon {
+                   font-size: var(--font-size-large);
+                    padding: var(--spacing-small);
+                }
+                
+                .submitGenerateButton {
+                    font-size: var(--font-size-normal);
+                    padding: var(--spacing-small);
+                    line-height: var(--font-size-large);
+                }
+
+                .ai-notice {
+                    margin: 0;
+                    padding: var(--spacing-small);
+                    background-color: var(--info-yellow-light);
+                    border: 1px solid color-mix(in srgb, var(--info-yellow) 30%, transparent);
+                    border-radius: var(--border-radius-small);
+                    color: var(--info-yellow);
+                    font-size: var(--font-size-small);
+                    text-align: center;
+                    line-height: 1.4;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: var(--spacing-x-small);
+                }
             `
         ];
     }
@@ -189,8 +302,49 @@ export class CustomElement extends observeState(LitElement) {
                             <image-changer
                                     imageId="${this.imageId}"
                                     @image-updated="${this._onImageChanged}"></image-changer>
+                            <button class="ai-generate-button primary shadow fancy" @click="${this._toggleAiInput}">
+                                <ai-icon></ai-icon>
+                            </button>
                         </div>
                         <span>Click the camera to change your profile picture</span>
+
+                        <!-- AI Image Generation Input -->
+                        ${this.showAiInput ? html`
+                            <form @submit="${this._generateAiImage}" class="ai-input-container">
+                                <div class="ai-generate-row">
+                                    <custom-input
+                                        placeholder="Describe an image..."
+                                        value="${this.aiPrompt}"
+                                        @value-changed="${this._onAiPromptChanged}"
+                                        fullWidth>
+                                    </custom-input>
+                                    <button
+                                        data-image-type="custom"
+                                        type="submit"
+                                        class="primary button fancy submitGenerateButton" 
+                                        ?disabled="${this.isGeneratingImage}">
+                                        ${this.isGeneratingImage ? 'Generating...' : 'Generate'}
+                                    </button>
+                                    <button
+                                            data-image-type="abstract"
+                                            type="submit"
+                                            class="primary button fancy-alt icon"
+                                            ?disabled="${this.isGeneratingImage}">
+                                        <abstract-icon></abstract-icon>
+                                    </button>
+                                    <custom-tooltip>Generate a random abstract image</custom-tooltip>
+                                    <button
+                                            data-image-type="animal"
+                                            type="submit"
+                                            class="primary button icon"
+                                            ?disabled="${this.isGeneratingImage}">
+                                        <dog-icon></dog-icon>
+                                    </button>
+                                    <custom-tooltip>Generate image of a cartoon animal</custom-tooltip>
+                                </div>
+                                <p class="ai-notice"><info-icon></info-icon> Remember to save changes after generating</p>
+                            </form>
+                        ` : ''}
 
                         <!-- Listen for value-changed events to update properties -->
                         <custom-input
@@ -238,7 +392,7 @@ export class CustomElement extends observeState(LitElement) {
                         <button type="button" class="secondary" @click="${() => this._close(true)}">
                             Cancel
                         </button>
-                        <button type="submit" class="primary">
+                        <button type="submit" class="primary" @click="${this._handleSubmit}">
                             Save Changes
                         </button>
                     </div>

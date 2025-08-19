@@ -214,24 +214,18 @@ export class InvitedGroups extends observeState(LitElement) {
                         </div>
 
                         <button
-                                class="icon-button decline-button"
+                                class="icon-button decline-button danger-text"
                                 @click="${(e) => this.handleDeclineInvite(group.id, e)}"
                                 title="Decline invitation"
-                                style="--icon-color: var(--delete-red);
-                                 --icon-color-hover: var(--delete-red-darker);
-                                 --icon-hover-background: var(--delete-red-light);"
                         >
                             <delete-icon></delete-icon>
                         </button>
                         <custom-tooltip>Decline Invitation</custom-tooltip>
                         
                         <button 
-                            class="icon-button accept-button" 
+                            class="icon-button accept-button green-text" 
                             @click="${(e) => this.handleAcceptInvite(group, e)}"
                             title="Accept invitation"
-                            style="--icon-color: var(--green-normal);
-                                 --icon-color-hover: var(--green-darker);
-                                 --icon-hover-background: var(--green-light);"
                         >
                             <check-icon></check-icon>
                         </button>

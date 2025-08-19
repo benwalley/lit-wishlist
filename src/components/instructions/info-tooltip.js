@@ -7,7 +7,8 @@ export class InfoTooltip extends LitElement {
     static properties = {
         tooltipText: {type: String},
         isModalOpen: {type: Boolean, state: true},
-        buttonClasses: {type: String}
+        buttonClasses: {type: String},
+        removeDefaultClasses: {type: Boolean},
     };
 
     static get styles() {
@@ -32,6 +33,7 @@ export class InfoTooltip extends LitElement {
         this.tooltipText = '';
         this.isModalOpen = false;
         this.buttonClasses = '';
+        this.removeDefaultClasses = false;
     }
 
     _handleTriggerClick() {
@@ -43,7 +45,7 @@ export class InfoTooltip extends LitElement {
     }
 
     render() {
-        const classes = `icon-button trigger-button ${this.buttonClasses}`;
+        const classes = `${!this.removeDefaultClasses ? 'icon-button' : ''} trigger-button ${this.buttonClasses}`;
 
         return html`
             <button 

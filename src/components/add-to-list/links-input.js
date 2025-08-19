@@ -162,10 +162,7 @@ class LinksInput extends LitElement {
                         </div>
                         <button 
                             aria-label="Delete Link"
-                            style="--icon-color: var(--delete-red);
-                                 --icon-color-hover: var(--delete-red-darker);
-                                 --icon-hover-background: var(--delete-red-light);"
-                            class="icon-button delete-button"
+                            class="icon-button delete-button danger-text"
                             @click=${() => this._removeLink(index)}
                         >
                             <delete-icon></delete-icon>

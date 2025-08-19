@@ -303,6 +303,7 @@ export class AddProposalModal extends observeState(LitElement) {
             this.isOpen = true;
 
             if (this.isEditMode && event.detail.proposalData) {
+                this.itemData = event.detail.proposalData.itemData || null;
                 this._populateEditData(event.detail.proposalData);
             } else {
                 this.itemData = event.detail.itemData || null;
@@ -356,21 +357,23 @@ export class AddProposalModal extends observeState(LitElement) {
         this.itemData = proposalData?.itemData || {}
         this.proposalId = proposalData?.id;
 
-        // Populate participants from proposal data
-        if (proposalData.proposalParticipants && Array.isArray(proposalData.proposalParticipants)) {
+        // Populate participants from proposal data - check both possible field names
+        const participants = proposalData.proposalParticipants || proposalData.participants || [];
+
+        if (participants && Array.isArray(participants)) {
             // Extract user objects and IDs from participants
-            this.selectedUsers = proposalData.proposalParticipants.map(participant => participant.user);
+            this.selectedUsers = participants;
             this.selectedUserIds = this.selectedUsers.map(user => user.id);
 
             // Populate user prices from participants
             const userPrices = {};
-            proposalData.proposalParticipants.forEach(participant => {
+            participants.forEach(participant => {
                 userPrices[participant.user.id] = participant.amountRequested;
             });
             this.userPrices = userPrices;
 
             // Find and set the buyer
-            const buyerParticipant = proposalData.proposalParticipants.find(p => p.isBuying);
+            const buyerParticipant = participants.find(p => p.isBuying);
             if (buyerParticipant) {
                 this.selectedBuyer = buyerParticipant.user;
             }
@@ -382,6 +385,7 @@ export class AddProposalModal extends observeState(LitElement) {
     }
 
     _handleUsersSelectionChanged(event) {
+        console.log(event.detail);
         // Store full user objects for display
         let selectedUsers = event.detail.selectedUsers || [];
         const originallySelectedUserIds = selectedUsers.map(user => user.id);

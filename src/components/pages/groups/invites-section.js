@@ -338,16 +338,14 @@ export class InvitesSection extends observeState(LitElement) {
                         <span class="invite-email">${invite.email}</span>
                         ${isAdmin ? html`
                             <button
-                                class="icon-button"
+                                class="icon-button danger-text"
                                 @click=${() => this._cancelInvite(invite.id)}
                                 aria-label="Cancel invite for ${invite.email}"
                                 title="Cancel invite"
-                                style="--icon-color: var(--delete-red);
-                                 --icon-color-hover: var(--delete-red-darker);
-                                 --icon-hover-background: var(--delete-red-light);"
                             >
                                 <delete-icon></delete-icon>
                             </button>
+                            <custom-tooltip>Cancel invite</custom-tooltip>
                         ` : ''}
                     </div>
                 `)}

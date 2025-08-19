@@ -167,18 +167,10 @@ export class ProposalParticipants extends observeState(LitElement) {
                 }
 
             .icon-button.accept-btn {
-                --icon-background: var(--green-light);
-                --icon-color: var(--green-darker);
-                --icon-color-hover: var(--green-darker);
-                --icon-hover-background: var(--green-light);
                 font-size: var(--font-size-large);
             }
 
             .icon-button.reject-btn {
-                --icon-background: var(--delete-red-light);
-                --icon-color: var(--delete-red);
-                --icon-color-hover: var(--delete-red-darker);
-                --icon-hover-background: var(--delete-red-light);
                 font-size: var(--font-size-normal);
             }
             `
@@ -296,7 +288,7 @@ export class ProposalParticipants extends observeState(LitElement) {
                                 <div class="proposal-actions">
                                     ${this._canAccept(participant) ? html`
                                         <button 
-                                            class="icon-button accept-btn"
+                                            class="icon-button accept-btn green-text"
                                             @click=${this._handleAcceptProposal}
                                             title="Accept proposal"
                                         >
@@ -305,7 +297,7 @@ export class ProposalParticipants extends observeState(LitElement) {
                                     ` : ''}
                                     ${this._canReject(participant) ? html`
                                         <button 
-                                            class="icon-button reject-btn"
+                                            class="icon-button reject-btn danger-text"
                                             @click=${this._handleDeclineProposal}
                                             title="Decline proposal"
                                         >

@@ -11,8 +11,10 @@ import buttonStyles from '../../css/buttons.js';
 import '../../svg/user.js';
 import '../../svg/gear.js';
 import '../../svg/moon.js';
-import '../../svg/bell.js';
+import '../../svg/sun.js';
 import '../../svg/shield.js';
+import {getDarkLightMode, setDarkLightMode} from "../../localStorage/themeStorage.js";
+import {listenThemeChanged} from "../../events/eventListeners.js";
 
 export class SettingsContent extends observeState(LitElement) {
     static get properties() {
@@ -29,22 +31,32 @@ export class SettingsContent extends observeState(LitElement) {
     constructor() {
         super();
         this.activeTab = 'general';
-        this.selectedTheme = 'regular';
+        this.selectedTheme = getDarkLightMode();
         this.currentPassword = '';
         this.newPassword = '';
         this.confirmPassword = '';
         this.isChangingPassword = false;
+        
+        // Listen for theme changes from other components
+        listenThemeChanged((event) => {
+            const newTheme = event.detail.theme;
+            if (this.selectedTheme !== newTheme) {
+                this.selectedTheme = newTheme;
+            }
+        });
 
         this.themes = [
             {
-                id: 'regular',
-                name: 'Regular',
+                id: 'light',
+                name: 'Light',
+                icon: html`<sun-icon></sun-icon>`,
                 description: 'Light theme with clean design',
-                colors: ['var(--purple-normal)', 'var(--blue-normal)', 'var(--background-light)', 'var(--background-dark)']
+                colors: ['var(--purple-normal)', 'var(--blue-normal)', 'var(--background-light-light)', 'var(--background-light-dark)']
             },
             {
                 id: 'dark',
                 name: 'Dark',
+                icon: html`<moon-icon></moon-icon>`,
                 description: 'Dark theme that\'s easy on the eyes',
                 colors: ['var(--purple-normal)', 'var(--blue-normal)', 'var(--background-dark-dark)', '#6b7280']
             }
@@ -288,7 +300,6 @@ export class SettingsContent extends observeState(LitElement) {
 
                 .theme-option:hover {
                     border-color: var(--primary-color);
-                    transform: translateY(-2px);
                     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
                 }
 
@@ -318,6 +329,9 @@ export class SettingsContent extends observeState(LitElement) {
                     font-weight: 600;
                     color: var(--text-color-dark);
                     margin-bottom: var(--spacing-x-small);
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
                 }
 
                 .theme-option-description {
@@ -386,12 +400,7 @@ export class SettingsContent extends observeState(LitElement) {
     }
 
     _selectTheme(themeId) {
-        this.selectedTheme = themeId;
-        this.dispatchEvent(new CustomEvent('theme-changed', {
-            detail: { themeId },
-            bubbles: true,
-            composed: true
-        }));
+        setDarkLightMode(themeId);
     }
 
     _handlePasswordInput(field, event) {
@@ -522,61 +531,6 @@ export class SettingsContent extends observeState(LitElement) {
         `;
     }
 
-    _renderPrivacyTab() {
-        return html`
-            <div class="settings-section">
-                <h3 class="section-title">Privacy Settings</h3>
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <div class="setting-label">Profile Visibility</div>
-                        <div class="setting-description">Control who can see your profile and lists</div>
-                    </div>
-                    <div class="setting-control">
-                        <select class="form-control">
-                            <option value="public">Public</option>
-                            <option value="friends">Friends Only</option>
-                            <option value="private">Private</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    _renderNotificationsTab() {
-        return html`
-            <div class="settings-section">
-                <h3 class="section-title">Email Notifications</h3>
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <div class="setting-label">New Group Invitations</div>
-                        <div class="setting-description">Get notified when someone invites you to a group</div>
-                    </div>
-                    <div class="setting-control">
-                        <custom-toggle .checked=${true}></custom-toggle>
-                    </div>
-                </div>
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <div class="setting-label">List Updates</div>
-                        <div class="setting-description">Get notified when items are added to your lists</div>
-                    </div>
-                    <div class="setting-control">
-                        <custom-toggle .checked=${true}></custom-toggle>
-                    </div>
-                </div>
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <div class="setting-label">Weekly Summary</div>
-                        <div class="setting-description">Receive a weekly digest of your activity</div>
-                    </div>
-                    <div class="setting-control">
-                        <custom-toggle .checked=${false}></custom-toggle>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
 
     _renderThemeTab() {
         return html`
@@ -598,7 +552,10 @@ export class SettingsContent extends observeState(LitElement) {
                                     `)}
                                 </div>
                             </div>
-                            <div class="theme-option-name">${theme.name}</div>
+                            <div class="theme-option-name">
+                                ${theme.icon}
+                                ${theme.name}
+                            </div>
                             <div class="theme-option-description">${theme.description}</div>
                         </div>
                     `)}
@@ -613,10 +570,6 @@ export class SettingsContent extends observeState(LitElement) {
                 return this._renderGeneralTab();
             case 'account':
                 return this._renderAccountTab();
-            case 'privacy':
-                return this._renderPrivacyTab();
-            case 'notifications':
-                return this._renderNotificationsTab();
             case 'theme':
                 return this._renderThemeTab();
             default:
@@ -645,18 +598,6 @@ export class SettingsContent extends observeState(LitElement) {
                             @click=${() => this._setActiveTab('account')}>
                             <user-icon style="width: 16px; height: 16px;"></user-icon>
                             Account
-                        </button>
-                        <button 
-                            class="tab-button ${this.activeTab === 'privacy' ? 'active' : ''}"
-                            @click=${() => this._setActiveTab('privacy')}>
-                            <shield-icon style="width: 16px; height: 16px;"></shield-icon>
-                            Privacy
-                        </button>
-                        <button 
-                            class="tab-button ${this.activeTab === 'notifications' ? 'active' : ''}"
-                            @click=${() => this._setActiveTab('notifications')}>
-                            <bell-icon style="width: 16px; height: 16px;"></bell-icon>
-                            Notifications
                         </button>
                         <button 
                             class="tab-button ${this.activeTab === 'theme' ? 'active' : ''}"

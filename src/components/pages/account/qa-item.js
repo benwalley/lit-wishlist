@@ -337,20 +337,14 @@ export class QAItem extends observeState(LitElement) {
             <div class="actions">
                 <button
                         aria-label="edit"
-                        class="icon-button"
-                        style="--icon-color: var(--blue-normal);
-                         --icon-color-hover: var(--blue-darker);
-                         --icon-hover-background: var(--blue-light);"
+                        class="icon-button blue-text"
                         @click="${this._toggleEdit}"
                 >
                     <edit-icon></edit-icon>
                 </button>
                 ${this._isQuestionCreator() ? html`<button
                         aria-label="delete"
-                        class="icon-button"
-                        style="--icon-color: var(--delete-red);
-                         --icon-color-hover: var(--delete-red-darker);
-                         --icon-hover-background: var(--delete-red-light);"
+                        class="icon-button danger-text"
                         @click="${this._deleteItem}"
                 >
                     <delete-icon></delete-icon>
