@@ -9,6 +9,8 @@ import '../../svg/lock.js';
 import '../../svg/ai.js';
 import '../../svg/abstract.js';
 import '../../svg/dog.js';
+import '../../svg/arrow-long.js';
+import '../../svg/arrow-long-left.js';
 import '../instructions/info-tooltip.js';
 import '../instructions/publicity-details.js';
 import '../global/custom-input.js';
@@ -35,7 +37,9 @@ export class CustomElement extends observeState(LitElement) {
         errorMessage: {type: String}, // New property to hold error messages
         showAiInput: {type: Boolean},
         aiPrompt: {type: String},
-        isGeneratingImage: {type: Boolean}
+        isGeneratingImage: {type: Boolean},
+        imageHistory: {type: Array}, // Array of image IDs that have been chosen/generated
+        currentImageIndex: {type: Number} // Current position in image history
     };
 
     constructor() {
@@ -49,6 +53,8 @@ export class CustomElement extends observeState(LitElement) {
         this.showAiInput = false;
         this.aiPrompt = '';
         this.isGeneratingImage = false;
+        this.imageHistory = [];
+        this.currentImageIndex = -1;
     }
 
     connectedCallback() {
@@ -70,10 +76,20 @@ export class CustomElement extends observeState(LitElement) {
 
     setUserData = () => {
         if (userState?.userData) {
-            this.imageId = userState.userData.image || 0;
+            const initialImageId = userState.userData.image || 0;
+            this.imageId = initialImageId;
             this.username = userState.userData.name || '';
             this.description = userState.userData.publicDescription || '';
             this.isPublic = userState.userData.isPublic || false;
+            
+            // Initialize image history with current user image if it exists
+            if (initialImageId > 0) {
+                this.imageHistory = [initialImageId];
+                this.currentImageIndex = 0;
+            } else {
+                this.imageHistory = [];
+                this.currentImageIndex = -1;
+            }
         }
     }
 
@@ -88,7 +104,8 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     _onImageChanged(e) {
-        this.imageId = e.detail.imageId;
+        const newImageId = e.detail.imageId;
+        this._addImageToHistory(newImageId);
         this.errorMessage = '';
     }
 
@@ -103,6 +120,8 @@ export class CustomElement extends observeState(LitElement) {
             this.username = userState.userData.name || '';
             this.imageId = userState.userData?.imageId || 0;
             this.isPublic = userState.userData.isPublic || false;
+            // Reset image history when clearing
+            this.setUserData();
         }
         // Reset AI state
         this.showAiInput = false;
@@ -165,8 +184,7 @@ export class CustomElement extends observeState(LitElement) {
             const result = await generateImage(type, this.aiPrompt.trim());
 
             if (result.success && result.imageId) {
-                this.imageId = result.imageId;
-                this.showAiInput = false;
+                this._addImageToHistory(result.imageId);
                 this.aiPrompt = '';
                 messagesState.addMessage('AI image generated successfully');
             } else {
@@ -177,6 +195,53 @@ export class CustomElement extends observeState(LitElement) {
             this._showError('An unexpected error occurred while generating the image');
         } finally {
             this.isGeneratingImage = false;
+        }
+    }
+
+    /**
+     * Navigate between images in the history
+     * @param {string} direction - 'prev' or 'next'
+     */
+    _navigateImage(direction) {
+        if (this.imageHistory.length <= 1) return;
+
+        let newIndex = this.currentImageIndex;
+        
+        if (direction === 'prev') {
+            newIndex = Math.max(0, this.currentImageIndex - 1);
+        } else if (direction === 'next') {
+            newIndex = Math.min(this.imageHistory.length - 1, this.currentImageIndex + 1);
+        }
+
+        if (newIndex !== this.currentImageIndex) {
+            this.currentImageIndex = newIndex;
+            this.imageId = this.imageHistory[newIndex];
+        }
+    }
+
+    /**
+     * Add a new image to the history and set it as current
+     * @param {number} imageId - The ID of the image to add
+     */
+    _addImageToHistory(imageId) {
+        if (imageId && imageId > 0) {
+            // Avoid duplicates by checking if image already exists
+            const existingIndex = this.imageHistory.indexOf(imageId);
+            if (existingIndex !== -1) {
+                // If image already exists, just navigate to it
+                this.currentImageIndex = existingIndex;
+                this.imageId = imageId;
+            } else {
+                // Add new image to history and set as current
+                this.imageHistory = [...this.imageHistory, imageId];
+                this.currentImageIndex = this.imageHistory.length - 1;
+                this.imageId = imageId;
+            }
+        } else {
+            // Handle image removal (imageId = 0)
+            this.imageId = 0;
+            // Keep the history but reset current index
+            this.currentImageIndex = -1;
         }
     }
 
@@ -201,6 +266,43 @@ export class CustomElement extends observeState(LitElement) {
                 .content .user-image {
                     position: relative;
                     display: flex;
+                    align-items: center;
+                    gap: var(--spacing-small);
+                }
+                
+                .image-nav-button {
+                    background: var(--background-dark-gradient);
+                    border: 2px solid var(--border-color-light);
+                    border-radius: 50%;
+                    padding: var(--spacing-small);
+                    font-size: var(--font-size-large);
+                    color: var(--text-color-light);
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-width: 40px;
+                    min-height: 40px;
+                }
+                
+                .image-nav-button:hover {
+                    background: var(--background-light);
+                    border-color: var(--primary-color);
+                    color: var(--primary-color);
+                }
+                
+                .image-nav-button:disabled {
+                    opacity: 0.3;
+                    cursor: not-allowed;
+                }
+                
+                .avatar-container {
+                    position: relative;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: var(--spacing-x-small);
                 }
 
 
@@ -230,7 +332,6 @@ export class CustomElement extends observeState(LitElement) {
 
                 .ai-input-container {
                     width: 100%;
-                    margin-top: var(--spacing-normal);
                     display: flex;
                     flex-direction: column;
                     gap: var(--spacing-small);
@@ -274,6 +375,13 @@ export class CustomElement extends observeState(LitElement) {
                     justify-content: center;
                     gap: var(--spacing-x-small);
                 }
+                
+                .image-counter {
+                    font-size: var(--font-size-small);
+                    color: var(--text-color-light);
+                    text-align: center;
+                    margin-top: var(--spacing-x-small);
+                }
             `
         ];
     }
@@ -293,20 +401,49 @@ export class CustomElement extends observeState(LitElement) {
                             <div class="content">
 
                         <div class="user-image">
-                            <!-- Use the component's username property -->
-                            <custom-avatar size="120"
-                                           shadow
-                                           username="${this.username}"
-                                           imageId="${this.imageId}">
-                            </custom-avatar>
-                            <image-changer
-                                    imageId="${this.imageId}"
-                                    @image-updated="${this._onImageChanged}"></image-changer>
-                            <button class="ai-generate-button primary shadow fancy" @click="${this._toggleAiInput}">
-                                <ai-icon></ai-icon>
-                            </button>
+                            <!-- Left arrow navigation -->
+                            ${this.imageHistory.length > 1 ? html`
+                                <button class="image-nav-button" 
+                                        @click="${() => this._navigateImage('prev')}"
+                                        ?disabled="${this.currentImageIndex <= 0}">
+                                    <arrow-long-left-icon></arrow-long-left-icon>
+                                </button>
+                            ` : ''}
+                            
+                            <!-- Avatar and image controls -->
+                            <div class="avatar-container">
+                                <div style="position: relative;">
+                                    <custom-avatar size="120"
+                                                   shadow
+                                                   username="${this.username}"
+                                                   imageId="${this.imageId}">
+                                    </custom-avatar>
+                                    <image-changer
+                                            imageId="${this.imageId}"
+                                            @image-updated="${this._onImageChanged}"></image-changer>
+                                    <button class="ai-generate-button primary shadow fancy" @click="${this._toggleAiInput}">
+                                        <ai-icon></ai-icon>
+                                    </button>
+                                </div>
+                                
+                                <!-- Image counter -->
+                                ${this.imageHistory.length > 1 ? html`
+                                    <div class="image-counter">
+                                        ${this.currentImageIndex + 1} of ${this.imageHistory.length}
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
+                            <!-- Right arrow navigation -->
+                            ${this.imageHistory.length > 1 ? html`
+                                <button class="image-nav-button"
+                                        @click="${() => this._navigateImage('next')}"
+                                        ?disabled="${this.currentImageIndex >= this.imageHistory.length - 1}">
+                                    <arrow-long-icon></arrow-long-icon>
+                                </button>
+                            ` : ''}
                         </div>
-                        <span>Click the camera or AI button to change your profile picture</span>
+                        <span style="text-align: center;">Click the camera or AI button to change your profile picture</span>
 
                         <!-- AI Image Generation Input -->
                         ${this.showAiInput ? html`
