@@ -149,7 +149,7 @@ export class EditGroupForm extends LitElement {
                 <image-selector-with-nav
                         imageId="${this.imageId}"
                         username="${this.groupName}"
-                        size="120"
+                        size="200"
                         showAi
                         allowNavigation
                         @image-changed="${this._onImageChanged}">

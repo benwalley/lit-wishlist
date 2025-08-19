@@ -249,7 +249,7 @@ export class EditListForm extends LitElement {
                         <image-selector-with-nav
                                 imageId="${this.imageId}"
                                 username="${this.listName}"
-                                size="150"
+                                size="200"
                                 showAi
                                 allowNavigation
                                 @image-changed="${this._onImageChanged}">

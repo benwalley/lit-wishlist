@@ -34,7 +34,7 @@ export class ImageSelectorWithNav extends LitElement {
         super();
         this.imageId = 0;
         this.username = '';
-        this.size = 120;
+        this.size = 200;
         this.showAi = true;
         this.allowNavigation = true;
         this.imageHistory = [];
@@ -418,7 +418,7 @@ export class ImageSelectorWithNav extends LitElement {
                                     ?disabled="${this.isGeneratingImage}">
                                 <dog-icon></dog-icon>
                             </button>
-                            <custom-tooltip>Generate an image of a cartoon animal</custom-tooltip>
+                            <custom-tooltip>Generate an image of a cute cartoon animal</custom-tooltip>
                         </div>
                     </form>
                 ` : ''}

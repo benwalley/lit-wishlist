@@ -157,7 +157,7 @@ export class CreateGroupForm extends LitElement {
                         <image-selector-with-nav
                                 imageId="${this.groupImage}"
                                 username="${this.groupName || 'New Group'}"
-                                size="120"
+                                size="200"
                                 showAi
                                 allowNavigation
                                 @image-changed="${this._onImageChanged}">

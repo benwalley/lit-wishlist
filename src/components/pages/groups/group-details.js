@@ -108,6 +108,9 @@ export class GroupDetails extends observeState(LitElement) {
                     font-size: var(--font-size-small);
                     color: var(--text-color-medium-dark);
                     margin-top: var(--spacing-small);
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
                 }
                 
                 .created-by-label {
