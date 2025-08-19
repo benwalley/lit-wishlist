@@ -6,9 +6,7 @@ import { createGroup } from '../../helpers/api/groups.js';
 import { messagesState } from '../../state/messagesStore.js';
 import '../global/custom-input.js';
 import {triggerBulkAddToGroupModal, triggerGroupUpdated} from "../../events/eventListeners.js";
-import '../pages/account/avatar.js';
-import '../global/image-changer.js';
-import '../../svg/camera.js';
+import '../global/image-selector-with-nav.js';
 
 export class CreateGroupForm extends LitElement {
     static properties = {
@@ -52,19 +50,12 @@ export class CreateGroupForm extends LitElement {
                     gap: var(--spacing-normal);
                 }
                 
-                .user-image {
-                    position: relative;
-                    margin: 0 auto;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                }
-                
                 .image-container {
-                    position: relative;
-                    margin-bottom: var(--spacing-normal);
                     display: flex;
                     flex-direction: column;
+                    align-items: center;
+                    gap: var(--spacing-small);
+                    margin-bottom: var(--spacing-normal);
                 }
                 
                 
@@ -163,17 +154,15 @@ export class CreateGroupForm extends LitElement {
                 <div class="modal-content">
                     <div class="form-fields">
                     <div class="image-container">
-                        <div class="user-image">
-                            <custom-avatar size="120"
-                                          shadow
-                                          username="${this.groupName || 'New Group'}"
-                                          imageId="${this.groupImage}">
-                            </custom-avatar>
-                            <image-changer
-                                    imageId="${this.groupImage}"
-                                    @image-updated="${this._onImageChanged}"></image-changer>
-                        </div>
-                        <p style="text-align: center; margin-top: var(--spacing-small); font-size: var(--font-size-small);">Click the camera to add a group image</p>
+                        <image-selector-with-nav
+                                imageId="${this.groupImage}"
+                                username="${this.groupName || 'New Group'}"
+                                size="120"
+                                showAi
+                                allowNavigation
+                                @image-changed="${this._onImageChanged}">
+                            <span style="font-size: var(--font-size-small);">Click the camera or AI button to add a group image</span>
+                        </image-selector-with-nav>
                     </div>
                     
                     <custom-input

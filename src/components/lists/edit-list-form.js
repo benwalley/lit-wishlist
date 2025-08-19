@@ -1,15 +1,13 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../css/buttons.js";
 import modalSections from "../../css/modal-sections.js";
-import '../pages/account/avatar.js'
 import '../global/custom-input.js'
 import '../global/custom-toggle.js'
 import '../groups/your-groups-list.js'
 import '../users/your-users-list.js'
-import '../global/image-changer.js'
+import '../global/image-selector-with-nav.js'
 import '../../svg/user.js'
 import '../../svg/group.js'
-import '../../svg/camera.js'
 import {messagesState} from "../../state/messagesStore.js";
 import {triggerUpdateList} from "../../events/eventListeners.js";
 import {updateList} from "../../helpers/api/lists.js";
@@ -161,17 +159,6 @@ export class EditListForm extends LitElement {
                     align-items: center;
                     gap: var(--spacing-small);
                 }
-                
-                .user-image {
-                    position: relative;
-                    display: flex;
-                }
-                
-                .image-tip {
-                    font-size: var(--font-size-small);
-                    color: var(--text-color-medium-dark);
-                    margin-top: var(--spacing-x-small);
-                }
                
                 
                 .select-section {
@@ -259,16 +246,15 @@ export class EditListForm extends LitElement {
                     <div class="form-grid">
                 <div class="left-column">
                     <div class="image-container">
-                        <div class="user-image">
-                            <custom-avatar size="150" 
-                                       .username="${this.listName}"
-                                       .imageId="${this.imageId}"
-                            ></custom-avatar>
-                            <image-changer  
-                                       .imageId="${this.imageId}"
-                                       @image-updated="${this._onImageChanged}"></image-changer>
-                        </div>
-                        <span class="image-tip">Click the camera to change list image</span>
+                        <image-selector-with-nav
+                                imageId="${this.imageId}"
+                                username="${this.listName}"
+                                size="150"
+                                showAi
+                                allowNavigation
+                                @image-changed="${this._onImageChanged}">
+                            <span style="font-size: var(--font-size-small); color: var(--text-color-medium-dark);">Click the camera or AI button to change list image</span>
+                        </image-selector-with-nav>
                     </div>
                     <custom-input placeholder="List Name" 
                                   required="true"

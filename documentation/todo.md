@@ -19,3 +19,5 @@
  - make sure permissions work.
  - add publicity popup to other places, and add popup for other instrutions
  - on list, add "use account image" button.
+ - add "share with" functionality.
+ - 

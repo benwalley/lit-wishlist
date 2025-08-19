@@ -2,30 +2,22 @@ import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../css/buttons";
 import modalSections from "../../css/modal-sections.js";
 import '../../svg/x.js';
-import '../../svg/camera.js';
 import '../../svg/info.js';
 import '../../svg/world.js';
 import '../../svg/lock.js';
-import '../../svg/ai.js';
-import '../../svg/abstract.js';
-import '../../svg/dog.js';
-import '../../svg/arrow-long.js';
-import '../../svg/arrow-long-left.js';
 import '../instructions/info-tooltip.js';
 import '../instructions/publicity-details.js';
 import '../global/custom-input.js';
 import '../global/custom-modal.js';
-import '../pages/account/avatar.js';
+import '../global/image-selector-with-nav.js';
 import {observeState} from 'lit-element-state';
 import {userState} from "../../state/userStore.js";
 import {listenToCustomEvent} from "../../events/custom-events.js";
 import {customFetch} from "../../helpers/fetchHelpers.js";
 import {updateUserData} from "../../helpers/api/users.js";
 import {messagesState} from "../../state/messagesStore.js";
-import '../global/image-changer.js';
 import '../global/custom-toggle.js';
 import {triggerUpdateUser} from "../../events/eventListeners.js";
-import {generateCustomImage, generateImage} from "../../helpers/api/ai.js";
 
 export class CustomElement extends observeState(LitElement) {
     static properties = {
@@ -34,12 +26,7 @@ export class CustomElement extends observeState(LitElement) {
         username: {type: String},
         description: {type: String},
         isPublic: {type: Boolean},
-        errorMessage: {type: String}, // New property to hold error messages
-        showAiInput: {type: Boolean},
-        aiPrompt: {type: String},
-        isGeneratingImage: {type: Boolean},
-        imageHistory: {type: Array}, // Array of image IDs that have been chosen/generated
-        currentImageIndex: {type: Number} // Current position in image history
+        errorMessage: {type: String} // New property to hold error messages
     };
 
     constructor() {
@@ -50,11 +37,6 @@ export class CustomElement extends observeState(LitElement) {
         this.description = '';
         this.isPublic = false;
         this.errorMessage = '';
-        this.showAiInput = false;
-        this.aiPrompt = '';
-        this.isGeneratingImage = false;
-        this.imageHistory = [];
-        this.currentImageIndex = -1;
     }
 
     connectedCallback() {
@@ -76,20 +58,10 @@ export class CustomElement extends observeState(LitElement) {
 
     setUserData = () => {
         if (userState?.userData) {
-            const initialImageId = userState.userData.image || 0;
-            this.imageId = initialImageId;
+            this.imageId = userState.userData.image || 0;
             this.username = userState.userData.name || '';
             this.description = userState.userData.publicDescription || '';
             this.isPublic = userState.userData.isPublic || false;
-            
-            // Initialize image history with current user image if it exists
-            if (initialImageId > 0) {
-                this.imageHistory = [initialImageId];
-                this.currentImageIndex = 0;
-            } else {
-                this.imageHistory = [];
-                this.currentImageIndex = -1;
-            }
         }
     }
 
@@ -104,8 +76,7 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     _onImageChanged(e) {
-        const newImageId = e.detail.imageId;
-        this._addImageToHistory(newImageId);
+        this.imageId = e.detail.imageId;
         this.errorMessage = '';
     }
 
@@ -120,13 +91,7 @@ export class CustomElement extends observeState(LitElement) {
             this.username = userState.userData.name || '';
             this.imageId = userState.userData?.imageId || 0;
             this.isPublic = userState.userData.isPublic || false;
-            // Reset image history when clearing
-            this.setUserData();
         }
-        // Reset AI state
-        this.showAiInput = false;
-        this.aiPrompt = '';
-        this.isGeneratingImage = false;
         this._getModal().closeModal();
     }
 
@@ -156,94 +121,6 @@ export class CustomElement extends observeState(LitElement) {
         this.errorMessage = message;
     }
 
-    _toggleAiInput(e) {
-        e.preventDefault();
-        this.showAiInput = !this.showAiInput;
-        this.errorMessage = '';
-    }
-
-    _onAiPromptChanged(e) {
-        this.aiPrompt = e.detail.value;
-        this.errorMessage = '';
-    }
-
-    async _generateAiImage(e) {
-        e.preventDefault();
-        const submitter = e.submitter;
-        let type = submitter?.dataset?.imageType || 'custom';
-
-        if (type === 'custom' && !this.aiPrompt.trim()) {
-            type = Math.random() < 0.5 ? 'abstract' : 'animal';
-        }
-
-        this.isGeneratingImage = true;
-        this.errorMessage = '';
-
-
-        try {
-            const result = await generateImage(type, this.aiPrompt.trim());
-
-            if (result.success && result.imageId) {
-                this._addImageToHistory(result.imageId);
-                this.aiPrompt = '';
-                messagesState.addMessage('AI image generated successfully');
-            } else {
-                this._showError(result.error || 'Failed to generate AI image');
-            }
-        } catch (error) {
-            console.error('Error generating AI image:', error);
-            this._showError('An unexpected error occurred while generating the image');
-        } finally {
-            this.isGeneratingImage = false;
-        }
-    }
-
-    /**
-     * Navigate between images in the history
-     * @param {string} direction - 'prev' or 'next'
-     */
-    _navigateImage(direction) {
-        if (this.imageHistory.length <= 1) return;
-
-        let newIndex = this.currentImageIndex;
-        
-        if (direction === 'prev') {
-            newIndex = Math.max(0, this.currentImageIndex - 1);
-        } else if (direction === 'next') {
-            newIndex = Math.min(this.imageHistory.length - 1, this.currentImageIndex + 1);
-        }
-
-        if (newIndex !== this.currentImageIndex) {
-            this.currentImageIndex = newIndex;
-            this.imageId = this.imageHistory[newIndex];
-        }
-    }
-
-    /**
-     * Add a new image to the history and set it as current
-     * @param {number} imageId - The ID of the image to add
-     */
-    _addImageToHistory(imageId) {
-        if (imageId && imageId > 0) {
-            // Avoid duplicates by checking if image already exists
-            const existingIndex = this.imageHistory.indexOf(imageId);
-            if (existingIndex !== -1) {
-                // If image already exists, just navigate to it
-                this.currentImageIndex = existingIndex;
-                this.imageId = imageId;
-            } else {
-                // Add new image to history and set as current
-                this.imageHistory = [...this.imageHistory, imageId];
-                this.currentImageIndex = this.imageHistory.length - 1;
-                this.imageId = imageId;
-            }
-        } else {
-            // Handle image removal (imageId = 0)
-            this.imageId = 0;
-            // Keep the history but reset current index
-            this.currentImageIndex = -1;
-        }
-    }
 
     static get styles() {
         return [
@@ -263,51 +140,7 @@ export class CustomElement extends observeState(LitElement) {
                     gap: var(--spacing-normal);
                 }
 
-                .content .user-image {
-                    position: relative;
-                    display: flex;
-                    align-items: center;
-                    gap: var(--spacing-small);
-                }
-                
-                .image-nav-button {
-                    background: var(--background-dark-gradient);
-                    border: 2px solid var(--border-color-light);
-                    border-radius: 50%;
-                    padding: var(--spacing-small);
-                    font-size: var(--font-size-large);
-                    color: var(--text-color-light);
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    min-width: 40px;
-                    min-height: 40px;
-                }
-                
-                .image-nav-button:hover {
-                    background: var(--background-light);
-                    border-color: var(--primary-color);
-                    color: var(--primary-color);
-                }
-                
-                .image-nav-button:disabled {
-                    opacity: 0.3;
-                    cursor: not-allowed;
-                }
-                
-                .avatar-container {
-                    position: relative;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: var(--spacing-x-small);
-                }
-
-
                 /* Error message styles */
-
                 .error {
                     color: red;
                     font-size: 0.9em;
@@ -320,68 +153,6 @@ export class CustomElement extends observeState(LitElement) {
                     align-items: center;
                     gap: var(--spacing-x-small);
                 }
-
-                .ai-generate-button {
-                    box-sizing: border-box;
-                    font-size: var(--font-size-large);
-                    position: absolute;
-                    padding: var(--spacing-small);
-                    bottom: -6px;
-                    left: -6px;
-                }
-
-                .ai-input-container {
-                    width: 100%;
-                    display: flex;
-                    flex-direction: column;
-                    gap: var(--spacing-small);
-                }
-
-                .ai-generate-row {
-                    display: flex;
-                    gap: var(--spacing-small);
-                    align-items: flex-end;
-                    flex-wrap: wrap;
-                }
-
-                .ai-generate-row custom-input {
-                    flex: 1;
-                    min-width: 200px;
-                }
-
-                .ai-generate-row button.icon {
-                   font-size: var(--font-size-large);
-                    padding: var(--spacing-small);
-                }
-                
-                .submitGenerateButton {
-                    font-size: var(--font-size-normal);
-                    padding: var(--spacing-small);
-                    line-height: var(--font-size-large);
-                }
-
-                .ai-notice {
-                    margin: 0;
-                    padding: var(--spacing-small);
-                    background-color: var(--info-yellow-light);
-                    border: 1px solid var(--info-yellow);
-                    border-radius: var(--border-radius-small);
-                    color: var(--info-yellow);
-                    font-size: var(--font-size-small);
-                    text-align: center;
-                    line-height: 1.4;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: var(--spacing-x-small);
-                }
-                
-                .image-counter {
-                    font-size: var(--font-size-small);
-                    color: var(--text-color-light);
-                    text-align: center;
-                    margin-top: var(--spacing-x-small);
-                }
             `
         ];
     }
@@ -389,7 +160,7 @@ export class CustomElement extends observeState(LitElement) {
     render() {
         return html`
             <custom-modal id="edit-user-modal"
-                          maxWidth="500px"
+                          maxWidth="600px"
                           noPadding
                           @modal-changed="${this._handleModalChanged}">
                 <div class="modal-container">
@@ -400,88 +171,15 @@ export class CustomElement extends observeState(LitElement) {
                         <div class="modal-content">
                             <div class="content">
 
-                        <div class="user-image">
-                            <!-- Left arrow navigation -->
-                            ${this.imageHistory.length > 1 ? html`
-                                <button class="image-nav-button" 
-                                        @click="${() => this._navigateImage('prev')}"
-                                        ?disabled="${this.currentImageIndex <= 0}">
-                                    <arrow-long-left-icon></arrow-long-left-icon>
-                                </button>
-                            ` : ''}
-                            
-                            <!-- Avatar and image controls -->
-                            <div class="avatar-container">
-                                <div style="position: relative;">
-                                    <custom-avatar size="120"
-                                                   shadow
-                                                   username="${this.username}"
-                                                   imageId="${this.imageId}">
-                                    </custom-avatar>
-                                    <image-changer
-                                            imageId="${this.imageId}"
-                                            @image-updated="${this._onImageChanged}"></image-changer>
-                                    <button class="ai-generate-button primary shadow fancy" @click="${this._toggleAiInput}">
-                                        <ai-icon></ai-icon>
-                                    </button>
-                                </div>
-                                
-                                <!-- Image counter -->
-                                ${this.imageHistory.length > 1 ? html`
-                                    <div class="image-counter">
-                                        ${this.currentImageIndex + 1} of ${this.imageHistory.length}
-                                    </div>
-                                ` : ''}
-                            </div>
-                            
-                            <!-- Right arrow navigation -->
-                            ${this.imageHistory.length > 1 ? html`
-                                <button class="image-nav-button"
-                                        @click="${() => this._navigateImage('next')}"
-                                        ?disabled="${this.currentImageIndex >= this.imageHistory.length - 1}">
-                                    <arrow-long-icon></arrow-long-icon>
-                                </button>
-                            ` : ''}
-                        </div>
-                        <span style="text-align: center;">Click the camera or AI button to change your profile picture</span>
-
-                        <!-- AI Image Generation Input -->
-                        ${this.showAiInput ? html`
-                            <form @submit="${this._generateAiImage}" class="ai-input-container">
-                                <div class="ai-generate-row">
-                                    <custom-input
-                                        placeholder="Describe an image..."
-                                        value="${this.aiPrompt}"
-                                        @value-changed="${this._onAiPromptChanged}"
-                                        fullWidth>
-                                    </custom-input>
-                                    <button
-                                        data-image-type="custom"
-                                        type="submit"
-                                        class="primary button fancy submitGenerateButton" 
-                                        ?disabled="${this.isGeneratingImage}">
-                                        ${this.isGeneratingImage ? 'Generating...' : 'Generate'}
-                                    </button>
-                                    <button
-                                            data-image-type="abstract"
-                                            type="submit"
-                                            class="primary button fancy-alt icon"
-                                            ?disabled="${this.isGeneratingImage}">
-                                        <abstract-icon></abstract-icon>
-                                    </button>
-                                    <custom-tooltip>Generate a random abstract image</custom-tooltip>
-                                    <button
-                                            data-image-type="animal"
-                                            type="submit"
-                                            class="primary button icon"
-                                            ?disabled="${this.isGeneratingImage}">
-                                        <dog-icon></dog-icon>
-                                    </button>
-                                    <custom-tooltip>Generate image of a cartoon animal</custom-tooltip>
-                                </div>
-                                <p class="ai-notice"><info-icon></info-icon> Remember to save changes after generating</p>
-                            </form>
-                        ` : ''}
+                        <image-selector-with-nav
+                                imageId="${this.imageId}"
+                                username="${this.username}"
+                                size="120"
+                                showAi
+                                allowNavigation
+                                @image-changed="${this._onImageChanged}">
+                            <span style="text-align: center;">Click the camera or AI button to change your profile picture</span>
+                        </image-selector-with-nav>
 
                         <!-- Listen for value-changed events to update properties -->
                         <custom-input

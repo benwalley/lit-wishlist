@@ -1,13 +1,11 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../css/buttons";
 import '../../svg/x.js';
-import '../../svg/camera.js';
 import '../global/custom-input.js';
-import '../global/image-changer.js';
+import '../global/image-selector-with-nav.js';
 import {updateGroup} from "../../helpers/api/groups.js";
 import {messagesState} from "../../state/messagesStore.js";
 import {triggerGroupUpdated} from "../../events/eventListeners.js";
-import '../pages/account/avatar.js';
 
 export class EditGroupForm extends LitElement {
     static properties = {
@@ -122,10 +120,6 @@ export class EditGroupForm extends LitElement {
                     gap: var(--spacing-normal);
                 }
                 
-                .content .group-image {
-                    position: relative;
-                    display: flex;
-                }
 
                 .footer {
                     display: flex;
@@ -152,16 +146,15 @@ export class EditGroupForm extends LitElement {
                 <h2>Edit Group</h2>
             </div>
             <div class="content">
-                <div class="group-image">
-                    <custom-avatar size="120" 
-                                   shadow 
-                                   username="${this.groupName}" 
-                                   imageid="${this.imageId}">
-                    </custom-avatar>
-                    <image-changer imageId="${this.imageId}"
-                                  @image-updated="${this._onImageChanged}"></image-changer>
-                </div>
-                <span>Click the camera to change your group picture</span>
+                <image-selector-with-nav
+                        imageId="${this.imageId}"
+                        username="${this.groupName}"
+                        size="120"
+                        showAi
+                        allowNavigation
+                        @image-changed="${this._onImageChanged}">
+                    <span>Click the camera or AI button to change your group picture</span>
+                </image-selector-with-nav>
 
                 <custom-input
                         placeholder="Group Name"

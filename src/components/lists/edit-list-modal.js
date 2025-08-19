@@ -28,7 +28,7 @@ export class EditListModal extends LitElement {
     _handleOpenEvent(event) {
         if (event.detail && event.detail.listData) {
             this.listData = event.detail.listData;
-            
+
             // Open the modal
             const modal = this.shadowRoot.querySelector('custom-modal');
             if (modal) {
@@ -58,7 +58,7 @@ export class EditListModal extends LitElement {
                 level="2"
                 triggerEvent="none"
                 @modal-changed="${this._handleModalChanged}"
-                maxWidth="800px"
+                maxWidth="1000px"
                 noPadding>
                 ${this.listData ? html`
                     <edit-list-form .listData="${this.listData}"></edit-list-form>

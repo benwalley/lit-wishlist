@@ -267,7 +267,7 @@ export class GroupDetails extends observeState(LitElement) {
                 ` : ''}
             </div>
             
-            <custom-modal id="edit-group-modal" maxWidth="500px" noPadding>
+            <custom-modal id="edit-group-modal" maxWidth="600px" noPadding>
                 <edit-group-form 
                     .groupData="${this.groupData}"
                     @close-edit-group-modal="${this._closeEditGroupModal}">
