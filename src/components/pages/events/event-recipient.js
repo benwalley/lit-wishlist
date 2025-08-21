@@ -5,6 +5,7 @@ import modalSections from "../../../css/modal-sections.js";
 import '../../global/custom-input.js';
 import '../../global/custom-modal.js';
 import '../gift-tracking/gift-tracking-row.js';
+import '../gift-tracking/go-in-on-tracking-row.js';
 import {getUserImageIdByUserId, getUsernameById} from "../../../helpers/generalHelpers.js";
 import {observeState} from "lit-element-state";
 import {eventStatuses} from './event-statuses.js';
@@ -50,6 +51,7 @@ export class EventRecipient extends observeState(LitElement) {
                     align-items: center;
                     padding: var(--spacing-x-small) var(--spacing-small);
                     border-bottom: 1px solid var(--border-color);
+                    background: var(--fancy-purple-gradient);
                 }
 
                 .recipient-row:hover {
@@ -59,6 +61,10 @@ export class EventRecipient extends observeState(LitElement) {
                 .recipient-name {
                     font-weight: bold;
                     color: var(--text-color-dark);
+                    color: var(--light-text-color);
+                    display: flex;
+                    align-content: center;
+                    gap: var(--spacing-small);
                 }
 
                 .status-select {
@@ -71,6 +77,8 @@ export class EventRecipient extends observeState(LitElement) {
                     text-transform: capitalize;
                     background: var(--background-color);
                     color: var(--text-color-dark);
+                    color: var(--light-text-color);
+                    box-shadow: var(--shadow-2-soft);
                     cursor: pointer;
                     appearance: none;
                     -webkit-appearance: none;
@@ -95,6 +103,7 @@ export class EventRecipient extends observeState(LitElement) {
 
                 .note {
                     color: var(--text-color-dark);
+                    color: var(--light-text-color);
                     font-size: var(--font-size-small);
                     cursor: pointer;
                     padding: var(--spacing-x-small);
@@ -104,10 +113,18 @@ export class EventRecipient extends observeState(LitElement) {
                     overflow: hidden;
                     text-overflow: ellipsis;
                     max-width: 100%;
+                    display: flex;
+                    align-items: center;
+                    gap: var(--spacing-small);
+
+                    edit-icon {
+                        color: var(--blue-normal);
+                    }
                 }
 
                 .note.empty {
                     color: var(--text-color-medium-dark);
+                    color: var(--light-text-color);
                     font-style: italic;
                 }
 
@@ -150,7 +167,8 @@ export class EventRecipient extends observeState(LitElement) {
                 }
                 
                 .gift-tracking-grid {
-                    --gift-tracking-columns: 1fr 200px 150px 80px 80px 40px;
+                    --gift-tracking-columns: 1fr 200px 150px 80px 80px 40px 40px;
+                    --go-in-on-tracking-columns: 1fr 300px 40px 40px 40px;
                     display: grid;
                     grid-template-columns: 1fr;
                     overflow: hidden;
@@ -198,7 +216,7 @@ export class EventRecipient extends observeState(LitElement) {
     _openNoteModal() {
         this.noteText = this.recipient.note || '';
         this.isEditingNote = true;
-        
+
         // Focus the textarea after the modal renders
         this.updateComplete.then(() => {
             const textarea = this.shadowRoot.querySelector('.note-textarea');
@@ -302,7 +320,8 @@ export class EventRecipient extends observeState(LitElement) {
                         @click=${this._openNoteModal}
                         title="${this.recipient.note || 'Click to add a note'}"
                     >
-                        ${this.recipient.note || 'Add note...'}
+                        ${this.recipient.note || 'Click to add note...'}
+                        ${this.recipient.note ? html`<edit-icon></edit-icon>` : ''}
                     </div>
                 </div>
                 <div class="status-container">
@@ -327,6 +346,18 @@ export class EventRecipient extends observeState(LitElement) {
                             .itemIndex=${index}
                             .lastItem=${index === this.recipient.getting.length - 1}
                         ></gift-tracking-row>
+                    `)}
+                </div>
+            ` : ''}
+
+            ${this.recipient.goInOn && this.recipient.goInOn.length > 0 ? html`
+                <div class="gift-tracking-grid">
+                    ${this.recipient.goInOn.map((item, index) => html`
+                        <go-in-on-tracking-row 
+                            .item=${item}
+                            .itemIndex=${index}
+                            .lastItem=${index === this.recipient.getting.length - 1}
+                        ></go-in-on-tracking-row>
                     `)}
                 </div>
             ` : ''}

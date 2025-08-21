@@ -83,4 +83,38 @@ export async function bulkUpdateGoInOn(data) {
     }
 }
 
+/**
+ * Deletes a getting item from gift tracking
+ * @param {string} gettingId - The ID of the getting item to delete
+ * @returns {Promise<{success: boolean, data?: any, error?: string, publicMessage?: string}>}
+ */
+export async function deleteGetting(gettingId) {
+    try {
+        const options = {
+            method: 'DELETE',
+        };
+
+        return await customFetch(`/giftTracking/getting/${gettingId}`, options, true);
+    } catch (e) {
+        return {publicMessage: e, success: false}
+    }
+}
+
+/**
+ * Deletes a go-in-on item from gift tracking
+ * @param {string} goInOnId - The ID of the go-in-on item to delete
+ * @returns {Promise<{success: boolean, data?: any, error?: string, publicMessage?: string}>}
+ */
+export async function deleteGoInOn(goInOnId) {
+    try {
+        const options = {
+            method: 'DELETE',
+        };
+
+        return await customFetch(`/giftTracking/goInOn/${goInOnId}`, options, true);
+    } catch (e) {
+        return {publicMessage: e, success: false}
+    }
+}
+
 

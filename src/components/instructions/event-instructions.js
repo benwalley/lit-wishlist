@@ -56,12 +56,11 @@ export class EventInstructions extends LitElement {
             <div class="modal-content">
                 <div class="content">
                     <div class="section">
-                        <p><strong>Events</strong> help you organize gift-giving occasions with specific people and due dates.</p>
+                        <p><strong>Events</strong> help you track gift-giving for specific events</p>
                         <ul>
-                            <li>Perfect for birthdays, holidays, anniversaries, and special occasions</li>
-                            <li>Track what gifts you need to buy and for whom</li>
-                            <li>Set due dates to stay organized and never miss an occasion</li>
-                            <li>Share events with family members or gift-giving partners</li>
+                            <li>Remember who you still need to get gifts for</li>
+                            <li>Track the status of each gift</li>
+                            <li>Track how much you spend on each gift</li>
                         </ul>
                     </div>
                     
@@ -81,10 +80,12 @@ export class EventInstructions extends LitElement {
                             <p><strong>Example:</strong> "Christmas 2024" with participants: Mom, Dad, Sister, Brother</p>
                         </div>
                     </div>
-                    
+
+
                     <div class="highlight">
-                        <p><strong>Pro Tip:</strong> Use events to plan ahead for recurring occasions like birthdays and holidays. You can create events well in advance to give yourself time to find the perfect gifts!</p>
+                        <p>You are the only one who can see the events you create.</p>
                     </div>
+            
                 </div>
             </div>
         `;

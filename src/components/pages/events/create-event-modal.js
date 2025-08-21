@@ -151,10 +151,6 @@ export class CreateEventModal extends observeState(LitElement) {
             errors.push('Event name is required');
         }
 
-        if (!this.dueDate) {
-            errors.push('Due date is required');
-        }
-
         if (this.selectedUsers.length === 0) {
             errors.push('Please select at least one participant');
         }

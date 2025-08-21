@@ -18,7 +18,12 @@ import '../../../svg/delete.js';
 import {formatDate} from "../../../helpers.js";
 import {getUserImageIdByUserId, getUsernameById, maxLength} from "../../../helpers/generalHelpers.js";
 import {envVars} from "../../../config.js";
-import {triggerEditProposalModal, triggerDeleteProposal, listenProposalDeleted, listenUpdateItem} from "../../../events/eventListeners.js";
+import {
+    triggerEditProposalModal,
+    triggerDeleteProposal,
+    listenProposalDeleted,
+    listenUpdateItem
+} from "../../../events/eventListeners.js";
 
 export class GiftTrackingProposals extends observeState(LitElement) {
     static properties = {
@@ -158,13 +163,13 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                     background: var(--delete-red-light);
                     color: var(--delete-red);
                 }
-                
+
                 .proposal-meta {
                     display: flex;
                     flex-direction: column;
                     gap: var(--spacing-x-small)
                 }
-                
+
                 .meta-row {
                     display: flex;
                     align-items: center;
@@ -192,7 +197,7 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                     gap: var(--spacing-x-small);
                     color: inherit;
                     text-decoration: none;
-                    
+
                     &:hover {
                         text-decoration: none;
                     }
@@ -348,7 +353,7 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                     flex-wrap: wrap;
                     align-items: center;
                 }
-                
+
                 .learn-more-button {
                     display: flex;
                     align-items: center;
@@ -404,18 +409,24 @@ export class GiftTrackingProposals extends observeState(LitElement) {
             {
                 id: 'edit',
                 label: 'Edit Proposal',
-                icon: html`<edit-icon></edit-icon>`,
+                icon: html`
+                    <edit-icon></edit-icon>`,
                 classes: 'blue-text',
                 action: () => this._handleEditProposal(proposal)
             },
             {
                 id: 'delete',
                 label: 'Delete Proposal',
-                icon: html`<delete-icon></delete-icon>`,
+                icon: html`
+                    <delete-icon></delete-icon>`,
                 classes: 'danger-text',
                 action: () => this._handleDeleteProposal(proposal)
             }
         ];
+    }
+
+    _isProposalCreator(proposal) {
+        return userState?.userData?.id === proposal.proposalCreatorId;
     }
 
     _handleEditProposal(proposal) {
@@ -427,7 +438,7 @@ export class GiftTrackingProposals extends observeState(LitElement) {
     }
 
     _handleProposalDeleted(event) {
-        const { proposalId } = event.detail;
+        const {proposalId} = event.detail;
         // Remove the proposal from the local state
         this.proposals = this.proposals.filter(p => p.id !== proposalId);
     }
@@ -435,7 +446,8 @@ export class GiftTrackingProposals extends observeState(LitElement) {
 
     render() {
         if (this.loading) {
-            return html`<loading-screen></loading-screen>`;
+            return html`
+                <loading-screen></loading-screen>`;
         }
 
         const counts = this._getProposalCounts();
@@ -453,21 +465,21 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                 </info-tooltip>
             </div>
             <div class="tabs-container">
-                <button 
-                    class="tab-button ${this.activeTab === 'pending' ? 'active' : ''}"
-                    @click="${() => this._handleTabChange('pending')}">
+                <button
+                        class="tab-button ${this.activeTab === 'pending' ? 'active' : ''}"
+                        @click="${() => this._handleTabChange('pending')}">
                     Pending
                     <span class="tab-counter">${counts.pending}</span>
                 </button>
-                <button 
-                    class="tab-button ${this.activeTab === 'accepted' ? 'active' : ''}"
-                    @click="${() => this._handleTabChange('accepted')}">
+                <button
+                        class="tab-button ${this.activeTab === 'accepted' ? 'active' : ''}"
+                        @click="${() => this._handleTabChange('accepted')}">
                     Accepted
                     <span class="tab-counter">${counts.accepted}</span>
                 </button>
-                <button 
-                    class="tab-button ${this.activeTab === 'rejected' ? 'active' : ''}"
-                    @click="${() => this._handleTabChange('rejected')}">
+                <button
+                        class="tab-button ${this.activeTab === 'rejected' ? 'active' : ''}"
+                        @click="${() => this._handleTabChange('rejected')}">
                     Rejected
                     <span class="tab-counter">${counts.rejected}</span>
                 </button>
@@ -480,65 +492,80 @@ export class GiftTrackingProposals extends observeState(LitElement) {
             ` : html`
                 <div class="proposals-container">
                     ${filteredProposals.map(proposal => html`
-                    <div class="proposal-item">
-                        <div class="proposal-header">
-                            ${proposal.itemData?.imageIds?.length > 0 ? html`
-                                <custom-image
-                                    class="proposal-image"
-                                    imageId="${proposal.itemData.imageIds[0]}"
-                                    alt="${proposal.itemData.name}"
-                                ></custom-image>
-                            ` : ''}
-                            <div class="proposal-info">
-                                <div class="proposal-title">${maxLength(proposal.itemData?.name || 'Unknown Item', envVars.LIST_ITEM_MAX_LENGTH)}</div>
-                                <span class="proposal-status status-${proposal.proposalStatus}">
+                        <div class="proposal-item">
+                            <div class="proposal-header">
+                                ${proposal.itemData?.imageIds?.length > 0 ? html`
+                                    <custom-image
+                                            class="proposal-image"
+                                            imageId="${proposal.itemData.imageIds[0]}"
+                                            alt="${proposal.itemData.name}"
+                                    ></custom-image>
+                                ` : ''}
+                                <div class="proposal-info">
+                                    <div class="proposal-title">
+                                        ${maxLength(proposal.itemData?.name || 'Unknown Item', envVars.LIST_ITEM_MAX_LENGTH)}
+                                    </div>
+                                    <span class="proposal-status status-${proposal.proposalStatus}">
                                     ${proposal.proposalStatus}
                                 </span>
-                                <div class="proposal-meta">
-                                    <div class="meta-row">
-                                        <span class="meta-label">Created:</span>
-                                        <span class="meta-value">${formatDate(proposal.createdAt)}</span>
-                                    </div>
-                                    <div class="meta-row">
-                                        <span class="meta-label">Gift for:</span>
-                                        <div class="meta-value">
-                                            <a class="meta-user" href="/user/${proposal.itemData?.createdById}">
-                                                <custom-avatar
-                                                        username="${getUsernameById(proposal.itemData?.createdById)}"
-                                                        imageId="${getUserImageIdByUserId(proposal.itemData?.createdById)}"
-                                                        size="20"
-                                                ></custom-avatar>
-                                                <span>${getUsernameById(proposal.itemData?.createdById)}</span>
-                                            </a>
+                                    <div class="proposal-meta">
+                                        <div class="meta-row">
+                                            <span class="meta-label">Created by:</span>
+                                            <div class="meta-value">
+                                                <a class="meta-user" href="/user/${proposal.proposalCreatorId}">
+                                                    <custom-avatar
+                                                            username="${getUsernameById(proposal.proposalCreatorId)}"
+                                                            imageId="${getUserImageIdByUserId(proposal.proposalCreatorId)}"
+                                                            size="20"
+                                                    ></custom-avatar>
+                                                    <span>${getUsernameById(proposal.proposalCreatorId)}</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="meta-row">
+                                            <span class="meta-label">Created:</span>
+                                            <span class="meta-value">${formatDate(proposal.createdAt)}</span>
+                                        </div>
+                                        <div class="meta-row">
+                                            <span class="meta-label">Gift for:</span>
+                                            <div class="meta-value">
+                                                <a class="meta-user" href="/user/${proposal.itemData?.createdById}">
+                                                    <custom-avatar
+                                                            username="${getUsernameById(proposal.itemData?.createdById)}"
+                                                            imageId="${getUserImageIdByUserId(proposal.itemData?.createdById)}"
+                                                            size="20"
+                                                    ></custom-avatar>
+                                                    <span>${getUsernameById(proposal.itemData?.createdById)}</span>
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        ${this._getProposalActions(proposal).length > 0 ? html`
-                        <div class="proposal-actions">
-                            <div class="actions-container">
-                                <action-dropdown .items=${this._getProposalActions(proposal)}>
-                                    <button
-                                            class="button icon-button action-button"
-                                            aria-label="Proposal actions"
-                                            slot="toggle"
-                                    >
-                                        <dots-icon></dots-icon>
-                                    </button>
-                                </action-dropdown>
-                            </div>
-                        </div>
-                        ` : ''}
+                            ${this._isProposalCreator(proposal) && this._getProposalActions(proposal).length > 0 ? html`
+                                <div class="proposal-actions">
+                                    <div class="actions-container">
+                                        <action-dropdown .items=${this._getProposalActions(proposal)}>
+                                            <button
+                                                    class="button icon-button action-button"
+                                                    aria-label="Proposal actions"
+                                                    slot="toggle"
+                                            >
+                                                <dots-icon></dots-icon>
+                                            </button>
+                                        </action-dropdown>
+                                    </div>
+                                </div>
+                            ` : ''}
 
-                        <proposal-participants
-                            .participants=${proposal.proposalParticipants}
-                            .creatorId=${proposal.creator?.id}
-                            .proposalId=${proposal.id}
-                            .showTotal=${true}
-                        ></proposal-participants>
-                    </div>
-                `)}
+                            <proposal-participants
+                                    .participants=${proposal.proposalParticipants}
+                                    .creatorId=${proposal.creator?.id}
+                                    .proposalId=${proposal.id}
+                                    .showTotal=${true}
+                            ></proposal-participants>
+                        </div>
+                    `)}
                 </div>
             `}
         `;

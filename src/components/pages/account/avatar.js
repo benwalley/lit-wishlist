@@ -55,9 +55,6 @@ export class Avatar extends LitElement {
                 margin-left: -10px;
             }
             
-            &.shadow {
-                box-shadow: var(--shadow-1-soft);
-            }
         }
 
         .avatar img {
@@ -81,18 +78,29 @@ export class Avatar extends LitElement {
             .join('');
     }
 
+    /**
+     * Get appropriate shadow level based on avatar size
+     */
+    getShadowLevel() {
+        if (this.size <= 40) return '--shadow-1-soft';
+        if (this.size <= 80) return '--shadow-2-soft';
+        return '--shadow-4-soft';
+    }
+
 
     render() {
         // If there's an image URL, show the image.
         if (this.imageId > 0) {
+            const shadowVar = this.shadow ? this.getShadowLevel() : 'none';
             return html`
                 <div
-                        class="avatar ${this.round ? 'round' : ''} ${this.shadow ? 'shadow' : ''} ${this.border ? 'border' : ''} ${this.stackLeft ? 'stack-left' : ''}"
+                        class="avatar ${this.round ? 'round' : ''} ${this.border ? 'border' : ''} ${this.stackLeft ? 'stack-left' : ''}"
                         style="
                             width: ${this.size}px; 
                             height: ${this.size}px; 
                             border-radius: ${this.borderradius};
                             font-size: ${this.size * 0.5}px;
+                            box-shadow: ${this.shadow ? `var(${shadowVar})` : 'none'};
                           "
                 >
                     <custom-image
@@ -111,6 +119,7 @@ export class Avatar extends LitElement {
         // and display initials if username is provided.
         const [color1, color2] = generateTwoSimilarColorsFromString(this.username || 'No Data');
         const initials = this.getInitials(this.username);
+        const shadowVar = this.shadow ? this.getShadowLevel() : 'none';
         return html`
             <div
                     class="avatar ${this.round ? 'round' : ''} ${this.border ? 'border' : ''} ${this.stackLeft ? 'stack-left' : ''}"
@@ -120,6 +129,7 @@ export class Avatar extends LitElement {
           border-radius: ${this.borderradius};
           font-size: ${this.size * 0.5}px;
           background: linear-gradient(135deg, ${color1}, ${color2});
+          box-shadow: ${this.shadow ? `var(${shadowVar})` : 'none'};
         "
             >
                 ${initials}

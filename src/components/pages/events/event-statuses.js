@@ -2,19 +2,19 @@ export const eventStatuses = [
     {
         id: 'pending',
         label: 'Pending',
-        backgroundColor: 'var(--info-yellow-light)',
-        color: 'var(--info-yellow)'
+        backgroundColor: 'var(--info-yellow)',
+        color: 'var(--light-text-color)'
     },
     {
         id: 'in-progress',
         label: 'In Progress',
-        backgroundColor: 'var(--purple-light)',
-        color: 'var(--purple-darker)'
+        backgroundColor: 'var(--blue-normal)',
+        color: 'var(--light-text-color)'
     },
     {
         id: 'done',
         label: 'Done',
-        backgroundColor: 'var(--green-light)',
-        color: 'var(--green-normal)'
+        backgroundColor: 'var(--green-normal)',
+        color: 'var(--light-text-color)'
     }
 ];

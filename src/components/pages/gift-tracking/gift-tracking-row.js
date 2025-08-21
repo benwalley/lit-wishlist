@@ -2,6 +2,7 @@ import {LitElement, html, css} from 'lit';
 import {currencyHelper} from "../../../helpers.js";
 import '../../../svg/arrow-long.js';
 import '../../../svg/check.js';
+import '../../../svg/delete.js';
 import '../../global/custom-image.js';
 import '../../global/custom-tooltip.js';
 import '../../global/contributor-stack.js';
@@ -11,6 +12,10 @@ import './tracking-amount-input.js';
 import {observeState} from "lit-element-state";
 import {userState} from "../../../state/userStore.js";
 import  "./giving-tracking.js";
+import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
+import {deleteGetting} from "../../../helpers/api/gifts.js";
+import {messagesState} from "../../../state/messagesStore.js";
+import {triggerUpdateItem} from "../../../events/eventListeners.js";
 
 export class GiftTrackingRow extends observeState(LitElement) {
     static properties = {
@@ -156,6 +161,24 @@ export class GiftTrackingRow extends observeState(LitElement) {
                     }
                 }
                 
+                .delete-button {
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: var(--transition-200);
+                    border: none;
+                    background: transparent;
+                    cursor: pointer;
+                    color: var(--delete-red);
+                    
+                    &:hover {
+                        color: var(--delete-red);
+                        background: var(--delete-red-light);
+                    }
+                }
+                
                 /* Input styles moved to respective components */
                 
                 @media (max-width: 768px) {
@@ -179,6 +202,37 @@ export class GiftTrackingRow extends observeState(LitElement) {
         return [userState.userData?.id]
     }
 
+    _getBuyerData() {
+        const buyerData = this.item?.proposal?.proposalParticipants?.find(participant => participant.isBuying) || false;
+        return buyerData;
+    }
+
+    async _handleDelete() {
+        try {
+            const confirmed = await showConfirmation({
+                heading: 'Mark as Not Gotten',
+                message: `Are you sure you want to mark this item as not gotten?`,
+                submessage: 'This will remove it from your gift tracking.',
+                confirmLabel: 'Mark as Not Gotten',
+                cancelLabel: 'Cancel'
+            });
+
+            if (confirmed) {
+                const response = await deleteGetting(this.item.id);
+
+                if (response.success) {
+                    messagesState.addMessage('Item marked as not gotten and removed from gift tracking');
+                    triggerUpdateItem();
+                } else {
+                    messagesState.addMessage(response.error || 'Failed to remove item from gift tracking', 'error');
+                }
+            }
+        } catch (error) {
+            console.error('Error deleting getting item:', error);
+            messagesState.addMessage('An error occurred while removing the item from gift tracking', 'error');
+        }
+    }
+
     constructor() {
         super();
         this.itemIndex = 0;
@@ -190,8 +244,9 @@ export class GiftTrackingRow extends observeState(LitElement) {
 
         return html`
             <div class="table-row">
-                
-                <div class="item-name cell padded">${this.item.item?.name || '--'}</div>
+                <div class="item-name cell padded">
+                    <span>${this.item.item?.name || '--'}</span>
+                </div>
                 <div class="contributors cell">
                     <giving-tracking .givingData=${this.item}
                     ></giving-tracking>
@@ -200,6 +255,8 @@ export class GiftTrackingRow extends observeState(LitElement) {
                     class="cell" 
                     itemId="${this.item.id}" 
                     status="${this.item.status || 'none'}"
+                    .buyerData="${this._getBuyerData()}"
+                    .buyerStatus="${this.item.buyerStatus || 'none'}"
                 ></tracking-status>
                 <div class="amount-cell price-display cell">
                     <tracking-qty-input
@@ -213,7 +270,18 @@ export class GiftTrackingRow extends observeState(LitElement) {
                 </div>
         
                 <div class="view-link cell">
-                    <a href="/item/${this.item.id}" aria-label="View item details" class="button icon-button text-blue view-details-button">
+                    <button 
+                        class="delete-button" 
+                        @click=${this._handleDelete}
+                        aria-label="Delete item from tracking"
+                    >
+                        <delete-icon></delete-icon>
+                    </button>
+                    <custom-tooltip>Mark as not gotten</custom-tooltip>
+                </div>
+                
+                <div class="view-link cell">
+                    <a href="/item/${this.item.itemId}" aria-label="View item details" class="button icon-button text-blue view-details-button">
                         <arrow-long-icon></arrow-long-icon>
                     </a>
                 </div>

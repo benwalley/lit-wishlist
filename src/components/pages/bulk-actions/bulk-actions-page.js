@@ -679,7 +679,7 @@ class BulkActionsPage extends observeState(LitElement) {
                                         ></priority-selector>
                                     </div>
                                     <div class="grid-cell">
-                                        <a href="/items/${item.id}" class="button icon-button blue-text" target="_blank" title="View item">
+                                        <a href="/item/${item.id}" class="button icon-button blue-text" target="_blank" title="View item">
                                             <link-icon></link-icon>
                                         </a>
                                     </div>

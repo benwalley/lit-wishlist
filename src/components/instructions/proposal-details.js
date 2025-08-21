@@ -128,15 +128,29 @@ export class ProposalDetails extends LitElement {
                             <p>Invited people can accept or decline the proposal. They'll see the item details and their contribution amount.</p>
                         </div>
                     </div>
-                    
+
                     <div class="step">
                         <div class="step-number">4</div>
                         <div class="step-content">
-                            <strong>Coordinate Purchase</strong>
-                            <p>One person will be designated as the buyer and they will purchase the gift.</p>
+                            <strong>Accept Proposal</strong>
+                            <p>If the proposal is accepted by everyone, it will be marked as <strong>gotten</strong> by each of them.</p>
                         </div>
                     </div>
+                    
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <strong>Coordinate Purchase</strong>
+                            <p>One person will be designated as the buyer and they will purchase the gift. </p>
+                        </div>
+                    </div>
+
+                    <div class="highlight">
+                        <strong>💡 Tip:</strong> All proposal participants will see the gift tracking status that the <strong>buyer</strong> updates in <a href="/events">events</a>.
+                    </div>
                 </div>
+                
+                
             </div>
         `;
     }

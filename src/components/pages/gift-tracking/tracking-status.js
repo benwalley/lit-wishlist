@@ -8,14 +8,20 @@ import formStyles from '../../../css/forms.js'
 import {customFetch} from '../../../helpers/fetchHelpers.js';
 import {messagesState} from '../../../state/messagesStore.js';
 import {statuses} from "./gift-giving-helpers.js";
+import '../account/avatar.js';
+import {getUserImageIdByUserId, getUsernameById} from "../../../helpers/generalHelpers.js";
+import {userState} from "../../../state/userStore.js";
+import {observeState} from "lit-element-state";
 
-export class TrackingStatus extends LitElement {
+export class TrackingStatus extends observeState(LitElement) {
     static properties = {
         itemId: {type: String},
         status: {type: String},
         loading: {type: Boolean},
         originalStatus: {type: String, state: true},
-        hasChanged: {type: Boolean, state: true}
+        hasChanged: {type: Boolean, state: true},
+        buyerData: {type: Object},
+        buyerStatus: {type: String}
     };
 
     constructor() {
@@ -116,6 +122,18 @@ export class TrackingStatus extends LitElement {
                     width: 18px;
                     height: 18px;
                 }
+                
+                .buyer-status-indicator {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    width: 0;
+                    height: 0;
+                    border-style: solid;
+                    border-width: 0 8px 8px 0;
+                    border-color: transparent var(--info-yellow) transparent transparent;
+                    z-index: 5;
+                }
             `
         ];
     }
@@ -156,6 +174,7 @@ export class TrackingStatus extends LitElement {
         const isSelected = this.isSelected(status.id);
         const isCompleted = this.isCompleted(status.id);
         const isOriginal = this.isOriginal(status.id);
+        const isBuyerStatus = this.buyerData && this.buyerStatus === status.id && !(this.buyerData.userId === userState.userData?.id);
 
         let cellClass = '';
         if (isSelected) {
@@ -182,6 +201,29 @@ export class TrackingStatus extends LitElement {
                         <span>...</span>
                     </div>
                 ` : ''}
+                ${isBuyerStatus ? html`
+                    <div class="buyer-status-indicator"></div>
+                    <custom-tooltip>
+                        <div class="buyer-details" 
+                             style="display: flex;
+                            flex-direction: row;
+                            gap: var(--spacing-small);">
+                            <custom-avatar
+                                    class="buyer-avatar"
+                                    username="${getUsernameById(this.buyerData.userId) || 'Anonymous'}"
+                                    imageId="${getUserImageIdByUserId(this.buyerData.userId) || 0}"
+                                    size="40"
+                                    round="true"
+                                    shadow
+                            ></custom-avatar>
+                            <span>
+                                <strong>${getUsernameById(this.buyerData.userId) || 'Anonymous'}</strong>
+                                is buying this item and has the status set to <strong style="color: var(--blue-normal)">${status.label}</strong>
+                            </span>
+                        </div>
+                    </custom-tooltip>
+                ` : ''}
+      
             </div>
         `;
     }

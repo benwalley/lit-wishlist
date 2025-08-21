@@ -186,6 +186,10 @@ export class EditItemForm extends LitElement {
                     gap: var(--spacing-normal);
                 }
                 
+                .modal-body {
+                    overflow: auto;
+                }
+                
                 .advanced-options-container {
                     grid-column: 1 / -1;
                     margin-top: var(--spacing-normal);
@@ -376,7 +380,7 @@ export class EditItemForm extends LitElement {
                     <h2>Edit Item</h2>
                 </div>
                 
-                <form @submit=${this._submitHandler}>
+                <form @submit=${this._submitHandler} class="modal-body">
                     <div class="modal-content">
                         <div class="form-contents">
                     <div class="column">

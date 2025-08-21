@@ -71,7 +71,7 @@ export class GiftTrackingGetting extends observeState(LitElement) {
                     display: block;
                     position: relative;
                     padding-top: var(--spacing-normal);
-                    --gift-tracking-columns: 200px 1fr 120px 200px 80px 80px 40px;
+                    --gift-tracking-columns: 200px 1fr 120px 200px 80px 80px 40px 40px;
                 }
                 
                 .save-button {
@@ -216,6 +216,7 @@ export class GiftTrackingGetting extends observeState(LitElement) {
                         <div class="table-header-name">Status</div>
                         <div class="table-header-name right-align">qty</div>
                         <div class="table-header-name right-align">Price</div>
+                        <div class="table-header-name"></div>
                         <div class="table-header-name"></div>
                     </div>
                     ${this.sortedByUser.map(group => html`
