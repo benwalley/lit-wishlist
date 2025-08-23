@@ -1,4 +1,5 @@
 import {LitElement, html, css} from 'lit';
+import {keyed} from 'lit/directives/keyed.js';
 import buttonStyles from "../../../css/buttons.js";
 import formStyles from "../../../css/forms.js";
 import modalSections from "../../../css/modal-sections.js";
@@ -6,11 +7,13 @@ import '../../global/custom-input.js';
 import '../../global/custom-modal.js';
 import '../gift-tracking/gift-tracking-row.js';
 import '../gift-tracking/go-in-on-tracking-row.js';
+import '../../../svg/chevron-down.js';
 import {getUserImageIdByUserId, getUsernameById} from "../../../helpers/generalHelpers.js";
 import {observeState} from "lit-element-state";
 import {eventStatuses} from './event-statuses.js';
 import {updateEventRecipientNote} from '../../../helpers/api/events.js';
 import {messagesState} from '../../../state/messagesStore.js';
+import {getRecipientCollapsedState, setRecipientCollapsedState} from '../../../localStorage/recipientCollapsedState.js';
 
 export class EventRecipient extends observeState(LitElement) {
     static properties = {
@@ -20,7 +23,8 @@ export class EventRecipient extends observeState(LitElement) {
         noteText: {type: String},
         originalStatus: {type: String, state: true},
         hasStatusChanged: {type: Boolean, state: true},
-        saving: {type: Boolean}
+        saving: {type: Boolean},
+        isCollapsed: {type: Boolean}
     };
 
     constructor() {
@@ -32,6 +36,23 @@ export class EventRecipient extends observeState(LitElement) {
         this.originalStatus = '';
         this.hasStatusChanged = false;
         this.saving = false;
+        this.isCollapsed = false;
+    }
+
+    connectedCallback() {
+        super.connectedCallback();
+        // Load collapse state when component is connected
+        this.updateComplete.then(() => {
+            this._loadCollapseState();
+        });
+    }
+
+    updated(changedProperties) {
+        super.updated(changedProperties);
+        // Re-fetch collapse state if recipient or userId changes
+        if (changedProperties.has('recipient')) {
+            this._loadCollapseState();
+        }
     }
 
     static get styles() {
@@ -46,22 +67,32 @@ export class EventRecipient extends observeState(LitElement) {
 
                 .recipient-row {
                     display: grid;
-                    grid-template-columns: 200px 1fr 120px;
+                    grid-template-columns: 200px 1fr 120px 40px;
                     gap: var(--spacing-normal);
                     align-items: center;
                     padding: var(--spacing-x-small) var(--spacing-small);
                     border-bottom: 1px solid var(--border-color);
-                    background: var(--fancy-purple-gradient);
                 }
-
-                .recipient-row:hover {
-                    background-color: var(--background-light);
+                
+                .recipient-row.pending {
+                    background: var(--info-yellow-light);
+                    border-left: 3px solid var(--info-yellow);
+                }
+                
+                .recipient-row.in-progress {
+                    background: var(--blue-light);
+                    border-left: 3px solid var(--blue-normal);
+                }
+                
+                .recipient-row.done {
+                    background: var(--green-light);
+                    border-left: 3px solid var(--green-normal);
+                    
                 }
 
                 .recipient-name {
                     font-weight: bold;
                     color: var(--text-color-dark);
-                    color: var(--light-text-color);
                     display: flex;
                     align-content: center;
                     gap: var(--spacing-small);
@@ -77,7 +108,6 @@ export class EventRecipient extends observeState(LitElement) {
                     text-transform: capitalize;
                     background: var(--background-color);
                     color: var(--text-color-dark);
-                    color: var(--light-text-color);
                     box-shadow: var(--shadow-2-soft);
                     cursor: pointer;
                     appearance: none;
@@ -103,7 +133,6 @@ export class EventRecipient extends observeState(LitElement) {
 
                 .note {
                     color: var(--text-color-dark);
-                    color: var(--light-text-color);
                     font-size: var(--font-size-small);
                     cursor: pointer;
                     padding: var(--spacing-x-small);
@@ -124,7 +153,6 @@ export class EventRecipient extends observeState(LitElement) {
 
                 .note.empty {
                     color: var(--text-color-medium-dark);
-                    color: var(--light-text-color);
                     font-style: italic;
                 }
 
@@ -172,6 +200,41 @@ export class EventRecipient extends observeState(LitElement) {
                     display: grid;
                     grid-template-columns: 1fr;
                     overflow: hidden;
+                    transition: var(--transition-normal);
+                    
+                    &.go-in-on {
+                        border-top: 1px solid var(--grayscale-300);
+                    }
+                    
+                    &.collapsed {
+                        display: none;
+                    }
+                }
+
+                .collapse-toggle {
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    padding: var(--spacing-x-small);
+                    border-radius: var(--border-radius-small);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: var(--text-color-dark);
+                    transition: var(--transition-200);
+                }
+
+                .collapse-toggle:hover {
+                    background: rgba(255, 255, 255, 0.1);
+                }
+
+                .collapse-toggle chevron-down-icon {
+                    transition: var(--transition-200);
+                    transform: rotate(0deg);
+                }
+
+                .collapse-toggle.collapsed chevron-down-icon {
+                    transform: rotate(180deg);
                 }
 
                 @media (max-width: 768px) {
@@ -299,11 +362,41 @@ export class EventRecipient extends observeState(LitElement) {
         return status ? `background-color: ${status.backgroundColor}; color: ${status.color};` : '';
     }
 
+    _isAlreadyGotten(goInOnItem) {
+        return this.recipient.getting && this.recipient.getting.some(gettingItem =>
+            gettingItem.itemId === goInOnItem.itemId
+        );
+    }
+
+    _getCollapseStateKey() {
+        return `${this.eventId}-${this.recipient.userId}`;
+    }
+
+    _loadCollapseState() {
+        if (this.eventId && this.recipient.userId) {
+            this.isCollapsed = getRecipientCollapsedState(this.eventId, this.recipient.userId);
+            console.log(`${this.eventId}-${this.recipient.userId}`, this.isCollapsed);
+        }
+    }
+
+    _saveCollapseState(collapsed) {
+        console.log(this.recipient)
+        if (this.eventId && this.recipient.userId) {
+            setRecipientCollapsedState(this.eventId, this.recipient.userId, collapsed);
+        }
+    }
+
+    _toggleCollapse() {
+        const newValue = !this.isCollapsed
+        this.isCollapsed = newValue;
+        this._saveCollapseState(newValue);
+    }
+
     render() {
         if (!this.recipient) return html``;
 
         return html`
-            <div class="recipient-row">
+            <div class="recipient-row ${this.recipient.status || 'pending'}">
                 <a class="recipient-name" href="/user/${this.recipient.userId}">
                     <custom-avatar
                             size="24"
@@ -335,30 +428,42 @@ export class EventRecipient extends observeState(LitElement) {
                         `)}
                     </select>
                 </div>
+                <button 
+                    class="collapse-toggle ${this.isCollapsed ? 'collapsed' : ''}" 
+                    @click="${this._toggleCollapse}"
+                    aria-label="${this.isCollapsed ? 'Expand' : 'Collapse'} recipient details"
+                >
+                    <chevron-down-icon></chevron-down-icon>
+                </button>
             </div>
 
             ${this.recipient.getting && this.recipient.getting.length > 0 ? html`
-                <div class="gift-tracking-grid">
-                    ${this.recipient.getting.map((item, index) => html`
+                <div class="gift-tracking-grid ${this.isCollapsed ? 'collapsed' : ''}">
+                    ${this.recipient.getting.map((item, index) => keyed(item.itemId || item.id, html`
                         <gift-tracking-row 
                             .item=${item}
                             .showUsername=${false}
                             .itemIndex=${index}
                             .lastItem=${index === this.recipient.getting.length - 1}
                         ></gift-tracking-row>
-                    `)}
+                    `))}
                 </div>
             ` : ''}
 
             ${this.recipient.goInOn && this.recipient.goInOn.length > 0 ? html`
-                <div class="gift-tracking-grid">
-                    ${this.recipient.goInOn.map((item, index) => html`
-                        <go-in-on-tracking-row 
-                            .item=${item}
-                            .itemIndex=${index}
-                            .lastItem=${index === this.recipient.getting.length - 1}
-                        ></go-in-on-tracking-row>
-                    `)}
+                <div class="gift-tracking-grid go-in-on ${this.isCollapsed ? 'collapsed' : ''}">
+                    ${this.recipient.goInOn.map((item, index) => {
+                        const alreadyGotten = this._isAlreadyGotten(item);
+                        
+                        return keyed(item.itemId || item.id, html`
+                            <go-in-on-tracking-row 
+                                .item=${item}
+                                .itemIndex=${index}
+                                .lastItem=${index === this.recipient.goInOn.length - 1}
+                                .alreadyGotten=${alreadyGotten}
+                            ></go-in-on-tracking-row>
+                        `);
+                    })}
                 </div>
             ` : ''}
 

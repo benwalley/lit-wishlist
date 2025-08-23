@@ -41,6 +41,16 @@
     --transparent-fancy-purple-gradient: linear-gradient(to right bottom, color-mix(in srgb, var(--blue-normal) 50%, transparent), color-mix(in srgb, var(--purple-normal) 50%, transparent));
     --fancy-gradient-two: linear-gradient(to right, #4f46e5, #9333ea);
     --transparent-fancy-gradient-two: linear-gradient(to right bottom, color-mix(in srgb, #4f46e5 80%, transparent), color-mix(in srgb, #9333ea 80%, transparent));
+    
+    /* Status-based gradients for table headers */
+    --pending-gradient: linear-gradient(to right bottom, #f59e0b, #dc2626);
+    --transparent-pending-gradient: linear-gradient(to right bottom, color-mix(in srgb, #f59e0b 50%, transparent), color-mix(in srgb, #dc2626 50%, transparent));
+    
+    --in-progress-gradient: linear-gradient(to right bottom, #3b82f6, #7c3aed);
+    --transparent-in-progress-gradient: linear-gradient(to right bottom, color-mix(in srgb, #3b82f6 50%, transparent), color-mix(in srgb, #7c3aed 50%, transparent));
+    
+    --done-gradient: linear-gradient(to right bottom, #059669, #0891b2);
+    --transparent-done-gradient: linear-gradient(to right bottom, color-mix(in srgb, #059669 50%, transparent), color-mix(in srgb, #0891b2 50%, transparent));
 
 
 

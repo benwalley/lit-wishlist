@@ -2,6 +2,7 @@ import {LitElement, html, css} from 'lit';
 import '../../../svg/arrow-long.js';
 import '../../../svg/delete.js';
 import '../../../svg/group.js';
+import '../../../svg/cart.js';
 import '../../global/custom-tooltip.js';
 import '../../global/custom-modal.js';
 import '../account/avatar.js';
@@ -19,6 +20,7 @@ export class GoInOnTrackingRow extends observeState(LitElement) {
         itemIndex: {type: Number},
         lastItem: {type: Boolean},
         showPeopleModal: {type: Boolean, state: true},
+        alreadyGotten: {type: Boolean},
     };
 
     static get styles() {
@@ -91,6 +93,17 @@ export class GoInOnTrackingRow extends observeState(LitElement) {
                 
                 .go-in-on-indicator {
                     color: var(--info-yellow);
+                    padding-right: var(--spacing-x-small);
+                }
+                
+                .already-gotten-indicator {
+                    font-size: var(--font-size-x-small);
+                    color: var(--medium-text-color);
+                    background: var(--background-light);
+                    padding: var(--spacing-x-small) var(--spacing-small);
+                    border-radius: var(--border-radius-small);
+                    margin-left: var(--spacing-small);
+                    font-weight: 500;
                 }
                 
                 .person-name {
@@ -159,6 +172,12 @@ export class GoInOnTrackingRow extends observeState(LitElement) {
                     }
                 }
                 
+                cart-icon {
+                    color: var(--green-normal);
+                    padding: 0 var(--spacing-x-small);
+                    border-left: 1px solid var(--border-color);
+                }
+                
                 @media (max-width: 768px) {
                     .table-row {
                         grid-template-columns: 1fr 200px 32px 32px 32px;
@@ -192,6 +211,10 @@ export class GoInOnTrackingRow extends observeState(LitElement) {
                 <div class="item-name cell padded">
                     <group-icon class="go-in-on-indicator"></group-icon>
                     <custom-tooltip>You want to go in on this</custom-tooltip>
+                    ${this.alreadyGotten ? html`
+                        <cart-icon></cart-icon>
+                        <custom-tooltip>You're getting this</custom-tooltip>
+                    ` : ''}
                     ${this.item.item?.name || '--'}
                 </div>
                 

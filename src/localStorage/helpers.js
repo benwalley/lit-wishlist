@@ -48,3 +48,11 @@ export function setItem(key, value) {
     storageObj[key] = value;
     setLocalStorageItem(storageObj);
 }
+
+/**
+ * Clear all application data from localStorage.
+ * This should be called on logout to prevent data leakage between users.
+ */
+export function clearAllStorage() {
+    localStorage.removeItem(envVars.STORAGE_ITEM_NAME);
+}

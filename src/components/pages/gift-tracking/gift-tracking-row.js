@@ -253,8 +253,8 @@ export class GiftTrackingRow extends observeState(LitElement) {
                 </div>
                 <tracking-status 
                     class="cell" 
-                    itemId="${this.item.id}" 
-                    status="${this.item.status || 'none'}"
+                    itemId="${this.item.itemId}" 
+                    .status="${this.item.status || 'none'}"
                     .buyerData="${this._getBuyerData()}"
                     .buyerStatus="${this.item.buyerStatus || 'none'}"
                 ></tracking-status>

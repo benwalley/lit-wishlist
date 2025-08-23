@@ -5,6 +5,9 @@ import {messagesState} from "../../../state/messagesStore.js";
 import '../../loading/skeleton-loader.js';
 import '../../../svg/calendar.js';
 import '../../../svg/arrow-long-left.js';
+import '../../../svg/info.js';
+import '../../instructions/info-tooltip.js';
+import '../../instructions/event-view-instructions.js';
 import {formatDate, getUsernameById} from "../../../helpers/generalHelpers.js";
 import './event-recipient.js';
 import './event-view-actions.js';
@@ -50,7 +53,6 @@ export class EventViewContainer extends observeState(LitElement) {
         try {
             const response = await fetchEvent(this.eventId);
             if (response.success) {
-                console.log(response.data)
                 this.event = response.data || {};
                 this.calculateDaysRemaining();
             } else {
@@ -190,6 +192,7 @@ export class EventViewContainer extends observeState(LitElement) {
                     margin: 0 auto;
                     box-sizing: border-box;
                     width: 100%;
+                    overflow: auto;
                 }
 
                 .back-link {
@@ -208,6 +211,12 @@ export class EventViewContainer extends observeState(LitElement) {
                     transform: translateX(-2px);
                 }
 
+
+                .title-with-info {
+                    display: flex;
+                    align-items: center;
+                    gap: var(--spacing-small);
+                }
 
                 .event-title {
                     margin: 0;
@@ -310,7 +319,12 @@ export class EventViewContainer extends observeState(LitElement) {
                     background: var(--background-light);
                     border: 1px solid var(--border-color);
                     border-radius: var(--border-radius-normal);
-                    overflow: hidden;
+                    overflow: auto;
+                    
+                    event-recipient {
+                        min-width: 60rem;
+
+                    }
                 }
                 
                 .save-button {
@@ -342,7 +356,18 @@ export class EventViewContainer extends observeState(LitElement) {
                 <div class="event-header">
                     <div class="top-row">
                         <div class="event-header-left">
-                            <h1 class="event-title">${this.event.name || 'Untitled Event'}</h1>
+                            <div class="title-with-info">
+                                <h1 class="event-title">${this.event.name || 'Untitled Event'}</h1>
+                                <info-tooltip 
+                                    buttonClasses="large blue-text"
+                                >
+                                    <info-icon slot="icon"></info-icon>
+                                    <event-view-instructions 
+                                        slot="modal-content"
+                                        .eventName="${this.event.name || 'this event'}"
+                                    ></event-view-instructions>
+                                </info-tooltip>
+                            </div>
                         </div>
                         
                         <div class="event-header-right">

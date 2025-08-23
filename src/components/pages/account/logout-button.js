@@ -4,6 +4,7 @@ import {userState} from "../../../state/userStore.js";
 import {globalState} from "../../../state/globalStore.js";
 import {logout} from "../../../helpers/api/users.js";
 import {setJwt, setRefreshToken} from "../../../localStorage/tokens.js";
+import {clearAllStorage} from "../../../localStorage/helpers.js";
 import {navigate} from "../../../router/main-router.js";
 import {messagesState} from "../../../state/messagesStore.js";
 import buttonStyles from "../../../css/buttons.js";
@@ -49,8 +50,7 @@ export class LogoutButton extends observeState(LitElement) {
     }
 
     _frontendLogout() {
-        setJwt(undefined);
-        setRefreshToken(undefined);
+        clearAllStorage();
         userState.userData = undefined;
         userState.subusers = [];
         userState.myGroups = [];
