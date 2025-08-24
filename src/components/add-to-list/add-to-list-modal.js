@@ -17,6 +17,7 @@ import '../global/custom-tooltip.js'
 import '../../svg/gear.js'
 import '../global/process-loading-ring.js'
 import {customFetch} from "../../helpers/fetchHelpers.js";
+import {asyncItemFetch} from "../../helpers/api/asyncItemFetch.js";
 import {triggerUpdateItem, triggerUpdateList} from "../../events/eventListeners.js";
 import {messagesState} from "../../state/messagesStore.js";
 
@@ -102,22 +103,47 @@ export class AddToListModal extends LitElement {
             },
             {
                 icon: html`<ai-icon></ai-icon>`,
-                message: 'Optimizing data...',
-                detail: 'Cleaning up information',
-                duration: 2000
+                message: 'Formatting results...',
+                detail: 'Preparing for display',
+                duration: 4000
             },
             {
                 icon: html`<ai-icon></ai-icon>`,
-                message: 'Formatting results...',
-                detail: 'Preparing for display',
-                duration: 1500
+                message: 'Getting distracted...',
+                detail: 'Watching cat videos',
+                duration: 4000
+            },
+            {
+                icon: html`<ai-icon></ai-icon>`,
+                message: 'Making coffee...',
+                detail: 'Need caffeine to continue',
+                duration: 4000
+            },
+            {
+                icon: html`<ai-icon></ai-icon>`,
+                message: 'Contemplating existence...',
+                detail: 'Deep thoughts about URLs',
+                duration: 4000
+            },
+            {
+                icon: html`<ai-icon></ai-icon>`,
+                message: 'Untangling headphones...',
+                detail: 'They were fine 5 minutes ago',
+                duration: 4000
+            },
+            {
+                icon: html`<ai-icon></ai-icon>`,
+                message: 'Arguing with pixels...',
+                detail: 'They refuse to cooperate',
+                duration: 4000
             },
             {
                 icon: html`<ai-icon></ai-icon>`,
                 message: 'Finalizing...',
                 detail: 'Almost ready',
-                duration: 1000
-            }
+                duration: 6000
+            },
+
         ];
     }
 
@@ -407,41 +433,29 @@ export class AddToListModal extends LitElement {
         this.isFetching = true;
 
         try {
-            const response = await customFetch('/itemFetch/fetch', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    url: this.fetchUrl
-                })
-            }, true);
+            // Use async pattern to avoid timeouts on slow URLs
+            const data = await asyncItemFetch.fetchItem(this.fetchUrl);
 
-            if (response.success && response.data) {
-                const data = response.data;
-
-                // Populate the form with fetched data
-                if (data.name) this.itemName = data.name;
-                if (data.price) {
-                    const priceString = data.price.replace(/[^0-9.-]+/g, '')
-                    this.singlePrice = parseFloat(priceString) || 0;
-                }
-                if (data.imageId) {
-                    this.imageIds = [data.imageId];
-                }
-                if (this.fetchUrl) {
-                    this.links = [{ url: this.fetchUrl, label: data.linkLabel || 'Product Link' }];
-                }
-                // Clear the fetch URL after successful fetch
-                this.fetchUrl = '';
-                this.showFetchSection = false;
-                messagesState.addMessage('Item details fetched successfully!', 'success');
-            } else {
-                messagesState.addMessage('Failed to fetch item details', 'error');
+            // Populate the form with fetched data
+            if (data.name) this.itemName = data.name;
+            if (data.price) {
+                const priceString = data.price.replace(/[^0-9.-]+/g, '')
+                this.singlePrice = parseFloat(priceString) || 0;
             }
+            if (data.imageId) {
+                this.imageIds = [data.imageId];
+            }
+            if (this.fetchUrl) {
+                this.links = [{ url: this.fetchUrl, label: data.linkLabel || 'Product Link' }];
+            }
+            // Clear the fetch URL after successful fetch
+            this.fetchUrl = '';
+            this.showFetchSection = false;
+            messagesState.addMessage('Item details fetched successfully!', 'success');
+
         } catch (error) {
             console.error('Error fetching item:', error);
-            messagesState.addMessage('Error fetching item details', 'error');
+            messagesState.addMessage(error.message || 'Error fetching item details', 'error');
         } finally {
             this.isFetching = false;
         }

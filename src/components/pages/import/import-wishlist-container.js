@@ -3,7 +3,7 @@ import { observeState } from 'lit-element-state';
 import '../../global/custom-input.js';
 import '../../global/process-loading-ring.js';
 import buttonStyles from '../../../css/buttons.js';
-import { importAmazonWishlist } from '../../../helpers/api/import.js';
+import { importAmazonWishlist, importAmazonWishlistAsync } from '../../../helpers/api/import.js';
 import { messagesState } from '../../../state/messagesStore.js';
 import { navigate } from '../../../router/main-router.js';
 import './import-container.js';
@@ -149,29 +149,25 @@ class ImportWishlistContainer extends observeState(LitElement) {
 
         // Loading phases for process-loading-ring
         this.loadingPhases = [
-            { icon: html`🔗`, message: 'Connecting to Amazon...', duration: 4000 },
-            { icon: html`📦`, message: 'Fetching wishlist content...', duration: 4000 },
-            { icon: html`🔍`, message: 'Parsing HTML structure...', duration: 4000 },
-            { icon: html`🧠`, message: 'Analyzing product data...', duration: 4000 },
-            { icon: html`🎪`, message: 'Flibbertigibbeting...', duration: 4000 },
-            { icon: html`🖼️`, message: 'Extracting images...', duration: 4000 },
-            { icon: html`💰`, message: 'Processing prices...', duration: 4000 },
-            { icon: html`🔗`, message: 'Validating product links...', duration: 4000 },
-            { icon: html`📋`, message: 'Organizing items...', duration: 4000 },
-            { icon: html`✅`, message: 'Running quality checks...', duration: 4000 },
-            { icon: html`⏰`, message: 'Taking my time...', duration: 4000 },
-            { icon: html`🚗`, message: 'Stuck in traffic...', duration: 4000 },
-            { icon: html`🏛️`, message: 'Waiting in line at the bank...', duration: 4000 },
-            { icon: html`🍽️`, message: 'Working up an appetite...', duration: 4000 },
-            { icon: html`☕`, message: 'Getting another coffee...', duration: 4000 },
-            { icon: html`🐕`, message: 'Walking the dog...', duration: 4000 },
-            { icon: html`📱`, message: 'Checking social media...', duration: 4000 },
-            { icon: html`🍕`, message: 'Ordering pizza...', duration: 4000 },
-            { icon: html`🧦`, message: 'Looking for matching socks...', duration: 4000 },
-            { icon: html`🐢`, message: 'Moving at turtle speed...', duration: 4000 },
-            { icon: html`🎭`, message: 'Practicing dramatic pauses...', duration: 4000 },
-            { icon: html`🧘`, message: 'Meditating on life choices...', duration: 4000 },
-            { icon: html`🎪`, message: 'Joining the circus...', duration: 4000 },
+            { icon: html`📋`, message: 'Fetching wishlist. This will take about a minute and a half', duration: 6000 },
+            { icon: html`🔍`, message: 'Parsing HTML structure...', duration: 6000 },
+            { icon: html`🧠`, message: 'Analyzing product data...', duration: 6000 },
+            { icon: html`🎪`, message: 'Flibbertigibbeting...', duration: 6000 },
+            { icon: html`🖼️`, message: 'Extracting images...', duration: 8000 },
+            { icon: html`⏰`, message: 'Taking my time...', duration: 6000 },
+            { icon: html`🚗`, message: 'Stuck in traffic...', duration: 6000 },
+            { icon: html`🏛️`, message: 'Waiting in line at the bank...', duration: 6000 },
+            { icon: html`🍽️`, message: 'Working up an appetite...', duration: 6000 },
+            { icon: html`☕`, message: 'Getting another coffee...', duration: 6000 },
+            { icon: html`🐕`, message: 'Walking the dog...', duration: 6000 },
+            { icon: html`📱`, message: 'Checking social media...', duration: 6000 },
+            { icon: html`🍕`, message: 'Ordering pizza...', duration: 6000 },
+            { icon: html`🧦`, message: 'Looking for matching socks...', duration: 6000 },
+            { icon: html`🐢`, message: 'Moving at turtle speed...', duration: 6000 },
+            { icon: html`🎭`, message: 'Practicing dramatic pauses...', duration: 6000 },
+            { icon: html`🧘`, message: 'Meditating on life choices...', duration: 6000 },
+            { icon: html`🎪`, message: 'Joining the circus...', duration: 6000 },
+            { icon: html`✅`, message: 'Running quality checks...', duration: 6000 },
             { icon: html`🎯`, message: 'Finalizing import...', duration: 4000 },
         ];
     }
@@ -192,7 +188,7 @@ class ImportWishlistContainer extends observeState(LitElement) {
         this.importResult = null;
 
         try {
-            const response = await importAmazonWishlist(this.wishlistUrl.trim());
+            const response = await importAmazonWishlistAsync(this.wishlistUrl.trim());
 
             if (response.success) {
                 this.importResult = response.data;

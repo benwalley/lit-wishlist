@@ -1,4 +1,5 @@
 import {customFetch} from "../fetchHelpers.js";
+import {AsyncItemFetch} from "./asyncItemFetch.js";
 
 /**
  * Import items from an Amazon wishlist
@@ -114,6 +115,83 @@ export async function importAmazonWishlist(wishlistUrl) {
     } catch (error) {
         console.error('Error importing Amazon wishlist:', error);
         return { success: false, error };
+    }
+}
+
+/**
+ * Import items from an Amazon wishlist using async job pattern (no timeouts)
+ * @param {string} wishlistUrl - The Amazon wishlist URL to import from
+ * @returns {Promise<{success: boolean, data: Object}|{success: boolean, error: Error}>}
+ */
+export async function importAmazonWishlistAsync(wishlistUrl) {
+    try {
+        if (!wishlistUrl) {
+            throw new Error('Amazon wishlist URL is required');
+        }
+
+        // Use fake data in development mode
+        if (USE_FAKE_DATA) {
+            console.log('Using fake data for development');
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            return generateFakeWishlistData(wishlistUrl);
+        }
+
+        // Use the async job pattern
+        const asyncFetch = new AsyncItemFetch();
+
+        // Map the async API endpoint to the wishlist endpoint
+        // The async API uses /api/itemFetch/start but we need to modify it for wishlist
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ url: wishlistUrl })
+        };
+
+        // Start async job
+        const startResponse = await customFetch('/wishlistImport/start', options, true);
+        if (!startResponse.success) {
+            throw new Error(startResponse.error || 'Failed to start wishlist import job');
+        }
+
+        // Poll for completion using the existing polling mechanism
+        const jobId = startResponse.jobId;
+        let attempts = 0;
+        const maxAttempts = 60;
+        const baseDelay = 1000;
+        const maxDelay = 3000;
+
+        while (attempts < maxAttempts) {
+            const response = await customFetch(`/wishlistImport/status/${jobId}`, {}, true);
+
+            if (!response.success) {
+                throw new Error(response.error || 'Failed to check job status');
+            }
+
+            if (response.status === 'completed') {
+                return {
+                    success: true,
+                    data: response.data
+                };
+            }
+
+            if (response.status === 'failed') {
+                throw new Error(response.error || 'Wishlist import job failed');
+            }
+
+            // Wait before next poll with exponential backoff
+            const delay = Math.min(baseDelay + (attempts * 200), maxDelay);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            attempts++;
+        }
+
+        throw new Error('Wishlist import timed out after maximum attempts');
+
+    } catch (error) {
+        console.error('Error importing Amazon wishlist async:', error);
+        return { success: false, error: error.message };
     }
 }
 
