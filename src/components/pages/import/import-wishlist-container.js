@@ -26,10 +26,11 @@ class ImportWishlistContainer extends observeState(LitElement) {
                     display: block;
                     margin: 0 auto;
                     width: 100%;
+                    padding-bottom: 100px;
                 }
 
                 .import-header {
-                    padding: var(--spacing-normal);
+                    padding: var(--spacing-normal-variable);
                 }
 
                 h1 {
@@ -48,7 +49,7 @@ class ImportWishlistContainer extends observeState(LitElement) {
                     display: flex;
                     flex-direction: column;
                     gap: var(--spacing-normal);
-                    padding: var(--spacing-normal);
+                    padding: var(--spacing-normal-variable);
                 }
 
                 .form-group {
@@ -77,7 +78,7 @@ class ImportWishlistContainer extends observeState(LitElement) {
                     background: var(--info-background);
                     border: 1px solid var(--info-border);
                     border-radius: var(--border-radius-small);
-                    padding: 16px;
+                    padding: var(--spacing-normal-variable);
                     margin-bottom: 24px;
                 }
 

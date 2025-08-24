@@ -43,7 +43,7 @@ class ImportContainer extends observeState(LitElement) {
                 .import-header {
                     text-align: center;
                     margin-bottom: var(--spacing-normal);
-                    padding: var(--spacing-normal);
+                    padding: var(--spacing-normal-variable);
                 }
 
                 .import-header h1 {
@@ -57,12 +57,23 @@ class ImportContainer extends observeState(LitElement) {
                     margin: 0;
                 }
 
-                .import-actions {
-                    background: var(--card-background);
-                    border: 1px solid var(--border-color);
+                .import-instructions {
+                    background: var(--blue-light);
+                    border: 1px solid var(--blue-normal);
                     border-radius: var(--border-radius-normal);
                     padding: var(--spacing-normal);
-                    padding-bottom: 100px;
+                    margin: var(--spacing-normal) 0;
+                    text-align: center;
+                }
+
+                .import-instructions p {
+                    margin: 0;
+                    color: var(--text-color-dark);
+                    font-size: var(--font-size-small);
+                }
+
+                .import-actions {
+                    padding: var(--spacing-normal-variable);
                     display: flex;
                     flex-direction: column;
                     gap: var(--spacing-normal);
@@ -153,8 +164,9 @@ class ImportContainer extends observeState(LitElement) {
                 itemLinks: item.linkUrl ? [{ url: item.linkUrl, label: 'Amazon Link' }] : [],
                 description: '',
                 notes: '',
-                priority: 3,
-                category: ''
+                priority: item.priority !== undefined ? item.priority : 3,
+                category: '',
+                isPublic: item.isPublic !== undefined ? item.isPublic : false
             }));
 
             const response = await bulkCreateItems(transformedItems, [this.selectedListId]);
@@ -233,6 +245,11 @@ class ImportContainer extends observeState(LitElement) {
                         <select-my-lists
                             @change="${this._handleWishlistSelected}"
                         ></select-my-lists>
+                        
+                        <div class="import-instructions">
+                            <p><strong>Ready to import?</strong> Make sure you've selected items, chosen your destination list(s), and customized names, priorities, and visibility settings as needed.</p>
+                        </div>
+                        
                         <button
                             class="button primary import-button"
                             @click="${this._handleImport}"

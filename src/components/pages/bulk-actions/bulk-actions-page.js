@@ -578,6 +578,22 @@ class BulkActionsPage extends observeState(LitElement) {
                     margin-top: var(--spacing-normal);
                 }
 
+                .save-instructions {
+                    background: var(--blue-light);
+                    border: 1px solid var(--blue-normal);
+                    border-radius: var(--border-radius-normal);
+                    padding: var(--spacing-small) var(--spacing-normal);
+                    margin-bottom: var(--spacing-normal);
+                    text-align: left;
+                }
+
+                .save-instructions p {
+                    margin: 0;
+                    color: var(--text-color-dark);
+                    font-size: var(--font-size-small);
+                    line-height: 1.4;
+                }
+
             `
         ];
     }
@@ -586,6 +602,10 @@ class BulkActionsPage extends observeState(LitElement) {
         return html`
             <div class="bulk-actions-header">
                 <h1>Bulk Actions</h1>
+            </div>
+            
+            <div class="save-instructions">
+                <p><strong>Important:</strong> To save changes highlighted in green, click the "Save Public and Priority changes" button at the bottom of the page.</p>
             </div>
             
             ${this.loading ? html`

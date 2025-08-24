@@ -132,8 +132,6 @@ export async function importAmazonWishlistAsync(wishlistUrl) {
         // Use fake data in development mode
         if (USE_FAKE_DATA) {
             console.log('Using fake data for development');
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
             return generateFakeWishlistData(wishlistUrl);
         }
 

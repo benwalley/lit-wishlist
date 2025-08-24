@@ -3,6 +3,9 @@ import { observeState } from 'lit-element-state';
 import buttonStyles from '../../../css/buttons.js';
 import '../../add-to-list/priority-selector.js';
 import '../../global/custom-image.js';
+import '../../global/custom-toggle.js';
+import '../../../svg/world.js';
+import '../../../svg/lock.js';
 
 class ImportItemsDisplay extends observeState(LitElement) {
     static get properties() {
@@ -11,7 +14,8 @@ class ImportItemsDisplay extends observeState(LitElement) {
             selectedItems: { type: Array },
             isLoading: { type: Boolean },
             itemPriorities: { type: Object },
-            editedItemNames: { type: Object }
+            editedItemNames: { type: Object },
+            itemIsPublic: { type: Object }
         };
     }
 
@@ -23,24 +27,12 @@ class ImportItemsDisplay extends observeState(LitElement) {
                     display: block;
                     width: 100%;
                 }
-
-                .import-header {
-                    border-radius: var(--border-radius-normal);
-                    padding: var(--spacing-normal);
-                    margin-bottom: var(--spacing-normal);
-                }
-
-                .import-header h2 {
-                    margin: 0 0 var(--spacing-small) 0;
-                    color: var(--text-color-dark);
-                    font-size: var(--font-size-large);
-                }
-
+                
                 .import-meta {
                     display: flex;
                     flex-wrap: wrap;
                     gap: var(--spacing-normal);
-                    color: var(--text-color-medium);
+                    color: var(--text-color-medium-dark);
                     font-size: var(--font-size-small);
                 }
 
@@ -51,7 +43,7 @@ class ImportItemsDisplay extends observeState(LitElement) {
                 }
 
                 .items-container {
-                    padding: var(--spacing-normal);
+                    padding: var(--spacing-normal-variable);
                 }
 
                 .selection-controls {
@@ -87,7 +79,7 @@ class ImportItemsDisplay extends observeState(LitElement) {
 
                 .item-card {
                     border: 1px solid var(--border-color);
-                    border-radius: var(--border-radius-small);
+                    border-radius: var(--border-radius-normal);
                     padding: var(--spacing-small);
                     display: flex;
                     flex-direction: column;
@@ -100,12 +92,11 @@ class ImportItemsDisplay extends observeState(LitElement) {
                 .item-card:hover {
                     box-shadow: var(--shadow-1-soft);
                     border-color: var(--primary-color);
-                    transform: translateY(-2px);
                 }
 
                 .item-card.selected {
                     border-color: var(--primary-color);
-                    background: var(--primary-color-light);
+                    background: var(--background-light);
                     box-shadow: var(--shadow-1-soft);
                 }
 
@@ -189,6 +180,38 @@ class ImportItemsDisplay extends observeState(LitElement) {
                     padding: var(--spacing-large);
                     color: var(--text-color-medium);
                 }
+                
+                .selected-title {
+                    display: flex;
+                    flex-direction: column;
+                }
+                
+                .item-controls {
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-x-small);
+                }
+                
+                .price-and-public {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                
+                .public-toggle-with-icon {
+                    display: flex;
+                    align-items: center;
+                    gap: var(--spacing-x-small);
+                }
+                
+                .public-icon {
+                    font-size: var(--font-size-medium);
+                    color: var(--text-color-medium-dark);
+                }
+                
+                world-icon.public-icon {
+                    color: var(--purple-normal);
+                }
 
                 @media (max-width: 768px) {
                     .items-grid {
@@ -211,6 +234,7 @@ class ImportItemsDisplay extends observeState(LitElement) {
         this.isLoading = false;
         this.itemPriorities = {};
         this.editedItemNames = {};
+        this.itemIsPublic = {};
     }
 
     _handleItemClick(e, item) {
@@ -282,12 +306,14 @@ class ImportItemsDisplay extends observeState(LitElement) {
             const itemKey = this._getItemKey(item);
             const priority = this.itemPriorities[itemKey];
             const editedName = this.editedItemNames[itemKey];
+            const isPublic = this.itemIsPublic[itemKey];
 
             return {
                 ...item,
                 originalName: item.originalName || item.name, // Preserve original name
                 name: editedName !== undefined ? editedName : item.name,
-                priority: priority !== undefined ? priority : 3 // Default priority of 3
+                priority: priority !== undefined ? priority : 3, // Default priority of 3
+                isPublic: isPublic !== undefined ? isPublic : false // Default to public
             };
         });
 
@@ -319,6 +345,24 @@ class ImportItemsDisplay extends observeState(LitElement) {
         this._updateSelectedItemsWithPriorities();
     }
 
+    _handlePublicToggleChange(e, item) {
+        const itemKey = this._getItemKey(item);
+        const isPublic = e.detail.checked;
+
+        this.itemIsPublic = {
+            ...this.itemIsPublic,
+            [itemKey]: isPublic
+        };
+
+        // Update the selected items with the new public data
+        this._updateSelectedItemsWithPriorities();
+    }
+
+    _getItemIsPublic(item) {
+        const itemKey = this._getItemKey(item);
+        return this.itemIsPublic[itemKey] !== undefined ? this.itemIsPublic[itemKey] : false;
+    }
+
     render() {
         if (!this.importData) {
             return html`
@@ -331,16 +375,13 @@ class ImportItemsDisplay extends observeState(LitElement) {
         const { wishlistTitle, totalItems, items, sourceUrl, processingMethod } = this.importData;
 
         return html`
-            <div class="import-header">
-                <h2>${wishlistTitle}</h2>
-                <div class="import-meta">
-                    <span>📦 ${totalItems} items</span>
-                </div>
-            </div>
 
             <div class="items-container">
                 <div class="selection-controls">
-                    <h3>Select Items to Import</h3>
+                    <div class="selected-title">
+                        <h3>Select Items to Import</h3>
+                        <p>You can edit item names, set priority ratings, and choose whether to make each item public or private.</p>
+                    </div>
                     <div class="selection-actions">
                         <span class="selection-count">${this.selectedItems.length} of ${items?.length || 0} selected</span>
                         <button 
@@ -377,7 +418,24 @@ class ImportItemsDisplay extends observeState(LitElement) {
                                         placeholder="${item.name}"
                                         rows="2"
                                     ></textarea>
-                                    ${item.price ? html`<div class="item-price">$${item.price}</div>` : ''}
+                                    <div class="price-and-public">
+                                        ${item.price ? html`<div class="item-price">$${item.price}</div>` : html`<div></div>`}
+                                        <div class="public-toggle-with-icon">
+                                            ${this._getItemIsPublic(item) ? 
+                                                    html`
+                                                        <world-icon class="public-icon"></world-icon>
+                                                        <custom-tooltip>This item can be seen by anyone, even if they are not logged in, or aren't in your groups.</custom-tooltip>
+                                                    ` : html`
+                                                        <lock-icon class="public-icon"></lock-icon>
+                                                        <custom-tooltip>This item can only be seen by users who you have shared it with, or who are in groups you've shared this item with.</custom-tooltip>
+                                                    `}
+                                            <custom-toggle
+                                                .checked="${this._getItemIsPublic(item)}"
+                                                @change="${(e) => this._handlePublicToggleChange(e, item)}"
+                                                @click="${(e) => e.stopPropagation()}"
+                                            ></custom-toggle>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <priority-selector
