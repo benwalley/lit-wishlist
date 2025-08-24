@@ -31,7 +31,7 @@ export class CustomElement extends observeState(LitElement) {
                 }
                 
                 .question-card {
-                    padding: 1rem;
+                    padding: var(--spacing-normal-variable);
                     box-shadow: var(--shadow-1-soft);
                     border-radius: var(--border-radius-large);
                     background: var(--background-light);
@@ -47,24 +47,28 @@ export class CustomElement extends observeState(LitElement) {
 
                 .answers-list {
                     display: grid;
-                    gap: var(--spacing-small); /* Space between answers */
-                    padding-left: var(--spacing-small); /* Indent answers slightly */
-                    border-left: 2px solid var(--border-color); /* Visual cue for answer section */
-                    margin-left: var(--spacing-x-small);
+                    gap: var(--spacing-small);
                 }
 
                 .answer-item {
                     display: flex;
-                    justify-content: space-between; /* Pushes user info to the right */
-                    align-items: flex-start; /* Align items to the top */
-                    padding: 0; /* Compact vertical padding */
+                    flex-wrap: wrap;
+                    gap: var(--spacing-small);
+                    justify-content: space-between; 
+                    align-items: center;
+                    border-left: 2px solid var(--border-color);
+                    margin-left: 2px;
+                    padding: 0 var(--spacing-small);
+                    
+                    
                 }
 
                 .answer-text {
-                    flex-grow: 1; /* Allows text to take available space */
-                    margin-right: var(--spacing-small); /* Space between answer and user */
+                    flex-grow: 1; 
+                    margin-right: var(--spacing-small); 
                     line-height: 1.4;
-                    word-break: break-word; /* Prevent long words overflowing */
+                    word-break: break-word; 
+                    flex-wrap: wrap;
                 }
 
                 .no-answers {
@@ -135,6 +139,11 @@ export class CustomElement extends observeState(LitElement) {
                     margin-right: auto;
                     padding-left: var(--spacing-small);
                     padding-right: var(--spacing-small);
+                }
+                
+                .user-name {
+                    font-weight: 600;
+                    color: var(--medium-text-color);
                 }
             `
         ];

@@ -219,7 +219,7 @@ export class CreateListForm extends LitElement {
                         <image-selector-with-nav
                                 imageId="${this.imageId}"
                                 username="${this.listName}"
-                                size="200"
+                                size="180"
                                 showAi
                                 allowNavigation
                                 @image-changed="${this._onImageChanged}">

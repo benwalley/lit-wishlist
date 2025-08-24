@@ -333,6 +333,29 @@ export class ImageSelectorWithNav extends LitElement {
                     margin: 10px 0;
                     text-align: center;
                 }
+
+                .ai-instructions {
+                    background: var(--blue-light);
+                    border: 1px solid var(--blue-normal);
+                    border-radius: var(--border-radius-normal);
+                    padding: var(--spacing-small);
+                    margin-top: var(--spacing-small);
+                    text-align: left;
+                    font-size: var(--font-size-small);
+                    line-height: 1.4;
+                    max-width: 600px;
+                }
+
+                .ai-instructions p {
+                    margin: 0;
+                    color: var(--text-color-dark);
+                }
+                
+                .ai-button-group {
+                    display: flex;
+                    gap: var(--spacing-x-small);
+                    align-items: center;
+                }
             `
         ];
     }
@@ -396,29 +419,35 @@ export class ImageSelectorWithNav extends LitElement {
                                 @value-changed="${this._onAiPromptChanged}"
                                 fullWidth>
                             </custom-input>
-                            <button
-                                data-image-type="custom"
-                                type="submit"
-                                class="primary button fancy submitGenerateButton" 
-                                ?disabled="${this.isGeneratingImage}">
-                                ${this.isGeneratingImage ? 'Generating...' : 'Generate'}
-                            </button>
-                            <button
-                                    data-image-type="abstract"
-                                    type="submit"
-                                    class="primary button fancy-alt icon"
-                                    ?disabled="${this.isGeneratingImage}">
-                                <abstract-icon></abstract-icon>
-                            </button>
-                            <custom-tooltip>Generate an random abstract image</custom-tooltip>
-                            <button
-                                    data-image-type="animal"
-                                    type="submit"
-                                    class="primary button icon"
-                                    ?disabled="${this.isGeneratingImage}">
-                                <dog-icon></dog-icon>
-                            </button>
-                            <custom-tooltip>Generate an image of a cute cartoon animal</custom-tooltip>
+                            <div class="ai-button-group">
+                                <button
+                                        data-image-type="custom"
+                                        type="submit"
+                                        class="primary button fancy submitGenerateButton"
+                                        ?disabled="${this.isGeneratingImage}">
+                                    ${this.isGeneratingImage ? 'Generating...' : 'Generate'}
+                                </button>
+                                <button
+                                        data-image-type="abstract"
+                                        type="submit"
+                                        class="primary button fancy-alt icon"
+                                        ?disabled="${this.isGeneratingImage}">
+                                    <abstract-icon></abstract-icon>
+                                </button>
+                                <custom-tooltip>Generate an random abstract image</custom-tooltip>
+                                <button
+                                        data-image-type="animal"
+                                        type="submit"
+                                        class="primary button icon"
+                                        ?disabled="${this.isGeneratingImage}">
+                                    <dog-icon></dog-icon>
+                                </button>
+                                <custom-tooltip>Generate an image of a cute cartoon animal</custom-tooltip>
+                            </div>
+                        </div>
+                        
+                        <div class="ai-instructions">
+                            <p><strong>Quick start:</strong> Click Abstract or Animal buttons for random images. Or type a description and click Generate for exact results, Abstract for artistic style, or Animal for cute cartoon version.</p>
                         </div>
                     </form>
                 ` : ''}

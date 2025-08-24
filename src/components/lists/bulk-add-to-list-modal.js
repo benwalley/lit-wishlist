@@ -137,7 +137,7 @@ export class BulkAddToListModal extends LitElement {
                     flex: 1;
                     width: 100%;
                     box-sizing: border-box;
-                    padding: var(--spacing-normal);
+                    padding: var(--spacing-normal-variable);
                     overflow-y: auto;
                     overflow-x: hidden;
                 }

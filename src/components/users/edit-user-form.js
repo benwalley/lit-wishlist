@@ -174,7 +174,7 @@ export class CustomElement extends observeState(LitElement) {
                         <image-selector-with-nav
                                 imageId="${this.imageId}"
                                 username="${this.username}"
-                                size="200"
+                                size="180"
                                 showAi
                                 allowNavigation
                                 @image-changed="${this._onImageChanged}">

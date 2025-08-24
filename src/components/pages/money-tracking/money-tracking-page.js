@@ -32,6 +32,7 @@ export class MoneyTrackingPage extends LitElement {
         editingRecord: {type: Object},
         isEditMode: {type: Boolean},
         netAmounts: {type: Array},
+        selectedRecords: {type: Set},
     };
 
     constructor() {
@@ -51,6 +52,7 @@ export class MoneyTrackingPage extends LitElement {
         this.editingRecord = null;
         this.isEditMode = false;
         this.netAmounts = [];
+        this.selectedRecords = new Set();
     }
 
     connectedCallback() {
@@ -59,6 +61,7 @@ export class MoneyTrackingPage extends LitElement {
         listenUpdateMoney(() => this.fetchMoneyData());
         this.addEventListener('edit-money', this.handleEditMoney.bind(this));
         this.addEventListener('delete-money', this.handleDeleteMoney.bind(this));
+        this.addEventListener('checkbox-changed', this.handleCheckboxChanged.bind(this));
     }
 
     async fetchMoneyData() {
@@ -69,18 +72,22 @@ export class MoneyTrackingPage extends LitElement {
 
             if (result.success) {
                 this.moneyRecords = result.data;
+                // Select all records by default
+                this.selectedRecords = new Set(this.moneyRecords.map(record => record.id));
                 this.calculateNetAmounts();
             } else {
                 console.error('Error fetching money records:', result.error);
                 messagesState.addMessage('Failed to load money records', 'error');
                 this.moneyRecords = [];
                 this.netAmounts = [];
+                this.selectedRecords = new Set();
             }
         } catch (error) {
             console.error('Error fetching money records:', error);
             messagesState.addMessage('An error occurred while loading money records', 'error');
             this.moneyRecords = [];
             this.netAmounts = [];
+            this.selectedRecords = new Set();
         } finally {
             this.loading = false;
         }
@@ -92,11 +99,21 @@ export class MoneyTrackingPage extends LitElement {
             return;
         }
 
+        // Filter to only include selected records
+        const selectedMoneyRecords = this.moneyRecords.filter(record => 
+            this.selectedRecords.has(record.id)
+        );
+
+        if (selectedMoneyRecords.length === 0) {
+            this.netAmounts = [];
+            return;
+        }
+
         // Create a map to track debts between users
         const debtMap = new Map();
 
-        // Process each money record
-        this.moneyRecords.forEach(record => {
+        // Process each selected money record
+        selectedMoneyRecords.forEach(record => {
             const fromName = record.owedFromName;
             const toName = record.owedToName;
             const amount = parseFloat(record.amount) || 0;
@@ -406,6 +423,22 @@ export class MoneyTrackingPage extends LitElement {
         }
     }
 
+    handleCheckboxChanged(event) {
+        const { checked, record } = event.detail;
+        
+        if (checked) {
+            this.selectedRecords.add(record.id);
+        } else {
+            this.selectedRecords.delete(record.id);
+        }
+        
+        // Trigger reactivity
+        this.selectedRecords = new Set(this.selectedRecords);
+        
+        // Recalculate net amounts based on new selection
+        this.calculateNetAmounts();
+    }
+
     render() {
         return html`
             <div class="money-tracking-container">
@@ -431,12 +464,18 @@ export class MoneyTrackingPage extends LitElement {
                 ${!this.loading && this.moneyRecords.length > 0 ? html`
                     <div class="money-list">
                         ${this.moneyRecords.map(record => html`
-                            <money-card .record="${record}"></money-card>
+                            <money-card 
+                                .record="${record}"
+                                .checked="${this.selectedRecords.has(record.id)}"
+                            ></money-card>
                         `)}
                     </div>
                     
                     <div class="summary-section">
                         <h2>Net Amounts Owed</h2>
+                        <p style="margin: 0 0 1rem 0; color: var(--text-color-medium-dark); font-size: var(--font-size-small);">
+                            Based on ${this.selectedRecords.size} of ${this.moneyRecords.length} selected records. Click checkboxes above to include/exclude records.
+                        </p>
                         ${this.netAmounts.length > 0 ? html`
                             <div class="summary-list">
                                 ${this.netAmounts.map(netAmount => html`

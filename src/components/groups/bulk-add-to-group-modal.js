@@ -153,7 +153,7 @@ export class BulkAddToGroupModal extends observeState(LitElement) {
                     display: grid;
                     gap: var(--spacing-normal);
                     grid-template-columns: 1fr;
-                    padding: var(--spacing-normal);
+                    padding: var(--spacing-normal-variable);
                     overflow-y: auto;
                     overflow-x: hidden;
                     flex: 1;

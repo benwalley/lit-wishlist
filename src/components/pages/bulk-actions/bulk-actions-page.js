@@ -18,6 +18,7 @@ import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
 import {bulkDeleteItems, bulkUpdateVisibility, bulkUpdateLists} from "../../../helpers/api/bulkActions.js";
 import {invalidateCache} from "../../../helpers/caching.js";
 import {customFetch} from "../../../helpers/fetchHelpers.js";
+import {screenSizeState} from "../../../state/screenSizeStore.js";
 
 class BulkActionsPage extends observeState(LitElement) {
     static get properties() {
@@ -594,6 +595,123 @@ class BulkActionsPage extends observeState(LitElement) {
                     line-height: 1.4;
                 }
 
+                /* Mobile Styles */
+                .items-mobile-container {
+                    display: none;
+                }
+
+                @media (max-width: 767px) {
+                    .items-grid {
+                        display: none;
+                    }
+
+                    .items-mobile-container {
+                        display: block;
+                        margin-top: var(--spacing-normal);
+                    }
+
+                    .mobile-item-card {
+                        background: var(--background-medium);
+                        border: 1px solid var(--border-color);
+                        border-radius: var(--border-radius-normal);
+                        margin-bottom: var(--spacing-x-small);
+                        overflow: hidden;
+                    }
+
+                    .mobile-item-card.selected {
+                        background: var(--background-light);
+                    }
+
+                    .mobile-card-header {
+                        display: flex;
+                        align-items: center;
+                        padding: var(--spacing-x-small);
+                        gap: var(--spacing-small);
+                        position: relative;
+                        cursor: pointer;
+                        padding-right: 50px; /* Make room for the link button */
+                    }
+
+                    .mobile-checkbox {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 20px;
+                        height: 20px;
+                        min-width: 20px;
+                        border-radius: 3px;
+                        border: 2px solid var(--grayscale-300);
+                        transition: var(--transition-normal);
+                    }
+
+                    .mobile-checkbox.selected {
+                        border-color: var(--blue-normal);
+                        background-color: var(--blue-normal);
+                        color: white;
+                    }
+
+                    .mobile-image {
+                        width: 36px;
+                        height: 36px;
+                        min-width: 36px;
+                        border-radius: 4px;
+                        overflow: hidden;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: var(--background-dark);
+                    }
+
+                    .mobile-item-name {
+                        flex: 1;
+                        font-weight: 500;
+                        font-size: var(--font-size-small);
+                        min-width: 0;
+                        word-wrap: break-word;
+                    }
+
+                    .mobile-link-button {
+                        position: absolute;
+                        top: var(--spacing-x-small);
+                        right: var(--spacing-x-small);
+                        width: 28px;
+                        height: 28px;
+                        min-width: 28px;
+                    }
+
+                    .mobile-card-body {
+                        padding: var(--spacing-x-small);
+                        padding-top: 0;
+                        border-top: 1px solid var(--border-color);
+                        display: flex;
+                        flex-direction: column;
+                        gap: var(--spacing-x-small);
+                    }
+
+                    .mobile-control-row {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        min-height: 36px;
+                        padding: var(--spacing-x-small) 0;
+                    }
+
+                    .mobile-control-row.changed {
+                        background: var(--green-light);
+                        outline: 1.5px solid #a7dba9;
+                    }
+
+                    .mobile-control-label {
+                        font-weight: 500;
+                        font-size: var(--font-size-small);
+                        color: var(--text-color-dark);
+                    }
+
+                    .mobile-priority-selector {
+                        min-width: 120px;
+                    }
+                }
+
             `
         ];
     }
@@ -655,6 +773,7 @@ class BulkActionsPage extends observeState(LitElement) {
                     </div>
                     
                     ${this.myItems.length > 0 ? html`
+                        <!-- Desktop Grid Layout -->
                         <div class="items-grid">
                             <!-- Header Row -->
                             <div class="grid-header"></div>
@@ -702,6 +821,51 @@ class BulkActionsPage extends observeState(LitElement) {
                                         <a href="/item/${item.id}" class="button icon-button blue-text" target="_blank" title="View item">
                                             <link-icon></link-icon>
                                         </a>
+                                    </div>
+                                </div>
+                            `)}
+                        </div>
+
+                        <!-- Mobile Card Layout -->
+                        <div class="items-mobile-container">
+                            ${this.myItems.map(item => html`
+                                <div class="mobile-item-card ${this.selectedItems.has(item.id) ? 'selected' : ''}">
+                                    <div class="mobile-card-header" @click=${() => this.toggleItemSelection(item.id)}>
+                                        <div 
+                                            class="mobile-checkbox ${this.selectedItems.has(item.id) ? 'selected' : ''}"
+                                        >
+                                            ${this.selectedItems.has(item.id) ? html`<check-icon></check-icon>` : null}
+                                        </div>
+                                        <div class="mobile-image">
+                                            <custom-image 
+                                                imageId="${item.imageIds[0] || 0}"
+                                                width="36"
+                                                height="36"
+                                            ></custom-image>
+                                        </div>
+                                        <div class="mobile-item-name">${item.name}</div>
+                                        <a href="/item/${item.id}" class="button icon-button blue-text mobile-link-button" target="_blank" title="View item" @click=${(e) => e.stopPropagation()}>
+                                            <link-icon></link-icon>
+                                        </a>
+                                    </div>
+                                    <div class="mobile-card-body">
+                                        <div class="mobile-control-row ${this.isPublicityChanged(item) ? 'changed' : ''}">
+                                            <span class="mobile-control-label">Public</span>
+                                            <custom-toggle
+                                                .checked=${item.isPublic}
+                                                @change=${(e) => this.toggleItemPublic(item, e)}
+                                            ></custom-toggle>
+                                        </div>
+                                        <div class="mobile-control-row ${this.isPriorityChanged(item) ? 'changed' : ''}">
+                                            <span class="mobile-control-label">Priority</span>
+                                            <priority-selector 
+                                                class="mobile-priority-selector"
+                                                size="small"
+                                                hideLabel
+                                                .value=${item.priority || 0}
+                                                @priority-changed=${(e) => this.updateItemPriority(item, e.detail.value)}
+                                            ></priority-selector>
+                                        </div>
                                     </div>
                                 </div>
                             `)}

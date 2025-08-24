@@ -10,7 +10,7 @@ class GroupsPage extends observeState(LitElement) {
         return css`
             :host {
                 display: block;
-                padding: var(--spacing-normal);
+                padding: var(--spacing-normal-variable);
             }
 
             h1 {
