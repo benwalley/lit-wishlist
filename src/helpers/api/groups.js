@@ -167,7 +167,6 @@ export async function leaveGroup(groupId) {
         };
 
         const result = await customFetch(`/groups/${groupId}/leave`, options, true);
-        console.log({result})
         // if there is an error, there is result.responseData. Otherwise it is just in result
         return result;
     } catch (error) {

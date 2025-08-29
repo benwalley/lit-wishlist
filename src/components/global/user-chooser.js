@@ -180,7 +180,6 @@ export class UserChooser extends LitElement {
 
     handleBlur() {
         // Delay hiding dropdown to allow for clicks
-        console.log('bluring')
         setTimeout(() => {
             this.focused = false;
             this.showDropdown = false;
@@ -188,7 +187,6 @@ export class UserChooser extends LitElement {
     }
 
     handleUserSelect(e) {
-        console.log('user selecting')
         const user = e.detail.user;
         this.selectedUser = user;
         this.value = user.name;
@@ -228,7 +226,6 @@ export class UserChooser extends LitElement {
     }
 
     handleClickOutside(e) {
-        console.log('clicked outside')
         if (!this.contains(e.target)) {
             this.showDropdown = false;
             this.focused = false;

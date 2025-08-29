@@ -14,7 +14,6 @@ import { asyncItemFetch } from '../helpers/api/asyncItemFetch.js';
 // Fetch item data from a URL
 try {
     const itemData = await asyncItemFetch.fetchItem('https://example.com/product');
-    console.log('Item:', itemData.name, itemData.price, itemData.imageId);
 } catch (error) {
     console.error('Failed to fetch item:', error.message);
 }
@@ -28,7 +27,7 @@ import { importAmazonWishlistAsync } from '../helpers/api/import.js';
 try {
     const response = await importAmazonWishlistAsync('https://amazon.com/wishlist/...');
     if (response.success) {
-        console.log(`Imported ${response.data.totalItems} items`);
+        
     }
 } catch (error) {
     console.error('Import failed:', error);

@@ -69,7 +69,7 @@ Dispatched when the selected image changes.
 
 ```javascript
 _onImageChanged(e) {
-    console.log('New image ID:', e.detail.imageId);
+    
 }
 ```
 

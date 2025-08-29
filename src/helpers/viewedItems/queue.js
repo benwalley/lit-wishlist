@@ -20,7 +20,6 @@ const PROCESSING_INTERVAL = 5000; // 5 seconds
 export function addItemToQueue(itemId) {
     if (!itemId) return;
     addViewedItemToQueue(itemId);
-    console.log(`Added item ${itemId} to viewed queue. Queue size: ${getPendingViewedItemsCount()}`);
 }
 
 /**
@@ -31,8 +30,6 @@ export function startQueueProcessor() {
         console.warn('Queue processor already running');
         return;
     }
-
-    console.log('Starting viewed items queue processor');
 
     // Process any existing queue immediately
     processQueue();
@@ -48,7 +45,6 @@ export function startQueueProcessor() {
  */
 export function stopQueueProcessor() {
     if (queueProcessor) {
-        console.log('Stopping viewed items queue processor');
         clearInterval(queueProcessor);
         queueProcessor = null;
     }
@@ -64,8 +60,6 @@ export async function processQueue() {
     if (pendingItems.length === 0) {
         return true; // Nothing to process
     }
-
-    console.log(`Processing viewed items queue with ${pendingItems.length} items:`, pendingItems);
 
     try {
         const result = await markItemsAsViewed(pendingItems);
@@ -84,7 +78,6 @@ export async function processQueue() {
             triggerUpdateViewedItems();
             triggerUpdateList();
 
-            console.log(`Successfully processed ${pendingItems.length} viewed items`);
             return true;
         } else {
             console.error('Failed to mark items as viewed:', result.error);
@@ -94,7 +87,6 @@ export async function processQueue() {
                 removeItemFromQueue(itemId);
             });
             
-            console.log(`Removed ${pendingItems.length} failed items from queue`);
             return false;
         }
     } catch (error) {
@@ -105,7 +97,6 @@ export async function processQueue() {
             removeItemFromQueue(itemId);
         });
         
-        console.log(`Removed ${pendingItems.length} failed items from queue due to error`);
         return false;
     }
 }

@@ -56,7 +56,6 @@ export class GiftTrackingGetting extends observeState(LitElement) {
             messagesState.addMessage('An error occurred while fetching your gift tracking data.', 'error');
 
         } catch (e) {
-            console.log(e)
             messagesState.addMessage('An error occurred while fetching your gift tracking data.', 'error');
         } finally {
             this.loading = false;

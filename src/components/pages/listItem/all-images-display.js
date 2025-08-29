@@ -57,6 +57,7 @@ export class CustomElement extends LitElement {
                 /* Main image styling */
                 .main-image {
                     border-radius: var(--border-radius-normal, 8px);
+                    aspect-ratio: 1/1;
                     overflow: hidden;
                     box-shadow: var(--shadow-2-soft, 0 4px 8px rgba(0,0,0,0.1));
                     display: flex;

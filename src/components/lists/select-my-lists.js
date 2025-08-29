@@ -61,7 +61,6 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     render() {
-        console.log('rendering')
         return html`
             <selectable-list
                 .items=${userState.myLists}

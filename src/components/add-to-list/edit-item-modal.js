@@ -15,7 +15,6 @@ export class EditItemModal extends LitElement {
 
     connectedCallback() {
         super.connectedCallback();
-        console.log('EditItemModal connected');
         this.eventRemover = listenEditItemEvent(this._handleOpenEvent.bind(this));
     }
 

@@ -54,7 +54,6 @@ export class GroupViewContainer extends observeState(LitElement) {
     }
 
     _handleInviteUser() {
-        console.log('Invite user clicked');
         // Open invitation modal or navigate to invitation page
     }
 

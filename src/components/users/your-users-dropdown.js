@@ -41,7 +41,6 @@ class UserListComponent extends LitElement {
         try {
             const response = await customFetch(this.apiEndpoint, {}, true);
             const users = await response;
-            console.log(users)
             this.users = users;
 
         } catch (error) {

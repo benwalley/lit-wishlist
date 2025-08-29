@@ -63,14 +63,12 @@ async function fetchWithRetry(url, options, useAuth) {
                 return response;
             } else {
                 // handle token failed, retry necessary
-                console.log('refreshed token failed. Retry login')
                 return {error: 'user doesnt exist'};
             }
         }
 
         return response;
     } catch(e) {
-        console.log('there was an error fetching ' + url);
         return {error: e, message: `Error fetching ${url}`};
     }
 
@@ -96,11 +94,9 @@ async function parseResponse(response) {
             } else {
                 responseData = await response.text(); // Fallback to text if it's not JSON
             }
-            console.log(error)
             return responseData;
         } catch (e) {
             // If parsing fails (e.g., the body is empty or malformed), handle the fallback here
-            console.log(error)
             return error;
         }
     }
@@ -124,7 +120,6 @@ async function parseResponse(response) {
 async function refreshAuthToken() {
     // If a token refresh is already in progress, wait for it to complete
     if (tokenRefreshPromise) {
-        console.log('Token refresh already in progress. Waiting for completion...');
         return await tokenRefreshPromise;
     }
 
@@ -170,7 +165,6 @@ async function performTokenRefresh(refreshToken) {
         const tokenData = await response.json();
 
         const token = tokenData?.data?.jwtToken || tokenData?.jwtToken;
-        console.log('New token received:', token ? 'Yes' : 'No');
 
         if (token) {
             // Save the new JWT

@@ -13,7 +13,6 @@ function getModalInstance() {
 
 
 export async function showConfirmation(options) {
-    console.log('showing confirmation dialog')
     if (!options || !options.message) {
         messagesState.addMessage('Confirmation message is required.', 'error');
         return Promise.reject(new Error('Confirmation message is required.'));

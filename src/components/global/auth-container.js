@@ -155,7 +155,6 @@ export class AuthContainer extends observeState(LitElement) {
                 startQueueProcessor();
             }
         } catch (e) {
-            console.log('user is not logged in')
             userState.loadingUser = false;
         }
     }

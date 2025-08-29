@@ -394,8 +394,6 @@ export class AddProposalModal extends observeState(LitElement) {
     }
 
     _handleUsersSelectionChanged(event) {
-        console.log(event.detail);
-        // Store full user objects for display
         let selectedUsers = event.detail.selectedUsers || [];
         const originallySelectedUserIds = selectedUsers.map(user => user.id);
 

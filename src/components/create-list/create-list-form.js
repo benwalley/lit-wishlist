@@ -300,8 +300,6 @@ export class CreateListForm extends LitElement {
     }
 
     _handleGroupChange(e) {
-        console.log(e.detail.selectedGroups)
-        // Store group IDs rather than full group objects for API submission
         this.groups = e.detail.selectedGroups.map(group => group.id);
     }
 
@@ -310,8 +308,6 @@ export class CreateListForm extends LitElement {
     }
 
     _handleUserSelectionChanged(e) {
-        console.log('User selection changed:', e.detail.selectedUsers);
-        // Store user IDs rather than full user objects for API submission
         this.users = e.detail.selectedUsers.map(user => user.id);
     }
 }

@@ -15,7 +15,6 @@ class MessagesState extends LitState {
      * @param {number} timeout - Duration in milliseconds before auto-dismissal.
      */
     addMessage(message, type = 'success', timeout = 5000) {
-        console.log('adding')
         const id = Date.now() + Math.random(); // Ensure unique ID
         const newMessage = { id, message, type, timeout };
         this.messages = [...this.messages, newMessage];

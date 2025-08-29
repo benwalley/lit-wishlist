@@ -279,7 +279,6 @@ export class EventRecipient extends observeState(LitElement) {
     async _handleNoteSubmit(event) {
         event.preventDefault();
 
-        console.log(this)
         if (!this.eventId || !this.recipient.userId) {
             messagesState.addMessage('Missing event or recipient information', 'error');
             return;
@@ -355,12 +354,10 @@ export class EventRecipient extends observeState(LitElement) {
     _loadCollapseState() {
         if (this.eventId && this.recipient.userId) {
             this.isCollapsed = getRecipientCollapsedState(this.eventId, this.recipient.userId);
-            console.log(`${this.eventId}-${this.recipient.userId}`, this.isCollapsed);
         }
     }
 
     _saveCollapseState(collapsed) {
-        console.log(this.recipient)
         if (this.eventId && this.recipient.userId) {
             setRecipientCollapsedState(this.eventId, this.recipient.userId, collapsed);
         }

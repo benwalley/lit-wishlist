@@ -25,5 +25,4 @@ export function setRecipientCollapsedState(eventId, userId, isCollapsed) {
     const key = `${eventId}-${userId}`;
     allStates[key] = isCollapsed;
     setItem(RECIPIENT_COLLAPSED_STATE_NAME, allStates);
-    console.log(getItem(RECIPIENT_COLLAPSED_STATE_NAME));
 }

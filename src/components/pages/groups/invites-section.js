@@ -220,7 +220,6 @@ export class InvitesSection extends observeState(LitElement) {
                 await this._fetchInvitedUsers(); // Refresh list
                 this._toggleInviteForm(false); // Hide form on success
                 triggerGroupUpdated();
-                console.log(result)
                 messagesState.addMessage(result.message || 'Invitation sent successfully', 'success');
             } else {
                 this._inviteError = result.message || 'Failed to send invite. Please try again.';

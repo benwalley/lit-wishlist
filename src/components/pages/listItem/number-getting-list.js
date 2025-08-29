@@ -99,7 +99,6 @@ export class CustomElement extends observeState(LitElement) {
         const newUserList = []
         const myUsers = [userState.userData, ...userState.subusers];
         for(const user of myUsers) {
-            console.log(this.itemData)
             if(user.id === this.itemData.createdById) continue;
             const userData = {...user}; // Create a copy to avoid mutating original
             let qty = 0;

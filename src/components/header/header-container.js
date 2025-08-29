@@ -118,7 +118,6 @@ export class HeaderContainer extends observeState(LitElement) {
     }
 
     _handleToggleMobile() {
-        console.log(globalState.menuExpanded)
         globalState.menuExpanded = !globalState.menuExpanded;
     }
 

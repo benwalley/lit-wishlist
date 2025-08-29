@@ -24,7 +24,6 @@ export class CustomElement extends LitElement {
     connectedCallback() {
         super.connectedCallback();
         if (!this.listId?.length) {
-            console.log('no list ID');
             this.loading = false;
             return;
         }

@@ -55,7 +55,6 @@ export async function createQA(qaData) {
         return responseData
 
     } catch (e) {
-        console.log(e)
         handleQAError('There was an error saving your question. Please try again.')
         return {success: false, message: 'There was an error saving your question. Please try again.'}
     }
@@ -85,7 +84,6 @@ export async function updateQuestion(questionData) {
         return updatedValue;
 
     } catch (e) {
-        console.log(e)
         handleQAError('There was an error saving your question. Please try again.')
         return {success: false, message: 'There was an error saving your question. Please try again.'}
     }
@@ -105,7 +103,6 @@ export async function updateAnswer(answerData) {
         return {success: true, updatedValue}
 
     } catch (e) {
-        console.log(e)
         handleQAError('There was an error saving your answer. Please try again.')
         return {success: false, message: 'There was an error saving your answer. Please try again.'}
     }
@@ -113,7 +110,6 @@ export async function updateAnswer(answerData) {
 
 export async function getQAItems(userId) {
     try {
-        console.log({userId});
         const response = await cachedFetch(`/qa/user/${userId}`, {}, true);
         return response;
     } catch (e) {

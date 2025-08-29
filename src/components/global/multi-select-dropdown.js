@@ -214,7 +214,6 @@ export class MultiSelectDropdown extends LitElement {
             setTimeout(() => {
                 const searchInput = this.shadowRoot.querySelector('.search-container custom-input');
 
-                console.log(searchInput)
                 searchInput.focus()
             }, 0);
         }

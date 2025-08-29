@@ -87,12 +87,10 @@ export class CustomElement extends observeState(LitElement) {
 
     _handleLogout() {
         // Handle logout logic here
-        console.log('Logout requested');
     }
 
     _handleDeleteAccount() {
         // Handle account deletion logic here
-        console.log('Account deletion requested');
     }
 
     static get styles() {

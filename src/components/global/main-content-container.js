@@ -10,7 +10,6 @@ export class MainContentContainer extends observeState(LitElement) {
     };
 
     async firstUpdated() {
-        console.log(userState)
         initRouter(this.renderRoot);
     }
 

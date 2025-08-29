@@ -154,7 +154,6 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     hasCurrentUserAnswered() {
-        console.log(this.question.answers)
         return this.question.answers.some(answer => parseInt(answer.answererId) === parseInt(userState.userData?.id));
     }
 

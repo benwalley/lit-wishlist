@@ -409,8 +409,6 @@ export class AddToListModal extends LitElement {
             body: JSON.stringify(formData), // Send necessary data if any
         }
 
-        console.log('Submitting Form Data:', formData);
-
         const response = await customFetch('/listItems/create', options, true)
 
         if(response.success) {

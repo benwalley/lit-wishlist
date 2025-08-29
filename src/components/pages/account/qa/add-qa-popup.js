@@ -175,7 +175,6 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     editQuestion(data) {
-        console.log({data})
         this.isEditMode = true;
         this.questionText = data.questionText || '';
         this.answerText = data.answerText || '';

@@ -17,7 +17,6 @@ class ScreenSizeState extends LitState {
 
     // Initialize screen size detection
     initialize() {
-        console.log('Initializing screen size detection');
         if (typeof window !== 'undefined') {
             this.updateDimensions();
             this.setupEventListeners();

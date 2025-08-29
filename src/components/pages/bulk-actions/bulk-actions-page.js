@@ -255,7 +255,6 @@ class BulkActionsPage extends observeState(LitElement) {
 
     _handleListSelectionChanged(event) {
         const { selectedLists } = event.detail;
-        console.log('List selection changed:', { selectedLists });
         // Store the current list selection
         this.currentSelectedLists = selectedLists || [];
     }

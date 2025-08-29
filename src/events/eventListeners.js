@@ -57,7 +57,6 @@ export function triggerUpdateUser() {
 }
 
 export function listenUpdateUser(callback) {
-    console.log('heard an update user')
     return listenToCustomEvent(UPDATE_USER_EVENT, callback);
 }
 
