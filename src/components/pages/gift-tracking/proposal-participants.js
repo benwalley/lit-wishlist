@@ -53,6 +53,7 @@ export class ProposalParticipants extends observeState(LitElement) {
 
             .participant {
                 display: flex;
+                flex-wrap: wrap;
                 justify-content: space-between;
                 align-items: center;
                 padding: var(--spacing-small);
@@ -64,6 +65,7 @@ export class ProposalParticipants extends observeState(LitElement) {
             
             .participant-info {
                 display: flex;
+                flex-wrap: wrap;
                 align-items: center;
                 gap: var(--spacing-x-small);
             }
@@ -104,6 +106,13 @@ export class ProposalParticipants extends observeState(LitElement) {
                 color: var(--primary-color);
             }
 
+            .participant-right-side {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-small);
+                margin-left: auto;
+            }
+
             .total-amount {
                 color: var(--text-color-dark);
                 display: flex;
@@ -113,32 +122,10 @@ export class ProposalParticipants extends observeState(LitElement) {
                 gap: var(--spacing-x-small);
             }
 
-            cart-icon {
-                color: var(--green-normal);
-                cursor: pointer;
-                font-size: var(--font-size-medium);
-            }
-
             admin-icon {
                 color: var(--primary-color);
                 cursor: pointer;
                 font-size: var(--font-size-medium);
-            }
-
-            @media (max-width: 600px) {
-                .participant {
-                    flex-direction: column;
-                    align-items: stretch;
-                    gap: var(--spacing-x-small);
-                }
-
-                .participant-info {
-                    justify-content: center;
-                }
-
-                .participant-amount {
-                    align-self: center;
-                }
             }
 
             .proposal-actions {
@@ -173,6 +160,22 @@ export class ProposalParticipants extends observeState(LitElement) {
             .icon-button.reject-btn {
                 font-size: var(--font-size-normal);
             }
+                
+                .buyer-chip {
+                    border: 1px solid var(--green-normal);
+                    color: var(--light-text-color);
+                    display: flex;
+                    gap: var(--spacing-x-small);
+                    align-items: center;
+                    justify-content: center;
+                    padding: 3px 7px;
+                    border-radius: 50px;
+                    line-height: 1;
+                    font-size: var(--font-size-x-small);
+                    font-weight: 600;
+                    cursor: pointer;
+                    background-color: var(--green-normal);
+                }
             `
         ];
     }
@@ -271,10 +274,10 @@ export class ProposalParticipants extends observeState(LitElement) {
                                 ${this._getParticipantStatus(participant)}
                             </span>
                             ${participant?.isBuying ? html`
-                                <span>
-                                    <cart-icon></cart-icon>
-                                    <custom-tooltip>Buying</custom-tooltip>
-                                </span>
+                                    <span class="buyer-chip">
+                                        <cart-icon></cart-icon>
+                                        <span>buyer</span>
+                                    </span>
                             ` : ''}
                             ${participant.userId === this.creatorId ? html`
                                 <span>
@@ -283,7 +286,7 @@ export class ProposalParticipants extends observeState(LitElement) {
                                 </span>
                             ` : ''}
                         </div>
-                        <div style="display: flex; align-items: center; gap: var(--spacing-small);">
+                        <div class="participant-right-side">
                             ${(this._canAccept(participant) || this._canReject(participant)) ? html`
                                 <div class="proposal-actions">
                                     ${this._canAccept(participant) ? html`

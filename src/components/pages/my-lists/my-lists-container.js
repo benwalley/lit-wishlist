@@ -22,7 +22,8 @@ class MyListsContainer extends observeState(LitElement) {
             css`
                 :host {
                     display: block;
-                    padding: var(--spacing-normal);
+                    padding: var(--spacing-normal-variable);
+                    padding-bottom: 100px;
                     max-width: 1200px;
                     margin: 0 auto;
                 }

@@ -29,14 +29,24 @@ export class MoneyCard extends observeState(LitElement) {
 
             .money-item {
                 display: grid;
-                grid-template-columns: 40px 1fr auto 1fr auto auto 2fr;
                 gap: 0.5rem;
-                align-items: center;
+                grid-template-columns: 40px 1fr auto;
+                background: var(--background-light);
+                border-radius: var(--border-radius-normal);
                 padding: 0.75rem;
                 border: 1px solid var(--border-color);
                 margin-top: -1px;
                 transition: background-color 0.2s ease;
                 position: relative;
+                align-items: flex-end;
+                box-shadow: var(--shadow-1-soft);
+            }
+
+            @media only screen and (min-width: 768px) {
+                .money-item {
+                    grid-template-columns: 40px 1fr auto 1fr auto 52px;
+                }
+
             }
             
             .money-item:hover {
@@ -56,6 +66,7 @@ export class MoneyCard extends observeState(LitElement) {
             .money-amount {
                 font-weight: 600;
                 color: var(--primary-color);
+                text-align: right;
             }
 
             .item-content {
@@ -67,6 +78,7 @@ export class MoneyCard extends observeState(LitElement) {
             .item-info {
                 display: flex;
                 flex-direction: column;
+                width: 100%;
             }
 
             .item-name {
@@ -77,16 +89,16 @@ export class MoneyCard extends observeState(LitElement) {
                 grid-column: 1 / -1;
                 font-style: italic;
                 color: var(--text-color-medium-dark);
-                margin-top: 0.5rem;
-                padding: 0.5rem;
-                background: var(--background-light);
+                padding: var(--spacing-x-small);
                 border-radius: 4px;
+                border-top: 1px solid var(--border-color);
             }
 
             .checkbox {
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                align-self: flex-start;
                 cursor: pointer;
             }
 
@@ -118,12 +130,17 @@ export class MoneyCard extends observeState(LitElement) {
             }
 
             .money-actions {
-                position: absolute;
-                top: 0.5rem;
-                right: 0.5rem;
                 display: flex;
                 gap: 0.25rem;
-                z-index: 10;
+                grid-column-start: 3;
+                grid-row: 1;
+                justify-content: flex-end;
+            }
+            
+            @media only screen and (min-width: 768px) {
+                .money-actions {
+                    grid-column-start: 6;
+                }
             }
 
             .action-button {
@@ -153,6 +170,22 @@ export class MoneyCard extends observeState(LitElement) {
 
             .delete-button:hover {
                 background: rgba(239, 68, 68, 0.2);
+            }
+            
+            .for-row {
+                grid-column: 1 / -1;
+                display: flex;
+                gap: var(--spacing-small);
+            }
+            
+            .item {
+                overflow: hidden;
+                
+                .item-name {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
             }
         `
     ];
@@ -238,8 +271,7 @@ export class MoneyCard extends observeState(LitElement) {
                         <span class="person-name">${this.owedFromName()}</span>
                     </div>
                 </div>
-                <div>Owes</div>
-
+                <div class="owes-label">Owes</div>
                 <div class="to">
                     <div class="person-info">
                         <custom-avatar size="24"
@@ -252,38 +284,40 @@ export class MoneyCard extends observeState(LitElement) {
                 <div class="amount">
                     <div class="money-amount">${this.formatAmount(this.record.amount)}</div>
                 </div>
-                ${this.record.item ? html`
-                    <div>For</div>
-                    <div class="item">
-                        <div class="item-content">
-                            <custom-image width="40" height="40" imageId="${this.record.item?.imageIds?.[0]}"></custom-image>
-                            <div class="item-info">
-                                <div class="item-name">${this.record.item.name}</div>
+                ${this.record.itemData ? html`
+                    <div class="for-row">
+                        <div>For:</div>
+                        <div class="item">
+                            <div class="item-content">
+                                <custom-image width="40" height="40" imageId="${this.record.itemData?.imageIds?.[0]}"></custom-image>
+                                <div class="item-info">
+                                    <div class="item-name">${this.record.itemData?.name}</div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                ` : ''}
-
-                ${this.record.note ? html`
-                    <div class="money-note">${this.record.note}</div>
+                    
                 ` : ''}
 
                 <div class="money-actions">
-                    <button 
-                        class="action-button edit-button" 
-                        @click="${this.handleEditClick}"
-                        title="Edit money record"
+                    <button
+                            class="action-button edit-button"
+                            @click="${this.handleEditClick}"
+                            title="Edit money record"
                     >
                         <edit-icon></edit-icon>
                     </button>
-                    <button 
-                        class="action-button delete-button" 
-                        @click="${this.handleDeleteClick}"
-                        title="Delete money record"
+                    <button
+                            class="action-button delete-button"
+                            @click="${this.handleDeleteClick}"
+                            title="Delete money record"
                     >
                         <delete-icon></delete-icon>
                     </button>
                 </div>
+                ${this.record.note ? html`
+                    <div class="money-note">${this.record.note}</div>
+                ` : ''}
             </div>
         `;
     }

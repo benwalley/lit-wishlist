@@ -214,7 +214,7 @@ export class UserDetails extends observeState(LitElement) {
 
         return html`
             <div class="top-container">
-                <custom-avatar size="96"
+                <custom-avatar size="150"
                                username="${this._getUsername()}"
                                imageid="${this._getImageId()}"
                                shadow="true"

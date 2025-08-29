@@ -13,6 +13,7 @@ import '../../../svg/dots.js';
 import '../../instructions/info-tooltip.js'
 import '../../instructions/proposal-details.js'
 import '../../../svg/edit.js';
+import '../../../svg/dollar.js';
 import '../../../svg/info.js';
 import '../../../svg/delete.js';
 import {formatDate} from "../../../helpers.js";
@@ -24,6 +25,9 @@ import {
     listenProposalDeleted,
     listenUpdateItem
 } from "../../../events/eventListeners.js";
+import {createMoneyOwed} from "../../../helpers/api/money.js";
+import {userListState} from "../../../state/userListStore.js";
+import {messagesState} from "../../../state/messagesStore.js";
 
 export class GiftTrackingProposals extends observeState(LitElement) {
     static properties = {
@@ -82,20 +86,21 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                     margin: 0 auto;
                     padding: var(--spacing-normal-variable);
                     max-width: 1200px;
+                    overflow: auto;
                 }
 
                 .proposals-container {
                     width: 100%;
                     display: flex;
                     flex-direction: column;
-                    gap: var(--spacing-normal);
-                    padding-top: var(--spacing-normal);
+                    gap: var(--spacing-normal-variable);
+                    padding-top: var(--spacing-normal-variable);
                 }
 
                 .proposal-item {
                     border: 1px solid var(--border-color-light);
                     border-radius: var(--border-radius-large);
-                    padding: var(--spacing-normal);
+                    padding: var(--spacing-normal-variable);
                     background: var(--modal-background-color);
                     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
                     transition: var(--transition-200);
@@ -105,10 +110,18 @@ export class GiftTrackingProposals extends observeState(LitElement) {
 
                 .proposal-header {
                     display: flex;
+                    flex-direction: column;
                     align-items: flex-start;
                     gap: var(--spacing-normal);
                     margin-bottom: var(--spacing-normal);
                     position: relative;
+                    jusify-content: flex-start;
+                }
+                
+                @media only screen and (min-width: 600px) {
+                    .proposal-header {
+                        flex-direction: row;
+                    }
                 }
 
                 .proposal-image {
@@ -124,16 +137,22 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                 .proposal-info {
                     flex: 1;
                     min-width: 0;
+                    text-align: left;
                 }
 
                 .proposal-title {
                     font-size: var(--font-size-medium);
                     font-weight: 600;
-                    max-width: calc(100% - 140px);
                     color: var(--text-color-dark);
                     margin-bottom: var(--spacing-x-small);
                     line-height: 1.3;
                     word-wrap: break-word;
+                }
+                
+                @media only screen and (min-width: 600px) {
+                    .proposal-title {
+                        max-width: calc(100% - 140px);
+                    }
                 }
 
                 .proposal-status {
@@ -167,7 +186,9 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                 .proposal-meta {
                     display: flex;
                     flex-direction: column;
-                    gap: var(--spacing-x-small)
+                    gap: var(--spacing-x-small);
+                    text-align: left;
+                    justify-content: flex-start;
                 }
 
                 .meta-row {
@@ -254,6 +275,7 @@ export class GiftTrackingProposals extends observeState(LitElement) {
 
                 .tabs-container {
                     display: flex;
+                    overflow: auto;
                     justify-content: center;
                     margin-bottom: var(--spacing-normal);
                     border-bottom: 1px solid var(--border-color-light);
@@ -314,11 +336,6 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                         font-size: var(--font-size-small);
                     }
 
-                    .proposal-header {
-                        flex-direction: column;
-                        align-items: stretch;
-                    }
-
                     .proposal-status {
                         position: absolute;
                         top: var(--spacing-small);
@@ -326,24 +343,16 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                     }
 
                     .proposal-image {
-                        align-self: center;
                         width: 120px;
                         height: 120px;
                         margin-bottom: var(--spacing-small);
                     }
 
-                    .proposal-info {
-                        text-align: center;
-                    }
 
                     .proposal-meta {
                         margin-top: var(--spacing-normal);
                     }
 
-                    .meta-row {
-                        justify-content: center;
-                        margin-bottom: var(--spacing-small);
-                    }
                 }
 
                 .top-row {
@@ -421,8 +430,112 @@ export class GiftTrackingProposals extends observeState(LitElement) {
                     <delete-icon></delete-icon>`,
                 classes: 'danger-text',
                 action: () => this._handleDeleteProposal(proposal)
+            },
+            {
+                id: 'money',
+                label: 'Create Money Record',
+                icon: html`
+                    <dollar-icon></dollar-icon>`,
+                classes: 'green-text',
+                action: () => this._handleCreateMoneyRecord(proposal)
             }
         ];
+    }
+
+    async _handleCreateMoneyRecord(proposal) {
+        try {
+            const currentUser = userState?.userData;
+            if (!currentUser?.id) {
+                messagesState.addMessage('User data not available', 'error');
+                return;
+            }
+
+            const participants = proposal.proposalParticipants || [];
+            if (!participants.length) {
+                messagesState.addMessage('No participants found in proposal', 'error');
+                return;
+            }
+
+            // Find the buyer
+            const buyer = participants.find(p => p.isBuying);
+            if (!buyer) {
+                messagesState.addMessage('No buyer found in proposal', 'error');
+                return;
+            }
+
+            // Get buyer user info
+            const buyerUser = userListState.users.find(u => u.id === buyer.userId);
+            if (!buyerUser) {
+                messagesState.addMessage('Buyer user information not found', 'error');
+                return;
+            }
+
+            const note = `Created automatically from proposal.`;
+            const itemId = proposal.itemData?.id || null;
+
+            let recordsCreated = 0;
+
+            if (buyer.userId === currentUser.id) {
+                // Current user is buying - create records between current user and each participant who owes them
+                for (const participant of participants) {
+                    if (participant.userId !== currentUser.id && participant.amountRequested > 0) {
+                        const participantUser = userListState.users.find(u => u.id === participant.userId);
+                        if (participantUser) {
+                            const moneyData = {
+                                amount: participant.amountRequested,
+                                owedFromId: participant.userId,
+                                owedFromName: participantUser.name,
+                                owedToId: currentUser.id,
+                                owedToName: currentUser.name,
+                                note: note,
+                                itemId: itemId
+                            };
+
+                            const result = await createMoneyOwed(moneyData);
+                            if (result.success) {
+                                recordsCreated++;
+                            } else {
+                                console.error('Failed to create money record:', result.error);
+                            }
+                        }
+                    }
+                }
+            } else {
+                // Someone else is buying - create one record between current user and the buyer
+                const currentUserParticipant = participants.find(p => p.userId === currentUser.id);
+                if (currentUserParticipant && currentUserParticipant.amountRequested > 0) {
+                    const moneyData = {
+                        amount: currentUserParticipant.amountRequested,
+                        owedFromId: currentUser.id,
+                        owedFromName: currentUser.name,
+                        owedToId: buyer.userId,
+                        owedToName: buyerUser.name,
+                        note: note,
+                        itemId: itemId
+                    };
+
+                    const result = await createMoneyOwed(moneyData);
+                    if (result.success) {
+                        recordsCreated++;
+                    } else {
+                        console.error('Failed to create money record:', result.error);
+                    }
+                }
+            }
+
+            if (recordsCreated > 0) {
+                const message = recordsCreated === 1
+                    ? 'Money record created successfully!'
+                    : `${recordsCreated} money records created successfully!`;
+                messagesState.addMessage(message, 'success', 10000);
+            } else {
+                messagesState.addMessage('No money records were created', 'error');
+            }
+
+        } catch (error) {
+            console.error('Error creating money records:', error);
+            messagesState.addMessage('Failed to create money records', 'error');
+        }
     }
 
     _isProposalCreator(proposal) {

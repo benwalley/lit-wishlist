@@ -100,7 +100,7 @@ export class MoneyTrackingPage extends LitElement {
         }
 
         // Filter to only include selected records
-        const selectedMoneyRecords = this.moneyRecords.filter(record => 
+        const selectedMoneyRecords = this.moneyRecords.filter(record =>
             this.selectedRecords.has(record.id)
         );
 
@@ -119,10 +119,10 @@ export class MoneyTrackingPage extends LitElement {
             const amount = parseFloat(record.amount) || 0;
 
             // Create a unique key for this user pair (consistent order, case-insensitive)
-            const key = fromName.toLowerCase() < toName.toLowerCase() ? 
-                `${fromName.toLowerCase()}:${toName.toLowerCase()}` : 
+            const key = fromName.toLowerCase() < toName.toLowerCase() ?
+                `${fromName.toLowerCase()}:${toName.toLowerCase()}` :
                 `${toName.toLowerCase()}:${fromName.toLowerCase()}`;
-            
+
             if (!debtMap.has(key)) {
                 debtMap.set(key, {
                     user1: fromName.toLowerCase() < toName.toLowerCase() ? fromName : toName,
@@ -135,7 +135,7 @@ export class MoneyTrackingPage extends LitElement {
             }
 
             const debt = debtMap.get(key);
-            
+
             // Add the amount to the appropriate direction (case-insensitive comparison)
             if (fromName.toLowerCase() === debt.user1.toLowerCase()) {
                 debt.user1OwesUser2 += amount;
@@ -146,10 +146,10 @@ export class MoneyTrackingPage extends LitElement {
 
         // Calculate net amounts and create result array
         const netAmounts = [];
-        
+
         debtMap.forEach(debt => {
             const netAmount = debt.user1OwesUser2 - debt.user2OwesUser1;
-            
+
             if (Math.abs(netAmount) > 0.01) { // Only include if net amount is significant
                 if (netAmount > 0) {
                     // user1 owes user2
@@ -182,7 +182,8 @@ export class MoneyTrackingPage extends LitElement {
             css`
                 :host {
                     display: block;
-                    padding: 1rem;
+                    padding: var(--spacing-normal-variable);
+                    padding-bottom: 100px;
                 }
 
                 .money-tracking-container {
@@ -192,6 +193,7 @@ export class MoneyTrackingPage extends LitElement {
 
                 .page-header {
                     display: flex;
+                    flex-wrap: wrap;
                     justify-content: space-between;
                     align-items: center;
                     margin-bottom: 2rem;
@@ -222,8 +224,14 @@ export class MoneyTrackingPage extends LitElement {
                 .money-form {
                     padding: 0 1rem 1rem;
                     display: grid;
-                    grid-template-columns: 1fr 1fr;
+                    grid-template-columns: 1fr;
                     gap: var(--spacing-normal);
+                }
+                
+                @media (min-width: 570px) {
+                    .money-form {
+                        grid-template-columns: 1fr 1fr;
+                    }
                 }
 
                 .form-group {
@@ -248,6 +256,7 @@ export class MoneyTrackingPage extends LitElement {
                     display: flex;
                     flex-direction: column;
                     margin-top: 2rem;
+                    gap: var(--spacing-x-small);
                 }
 
                 .summary-section {
@@ -382,7 +391,7 @@ export class MoneyTrackingPage extends LitElement {
         const { record } = event.detail;
         this.editingRecord = record;
         this.isEditMode = true;
-        
+
         // Pre-populate form with record data
         this.owedFrom = record.owedFromName || '';
         this.owedTo = record.owedToName || '';
@@ -390,17 +399,17 @@ export class MoneyTrackingPage extends LitElement {
         this.note = record.note || '';
         this.item = record.item?.name || '';
         this.selectedItem = record.item || null;
-        
+
         // Set user objects if available
         this.owedFromUser = record.owedFromId ? { id: record.owedFromId, name: record.owedFromName } : null;
         this.owedToUser = record.owedToId ? { id: record.owedToId, name: record.owedToName } : null;
-        
+
         this.showModal = true;
     }
 
     async handleDeleteMoney(event) {
         const { record } = event.detail;
-        
+
         try {
             const confirmed = await showConfirmation({
                 heading: 'Delete Money Record',
@@ -425,16 +434,16 @@ export class MoneyTrackingPage extends LitElement {
 
     handleCheckboxChanged(event) {
         const { checked, record } = event.detail;
-        
+
         if (checked) {
             this.selectedRecords.add(record.id);
         } else {
             this.selectedRecords.delete(record.id);
         }
-        
+
         // Trigger reactivity
         this.selectedRecords = new Set(this.selectedRecords);
-        
+
         // Recalculate net amounts based on new selection
         this.calculateNetAmounts();
     }
@@ -446,7 +455,7 @@ export class MoneyTrackingPage extends LitElement {
                     <h1>Track Money</h1>
                     <button class="button primary" @click="${this.handleTrackMoneyOwed}">
                         <dollar-icon></dollar-icon>
-                        Track Money Owed
+                        Add Money Owed
                     </button>
                 </header>
 

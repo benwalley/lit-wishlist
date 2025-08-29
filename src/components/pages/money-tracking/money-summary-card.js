@@ -19,6 +19,7 @@ export class MoneySummaryCard extends LitElement {
 
         .summary-item {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             gap: 1rem;
             padding: 1rem;
@@ -41,8 +42,8 @@ export class MoneySummaryCard extends LitElement {
         }
 
         .owes-text {
-            color: var(--text-color-medium);
             font-weight: 500;
+            margin-left: auto;
         }
 
         .to-user {

@@ -20,7 +20,8 @@ class AllListsContainer extends observeState(LitElement) {
         return css`
             :host {
                 display: block;
-                padding: var(--spacing-normal);
+                padding: var(--spacing-normal-variable);
+                max-width: 1600px;
             }
 
             .lists-header {
@@ -28,7 +29,7 @@ class AllListsContainer extends observeState(LitElement) {
                 justify-content: space-between;
                 align-items: center;
                 margin-bottom: 24px;
-                gap: 16px;
+                gap: var(--spacing-normal-variable);
                 flex-wrap: wrap;
             }
             
@@ -43,15 +44,21 @@ class AllListsContainer extends observeState(LitElement) {
                 width: 100%;
             }
 
-            @media (min-width: 930px) {
+            @media (min-width: 700px) {
                 .lists-container {
                     grid-template-columns: repeat(2, 1fr);
                 }
             }
 
-            @media (min-width: 1200px) {
+            @media (min-width: 1000px) {
                 .lists-container {
                     grid-template-columns: repeat(3, 1fr);
+                }
+            }
+
+            @media (min-width: 1600px) {
+                .lists-container {
+                    grid-template-columns: repeat(4, 1fr);
                 }
             }
 

@@ -188,7 +188,8 @@ export class EventViewContainer extends observeState(LitElement) {
             css`
                 :host {
                     display: block;
-                    padding: var(--spacing-normal);
+                    padding: var(--spacing-normal-variable);
+                    padding-bottom: 100px;
                     margin: 0 auto;
                     box-sizing: border-box;
                     width: 100%;
@@ -279,6 +280,7 @@ export class EventViewContainer extends observeState(LitElement) {
                     
                     .top-row {
                         display: flex;
+                        flex-wrap: wrap;
                         flex-direction: row;
                         justify-content: space-between;
                         gap: var(--spacing-small);
@@ -292,6 +294,7 @@ export class EventViewContainer extends observeState(LitElement) {
 
                 .event-header-right {
                     display: flex;
+                    margin-left: auto;
                     align-items: center;
                     gap: var(--spacing-small);
                 }

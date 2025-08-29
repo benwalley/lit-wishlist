@@ -179,18 +179,7 @@ export class GiftTrackingRow extends observeState(LitElement) {
                     }
                 }
                 
-                /* Input styles moved to respective components */
                 
-                @media (max-width: 768px) {
-                    .table-row {
-                        grid-template-columns: 40px auto 3fr 1fr 1fr 40px;
-                    }
-                    
-                    .list-cell, 
-                    .amount-cell {
-                        display: none;
-                    }
-                }
             `
         ];
     }

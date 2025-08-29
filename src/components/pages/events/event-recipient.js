@@ -236,26 +236,6 @@ export class EventRecipient extends observeState(LitElement) {
                 .collapse-toggle.collapsed chevron-down-icon {
                     transform: rotate(180deg);
                 }
-
-                @media (max-width: 768px) {
-                    .recipient-row {
-                        grid-template-columns: 1fr;
-                        gap: var(--spacing-x-small);
-                        padding: var(--spacing-normal);
-                    }
-
-                    .mobile-label {
-                        font-weight: 500;
-                        color: var(--medium-text-color);
-                        font-size: var(--font-size-small);
-                        margin-bottom: var(--spacing-x-small);
-                    }
-
-                    .recipient-name {
-                        font-size: 1.1rem;
-                        margin-bottom: var(--spacing-small);
-                    }
-                }
             `
         ];
     }

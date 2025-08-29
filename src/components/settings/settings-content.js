@@ -36,7 +36,7 @@ export class SettingsContent extends observeState(LitElement) {
         this.newPassword = '';
         this.confirmPassword = '';
         this.isChangingPassword = false;
-        
+
         // Listen for theme changes from other components
         listenThemeChanged((event) => {
             const newTheme = event.detail.theme;
@@ -105,6 +105,7 @@ export class SettingsContent extends observeState(LitElement) {
                 .tab-sidebar {
                     width: 160px;
                     border-right: 1px solid var(--border-color);
+                    box-sizing: border-box;
                     padding: var(--spacing-small);
                 }
 
@@ -157,6 +158,8 @@ export class SettingsContent extends observeState(LitElement) {
 
                 .setting-item {
                     display: flex;
+                    flex-wrap: wrap;
+                    gap: var(--spacing-normal);
                     align-items: center;
                     justify-content: space-between;
                     padding: var(--spacing-normal) 0;

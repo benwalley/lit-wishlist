@@ -1,4 +1,4 @@
-import {LitElement, html, css} from 'lit';
+import {css, html, LitElement} from 'lit';
 import './custom-modal.js';
 import './custom-input.js';
 import './custom-image.js';
@@ -9,13 +9,15 @@ import {messagesState} from '../../state/messagesStore.js';
 import {createProposal, updateProposal} from '../../helpers/api/proposals.js';
 import {
     listenProposalModal,
+    listenUpdateUser,
     triggerProposalCreated,
-    triggerUpdateItem, listenUpdateUser
+    triggerUpdateItem
 } from '../../events/eventListeners.js';
 import {observeState} from 'lit-element-state';
 import {userState} from '../../state/userStore.js';
 import buttonStyles from '../../css/buttons.js';
 import formStyles from '../../css/forms.js';
+import {userListState} from "../../state/userListStore.js";
 
 export class AddProposalModal extends observeState(LitElement) {
     static properties = {
@@ -362,22 +364,29 @@ export class AddProposalModal extends observeState(LitElement) {
 
         if (participants && Array.isArray(participants)) {
             // Extract user objects and IDs from participants
-            this.selectedUsers = participants;
+            this.selectedUsers = this._createUserArrayFromParticipants(participants);
             this.selectedUserIds = this.selectedUsers.map(user => user.id);
 
             // Populate user prices from participants
             const userPrices = {};
             participants.forEach(participant => {
-                userPrices[participant.user.id] = participant.amountRequested;
+                userPrices[participant.userId] = participant.amountRequested;
             });
             this.userPrices = userPrices;
 
             // Find and set the buyer
             const buyerParticipant = participants.find(p => p.isBuying);
             if (buyerParticipant) {
-                this.selectedBuyer = buyerParticipant.user;
+                this.selectedBuyer = userListState.users.find(u => u.id === buyerParticipant.userId);
             }
         }
+    }
+
+    _createUserArrayFromParticipants(participants) {
+        return participants.map(participant => {
+            const  user = userListState.users.find(u => u.id === participant.userId);
+            return user ? {...user} : null;
+        });
     }
 
     _handleCustomItemNameChanged(event) {
