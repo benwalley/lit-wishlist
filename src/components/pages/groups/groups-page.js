@@ -11,6 +11,7 @@ class GroupsPage extends observeState(LitElement) {
             :host {
                 display: block;
                 padding: var(--spacing-normal-variable);
+                max-width: 1200px;
             }
 
             h1 {

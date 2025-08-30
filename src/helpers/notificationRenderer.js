@@ -28,16 +28,27 @@ const notificationRenderers = {
     proposal_created: (metadata) => {
         const { itemName, creatorName, itemId } = metadata;
         return html`
-            <strong>${creatorName}</strong> created a proposal for 
-            <a href="/item/${itemId}">${truncateText(itemName)}</a>
+            <strong>${creatorName}</strong> invited you to go in on  
+            <a href="/item/${itemId}">${truncateText(itemName)}</a>.
+            <span>Go to <a href="/proposals">proposals</a> page to see it.</span>
         `;
     },
 
     proposal_accepted: (metadata) => {
         const { itemName, accepterName, itemId } = metadata;
         return html`
-            <strong>${accepterName}</strong> accepted your proposal for 
+            All participants have accepted the proposal for 
+            <a href="/item/${itemId}">${truncateText(itemName)}</a>.
+            It is now marked as Gotten by all participants.
+        `;
+    },
+
+    proposal_deleted: (metadata) => {
+        const { itemName, itemId } = metadata;
+        return html`
+            A proposal for 
             <a href="/item/${itemId}">${truncateText(itemName)}</a>
+            was deleted.
         `;
     },
 

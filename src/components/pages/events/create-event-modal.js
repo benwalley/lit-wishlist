@@ -108,6 +108,7 @@ export class CreateEventModal extends observeState(LitElement) {
     openModal() {
         this.isOpen = true;
         this._resetForm();
+        this.shadowRoot.querySelector('your-users-list').clearSelection();
     }
 
     closeModal() {
@@ -139,9 +140,9 @@ export class CreateEventModal extends observeState(LitElement) {
     }
 
     _handleUsersSelectionChanged(event) {
-        const selectedUsers = event.detail.selectedUsers || [];
+        const {selectedUsers, selectedUserIds} = event.detail;
         this.selectedUsers = selectedUsers;
-        this.selectedUserIds = this.selectedUsers.map(user => user.id);
+        this.selectedUserIds = selectedUserIds;
     }
 
     _validateForm() {
@@ -240,10 +241,8 @@ export class CreateEventModal extends observeState(LitElement) {
                             <div class="user-selector-container">
                                 <your-users-list
                                     class="full-width"
-                                    apiEndpoint="/users/accessible"
                                     .selectedUsers=${this.selectedUserIds}
                                     @selection-changed=${this._handleUsersSelectionChanged}
-                                    multiSelect="true"
                                 ></your-users-list>
                             </div>
                             

@@ -49,8 +49,8 @@ export class ContributorStackContainer extends observeState(LitElement) {
             }
             
             .separator {
-                color: var(--border-color);
-                font-size: 0.875rem;
+                color: var(--medium-text-color);
+                
             }
             
             :host([simple]) .contributor-container {
@@ -80,7 +80,7 @@ export class ContributorStackContainer extends observeState(LitElement) {
                 ` : ''}
                 
                 ${this.shouldShowSeparator ? html`
-                    <span class="separator">"</span>
+                    <span class="separator">|</span>
                 ` : ''}
                 
                 ${this.showGoInOn && this.hasGoInOn ? html`

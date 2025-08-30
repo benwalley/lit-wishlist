@@ -23,6 +23,7 @@ export class NotificationItem extends LitElement {
             someone_go_in_on: 'green',
             proposal_created: 'blue',
             proposal_accepted: 'green',
+            proposal_deleted: 'red',
             gotten_item_deleted: 'red',
             item_shared: 'purple',
             list_shared: 'purple',

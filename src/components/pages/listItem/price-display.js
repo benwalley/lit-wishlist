@@ -13,7 +13,7 @@ export class CustomElement extends LitElement {
         super();
         this.itemData = {};
         this.showLabel = false;
-        this.size = 'normal';
+        this.size = 'small';
     }
 
     static get styles() {

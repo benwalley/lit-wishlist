@@ -3,6 +3,7 @@ import buttonStyles from "../../../css/buttons";
 import scrollbarStyles from "../../../css/scrollbars.js";
 import {customFetch} from "../../../helpers/fetchHelpers.js";
 import '../../global/custom-image.js';
+import '../../pages/account/avatar.js';
 import '../listItem/price-display.js';
 import '../listItem/links-display.js';
 import '../listItem/notes-display.js';

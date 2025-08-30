@@ -5,8 +5,11 @@ import '../../../svg/success.js'
 import {listenUpdateItem} from "../../../events/eventListeners.js";
 import {cachedFetch} from "../../../helpers/caching.js";
 import '../../loading/skeleton-loader.js'
+import {canUserContribute} from "../../../helpers/userHelpers.js";
+import {userState} from "../../../state/userStore.js";
+import {observeState} from "lit-element-state";
 
-export class CustomElement extends LitElement {
+export class CustomElement extends observeState(LitElement) {
     static properties = {
         itemData: { type: Object },
         publicView: { type: Boolean },
@@ -77,6 +80,11 @@ export class CustomElement extends LitElement {
         ];
     }
 
+    _canViewAmountGotten() {
+        if(this.publicView) return false;
+        if(canUserContribute(userState.userData, this.itemData)) return true;
+    }
+
     render() {
         return html`
             <div class="number-icon">
@@ -92,7 +100,7 @@ export class CustomElement extends LitElement {
                     <span>${this.itemData?.maxAmountWanted || '--'}</span>
                 </div>` : ''}
             </div>
-            ${!this.publicView ? html`
+            ${this._canViewAmountGotten() ? html`
                 <div class="amount-gotten-section">
                     ${this.loading ? html`
                                 <skeleton-loader width="100%" height="20px"></skeleton-loader>

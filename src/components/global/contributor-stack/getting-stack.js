@@ -116,7 +116,8 @@ export class GettingStack extends observeState(LitElement) {
             
             .getting-text {
                 font-size: 0.875rem;
-                color: var(--medium-text-color);
+                color: var(--green-normal);
+                font-weight: 600;
                 cursor: pointer;
                 display: flex;
                 flex-direction: row;
@@ -131,10 +132,6 @@ export class GettingStack extends observeState(LitElement) {
                 .getting-text .mobile-hidden {
                     display: block;
                 }
-            }
-            
-            .getting-text:hover {
-                color: var(--dark-text-color);
             }
             
             .user-item {
@@ -206,9 +203,9 @@ export class GettingStack extends observeState(LitElement) {
                                     size="24"
                                     round
                                     border
-                                    username="${getUsernameById(user.giverId)}"
+                                    username="${getUsernameById(user.giverId, 'Unknown')}"
                                     imageId="${getUserImageIdByUserId(user.giverId)}"
-                                    title="${getUsernameById(user.giverId)} is getting ${user.numberGetting || 1}"
+                                    title="${getUsernameById(user.giverId, 'Unknown')} is getting ${user.numberGetting || 1}"
                                 ></custom-avatar>
                             `)}
                             ${this.remainingCount > 0 ? html`
@@ -239,12 +236,12 @@ export class GettingStack extends observeState(LitElement) {
                         <div class="user-item">
                             <custom-avatar
                                 size="40"
-                                username="${getUsernameById(user.giverId)}"
+                                username="${getUsernameById(user.giverId, 'Unknown')}"
                                 imageId="${getUserImageIdByUserId(user.giverId)}"
                             ></custom-avatar>
                             <div class="user-info">
                                 <a href="/user/${user.giverId}" class="user-name">
-                                    <span>${getUsernameById(user.giverId)}</span>
+                                    <span>${getUsernameById(user.giverId, 'Unknown')}</span>
                                     ${user.giverId === userState?.userData?.id ? html`
                                         <div class="current-user-dot"></div>
                                     ` : ''}

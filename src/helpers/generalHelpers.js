@@ -22,13 +22,14 @@ export function getUniqueId () {
 /**
  * Get a username by user ID from the userListState
  * @param {string|number} userId - The user ID to look up
+ * @param notFoundString
  * @returns {string} - The username, or userId as fallback if not found
  */
-export function getUsernameById(userId) {
+export function getUsernameById(userId, notFoundString = '') {
     if (!userId) return '';
 
     const user = userListState.users.find(user => user.id === userId);
-    return user ? user.name : '';
+    return user ? user.name : notFoundString;
 }
 
 export function getUserDescriptionById(userId) {

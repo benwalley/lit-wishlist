@@ -1,5 +1,5 @@
 import {LitElement, html, css} from 'lit';
-import {ADD_MODAL_EVENT} from "../../events/custom-events.js";
+import {ADD_MODAL_EVENT, listenAddModalEvent} from "../../events/custom-events.js";
 import '../global/custom-modal.js'
 import '../global/custom-input.js'
 import '../global/custom-toggle.js'
@@ -20,8 +20,11 @@ import {customFetch} from "../../helpers/fetchHelpers.js";
 import {asyncItemFetch} from "../../helpers/api/asyncItemFetch.js";
 import {triggerUpdateItem, triggerUpdateList} from "../../events/eventListeners.js";
 import {messagesState} from "../../state/messagesStore.js";
+import {observeState} from "lit-element-state";
+import modalSections from "../../css/modal-sections.js";
+import {userState} from "../../state/userStore.js";
 
-export class AddToListModal extends LitElement {
+export class AddToListModal extends observeState(LitElement) {
     static properties = {
         advancedOpen: {type: Boolean},
         selectedListIds: {type: Array},
@@ -58,7 +61,7 @@ export class AddToListModal extends LitElement {
         this.singlePrice = 0;
         this.minPrice = 0;
         this.maxPrice = 0;
-        this.links = [{url: '', label: ''}];
+        this.links = [{ url: '', label: '' }];
         this.notes = '';
         this.images = [];
         this.imageIds = []; // Add this to ensure property is initialized
@@ -74,6 +77,7 @@ export class AddToListModal extends LitElement {
         this.fetchUrl = '';
         this.isFetching = false;
         this.showFetchSection = true;
+        this.initialListsSelected = false;
 
         // Define loading phases for item fetching
         this.fetchingPhases = [
@@ -151,13 +155,12 @@ export class AddToListModal extends LitElement {
     static get styles() {
         return [
             buttonStyles,
+            modalSections,
             css`
                 .modal-header {
                     position: sticky;
                     top: 0;
                     z-index: 10;
-                    background-color: var(--background-dark);
-                    border-bottom: 1px solid var(--border-color);
                 }
 
                 .modal-footer {
@@ -165,8 +168,6 @@ export class AddToListModal extends LitElement {
                     bottom: 0;
                     z-index: 10;
                     background-color: var(--modal-background-color);
-                    padding: var(--spacing-normal);
-                    border-top: 1px solid var(--border-color);
                 }
                 
                 .modal-contents {
@@ -175,13 +176,6 @@ export class AddToListModal extends LitElement {
                     height: 100%;
                     max-height: 90vh;
                     border-radius: var(--border-radius-large);
-                }
-
-                .modal-title {
-                    padding: var(--spacing-normal);
-                    background-color: light-dark(var(--mint-300), var(--mint-800));
-                    margin: 0;
-                    text-align: center;
                 }
 
                 .left-column {
@@ -214,7 +208,7 @@ export class AddToListModal extends LitElement {
                     }
                 }
 
-                .save-button {
+                button.save-button {
                     width: 100%;
                 }
                 
@@ -349,6 +343,20 @@ export class AddToListModal extends LitElement {
         ];
     }
 
+    connectedCallback() {
+        super.connectedCallback();
+        this.removeEventListener = listenAddModalEvent(() => {
+            this.openModal();
+        });
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        if (this.removeEventListener) {
+            this.removeEventListener();
+        }
+    }
+
     renderAdvancedOptions() {
         return html`
             <div class="advanced-options-content">
@@ -444,7 +452,7 @@ export class AddToListModal extends LitElement {
                 this.imageIds = [data.imageId];
             }
             if (this.fetchUrl) {
-                this.links = [{ url: this.fetchUrl, label: data.linkLabel || 'Product Link' }];
+                this.links = [{ url: this.fetchUrl, label: (data.linkLabel || 'Product Link') }];
             }
             // Clear the fetch URL after successful fetch
             this.fetchUrl = '';
@@ -463,13 +471,29 @@ export class AddToListModal extends LitElement {
         this.fetchUrl = e.detail.value;
     }
 
+    _setDefaultListSelection() {
+        if(this.initialListsSelected) return;
+        this.initialListsSelected = true;
+        const allLists = userState.myLists || [];
+        const listIds = allLists.map(list => list.id);
+        this.selectedListIds = listIds;
+    }
+
+    openModal() {
+        const modal = this.shadowRoot.querySelector('custom-modal');
+        if (modal && typeof modal.openModal === 'function') {
+            modal.openModal();
+            this._setDefaultListSelection();
+        }
+    }
+
     clearData() {
         this.itemName = '';
         this.isPriceRange = false;
         this.singlePrice = 0;
         this.minPrice = 0;
         this.maxPrice = 0;
-        this.links = [{url: '', label: ''}];
+        this.links = [{ url: '', label: '' }];
         this.notes = '';
         this.imageIds = [];
         this.amount = '';
@@ -480,10 +504,10 @@ export class AddToListModal extends LitElement {
         this.matchListVisibility = true;
         this.visibleToUsers = [];
         this.visibleToGroups = [];
-        this.selectedListIds = [];
         this.fetchUrl = '';
         this.isFetching = false;
         this.showFetchSection = true;
+        // this.selectedListIds = [];
     }
 
     closeModal() {
@@ -496,7 +520,7 @@ export class AddToListModal extends LitElement {
 
     render() {
         return html`
-            <custom-modal triggerEvent="${ADD_MODAL_EVENT}" noPadding="true">
+            <custom-modal noPadding="true">
 
                 <form @submit=${this._submitHandler} class="modal-contents">
                     <div class="modal-header">

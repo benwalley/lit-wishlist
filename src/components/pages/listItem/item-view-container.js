@@ -160,11 +160,18 @@ export class CustomElement extends observeState(LitElement) {
                 .main-content-wrapper {
                     grid-column: 1 / span 2;
                     display: grid;
-                    grid-template-columns: 1fr 1fr;
+                    grid-template-columns: 1fr;
                     gap: var(--spacing-normal);
                     overflow: auto;
-                    padding: var(--spacing-normal) var(--spacing-normal-variable) var(--spacing-large) var(--spacing-normal-variable);
+                    padding: var(--spacing-normal-variable);
+                    padding-bottom: 100px;
                     max-width: 1000px;
+                }
+                
+                @media only screen and (min-width: 700px) {
+                    .main-content-wrapper {
+                        grid-template-columns: 1fr 1fr;
+                    }
                 }
 
                 contributors-top-bar {
@@ -188,6 +195,8 @@ export class CustomElement extends observeState(LitElement) {
                     display: grid;
                     gap: var(--spacing-normal);
                     margin-bottom: auto;
+                    grid-row: 1 / span 2;
+                    grid-column: 2;
                 }
                 
                 aside.right-column {
@@ -255,6 +264,10 @@ export class CustomElement extends observeState(LitElement) {
                     gap: var(--spacing-normal);
                 }
                 
+                .left-column-end {
+                    grid-column: 1 / span 1;
+                }
+                
                 loading-screen {
                     grid-column: 1 / -1;
                 }
@@ -315,7 +328,6 @@ export class CustomElement extends observeState(LitElement) {
                                 <div class="main-content-wrapper custom-scrollbar">
                                     <div class="left-column">
                                         <all-images-display .itemData="${this.itemData}"></all-images-display>
-                                        <shared-with .itemData="${this.itemData}"></shared-with>
                                     </div>
                                     <div class="details-section">
                                         ${this.itemData?.createdById ? html`
@@ -383,6 +395,9 @@ export class CustomElement extends observeState(LitElement) {
                                         </div>
                                     ` : ''}
 
+                                    </div>
+                                    <div class="left-column-end">
+                                        <shared-with .itemData="${this.itemData}"></shared-with>
                                     </div>
                                 </div>
                             `}

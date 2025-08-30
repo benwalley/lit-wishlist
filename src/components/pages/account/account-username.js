@@ -26,7 +26,7 @@ export class AccountUsername extends observeState(LitElement) {
     `;
 
     render() {
-        const displayUsername = this.username || userState?.userData?.name;
+        const displayUsername = this.username;
         return html`<span>${displayUsername}</span>`;
     }
 }

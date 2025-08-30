@@ -54,7 +54,7 @@ export class EditItemForm extends LitElement {
         this.singlePrice = 0;
         this.minPrice = 0;
         this.maxPrice = 0;
-        this.links = [{url: '', label: ''}];
+        this.links = [{ url: '', label: '' }];
         this.notes = '';
         this.imageIds = [];
         this.amount = '';
@@ -80,7 +80,7 @@ export class EditItemForm extends LitElement {
         this.itemName = this.itemData.name || '';
 
         // Set price data
-        if (this.itemData.minPrice && this.itemData.maxPrice) {
+        if (this.itemData.minPrice && this.itemData.maxPrice && parseFloat(this.itemData.maxPrice) > 0) {
             this.isPriceRange = true;
             this.minPrice = this.itemData.minPrice;
             this.maxPrice = this.itemData.maxPrice;
@@ -92,28 +92,19 @@ export class EditItemForm extends LitElement {
             this.maxPrice = 0;
         }
 
-        // Set links data
-        if (this.itemData.links && Array.isArray(this.itemData.links)) {
-            try {
-                this.links = this.itemData.links.map(link => {
-                    if (typeof link === 'string') {
-                        try {
-                            return JSON.parse(link);
-                        } catch (e) {
-                            return { url: '', label: '' };
-                        }
-                    }
-                    return link;
-                });
-                if (this.links.length === 0) {
-                    this.links = [{url: '', label: ''}];
-                }
-            } catch (e) {
-                console.error('Error parsing links:', e);
-                this.links = [{url: '', label: ''}];
-            }
+        // Set links data - expect array of objects with new format
+        const linksData = this.itemData.links || this.itemData.itemLinks; // Check both properties for backward compatibility
+        if (linksData && Array.isArray(linksData) && linksData.length > 0) {
+            this.links = linksData.map(link => {
+                // Ensure each link has required properties
+                return {
+                    ...link,
+                    url: link.url || '',
+                    label: link.label || ''
+                };
+            });
         } else {
-            this.links = [{url: '', label: ''}];
+            this.links = [{ url: '', label: '' }];
         }
 
         // Set notes
@@ -325,9 +316,9 @@ export class EditItemForm extends LitElement {
         const formData = {
             id: this.itemData.id,
             name: this.itemName,
-            price: this.singlePrice,
-            minPrice: this.minPrice,
-            maxPrice: this.maxPrice,
+            price: this.isPriceRange ? null : this.singlePrice,
+            minPrice: this.isPriceRange ? this.minPrice : null,
+            maxPrice: this.isPriceRange ? this.maxPrice : null,
             itemLinks: this.links.filter(link => link.url && link.url.trim() !== ''),
             notes: this.notes,
             note: this.notes, // Include both for backward compatibility
@@ -458,7 +449,7 @@ export class EditItemForm extends LitElement {
                 
                 <div class="modal-footer">
                     <button type="button" class="secondary" @click=${this._handleCancel}>Cancel</button>
-                    <button type="submit" class="primary" ?disabled=${this.saving}>
+                    <button @click="${this._submitHandler}" type="submit" class="primary" ?disabled=${this.saving}>
                         ${this.saving ? 'Saving...' : 'Save Changes'}
                     </button>
                 </div>

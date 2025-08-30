@@ -58,7 +58,7 @@ export async function deleteProposalWithConfirmation(proposal) {
     try {
         const confirmed = await showConfirmation({
             heading: 'Delete Proposal',
-            message: `Are you sure you want to delete this proposal for "${proposal.item?.name || 'Unknown Item'}"? This action cannot be undone.`,
+            message: `Are you sure you want to delete this proposal for "${proposal.itemData?.name || 'Unknown Item'}"? This action cannot be undone.`,
             confirmLabel: 'Delete Proposal',
             cancelLabel: 'Cancel'
         });

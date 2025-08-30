@@ -35,6 +35,14 @@ export function canUserEditList(user, list) {
     return false;
 }
 
+export function canUserEditItem(user, itemData) {
+    if(!user || !itemData) return false;
+    if (itemData?.createdById && itemData?.createdById === user.id) {
+        return true;
+    }
+    return false;
+}
+
 export function isSubuserSecure() {
     return true;
 }

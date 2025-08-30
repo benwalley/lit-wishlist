@@ -31,6 +31,7 @@ export class CustomElement extends LitElement {
                     background: var(--background-light);
                     border-radius: var(--border-radius-large);
                     display: none;
+                    margin: 0;
                 }
 
                 @media only screen and (min-width: 1000px) {

@@ -72,10 +72,6 @@ class PriceInput extends LitElement {
 
     _toggleMode() {
         this.isRange = !this.isRange;
-        // Reset values when toggling
-        this.singlePrice = null;
-        this.minPrice = null;
-        this.maxPrice = null;
         this._emitChange();
     }
 

@@ -48,7 +48,7 @@ export class SharedWith extends observeState(LitElement) {
             }
 
             .group-title {
-                font-size: var(--font-size-normal);
+                font-size: var(--font-size-small);
                 color: var(--medium-text-color);
                 margin: 0;
                 margin-bottom: var(--spacing-small);
@@ -80,7 +80,6 @@ export class SharedWith extends observeState(LitElement) {
                 font-size: var(--font-size-x-small);
                 color: var(--medium-text-color);
                 font-style: italic;
-                margin-top: var(--spacing-small);
             }
 
             .public-indicator {
@@ -181,8 +180,10 @@ export class SharedWith extends observeState(LitElement) {
         return html`
             <div class="shared-with-container">
                 <div class="shared-list">
-                    ${this._renderSharedGroups()}
-                    ${this._renderSharedUsers()}
+                    ${!this.itemData.matchListVisibility ? html`
+                        ${this._renderSharedGroups()}
+                        ${this._renderSharedUsers()}
+                    ` : ''}
                     ${this._getVisibilityDescription()}
                 </div>
             </div>

@@ -21,9 +21,6 @@
  - on list, add "use account image" button.
  - add "share with" functionality.
  - on create event, by default there is no user selected but it looks like there is
- - have a list of things you want to go in on``
- - in events page show if you have gotten a gift that you also want to go in on.
  - make it so if you view public list logged in you can "save" it somehow so it shows up in all lists.
  - review notifications. I feel like the wrong people get them. Test add to group.
- - Allow users to create money item from proposals.
- - in proposal, indicate who is buying.
+ - make sharable link.

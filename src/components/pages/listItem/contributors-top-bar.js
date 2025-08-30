@@ -15,7 +15,7 @@ import '../../../svg/group.js';
 import {openEditItemModal} from "../../add-to-list/edit-item-modal.js";
 import {deleteItem} from "../../../helpers/api/listItems.js";
 import '../../global/contributor-stack/contributor-stack-container.js'
-import {canUserContribute} from "../../../helpers/userHelpers.js";
+import {canUserContribute, canUserEditItem} from "../../../helpers/userHelpers.js";
 import {userState} from "../../../state/userStore.js";
 import {observeState} from "lit-element-state";
 
@@ -98,6 +98,7 @@ export class ContributorsTopBar extends observeState(LitElement) {
                 .top-row {
                     gap: var(--spacing-small);
                     display: flex;
+                    flex-wrap: wrap;
                     align-items: center;
                     justify-content: space-between;
                     transition: opacity 0.3s ease-in-out;
@@ -142,14 +143,12 @@ export class ContributorsTopBar extends observeState(LitElement) {
 
 
                 .contributor-details {
-                    grid-row: 2;
                     display: flex;
                     padding-left: 10px;
                     flex-direction: column;
                     align-items: center;
                     gap: var(--spacing-small);
-                    margin-left: auto;
-                    margin-right: 0;
+                    margin-right: auto;
                 }
 
                 @media (min-width: 1000px) {
@@ -158,7 +157,6 @@ export class ContributorsTopBar extends observeState(LitElement) {
                         margin-right: auto;
                         margin-left: 0;
                     }
-
                 }
 
                 .avatar {
@@ -221,6 +219,12 @@ export class ContributorsTopBar extends observeState(LitElement) {
                     display: flex;
                     flex-direction: row;
                     justify-content: flex-end;
+                }
+                
+                @media (max-width: 400px) {
+                    .actions-container {
+                        margin-left: auto;
+                    }
                 }
 
                 .action-button {
@@ -305,7 +309,9 @@ export class ContributorsTopBar extends observeState(LitElement) {
     }
 
     get actionItems() {
-        const baseActions = [
+        const baseActions = []
+
+        if(canUserEditItem(userState.userData, this.itemData)) baseActions.push(
             {
                 id: 'edit',
                 label: 'Edit Item',
@@ -313,7 +319,7 @@ export class ContributorsTopBar extends observeState(LitElement) {
                 classes: 'blue-text',
                 action: () => this.handleEditItem()
             }
-        ];
+        );
 
         // Only add share action if item is public
         if (this.itemData?.isPublic) {
@@ -327,14 +333,16 @@ export class ContributorsTopBar extends observeState(LitElement) {
         }
 
         // Add remaining actions
-        baseActions.push(
+        if(canUserEditItem(userState.userData, this.itemData)) baseActions.push(
             {
                 id: 'delete',
                 label: 'Delete Item',
                 icon: html`<delete-icon></delete-icon>`,
                 classes: 'danger-text',
                 action: () => this.handleDeleteItem()
-            },
+            }
+        )
+        baseActions.push(
             {
                 id: 'proposal',
                 label: 'Create Proposal',

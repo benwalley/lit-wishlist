@@ -11,7 +11,7 @@ import buttonStyles from '../../../css/buttons.js';
 import {currencyHelper} from "../../../helpers.js";
 import {acceptProposal, declineProposal} from '../../../helpers/api/proposals.js';
 import {messagesState} from '../../../state/messagesStore.js';
-import {triggerUpdateItem} from '../../../events/eventListeners.js';
+import {triggerUpdateItem, triggerUpdateNotifications} from '../../../events/eventListeners.js';
 import {getUserImageIdByUserId, getUsernameById} from "../../../helpers/generalHelpers.js";
 
 export class ProposalParticipants extends observeState(LitElement) {
@@ -197,6 +197,7 @@ export class ProposalParticipants extends observeState(LitElement) {
             if (response.success) {
                 messagesState.addMessage('Proposal accepted successfully');
                 triggerUpdateItem();
+                triggerUpdateNotifications();
             } else {
                 messagesState.addMessage(response.error || 'Failed to accept proposal', 'error');
             }

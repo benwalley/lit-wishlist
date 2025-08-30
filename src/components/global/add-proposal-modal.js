@@ -468,7 +468,7 @@ export class AddProposalModal extends observeState(LitElement) {
             const price = this.userPrices[user.id];
             const numPrice = parseFloat(price);
             if (!price || isNaN(numPrice) || numPrice < 0) {
-                errors.push(`Please enter a valid amount for ${user.username || user.name}`);
+                errors.push(`Each participant must have a price set.`);
                 break;
             }
             if (numPrice === 0) {

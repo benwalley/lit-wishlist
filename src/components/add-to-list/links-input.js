@@ -1,5 +1,4 @@
 import { LitElement, html, css } from 'lit';
-import { arrayConverter } from '../../helpers/arrayHelpers.js';
 import '../global/custom-input.js'
 import buttonStyles from "../../css/buttons.js";
 import '../../svg/delete.js'
@@ -7,16 +6,33 @@ import '../../svg/plus.js'
 
 class LinksInput extends LitElement {
     static properties = {
-        values: {
-            type: Array,
-            reflect: true,
-            converter: arrayConverter,
-        },
+        values: { type: Array },
     };
 
     constructor() {
         super();
-        this.values = [{ url: '', label: '' }];
+        this.values = [this._createEmptyLink()];
+    }
+
+    /**
+     * Create a new empty link object with the minimal required structure
+     */
+    _createEmptyLink() {
+        return { url: '', label: '' };
+    }
+
+    /**
+     * Ensure a link object has the required properties
+     */
+    _normalizeLink(link) {
+        if (!link || typeof link !== 'object') {
+            return this._createEmptyLink();
+        }
+        return {
+            ...link,
+            url: link.url || '',
+            label: link.label || ''
+        };
     }
 
     static get styles() {
@@ -84,8 +100,8 @@ class LinksInput extends LitElement {
      * Add a new link row with empty url and label.
      */
     _addLink() {
-        const newLink = { url: '', label: '' };
-        this.values = [...this.values, newLink];
+        const newLink = this._createEmptyLink();
+        this.values = [...(this.values || []), newLink];
         this._emitChange();
     }
 
@@ -103,10 +119,14 @@ class LinksInput extends LitElement {
      * Update the URL of a link at the specified index.
      */
     _updateUrl(index, event) {
+        if (!this.values || index >= this.values.length) return;
+        
         const newValues = [...this.values];
-        const linkCopy = { ...newValues[index] };
-        linkCopy.url = event.target.value;
-        newValues[index] = linkCopy;
+        const existingLink = this._normalizeLink(newValues[index]);
+        newValues[index] = {
+            ...existingLink,
+            url: event.target.value
+        };
 
         this.values = newValues;
         this._emitChange();
@@ -116,10 +136,14 @@ class LinksInput extends LitElement {
      * Update the label of a link at the specified index.
      */
     _updateLabel(index, event) {
+        if (!this.values || index >= this.values.length) return;
+        
         const newValues = [...this.values];
-        const linkCopy = { ...newValues[index] };
-        linkCopy.label = event.target.value;
-        newValues[index] = linkCopy;
+        const existingLink = this._normalizeLink(newValues[index]);
+        newValues[index] = {
+            ...existingLink,
+            label: event.target.value
+        };
 
         this.values = newValues;
         this._emitChange();
@@ -142,21 +166,23 @@ class LinksInput extends LitElement {
         return html`
             <div class="container">
                 <div class="header">Link(s)</div>
-                ${this.values.map((link, index) => html`
+                ${(this.values || []).map((link, index) => {
+                    const normalizedLink = this._normalizeLink(link);
+                    return html`
                     <div class="row">
                         <div class="inputs-container">
                             <custom-input
                                 type="url"
                                 size="small"
                                 placeholder="https://..."
-                                .value=${link.url || ''}
+                                .value=${normalizedLink.url}
                                 @input=${(e) => this._updateUrl(index, e)}
                             ></custom-input>
                             <custom-input
                                 type="text"
                                 size="small"
                                 placeholder="Label - eg. Amazon"
-                                .value=${link.label || ''}
+                                .value=${normalizedLink.label}
                                 @input=${(e) => this._updateLabel(index, e)}
                             ></custom-input>
                         </div>
@@ -168,7 +194,8 @@ class LinksInput extends LitElement {
                             <delete-icon></delete-icon>
                         </button>
                     </div>
-                `)}
+                `;
+                })}
 
                 <button class="small-link-button add-row-button" @click=${this._addLink}>
                     <plus-icon></plus-icon>

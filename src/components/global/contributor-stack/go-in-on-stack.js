@@ -111,12 +111,24 @@ export class GoInOnStack extends observeState(LitElement) {
             
             .go-in-on-text {
                 font-size: 0.875rem;
-                color: var(--medium-text-color);
+                color: var(--purple-normal);
+                font-weight: 600;
                 cursor: pointer;
+                display: flex;
+                flex-direction: row;
+                gap: var(--spacing-x-small);
+                
+                .mobile-hidden {
+                    display: none;
+                }
             }
             
-            .go-in-on-text:hover {
-                color: var(--dark-text-color);
+            @media (min-width: 600px) {
+                .go-in-on-text {
+                    .mobile-hidden {
+                        display: block;
+                    }
+                }
             }
             
             
@@ -178,7 +190,7 @@ export class GoInOnStack extends observeState(LitElement) {
         }
 
         return html`
-            <div class="go-in-on-stack">
+            <div class="go-in-on-stack" @click="${this.openModal}">
                 ${this.showAvatars ? html`
                     <div class="avatar-container">
                         <div class="avatar-stack">
@@ -187,9 +199,9 @@ export class GoInOnStack extends observeState(LitElement) {
                                     size="24"
                                     round
                                     border
-                                    username="${getUsernameById(user.giverId)}"
+                                    username="${getUsernameById(user.giverId, 'Unknown')}"
                                     imageId="${getUserImageIdByUserId(user.giverId)}"
-                                    title="${getUsernameById(user.giverId)} wants to go in on this"
+                                    title="${getUsernameById(user.giverId, 'Unknown')} wants to go in on this"
                                 ></custom-avatar>
                             `)}
                             ${this.remainingCount > 0 ? html`
@@ -201,8 +213,9 @@ export class GoInOnStack extends observeState(LitElement) {
                     </div>
                 ` : ''}
                 
-                <div class="go-in-on-text" @click="${this.openModal}">
-                    ${this.goInOnList.length} ${this.goInOnList.length === 1 ? 'person wants' : 'people want'} to go in on
+                <div class="go-in-on-text" >
+                    <span>${this.goInOnList.length}</span>
+                    <span class="mobile-hidden">${this.goInOnList.length === 1 ? 'person wants' : 'people want'} to go in on</span>
                 </div>
             </div>
             
@@ -218,12 +231,12 @@ export class GoInOnStack extends observeState(LitElement) {
                         <div class="user-item">
                             <custom-avatar
                                 size="40"
-                                username="${getUsernameById(user.giverId)}"
+                                username="${getUsernameById(user.giverId, 'Unknown')}"
                                 imageId="${getUserImageIdByUserId(user.giverId)}"
                             ></custom-avatar>
                             <div class="user-info">
                                 <a href="/user/${user.giverId}" class="user-name">
-                                    <span>${getUsernameById(user.giverId)}</span>
+                                    <span>${getUsernameById(user.giverId, 'Unknown')}</span>
                                     ${user.giverId === userState?.userData?.id ? html`
                                         <div class="current-user-dot"></div>
                                     ` : ''}

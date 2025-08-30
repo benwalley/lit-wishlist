@@ -21,7 +21,7 @@ import {deleteItem} from "../../../helpers/api/listItems.js";
 import {messagesState} from "../../../state/messagesStore.js";
 import {userState} from "../../../state/userStore.js";
 import {observeState} from "lit-element-state";
-import {canUserContribute, isParentUserItem} from "../../../helpers/userHelpers.js";
+import {canUserContribute, canUserEditItem, isParentUserItem} from "../../../helpers/userHelpers.js";
 import {addItemToQueue} from "../../../helpers/viewedItems/index.js";
 import {viewedItemsState} from "../../../state/viewedItemsStore.js";
 import {listenInitialUserLoaded, listenUpdateItem, listenViewedItemsLoaded, listenUpdateViewedItems} from "../../../events/eventListeners.js";
@@ -101,19 +101,6 @@ export class ItemTile extends observeState(LitElement) {
             this.intersectionObserver.disconnect();
             this.intersectionObserver = null;
         }
-    }
-
-    /**
-     * Checks if the current user is the owner of the list
-     * @returns {boolean} True if current user is list owner, false otherwise
-     */
-    canUserEdit() {
-        const currentUser = userState.userData;
-        if(!currentUser) return false;
-        if(this.itemData?.createdById && this.itemData?.createdById === currentUser.id) {
-            return true;
-        }
-        return false;
     }
 
     static get styles() {
@@ -305,10 +292,10 @@ export class ItemTile extends observeState(LitElement) {
     }
 
     render() {
-        const itemUrl = this.publicView ? 
-            `/public/item/${this.itemData?.id}` : 
+        const itemUrl = this.publicView ?
+            `/public/item/${this.itemData?.id}` :
             `/list/${this.listId}/item/${this.itemData?.id}`;
-            
+
         return html`<a class="item-link ${this.small ? 'small' : ''} ${this.isNew() ? 'new-item' : ''}" href="${itemUrl}">
             <div class="privacy-icon">
                 ${this.itemData?.isPublic ? html`
@@ -349,7 +336,7 @@ export class ItemTile extends observeState(LitElement) {
         </a>
         ${!this.publicView ? html`
             <div class="item-actions">
-                ${this.canUserEdit() ? html`
+                ${canUserEditItem(userState.userData, this.itemData) ? html`
                             <button
                                     class="button icon-button delete-button danger-text"
                                     aria-label="Delete item"

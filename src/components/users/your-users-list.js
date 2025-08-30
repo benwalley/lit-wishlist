@@ -203,6 +203,7 @@ class UserListComponent extends observeState(LitElement) {
         this.dispatchEvent(new CustomEvent('selection-changed', {
             detail: {
                 selectedUsers,
+                selectedUserIds: this.selectedUserIds,
                 count: this.selectedUserIds.length
             },
             bubbles: true,
