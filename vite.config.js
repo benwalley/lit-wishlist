@@ -31,6 +31,13 @@ export default defineConfig({
       short_name: 'wishlist',
       description: 'wishlist website for sharing withlist with lots of people',
       theme_color: '#4f46e5',
+      share_target: {
+        action: '/add-item',
+        method: 'GET',
+        params: {
+          url: 'url'
+        }
+      }
     },
 
     workbox: {
