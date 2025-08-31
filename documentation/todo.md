@@ -24,3 +24,4 @@
  - make it so if you view public list logged in you can "save" it somehow so it shows up in all lists.
  - review notifications. I feel like the wrong people get them. Test add to group.
  - make sharable link.
+ - add filtering or sorting to lists and list list

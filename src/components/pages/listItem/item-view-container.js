@@ -195,8 +195,7 @@ export class CustomElement extends observeState(LitElement) {
                     display: grid;
                     gap: var(--spacing-normal);
                     margin-bottom: auto;
-                    grid-row: 1 / span 2;
-                    grid-column: 2;
+                    
                 }
                 
                 aside.right-column {
@@ -271,6 +270,24 @@ export class CustomElement extends observeState(LitElement) {
                 loading-screen {
                     grid-column: 1 / -1;
                 }
+                
+                .desktop-only {
+                    display: none;
+                }
+                
+                .mobile-only {
+                    display: block;
+                }
+                
+                @media (min-width: 700px) {
+                    .desktop-only {
+                        display: block;
+                    }
+
+                    .mobile-only {
+                        display: none;
+                    }
+                }
 
             `,
         ];
@@ -328,6 +345,7 @@ export class CustomElement extends observeState(LitElement) {
                                 <div class="main-content-wrapper custom-scrollbar">
                                     <div class="left-column">
                                         <all-images-display .itemData="${this.itemData}"></all-images-display>
+                                        <shared-with class="desktop-only" .itemData="${this.itemData}"></shared-with>
                                     </div>
                                     <div class="details-section">
                                         ${this.itemData?.createdById ? html`
@@ -396,7 +414,7 @@ export class CustomElement extends observeState(LitElement) {
                                     ` : ''}
 
                                     </div>
-                                    <div class="left-column-end">
+                                    <div class="mobile-end mobile-only">
                                         <shared-with .itemData="${this.itemData}"></shared-with>
                                     </div>
                                 </div>

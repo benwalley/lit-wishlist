@@ -20,14 +20,34 @@ export class AddItemPage extends LitElement {
             :host {
                 display: block;
                 width: 100%;
+                margin: 0 auto;
+                box-sizing: border-box;
+            }
+                
+                //@media (min-width: 1400px) {
+                //    :host {
+                //        padding: var(--spacing-normal);
+                //    }
+                //}
+                
+            item-form {
+                box-sizing: border-box;
                 max-width: 1200px;
                 margin: 0 auto;
                 padding: var(--spacing-normal-variable);
-                box-sizing: border-box;
+                background: var(--background-light);
             }
 
+                @media (min-width: 1475px) {
+                    item-form {
+                        border-radius: var(--border-radius-large);
+                        box-shadow: var(--shadow-3-soft);
+                        margin-bottom: var(--spacing-normal);
+                    }
+                }
+
             .page-header {
-                margin-bottom: var(--spacing-large);
+                padding: var(--spacing-normal) 0 0 0;
                 text-align: center;
             }
 
@@ -37,17 +57,23 @@ export class AddItemPage extends LitElement {
                 color: var(--text-color-dark);
                 margin: 0 0 var(--spacing-small) 0;
             }
+                
 
             .page-description {
                 font-size: var(--font-size-medium);
                 color: var(--text-color-medium-dark);
                 margin: 0;
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: var(--spacing-normal);
             }
 
-            @media (max-width: 768px) {
-                :host {
-                    padding: var(--spacing-small);
+                @media (min-width: 1475px) {
+                    .page-description {
+                        border-bottom: none;
+                    }
                 }
+
+            @media (max-width: 768px) {
 ==
 
                 .page-title {
@@ -59,9 +85,12 @@ export class AddItemPage extends LitElement {
                 display: flex;
                 gap: var(--spacing-normal);
                 justify-content: flex-end;
-                margin-top: var(--spacing-large);
-                padding-top: var(--spacing-normal);
                 border-top: 1px solid var(--border-color-extra-light);
+                position: sticky;
+                bottom: 0;
+                padding: var(--spacing-normal-variable);
+                background: var(--background-dark);
+                box-shadow: var(--shadow-2-soft);
             }
 
             .form-actions button {
@@ -77,12 +106,33 @@ export class AddItemPage extends LitElement {
     connectedCallback() {
         super.connectedCallback();
 
-        // Extract URL parameter for Web Share Target
+        // Extract URL parameters for Web Share Target
         const urlParams = new URLSearchParams(window.location.search);
-        const sharedUrl = urlParams.get('url');
-        alert(window.location);
+
+        // First check if URL parameter exists and is valid
+        let sharedUrl = urlParams.get('url');
         if (sharedUrl) {
-            this.sharedUrl = decodeURIComponent(sharedUrl);
+            sharedUrl = decodeURIComponent(sharedUrl);
+            if (this._isValidUrl(sharedUrl)) {
+                this.sharedUrl = sharedUrl;
+            } else {
+                sharedUrl = null;
+            }
+        }
+
+        // If no valid URL parameter, parse title and text for URLs
+        if (!sharedUrl) {
+            const title = urlParams.get('title');
+            const text = urlParams.get('text');
+
+            sharedUrl = this._extractUrlFromText(title) || this._extractUrlFromText(text);
+            if (sharedUrl) {
+                this.sharedUrl = sharedUrl;
+            }
+        }
+
+        // If we found a URL, trigger the auto-fetch
+        if (this.sharedUrl) {
             // Wait for the form to render, then trigger the fetch
             setTimeout(() => {
                 this._triggerAutoFetch();
@@ -95,6 +145,36 @@ export class AddItemPage extends LitElement {
         if (form && this.sharedUrl && typeof form.fetchItemFromUrl === 'function') {
             form.fetchItemFromUrl(this.sharedUrl);
         }
+    }
+
+    _isValidUrl(string) {
+        try {
+            const url = new URL(string);
+            return url.protocol === 'http:' || url.protocol === 'https:';
+        } catch (_) {
+            return false;
+        }
+    }
+
+    _extractUrlFromText(text) {
+        if (!text) return null;
+
+        const decodedText = decodeURIComponent(text);
+
+        // Look for URLs in the text using regex
+        const urlRegex = /(https?:\/\/[^\s]+)/gi;
+        const matches = decodedText.match(urlRegex);
+
+        if (matches && matches.length > 0) {
+            // Return the first valid URL found
+            for (const match of matches) {
+                if (this._isValidUrl(match)) {
+                    return match;
+                }
+            }
+        }
+
+        return null;
     }
 
     async _handleSubmit() {

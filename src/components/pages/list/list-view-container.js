@@ -15,6 +15,7 @@ import '../../global/loading-screen.js'
 import '../../global/custom-modal.js'
 import '../../instructions/info-tooltip.js'
 import '../../instructions/publicity-details.js'
+import './list-shared-with-details.js'
 import {openEditListModal} from '../../lists/edit-list-modal.js'
 import {listenUpdateItem, listenUpdateList, triggerDeleteList} from "../../../events/eventListeners.js";
 import buttonStyles from '../../../css/buttons.js';
@@ -80,9 +81,10 @@ export class ListViewContainer extends observeState(LitElement) {
                     padding-bottom: var(--spacing-large);
                 }
                 .list-header {
-                    display: flex;
+                    display: grid;
+                    grid-template-columns: auto 1fr;
                     align-items: flex-start;
-                    gap: 1rem;
+                    gap: 0 1rem;
                     padding: 1rem;
                     position: relative;
                     
@@ -90,6 +92,29 @@ export class ListViewContainer extends observeState(LitElement) {
                         margin: 0;
                         line-height: 1;
                     }
+                }
+
+                .desktop-only {
+                    display: none;
+                }
+                
+                .mobile-only {
+                    display: block;
+                    grid-column: 1 / -1;
+                }
+                
+                @media (min-width: 500px) {
+                    .desktop-only {
+                        display: block;
+                    }
+
+                    .mobile-only {
+                        display: none;
+                    }
+                }
+                
+                list-shared-with-details {
+                    margin-top: var(--spacing-x-small);
                 }
                 
                 .public-section {
@@ -281,7 +306,7 @@ export class ListViewContainer extends observeState(LitElement) {
         // Otherwise, show the list data
         return html`
             <div class="list-header">
-                <custom-avatar size="${screenSizeState.width < 500 ? '50' : '100'}" 
+                <custom-avatar size="${screenSizeState.width < 500 ? '50' : '120'}" 
                     username="${this.listData?.listName}"
                    imageId="${this.listData?.imageId || ''}"
                 ></custom-avatar>
@@ -330,9 +355,11 @@ export class ListViewContainer extends observeState(LitElement) {
                             </action-dropdown>
                         ` : ''}
                     </div>
-                    
-                    <div>${this.listData?.description}</div>
+                    <div class="description desktop-only">${this.listData?.description}</div>
+                    <list-shared-with-details class="desktop-only" .listData="${this.listData}"></list-shared-with-details>
                 </div>
+                <div class="description mobile-only">${this.listData?.description}</div>
+                <list-shared-with-details class="mobile-only" .listData="${this.listData}"></list-shared-with-details>
             </div>
             <div class="list-items">
                 ${this.listData.listItems?.length 
