@@ -35,6 +35,8 @@ export default defineConfig({
         action: '/add-item',
         method: 'GET',
         params: {
+          title: 'title',
+          text: 'text',
           url: 'url'
         }
       }
