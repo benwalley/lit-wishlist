@@ -80,7 +80,7 @@ export class AddItemPage extends LitElement {
         // Extract URL parameter for Web Share Target
         const urlParams = new URLSearchParams(window.location.search);
         const sharedUrl = urlParams.get('url');
-        alert(sharedUrl);
+        alert(window.location);
         if (sharedUrl) {
             this.sharedUrl = decodeURIComponent(sharedUrl);
             // Wait for the form to render, then trigger the fetch
