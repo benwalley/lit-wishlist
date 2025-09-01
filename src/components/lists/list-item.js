@@ -49,6 +49,8 @@ export class CustomElement extends observeState(LitElement) {
                     transition: var(--transition-normal);
                     background: var(--item-background);
                     display: flex;
+                    height: 100%;
+                    box-sizing: border-box;
                     position: relative;
                     flex-direction: row;
                     align-items: flex-start;
@@ -108,6 +110,8 @@ export class CustomElement extends observeState(LitElement) {
                     color: var(--text-color-dark);
                     width: 100%;
                     padding-bottom: 2px;
+                    padding-right: 55px;
+                    box-sizing: border-box;
                 }
 
                 .icon-button.icon-button {
@@ -179,7 +183,7 @@ export class CustomElement extends observeState(LitElement) {
 
     render() {
         const listUrl = this.publicOnly ? `/public/list/${this.itemData.id}` : `/list/${this.itemData.id}`;
-        
+
         return html`
             <a class="container" href="${listUrl}">
                <custom-avatar 

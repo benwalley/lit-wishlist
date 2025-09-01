@@ -155,6 +155,9 @@ export class ListSharedWithDetails extends observeState(LitElement) {
         const hasSharedContent = hasGroups || hasUsers;
         const shouldShowWarning = this._shouldShowWarning();
 
+        if(!this._isCurrentUserOwner()) {
+            return html``;
+        }
         // Don't render anything if there's no sharing information and no warning to show
         if (!hasSharedContent && !shouldShowWarning) {
             return html``;

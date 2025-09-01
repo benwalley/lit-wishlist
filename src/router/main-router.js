@@ -26,6 +26,7 @@ import '../components/pages/public/public-list-view.js';
 import '../components/pages/public/public-item-view.js';
 import '../components/pages/users/all-users-container.js';
 import '../components/pages/add-item/add-item-page.js';
+import '../components/pages/how-to-use/how-to-use-page.js';
 
 // Authentication guard function
 const requireAuth = (context, commands) => {
@@ -163,6 +164,11 @@ const routes = [
     {
         path: '/money-tracking',
         component: 'money-tracking-page',
+        action: requireAuth,
+    },
+    {
+        path: '/how-to-use',
+        component: 'how-to-use-page',
         action: requireAuth,
     },
     {

@@ -219,6 +219,8 @@ export class GoInOnStack extends observeState(LitElement) {
                 </div>
             </div>
             
+            <custom-tooltip>Click for details</custom-tooltip>
+            
             <custom-modal 
                 .isOpen="${this.modalOpen}" 
                 @modal-closed="${this.closeModal}"

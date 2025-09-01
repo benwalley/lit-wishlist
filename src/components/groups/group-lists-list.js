@@ -22,10 +22,22 @@ export class GroupListsList extends LitElement {
       }
 
       .list-container {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: 1fr;
         gap: 16px;
         width: 100%;
+      }
+      
+      @media only screen and (min-width: 600px) {
+        .list-container {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media only screen and (min-width: 1400px) {
+        .list-container {
+          grid-template-columns: 1fr 1fr 1fr;
+        }
       }
 
       .no-lists {

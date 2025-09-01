@@ -14,6 +14,7 @@ import '../../svg/user.js'
 import '../../svg/hourglass.js'
 import '../../svg/question-mark.js'
 import '../../svg/child.js'
+import '../../svg/info.js'
 import '../../svg/gear.js'
 import '../../svg/group.js'
 import '../../svg/cloud-upload.js'
@@ -321,6 +322,15 @@ export class CustomElement extends observeState(LitElement) {
                             <user-icon class="icon"></user-icon>
                             <span>All Users</span>
                         </a></li>
+                        <li class="menu-item-with-badge">
+                            <a href="/groups" class="menu-item-link ${this._isActive('/groups') ? 'active' : ''}" @click="${this._handleLinkClick}">
+                                <group-icon class="icon"></group-icon>
+                                <span>Groups</span>
+                            </a>
+                            ${groupInvitationsState.invitationCount > 0 ? html`
+                                <div class="invitation-badge">${groupInvitationsState.invitationCount}</div>
+                            ` : ''}
+                        </li>
                         <li><a href="/events" class="menu-item-link ${this._isActive('/events') ? 'active' : ''}" @click="${this._handleLinkClick}">
                             <calendar-icon class="icon"></calendar-icon>
                             <span>Events</span>
@@ -333,15 +343,6 @@ export class CustomElement extends observeState(LitElement) {
                             <dollar-icon class="icon"></dollar-icon>
                             <span>Money Tracking</span>
                         </a></li>
-                        <li class="menu-item-with-badge">
-                            <a href="/groups" class="menu-item-link ${this._isActive('/groups') ? 'active' : ''}" @click="${this._handleLinkClick}">
-                                <group-icon class="icon"></group-icon>
-                                <span>Groups</span>
-                            </a>
-                            ${groupInvitationsState.invitationCount > 0 ? html`
-                                <div class="invitation-badge">${groupInvitationsState.invitationCount}</div>
-                            ` : ''}
-                        </li>
                         ${!isCurrentUserSubuser() ? html`<li><a href="/subusers" class="menu-item-link ${this._isActive('/subusers') ? 'active' : ''}" @click="${this._handleLinkClick}">
                             <child-icon class="icon subuser"></child-icon>
                             <span>Subusers</span>
@@ -361,6 +362,10 @@ export class CustomElement extends observeState(LitElement) {
                         <li><a href="/import" class="menu-item-link ${this._isActive('/import') ? 'active' : ''}" @click="${this._handleLinkClick}">
                             <cloud-upload-icon class="icon"></cloud-upload-icon>
                             <span>Import Wishlist</span>
+                        </a></li>
+                        <li><a href="/how-to-use" class="menu-item-link ${this._isActive('/how-to-use') ? 'active' : ''}" @click="${this._handleLinkClick}">
+                            <info-icon class="icon"></info-icon>
+                            <span>How to Use</span>
                         </a></li>
                     </ul>
 

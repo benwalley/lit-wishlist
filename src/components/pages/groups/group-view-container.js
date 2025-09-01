@@ -5,6 +5,7 @@ import './group-details.js';
 import './group-users-list.js';
 import './invites-section.js';
 import '../../groups/group-lists-list.js';
+import '../../global/loading-screen.js';
 import {listenGroupUpdated} from "../../../events/eventListeners.js";
 import {isGroupAdmin} from "../../../helpers/groupHelpers.js";
 import {userState} from "../../../state/userStore.js";
@@ -86,6 +87,10 @@ export class GroupViewContainer extends observeState(LitElement) {
                     background: var(--background-light);
                     position: relative;
                 }
+                
+                .groups-list-container {
+                    grid-column: 1 / -1;
+                }
 
 
             `
@@ -94,7 +99,7 @@ export class GroupViewContainer extends observeState(LitElement) {
 
     render() {
         if (this.loading) {
-            return html`<p>Loading group data...</p>`;
+            return html`<loading-screen size="medium" version="Loading group data..."></loading-screen>`;
         }
 
         return html`
@@ -109,7 +114,7 @@ export class GroupViewContainer extends observeState(LitElement) {
                         @invite-user="${this._handleInviteUser}"
                     ></group-users-list>
                 </section>
-                <section>
+                <section class="groups-list-container">
                     <group-lists-list
                             .groupData="${this.groupData}"
                     ></group-lists-list>

@@ -223,6 +223,7 @@ export class GettingStack extends observeState(LitElement) {
                     <span class="mobile-hidden">getting</span>
                 </div>
             </div>
+            <custom-tooltip>Click for details</custom-tooltip>
             
             <custom-modal 
                 .isOpen="${this.modalOpen}" 

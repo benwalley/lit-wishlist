@@ -188,6 +188,7 @@ export class ListViewContainer extends observeState(LitElement) {
                     gap: var(--spacing-small);
                     align-items: center;
                     color: var(--text-color-medium-dark);
+                    padding-top: var(--spacing-x-small);
                     
                     a {
                         text-decoration: none;
