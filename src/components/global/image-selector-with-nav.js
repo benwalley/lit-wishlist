@@ -8,12 +8,14 @@ import '../../svg/dog.js';
 import '../../svg/info.js';
 import '../../svg/arrow-long.js';
 import '../../svg/arrow-long-left.js';
+import '../../svg/download.js';
 import '../pages/account/avatar.js';
 import './image-changer.js';
 import './custom-input.js';
 import './custom-tooltip.js';
 import {generateImage} from "../../helpers/api/ai.js";
 import {messagesState} from "../../state/messagesStore.js";
+import {envVars} from "../../config.js";
 
 export class ImageSelectorWithNav extends LitElement {
     static properties = {
@@ -172,6 +174,17 @@ export class ImageSelectorWithNav extends LitElement {
     }
 
     /**
+     * Get the image URL for downloading
+     */
+    _getImageUrl() {
+        if (!this.imageId || this.imageId === 0) {
+            return '';
+        }
+        
+        return `${envVars.API_URL}/images/get/${this.imageId}`;
+    }
+
+    /**
      * Generate AI image
      */
     async _generateAiImage(e) {
@@ -270,6 +283,32 @@ export class ImageSelectorWithNav extends LitElement {
                     padding: var(--spacing-small);
                     bottom: -6px;
                     left: -6px;
+                }
+
+                .download-button {
+                    box-sizing: border-box;
+                    font-size: var(--font-size-small);
+                    position: absolute;
+                    padding: 4px;
+                    top: -4px;
+                    left: -4px;
+                    background: var(--background-dark-gradient);
+                    border: 2px solid var(--border-color-light);
+                    border-radius: 50%;
+                    color: var(--text-color-light);
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-width: 24px;
+                    min-height: 24px;
+                }
+                
+                .download-button:hover {
+                    background: rgba(255, 255, 255, 0.1);
+                    border-color: rgba(255, 255, 255, 0.3);
+                    transform: scale(1.05);
                 }
 
                 .ai-input-container {
@@ -381,6 +420,11 @@ export class ImageSelectorWithNav extends LitElement {
                                            username="${this.username}"
                                            imageId="${this.imageId}">
                             </custom-avatar>
+                            ${this.imageId && this.imageId > 0 ? html`
+                                <a class="download-button" href="${this._getImageUrl()}" target="_blank" title="View image">
+                                    <download-icon></download-icon>
+                                </a>
+                            ` : ''}
                             <image-changer
                                     imageId="${this.imageId}"
                                     @image-updated="${this._onImageChanged}"></image-changer>

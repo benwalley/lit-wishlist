@@ -87,6 +87,20 @@ export class CustomElement extends observeState(LitElement) {
             if(response.success) {
                 const filteredQuestions = qaItems.filter(item => item.deleted !== true);
                 const deletedQuestions = qaItems.filter(item => item.deleted === true);
+                
+                // Sort questions: unanswered first, then by date asked (newest first)
+                filteredQuestions.sort((a, b) => {
+                    const aUnanswered = a.answers.length === 0 || !a.answers[0]?.answerText?.trim();
+                    const bUnanswered = b.answers.length === 0 || !b.answers[0]?.answerText?.trim();
+                    
+                    // Unanswered questions come first
+                    if (aUnanswered && !bUnanswered) return -1;
+                    if (!aUnanswered && bUnanswered) return 1;
+                    
+                    // If both have same answered status, sort by question ID (assuming higher ID = more recent)
+                    return b.id - a.id;
+                });
+                
                 this.questions = filteredQuestions;
                 this.deletedQuestions = deletedQuestions;
             }

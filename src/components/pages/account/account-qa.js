@@ -100,6 +100,28 @@ export class AccountQA extends observeState(LitElement) {
             if (response.success) {
                 this.qaItems = response.data || [];
                 this.qaItems = this.qaItems.filter(item => item.deleted !== true);
+                
+                // Sort questions: unanswered first, then by due date
+                this.qaItems.sort((a, b) => {
+                    const aUnanswered = a.answers.length === 0 || !a.answers[0]?.answerText?.trim();
+                    const bUnanswered = b.answers.length === 0 || !b.answers[0]?.answerText?.trim();
+                    
+                    // Unanswered questions come first
+                    if (aUnanswered && !bUnanswered) return -1;
+                    if (!aUnanswered && bUnanswered) return 1;
+                    
+                    // If both have same answered status, sort by due date (if available)
+                    const aDate = a.dueDate ? new Date(a.dueDate) : null;
+                    const bDate = b.dueDate ? new Date(b.dueDate) : null;
+                    
+                    if (aDate && bDate) {
+                        return aDate - bDate; // Earlier dates first
+                    }
+                    if (aDate && !bDate) return -1; // Questions with due dates come first
+                    if (!aDate && bDate) return 1;
+                    
+                    return 0; // No specific order for questions without due dates
+                });
             } else {
                 messagesState.addMessage(response.message || 'Failed to fetch Q&A items.', 'error');
             }
