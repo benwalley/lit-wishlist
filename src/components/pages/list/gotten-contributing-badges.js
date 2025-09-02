@@ -46,11 +46,13 @@ export class GottenContributingBadges extends observeState(LitElement) {
                 .gotten-badge {
                     background-color: var(--green-normal);
                     color: var(--light-text-color);
+                    box-shadow: var(--shadow-2-soft);
                 }
                 
                 .contributing-badge {
                     background-color: var(--purple-normal);
                     color: var(--light-text-color);
+                    box-shadow: var(--shadow-2-soft);
                 }
                 
                 dot-icon {

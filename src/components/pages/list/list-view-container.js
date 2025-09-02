@@ -26,13 +26,16 @@ import {observeState} from "lit-element-state";
 import {userState} from "../../../state/userStore.js";
 import {screenSizeState} from "../../../state/screenSizeStore.js";
 import {cachedFetch} from "../../../helpers/caching.js";
+import '../../global/list-sort-dropdown.js';
+import {getListSortOption, setListSortOption} from "../../../localStorage/listSortStorage.js";
 
 export class ListViewContainer extends observeState(LitElement) {
     static properties = {
         listId: { type: String },
         listData: {type: Object},
         loading: {type: Boolean},
-        selectedItem: {type: String}
+        selectedItem: {type: String},
+        sortOption: {type: String}
     };
 
     constructor() {
@@ -41,6 +44,7 @@ export class ListViewContainer extends observeState(LitElement) {
         this.listData = {};
         this.loading = true;
         this.selectedItem = '';
+        this.sortOption = getListSortOption();
     }
 
     connectedCallback() {
@@ -144,6 +148,14 @@ export class ListViewContainer extends observeState(LitElement) {
                     display: flex;
                     gap: var(--spacing-small);
                     margin-top: var(--spacing-x-small);
+                }
+                
+                .sort-container {
+                    padding: 0 var(--spacing-normal);
+                    margin-bottom: var(--spacing-normal);
+                    display: flex;
+                    justify-content: flex-end;
+                    max-width: 1400px;
                 }
                 
                 .name-section {
@@ -296,6 +308,83 @@ export class ListViewContainer extends observeState(LitElement) {
         return [...baseActions, ...editActions];
     }
 
+    _handleSortChange(event) {
+        this.sortOption = event.detail.value;
+        setListSortOption(this.sortOption);
+        this.requestUpdate();
+    }
+
+    _getSortedItems() {
+        if (!this.listData.listItems?.length) {
+            return [];
+        }
+
+        const items = [...this.listData.listItems];
+
+        switch (this.sortOption) {
+            case 'name-asc':
+                return items.sort((a, b) => {
+                    const nameCompare = (a.name || '').localeCompare(b.name || '');
+                    if (nameCompare !== 0) return nameCompare;
+                    return new Date(a.dateCreated || 0) - new Date(b.dateCreated || 0);
+                });
+            case 'name-desc':
+                return items.sort((a, b) => {
+                    const nameCompare = (b.name || '').localeCompare(a.name || '');
+                    if (nameCompare !== 0) return nameCompare;
+                    return new Date(a.dateCreated || 0) - new Date(b.dateCreated || 0);
+                });
+            case 'wanted-desc':
+                return items.sort((a, b) => {
+                    const aAmount = parseFloat(a.priority) || 0;
+                    const bAmount = parseFloat(b.priority) || 0;
+                    const priorityCompare = bAmount - aAmount;
+                    if (priorityCompare !== 0) return priorityCompare;
+                    const dateCompare = new Date(a.dateCreated || 0) - new Date(b.dateCreated || 0);
+                    if (dateCompare !== 0) return dateCompare;
+                    return (a.name || '').localeCompare(b.name || '');
+                });
+            case 'date-asc':
+                return items.sort((a, b) => {
+                    const dateCompare = new Date(a.dateCreated || 0) - new Date(b.dateCreated || 0);
+                    if (dateCompare !== 0) return dateCompare;
+                    return (a.name || '').localeCompare(b.name || '');
+                });
+            case 'gotten':
+                return items.sort((a, b) => {
+                    const aGotten = (a.getting?.length || 0) > 0;
+                    const bGotten = (b.getting?.length || 0) > 0;
+                    const gottenCompare = bGotten - aGotten; // Gotten items first
+                    if (gottenCompare !== 0) return gottenCompare;
+                    const dateCompare = new Date(a.dateCreated || 0) - new Date(b.dateCreated || 0);
+                    if (dateCompare !== 0) return dateCompare;
+                    return (a.name || '').localeCompare(b.name || '');
+                });
+            case 'not-gotten':
+                return items.sort((a, b) => {
+                    const aGotten = (a.getting?.length || 0) > 0;
+                    const bGotten = (b.getting?.length || 0) > 0;
+                    const notGottenCompare = aGotten - bGotten; // Not gotten items first
+                    if (notGottenCompare !== 0) return notGottenCompare;
+                    const dateCompare = new Date(a.dateCreated || 0) - new Date(b.dateCreated || 0);
+                    if (dateCompare !== 0) return dateCompare;
+                    return (a.name || '').localeCompare(b.name || '');
+                });
+            case 'want-to-go-in-on':
+                return items.sort((a, b) => {
+                    const aContributing = (a.goInOn?.length || 0) > 0;
+                    const bContributing = (b.goInOn?.length || 0) > 0;
+                    const contributingCompare = bContributing - aContributing; // Contributing items first
+                    if (contributingCompare !== 0) return contributingCompare;
+                    const dateCompare = new Date(a.dateCreated || 0) - new Date(b.dateCreated || 0);
+                    if (dateCompare !== 0) return dateCompare;
+                    return (a.name || '').localeCompare(b.name || '');
+                });
+            default:
+                return items;
+        }
+    }
+
 
 
     render() {
@@ -362,9 +451,17 @@ export class ListViewContainer extends observeState(LitElement) {
                 <div class="description mobile-only">${this.listData?.description}</div>
                 <list-shared-with-details class="mobile-only" .listData="${this.listData}"></list-shared-with-details>
             </div>
+            ${this.listData.listItems?.length ? html`
+                <div class="sort-container">
+                    <list-sort-dropdown 
+                        .selectedValue="${this.sortOption}"
+                        @sort-changed="${this._handleSortChange}"
+                    ></list-sort-dropdown>
+                </div>
+            ` : ''}
             <div class="list-items">
                 ${this.listData.listItems?.length 
-                    ? this.listData.listItems.map(item => html`
+                    ? this._getSortedItems().map(item => html`
                         <item-tile .itemData="${item}" .listId="${this.listId}" @navigate="${this._navigateToItem}"></item-tile>
                     `)
                     : html`<p>No items in this list yet.</p>`

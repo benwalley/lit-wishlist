@@ -206,6 +206,7 @@ export class CustomElement extends observeState(LitElement) {
                     padding: var(--spacing-small);
                     display: none;
                     overflow: auto;
+                    padding-bottom: 100px;
 
                     h2 {
                         margin-top: 0;

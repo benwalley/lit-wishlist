@@ -138,6 +138,7 @@ export class MiniItemTile extends observeState(LitElement) {
                     font-weight: 500;
                     padding: 2px 6px;
                     border-radius: 10px;
+                    box-shadow: var(--shadow-1-soft);
                 }
                 
                 .gotten-indicator {
