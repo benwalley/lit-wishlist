@@ -9,6 +9,8 @@ import {navigate} from "../../../router/main-router.js";
 import buttonStyles from "../../../css/buttons.js";
 import '../../../svg/empty-heart.js';
 import '../../../svg/star.js';
+import '../../../svg/group.js';
+import '../../../svg/gift.js';
 
 
 export class GuestHomeContainer extends observeState(LitElement) {
@@ -116,16 +118,16 @@ export class GuestHomeContainer extends observeState(LitElement) {
                         <!-- Left Section -->
                         <div class="left">
                             <div class="form-container">
-                                <h1>Welcome!</h1>
-                                <p class="details">Log in or create an account to experience all of the amazing features we have to offer.</p>
+                                <h1>Free Online Wishlist Maker</h1>
+                                <p class="details">Create and share wishlists for birthdays, Christmas, weddings, and any special occasion. Join thousands who use our free wishlist maker to coordinate gifts with family and friends.</p>
                                 <ul class="details">
                                     <li>
                                         <div class="display-icon">
                                             <empty-heart-icon></empty-heart-icon>
                                         </div>
                                         <div class="right-side">
-                                            <h3>Save your wishlist online</h3>
-                                            <p>Never lose track of what you want</p>
+                                            <h3>Create Unlimited Wishlists</h3>
+                                            <p>Birthday lists, Christmas wishlists, wedding registries & more</p>
                                         </div>
                                     </li>
                                     <li>
@@ -133,8 +135,8 @@ export class GuestHomeContainer extends observeState(LitElement) {
                                             <group-icon></group-icon>
                                         </div>
                                         <div class="right-side">
-                                            <h3>Create or join groups</h3>
-                                            <p>Connect with family and friends</p>
+                                            <h3>Share with Family & Friends</h3>
+                                            <p>Easy sharing and group coordination to avoid duplicate gifts</p>
                                         </div>
                                     </li>
                                     <li>
@@ -143,7 +145,7 @@ export class GuestHomeContainer extends observeState(LitElement) {
                                         </div>
                                         <div class="right-side">
                                             <h3>Track gift giving</h3>
-                                            <p>Know what you're giving everyone</p>
+                                            <p>Know what you're giving everyone and coordinate with others</p>
                                         </div>
                                     </li>
                                     <li>
@@ -151,8 +153,8 @@ export class GuestHomeContainer extends observeState(LitElement) {
                                             <star-icon></star-icon>
                                         </div>
                                         <div class="right-side">
-                                            <h3>And many more features!</h3>
-                                            <p>Discover all our amazing tools</p>
+                                            <h3>Import from Amazon & More</h3>
+                                            <p>Add items from Amazon, organize events, and control privacy</p>
                                         </div>
                                     </li>
                                 </ul>

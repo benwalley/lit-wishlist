@@ -1,0 +1,26 @@
+User-agent: *
+Allow: /
+Allow: /how-to-use
+Disallow: /public/
+Disallow: /account
+Disallow: /lists
+Disallow: /list/
+Disallow: /item/
+Disallow: /user/
+Disallow: /users
+Disallow: /group/
+Disallow: /groups
+Disallow: /events
+Disallow: /proposals
+Disallow: /subusers
+Disallow: /bulk-actions
+Disallow: /my-lists
+Disallow: /money-tracking
+Disallow: /import
+Disallow: /qa
+Disallow: /ai
+
+Sitemap: https://wishlistwebsite.org/sitemap.xml
+
+# Crawl-delay for bots
+Crawl-delay: 1

@@ -1,6 +1,7 @@
 // router.js
 import { Router } from '@vaadin/router';
 import { userState } from '../state/userStore.js';
+import { seoManager } from '../helpers/seoHelpers.js';
 import '../components/pages/guest-home/guest-home-container.js';
 import '../components/pages/account/account-container.js'
 import '../components/pages/list/list-view-container.js'
@@ -28,8 +29,30 @@ import '../components/pages/users/all-users-container.js';
 import '../components/pages/add-item/add-item-page.js';
 import '../components/pages/how-to-use/how-to-use-page.js';
 
+// SEO update function for route changes
+const updateSEO = (context) => {
+    const path = context.pathname;
+    const params = context.params || {};
+    
+    // Get SEO data for the current page
+    const seoData = seoManager.getPageSEO(path, params);
+    
+    // Update page SEO
+    seoManager.updatePageSEO(seoData);
+    
+    // Add structured data for homepage
+    if (path === '/') {
+        seoManager.updateStructuredData(seoManager.getWebApplicationSchema());
+    }
+    
+    return undefined;
+};
+
 // Authentication guard function
 const requireAuth = (context, commands) => {
+    // Update SEO for authenticated pages
+    updateSEO(context);
+    
     // If still loading user data, allow navigation (auth-container will handle)
     if (userState.loadingUser) {
         return undefined;
@@ -41,6 +64,12 @@ const requireAuth = (context, commands) => {
     }
     
     // User is authenticated, allow access
+    return undefined;
+};
+
+// Public page action (includes SEO updates)
+const publicPageAction = (context) => {
+    updateSEO(context);
     return undefined;
 };
 

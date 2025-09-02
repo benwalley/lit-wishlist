@@ -1,0 +1,11 @@
+name,price,image_url,link_url,priority,public
+"Wireless Bluetooth Headphones",89.99,https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400,https://example.com/headphones,4,false
+"Ergonomic Office Chair",249.00,https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400,https://example.com/chair,5,false
+"Smart Water Bottle",34.95,https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400,https://example.com/bottle,3,true
+"Mechanical Gaming Keyboard",129.99,https://images.unsplash.com/photo-1541140532154-b024d705b90a?w=400,https://example.com/keyboard,4,false
+"Portable Phone Charger 20000mAh",45.99,https://images.unsplash.com/photo-1609592720917-b9bb4d7fb8bb?w=400,https://example.com/charger,3,true
+"Stainless Steel Coffee Mug",24.99,https://images.unsplash.com/photo-1514228742587-6b1558fcf93a?w=400,https://example.com/mug,2,false
+"LED Desk Lamp with USB Charging",39.99,https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400,https://example.com/lamp,3,false
+"Noise Cancelling Sleep Mask",19.95,https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400,https://example.com/mask,2,true
+"Bluetooth Fitness Tracker",79.99,,https://example.com/tracker,4,false
+"Cozy Reading Blanket",35.50,https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400,,3,false

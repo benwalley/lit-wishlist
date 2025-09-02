@@ -1,5 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../css/buttons";
+import scrollbarStyles from "../../css/scrollbars";
 import logo from '../../assets/logo.svg';
 import {observeState} from 'lit-element-state';
 import {globalState} from "../../state/globalStore.js";
@@ -97,6 +98,7 @@ export class CustomElement extends observeState(LitElement) {
     static get styles() {
         return [
             buttonStyles,
+            scrollbarStyles,
             css`
                 :host {
                     grid-column: 1;
@@ -105,6 +107,10 @@ export class CustomElement extends observeState(LitElement) {
                     display: flex;
                     position: sticky;
                     top: 0;
+                }
+
+                :host([hidden]) {
+                    display: none !important;
                 }
                 
                 /* Hide sidebar completely when user is not authenticated */
@@ -287,10 +293,13 @@ export class CustomElement extends observeState(LitElement) {
     }
 
     render() {
-        // Only render sidebar if user is authenticated
+        // Hide sidebar completely if user is not authenticated
         if (!userState.userData?.id) {
+            this.hidden = true;
             return html``;
         }
+        
+        this.hidden = false;
 
         return html`
             <aside
@@ -303,7 +312,7 @@ export class CustomElement extends observeState(LitElement) {
                 <a class="logo-container" href="${globalState.landingPage}">
                     <img src="${logo}" alt="Logo" width="40px">
                 </a>
-                <nav class="nav-element">
+                <nav class="nav-element custom-scrollbar">
                     <h2 class="menu-section-heading">Main Menu</h2>
                     <ul class="menu-section-list">
                         <li><a href="/account" class="menu-item-link ${this._isActive('/account') ? 'active' : ''}" @click="${this._handleLinkClick}">

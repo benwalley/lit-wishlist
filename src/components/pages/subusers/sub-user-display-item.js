@@ -64,6 +64,15 @@ class SubUserDisplayItem extends observeState(LitElement) {
                     overflow: hidden;
                     text-overflow: ellipsis;
                     margin: 0;
+                    
+                    a {
+                        color: inherit;
+                        text-decoration: none;
+                        
+                        &:hover {
+                            text-decoration: underline;
+                        }
+                    }
                 }
 
                 .username-row {
@@ -210,7 +219,7 @@ class SubUserDisplayItem extends observeState(LitElement) {
                     
                     <div class="subuser-info">
                         <div class="username-row">
-                            <h3 class="subuser-username">${this.userData.name}</h3>
+                            <h3 class="subuser-username"><a href="/user/${this.userData.id}">${this.userData.name}</a></h3>
                             ${this.userData.isPublic ? html`
                                 <div class="publicity-indicator public-indicator">
                                     <world-icon></world-icon>

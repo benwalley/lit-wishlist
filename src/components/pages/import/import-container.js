@@ -162,8 +162,7 @@ class ImportContainer extends observeState(LitElement) {
                 price: item.price || '',
                 imageIds: [item.imageId || 0],
                 itemLinks: item.linkUrl ? [{ url: item.linkUrl, label: 'Amazon Link' }] : [],
-                description: '',
-                notes: '',
+                notes: item.description || '',
                 priority: item.priority !== undefined ? item.priority : 3,
                 category: '',
                 isPublic: item.isPublic !== undefined ? item.isPublic : false

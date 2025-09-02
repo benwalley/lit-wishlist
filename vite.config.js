@@ -27,10 +27,13 @@ export default defineConfig({
     },
 
     manifest: {
-      name: 'wishlist',
-      short_name: 'wishlist',
-      description: 'wishlist website for sharing withlist with lots of people',
+      name: 'Wishlist Website - Free Online Wishlist Maker',
+      short_name: 'Wishlist Website',
+      description: 'Create and share wishlists for birthdays, Christmas, weddings and more. Free online wishlist maker with group sharing, gift coordination, privacy controls, and Amazon import. Perfect for families, couples, and event planning.',
       theme_color: '#4f46e5',
+      background_color: '#ffffff',
+      categories: ['lifestyle', 'shopping', 'social'],
+      lang: 'en-US',
       share_target: {
         action: '/add-item',
         method: 'GET',
