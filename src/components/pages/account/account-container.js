@@ -20,6 +20,8 @@ import buttonStyles from '../../../css/buttons.js'
 import '../../users/edit-user-form.js';
 import {observeState} from "lit-element-state";
 import {isCurrentUserSubuser} from "../../../helpers/generalHelpers.js";
+import {groupInvitationsState} from "../../../state/groupInvitationsStore.js";
+
 export class AccountContainer extends observeState(LitElement) {
     static get styles() {
         return [
@@ -90,7 +92,7 @@ export class AccountContainer extends observeState(LitElement) {
                     <account-qa></account-qa>
                 </section>
 
-                ${!isCurrentUserSubuser() ? html`<section>
+                ${!isCurrentUserSubuser() && groupInvitationsState.invitations && groupInvitationsState.invitations.length > 0 ? html`<section>
                     <invited-groups></invited-groups>
                 </section>` : ''}
 
