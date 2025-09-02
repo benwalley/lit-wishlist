@@ -11,8 +11,10 @@ import '../../svg/group.js'
 import {messagesState} from "../../state/messagesStore.js";
 import {triggerUpdateList} from "../../events/eventListeners.js";
 import {updateList} from "../../helpers/api/lists.js";
+import {userState} from "../../state/userStore.js";
+import {observeState} from "lit-element-state";
 
-export class EditListForm extends LitElement {
+export class EditListForm extends observeState(LitElement) {
     static properties = {
         listData: {type: Object},
         listName: {type: String},
@@ -159,6 +161,22 @@ export class EditListForm extends LitElement {
                     align-items: center;
                     gap: var(--spacing-small);
                 }
+                
+                .use-profile-image-btn {
+                    background: none;
+                    border: 1px solid var(--purple-normal);
+                    color: var(--purple-normal);
+                    padding: 6px 12px;
+                    border-radius: var(--border-radius-small);
+                    font-size: var(--font-size-x-small);
+                    cursor: pointer;
+                    transition: var(--transition-normal);
+                }
+                
+                .use-profile-image-btn:hover {
+                    background: var(--purple-light);
+                    color: var(--purple-normal);
+                }
                
                 
                 .select-section {
@@ -255,6 +273,15 @@ export class EditListForm extends LitElement {
                                 @image-changed="${this._onImageChanged}">
                             <span style="font-size: var(--font-size-small); color: var(--text-color-medium-dark);">Click the camera or AI button to change list image</span>
                         </image-selector-with-nav>
+                        ${userState?.userData?.image ? html`
+                            <button 
+                                type="button" 
+                                class="use-profile-image-btn"
+                                @click="${this._useProfileImage}"
+                            >
+                                Use Profile Image
+                            </button>
+                        ` : ''}
                     </div>
                     <custom-input placeholder="List Name" 
                                   required="true"
@@ -335,6 +362,15 @@ ${!this.isPublic ? html`
 
     _onImageChanged(e) {
         this.imageId = e.detail.imageId;
+    }
+
+    _useProfileImage() {
+        if (userState?.userData?.image) {
+            this.imageId = userState.userData.image;
+            messagesState.addMessage('Profile image applied to list');
+        } else {
+            messagesState.addMessage('No profile image found to use', 'error');
+        }
     }
 
     _handleUserSelectionChanged(e) {
