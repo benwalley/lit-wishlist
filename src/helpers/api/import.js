@@ -155,7 +155,7 @@ export async function importAmazonWishlistAsync(wishlistUrl) {
         // Poll for completion using the existing polling mechanism
         const jobId = startResponse.jobId;
         let attempts = 0;
-        const maxAttempts = 60;
+        const maxAttempts = 360;
         const baseDelay = 1000;
         const maxDelay = 3000;
 

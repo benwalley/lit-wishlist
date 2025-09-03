@@ -45,10 +45,10 @@ export class PasswordResetContainer extends LitElement {
                 }
 
                 .form-container {
-                    background: white;
+                    background: var(--background-light);
                     padding: var(--spacing-large);
                     border-radius: var(--border-radius-normal);
-                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    box-shadow: var(--shadow-2-soft);
                     width: 100%;
                     max-width: 400px;
                 }
@@ -87,10 +87,11 @@ export class PasswordResetContainer extends LitElement {
 
                 .error-message {
                     text-align: center;
-                    color: var(--error-color, #dc3545);
+                    color: var(--error-color);
                     padding: var(--spacing-normal);
-                    background: rgba(220, 53, 69, 0.1);
+                    background: var(--error-light);
                     border-radius: var(--border-radius);
+                    border: 1px solid var(--error-color);
                 }
 
                 .loading {

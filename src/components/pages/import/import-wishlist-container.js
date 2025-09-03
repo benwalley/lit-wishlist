@@ -293,7 +293,7 @@ class ImportWishlistContainer extends observeState(LitElement) {
 
         // Loading phases for process-loading-ring
         this.loadingPhases = [
-            { icon: html`📋`, message: 'Fetching wishlist. This will take about a minute and a half', duration: 6000 },
+            { icon: html`📋`, message: 'Fetching wishlist. This will take about two minutes', duration: 6000 },
             { icon: html`🔍`, message: 'Parsing HTML structure...', duration: 6000 },
             { icon: html`🧠`, message: 'Analyzing product data...', duration: 6000 },
             { icon: html`🎪`, message: 'Flibbertigibbeting...', duration: 6000 },
@@ -540,7 +540,7 @@ class ImportWishlistContainer extends observeState(LitElement) {
                     <process-loading-ring
                         ?show="${this.isSubmitting}"
                         .phases="${this.loadingPhases}"
-                        duration="60000"
+                        duration="120000"
                     ></process-loading-ring>
                 </div>
             ` : ''}
