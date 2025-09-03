@@ -82,6 +82,7 @@ export class BulkAddToGroupModal extends observeState(LitElement) {
             if (result.success) {
                 messagesState.addMessage(`Successfully joined ${this.group.groupName}! You can now share items with this group.`);
                 triggerGroupUpdated(); // Trigger event to update other components
+                triggerUpdateList();
                 this.navigateToGroupPage()
                 this.isOpen = false;
             } else {

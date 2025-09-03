@@ -61,7 +61,7 @@ export class AddProposalModal extends observeState(LitElement) {
                     flex-direction: column;
                     gap: 0;
                     max-height: 85vh;
-                    overflow: hidden;
+                    overflow-y: auto;
                 }
 
                 .form-columns {
@@ -69,8 +69,6 @@ export class AddProposalModal extends observeState(LitElement) {
                     grid-template-columns: 1fr;
                     gap: var(--spacing-large);
                     flex: 1;
-                    overflow: hidden;
-                    min-height: 0;
                     padding: var(--spacing-normal);
                 }
 
@@ -159,7 +157,7 @@ export class AddProposalModal extends observeState(LitElement) {
 
                 .price-grid-header {
                     display: grid;
-                    grid-template-columns: 1fr 120px 50px;
+                    grid-template-columns: 1fr auto auto;
                     gap: var(--spacing-small);
                     padding: var(--spacing-small);
                     background: var(--background-dark);
@@ -169,6 +167,12 @@ export class AddProposalModal extends observeState(LitElement) {
                     position: sticky;
                     top: 0;
                     z-index: 1;
+                }
+                
+                @media (min-width: 600px) {
+                    .price-grid-header {
+                        grid-template-columns: 1fr 120px 50px;
+                    }
                 }
 
                 .price-grid-header > div {
@@ -191,12 +195,18 @@ export class AddProposalModal extends observeState(LitElement) {
 
                 .user-price-row {
                     display: grid;
-                    grid-template-columns: 1fr 120px 50px;
+                    grid-template-columns: 1fr 80px 20px;
                     gap: var(--spacing-small);
                     align-items: center;
                     padding: var(--spacing-x-small) var(--spacing-small);
                     border-bottom: 1px solid var(--border-color);
                     background: var(--background-color);
+                }
+                
+                @media (min-width: 600px) {
+                    .user-price-row {
+                        grid-template-columns: 1fr 120px 50px;
+                    }
                 }
 
                 .user-price-row:last-child {

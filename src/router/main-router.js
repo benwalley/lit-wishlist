@@ -45,6 +45,11 @@ const updateSEO = (context) => {
         seoManager.updateStructuredData(seoManager.getWebApplicationSchema());
     }
     
+    // Dispatch navigation event to close any open tooltips/popovers
+    window.dispatchEvent(new CustomEvent('routeChanged', {
+        detail: { path, params }
+    }));
+    
     return undefined;
 };
 

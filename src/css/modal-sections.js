@@ -45,6 +45,5 @@ export default css`
         flex-direction: column;
         height: 100%;
         max-height: 85vh;
-        overflow: hidden;
     }
 `;

@@ -367,7 +367,6 @@ ${!this.isPublic ? html`
     _useProfileImage() {
         if (userState?.userData?.image) {
             this.imageId = userState.userData.image;
-            messagesState.addMessage('Profile image applied to list');
         } else {
             messagesState.addMessage('No profile image found to use', 'error');
         }

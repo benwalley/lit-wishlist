@@ -98,6 +98,7 @@ export class CustomTooltip extends LitElement {
         this._referenceEl.addEventListener('focus', () => this._showTooltip(), true);
         this._referenceEl.addEventListener('blur', () => this._hideTooltip(), true);
         window.addEventListener('modalOpened', () => this._handleModalEvent());
+        window.addEventListener('routeChanged', () => this._hideTooltip());
     }
 
     _handleModalEvent() {
