@@ -287,9 +287,6 @@ export class PasswordResetContainer extends LitElement {
                             label="New Password"
                             ?disabled=${this.isSubmitting}>
                         </custom-input>
-                        <div class="password-requirements">
-                            Password must be at least 6 characters long.
-                        </div>
 
                         <custom-input 
                             id="confirmPassword" 

@@ -506,9 +506,6 @@ export class SettingsContent extends observeState(LitElement) {
                         .value="${this.confirmPassword}"
                         @input="${(e) => this._handlePasswordInput('confirmPassword', e)}">
                     </custom-input>
-                    <div class="password-requirements">
-                        Password must be at least 6 characters long
-                    </div>
                     <button 
                         type="button" 
                         class="button secondary" 
