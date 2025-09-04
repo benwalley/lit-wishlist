@@ -6,6 +6,7 @@ import {userState} from "../../../state/userStore.js";
 import {setJwt, setRefreshToken} from "../../../localStorage/tokens.js";
 import {messagesState} from "../../../state/messagesStore.js";
 import {navigate} from "../../../router/main-router.js";
+import {triggerUpdateUser} from "../../../events/eventListeners.js";
 
 export class CreateAccountForm extends LitElement {
     static get properties() {
@@ -148,7 +149,7 @@ export class CreateAccountForm extends LitElement {
         userState.loadingUser = false;
         setJwt(jwt)
         setRefreshToken(refreshToken)
-
+        triggerUpdateUser();
         messagesState.addMessage('Account created successfully!', 'success', 5000);
 
         navigate(`/account`)

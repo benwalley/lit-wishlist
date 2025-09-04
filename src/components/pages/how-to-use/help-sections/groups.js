@@ -102,7 +102,6 @@ export class GroupsHelp extends LitElement {
                         <li><strong>Close Friends:</strong> Your inner circle of friends</li>
                         <li><strong>Work Team:</strong> Colleagues for office gift exchanges</li>
                         <li><strong>College Friends:</strong> Friends from school</li>
-                        <li><strong>Book Club:</strong> Members of your book club</li>
                     </ul>
                 </div>
             </div>
@@ -113,11 +112,10 @@ export class GroupsHelp extends LitElement {
                     <p>To create a new group:</p>
                     <ul class="help-list">
                         <li>Go to <a href="/groups" class="help-link">Groups</a> in the sidebar</li>
-                        <li>Click "Create New Group"</li>
-                        <li>Choose a descriptive name for your group</li>
-                        <li>Add a description explaining the group's purpose</li>
+                        <li>Click "New Group"</li>
+                        <li>Choose a name for your group</li>
+                        <li>Add a description explaining the group's purpose (optional)</li>
                         <li>Upload a group image (optional but helpful)</li>
-                        <li>Set privacy preferences for the group</li>
                     </ul>
                 </div>
             </div>
@@ -128,17 +126,16 @@ export class GroupsHelp extends LitElement {
                     <p>Once you've created a group, you can invite others to join:</p>
                     <ul class="help-list">
                         <li>Open your group from the <a href="/groups" class="help-link">Groups</a> page</li>
-                        <li>Click "Invite Members" or the invite button</li>
-                        <li>Search for users by their username</li>
-                        <li>Send invitations to the people you want to add</li>
-                        <li>They'll receive a notification and can accept or decline</li>
+                        <li>Click "Invite User"</li>
+                        <li>Enter one or more email addresses separated by commas.</li>
+                        <li>If they don't have an account yet, they'll receive an email inviting them to create an account.</li>
                     </ul>
                 </div>
             </div>
 
             <div class="tip-box">
                 <div class="tip-title">👥 Group Management Tip</div>
-                <p>As the group creator, you're automatically the administrator. You can manage members, update group settings, and remove inactive members to keep the group relevant.</p>
+                <p>As the group creator, you're automatically the administrator. You can manage members, manage admin privileges, update group settings, and remove members if necessary.</p>
             </div>
 
             <div class="help-section">
@@ -147,7 +144,6 @@ export class GroupsHelp extends LitElement {
                     <p>You can also join groups created by others:</p>
                     <ul class="help-list">
                         <li>Check your notifications for group invitations</li>
-                        <li>Browse public groups in the <a href="/groups" class="help-link">Groups</a> section</li>
                         <li>Ask friends to invite you to their groups</li>
                         <li>Accept invitations to become an active member</li>
                     </ul>
@@ -169,27 +165,8 @@ export class GroupsHelp extends LitElement {
                     <ul class="help-list">
                         <li>Birthday wishlists shared with family</li>
                         <li>Holiday lists shared with your friend group</li>
-                        <li>Wedding registries shared with extended family</li>
-                        <li>Baby shower lists shared with colleagues</li>
                     </ul>
                 </div>
-            </div>
-
-            <div class="help-section">
-                <h2 class="section-title">Group Privacy Settings</h2>
-                <div class="help-content">
-                    <p>Groups can have different privacy levels:</p>
-                    <ul class="help-list">
-                        <li><strong>Public Groups:</strong> Anyone can see and request to join</li>
-                        <li><strong>Private Groups:</strong> Only visible to invited members</li>
-                        <li><strong>Invite-Only:</strong> Members can only join through invitations</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="tip-box">
-                <div class="tip-title">🔒 Privacy Best Practice</div>
-                <p>For family and close friend groups, use private or invite-only settings. Save public groups for broader communities like hobby groups or professional networks.</p>
             </div>
 
             <div class="help-section">
@@ -200,14 +177,13 @@ export class GroupsHelp extends LitElement {
                         <li>View all lists shared with the group</li>
                         <li>See other group members' public information</li>
                         <li>Leave the group at any time</li>
-                        <li>Get notifications when new lists are shared with the group</li>
                     </ul>
                     
                     <p>Group administrators can additionally:</p>
                     <ul class="help-list">
                         <li>Invite new members</li>
                         <li>Remove inactive or problematic members</li>
-                        <li>Update group settings and description</li>
+                        <li>Update group settings description, and image</li>
                         <li>Delete the group if needed</li>
                     </ul>
                 </div>

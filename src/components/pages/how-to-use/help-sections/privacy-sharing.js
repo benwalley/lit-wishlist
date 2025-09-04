@@ -136,30 +136,27 @@ export class PrivacySharingHelp extends LitElement {
     render() {
         return html`
             <div class="help-section">
-                <h2 class="section-title">Understanding Privacy Levels</h2>
+                <h2 class="section-title">Public vs Private</h2>
                 <div class="help-content">
-                    <p>Your privacy is important. The platform offers several levels of privacy control for your lists and items:</p>
+                    <p>Understanding the difference between public and private visibility is essential for controlling who can see your content:</p>
                     
                     <div class="privacy-level">
                         <div class="level-title">🌍 Public</div>
-                        <div class="level-description">Anyone can find and view your lists, even without an account. Great for wedding registries or general wishlists you want to share widely.</div>
-                    </div>
-                    
-                    <div class="privacy-level">
-                        <div class="level-title">👥 Shared with Groups/Users</div>
-                        <div class="level-description">Only specific people or groups you choose can see your lists. Perfect for family wishlists or close friend groups.</div>
+                        <div class="level-description">Public means that a user, list, or item can be accessed by someone who is <strong>not logged in</strong>. For lists or items, anyone in a group with you will also see that list or item.</div>
                     </div>
                     
                     <div class="privacy-level">
                         <div class="level-title">🔒 Private</div>
-                        <div class="level-description">Only you can see your lists. Useful for personal planning or draft lists you're not ready to share yet.</div>
+                        <div class="level-description">Private means that:</div>
+                        <ul class="help-list" style="margin-top: var(--spacing-x-small);">
+                            <li><strong>Your user profile</strong> is only visible to users in a group with you</li>
+                            <li><strong>Your lists</strong> are only visible to groups or users you've shared them with</li>
+                            <li><strong>Your items</strong> are only visible to groups/users the list is shared with (if visibility is set to match list) OR groups/users the item is specifically shared with (if visibility is set manually)</li>
+                        </ul>
                     </div>
+                    
+                    <p><strong>Key Point:</strong> Public content can be seen by anyone on the internet, even people without accounts. Private content requires specific sharing permissions.</p>
                 </div>
-            </div>
-
-            <div class="warning-box">
-                <div class="warning-title">🚨 Important Privacy Note</div>
-                <p>Once you make something public, search engines might index it and it could be visible to anyone on the internet. Be careful about including personal information like addresses, phone numbers, or financial details.</p>
             </div>
 
             <div class="help-section">
@@ -177,139 +174,13 @@ export class PrivacySharingHelp extends LitElement {
                     <p><strong>Item Privacy:</strong></p>
                     <ul class="help-list">
                         <li>Individual items can have different privacy settings</li>
-                        <li>Can override the list's default privacy level</li>
+                        <li>By default, anyone who can see the list, can see an item.</li>
+                        <li>Individual items can override the list's default privacy level</li>
                         <li>Useful for keeping some items more private than others</li>
                     </ul>
                     
                     <p>For example, you might have a public birthday list but keep expensive items private to share only with close family.</p>
                 </div>
-            </div>
-
-            <div class="help-section">
-                <h2 class="section-title">Managing Who Sees What</h2>
-                <div class="help-content">
-                    <p>Here's how to control access to your content:</p>
-                    
-                    <p><strong>For Lists:</strong></p>
-                    <ul class="help-list">
-                        <li>Edit any list and go to the "Privacy & Sharing" section</li>
-                        <li>Choose between Public, Private, or Shared</li>
-                        <li>If sharing, select specific users or groups</li>
-                        <li>Save your changes</li>
-                    </ul>
-                    
-                    <p><strong>For Items:</strong></p>
-                    <ul class="help-list">
-                        <li>Edit individual items to set their privacy</li>
-                        <li>Choose "Match List Privacy" or set a custom level</li>
-                        <li>Use <a href="/bulk-actions" class="help-link">Bulk Actions</a> to change many items at once</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="help-section">
-                <h2 class="section-title">Group Sharing Best Practices</h2>
-                <div class="help-content">
-                    <p>When sharing with groups, consider these practices:</p>
-                    
-                    <ul class="help-list">
-                        <li><strong>Family Groups:</strong> Great for birthday and holiday lists</li>
-                        <li><strong>Friend Groups:</strong> Perfect for casual gift exchanges</li>
-                        <li><strong>Work Groups:</strong> Suitable for office celebrations</li>
-                        <li><strong>Special Event Groups:</strong> Ideal for weddings, graduations, etc.</li>
-                    </ul>
-                    
-                    <p>Remember that when you share with a group, all current and future group members will see your list.</p>
-                </div>
-            </div>
-
-            <div class="tip-box">
-                <div class="tip-title">🎯 Sharing Strategy</div>
-                <p>Start conservative with your privacy settings. You can always make things more public later, but it's harder to make something private again once it's been widely shared.</p>
-            </div>
-
-            <div class="help-section">
-                <h2 class="section-title">What Information Is Visible</h2>
-                <div class="help-content">
-                    <p>Depending on privacy settings, others might see:</p>
-                    
-                    <p><strong>Always Visible (to people with access):</strong></p>
-                    <ul class="help-list">
-                        <li>List name and description</li>
-                        <li>Item names and descriptions</li>
-                        <li>Item prices and store links</li>
-                        <li>Your username and profile picture</li>
-                    </ul>
-                    
-                    <p><strong>Never Visible to Others:</strong></p>
-                    <ul class="help-list">
-                        <li>Your email address</li>
-                        <li>Your password</li>
-                        <li>Private lists you haven't shared</li>
-                        <li>Personal notes marked as private</li>
-                    </ul>
-                    
-                    <p><strong>Visible Only to List/Group Members:</strong></p>
-                    <ul class="help-list">
-                        <li>Gift tracking and proposal information</li>
-                        <li>Who's planning to get what</li>
-                        <li>Comments and coordination notes</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="help-section">
-                <h2 class="section-title">Children and Family Accounts</h2>
-                <div class="help-content">
-                    <p>Special considerations for family sharing:</p>
-                    
-                    <ul class="help-list">
-                        <li>Set up subuser accounts for children with appropriate privacy defaults</li>
-                        <li>Review children's lists before making them public</li>
-                        <li>Educate family members about what information to include</li>
-                        <li>Use family groups to keep sharing within the family</li>
-                        <li>Regularly review and update privacy settings</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="help-section">
-                <h2 class="section-title">Troubleshooting Privacy Issues</h2>
-                <div class="help-content">
-                    <p>If you have privacy concerns:</p>
-                    
-                    <ul class="help-list">
-                        <li><strong>Someone sees content they shouldn't:</strong> Check your sharing settings and group memberships</li>
-                        <li><strong>Content appears in search engines:</strong> It may take time for search engines to update after privacy changes</li>
-                        <li><strong>Group members see private items:</strong> Individual item privacy overrides list privacy</li>
-                        <li><strong>Lost control of sharing:</strong> Remove users from groups or change list privacy immediately</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="warning-box">
-                <div class="warning-title">⚠️ Privacy Recovery</div>
-                <p>If you accidentally made something public that should be private, change the privacy setting immediately. However, remember that people may have already seen or saved the information.</p>
-            </div>
-
-            <div class="help-section">
-                <h2 class="section-title">Account Security</h2>
-                <div class="help-content">
-                    <p>Protect your account with good security practices:</p>
-                    
-                    <ul class="help-list">
-                        <li>Use a strong, unique password</li>
-                        <li>Don't share your account credentials</li>
-                        <li>Log out from shared or public computers</li>
-                        <li>Review your account activity regularly</li>
-                        <li>Contact support if you notice suspicious activity</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="tip-box">
-                <div class="tip-title">🔐 Security Reminder</div>
-                <p>Your privacy settings are only as strong as your account security. Keep your login credentials safe and review your sharing settings periodically to make sure they still match your preferences.</p>
             </div>
         `;
     }

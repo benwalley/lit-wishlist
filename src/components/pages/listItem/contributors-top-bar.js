@@ -333,15 +333,17 @@ export class ContributorsTopBar extends observeState(LitElement) {
         }
 
         // Add remaining actions
-        if(canUserEditItem(userState.userData, this.itemData)) baseActions.push(
-            {
-                id: 'delete',
-                label: 'Delete Item',
-                icon: html`<delete-icon></delete-icon>`,
-                classes: 'danger-text',
-                action: () => this.handleDeleteItem()
-            }
-        )
+        if(canUserEditItem(userState.userData, this.itemData)) {
+            baseActions.push(
+                {
+                    id: 'delete',
+                    label: 'Delete Item',
+                    icon: html`<delete-icon></delete-icon>`,
+                    classes: 'danger-text',
+                    action: () => this.handleDeleteItem()
+                }
+            )
+        }
         baseActions.push(
             {
                 id: 'proposal',

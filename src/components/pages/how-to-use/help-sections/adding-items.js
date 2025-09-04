@@ -168,7 +168,7 @@ export class AddingItemsHelp extends LitElement {
 
             .steps-list li {
                 padding: var(--spacing-x-small) 0;
-                padding-left: var(--spacing-large);
+                padding-left: var(--spacing-medium);
                 position: relative;
                 counter-increment: step-counter;
             }

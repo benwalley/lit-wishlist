@@ -113,9 +113,10 @@ export class AuthContainer extends observeState(LitElement) {
     }
 
     async fetchGroupData() {
+        console.log('fetching group data');
         const myGroups = await getUserGroups();
         userState.myGroups = myGroups;
-
+        await groupInvitationsState.fetchInvitations();
     }
 
     async fetchUserData() {
@@ -150,8 +151,7 @@ export class AuthContainer extends observeState(LitElement) {
                 stopQueueProcessor();
                 navigate(globalState.landingPage)
             } else {
-                // User authenticated, fetch group invitations and start queue processor
-                groupInvitationsState.fetchInvitations();
+                // User authenticated, start queue processor
                 startQueueProcessor();
             }
         } catch (e) {

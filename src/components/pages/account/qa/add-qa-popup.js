@@ -339,7 +339,7 @@ export class CustomElement extends observeState(LitElement) {
                         <div class="container">
                             <your-users-list
                                     apiEndpoint="/users/accessible"
-                                    .selectedUsers="${this.sharedWithUserIds}"
+                                    .selectedUserIds="${this.sharedWithUserIds}"
                                     @selection-changed="${this._handleUserSelectionChanged}"
                                     requireCurrentUser
                             ></your-users-list>

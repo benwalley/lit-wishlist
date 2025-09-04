@@ -206,6 +206,11 @@ const routes = [
         action: requireAuth,
     },
     {
+        path: '/how-to-use/:section',
+        component: 'how-to-use-page',
+        action: requireAuth,
+    },
+    {
         path: '(.*)',
         component: 'not-found'
     }

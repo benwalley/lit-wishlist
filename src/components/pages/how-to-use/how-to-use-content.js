@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { observeState } from 'lit-element-state';
+import { Router } from '@vaadin/router';
 import { screenSizeState } from '../../../state/screenSizeStore.js';
 import './help-sections/getting-started.js';
 import './help-sections/adding-items.js';
@@ -8,7 +9,6 @@ import './help-sections/events.js';
 import './help-sections/gift-tracking.js';
 import './help-sections/advanced-features.js';
 import './help-sections/privacy-sharing.js';
-import './help-sections/troubleshooting.js';
 import '../../../svg/user.js';
 import '../../../svg/thick-list.js';
 import '../../../svg/group.js';
@@ -21,13 +21,15 @@ import '../../../svg/question-mark.js';
 export class HowToUseContent extends observeState(LitElement) {
     static get properties() {
         return {
-            activeSection: { type: String }
+            activeSection: { type: String },
+            initialSection: { type: String }
         };
     }
 
     constructor() {
         super();
         this.activeSection = 'getting-started';
+        this.initialSection = 'getting-started';
 
         this.sections = [
             {
@@ -72,13 +74,22 @@ export class HowToUseContent extends observeState(LitElement) {
                 icon: html`<shield-icon></shield-icon>`,
                 component: 'privacy-sharing-help'
             },
-            {
-                id: 'troubleshooting',
-                title: 'Troubleshooting',
-                icon: html`<question-mark-icon></question-mark-icon>`,
-                component: 'troubleshooting-help'
-            }
         ];
+    }
+
+    updated(changedProperties) {
+        super.updated(changedProperties);
+
+        // Update activeSection when initialSection changes
+        if (changedProperties.has('initialSection')) {
+            this.activeSection = this._validateSection(this.initialSection);
+        }
+    }
+
+    _validateSection(section) {
+        // Check if section is valid, fallback to getting-started
+        const validSections = this.sections.map(s => s.id);
+        return validSections.includes(section) ? section : 'getting-started';
     }
 
     static get styles() {
@@ -97,14 +108,12 @@ export class HowToUseContent extends observeState(LitElement) {
             .tab-navigation {
                 border-bottom: 1px solid var(--border-color);
                 background: var(--background-medium);
-                overflow-x: auto;
-                overflow-y: hidden;
                 flex-shrink: 0;
             }
 
             .tab-buttons {
                 display: flex;
-                min-width: fit-content;
+                flex-wrap: wrap;
                 padding: 0;
             }
 
@@ -146,6 +155,7 @@ export class HowToUseContent extends observeState(LitElement) {
             .tab-content {
                 flex: 1;
                 padding: var(--spacing-normal);
+                padding-bottom: 100px;
                 overflow-y: auto;
                 box-sizing: border-box;
                 background: var(--background-light);
@@ -178,9 +188,7 @@ export class HowToUseContent extends observeState(LitElement) {
 
             /* Hide button text on very small screens, show icons only */
             @media (max-width: 480px) {
-                .tab-button-text {
-                    display: none;
-                }
+            
 
                 .tab-button {
                     padding: var(--spacing-small);
@@ -192,7 +200,9 @@ export class HowToUseContent extends observeState(LitElement) {
     }
 
     _handleTabClick(sectionId) {
-        this.activeSection = sectionId;
+        // Navigate to the new route instead of just updating local state
+        const route = sectionId === 'getting-started' ? '/how-to-use' : `/how-to-use/${sectionId}`;
+        Router.go(route);
     }
 
     _renderSectionComponent(sectionId) {
@@ -211,8 +221,6 @@ export class HowToUseContent extends observeState(LitElement) {
                 return html`<advanced-features-help></advanced-features-help>`;
             case 'privacy-sharing':
                 return html`<privacy-sharing-help></privacy-sharing-help>`;
-            case 'troubleshooting':
-                return html`<troubleshooting-help></troubleshooting-help>`;
             default:
                 return html`<getting-started-help></getting-started-help>`;
         }

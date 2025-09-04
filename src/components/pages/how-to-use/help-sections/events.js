@@ -1,4 +1,5 @@
 import { LitElement, html, css } from 'lit';
+import eventDemoImage from '../../../../assets/event-demo.jpg';
 
 export class EventsHelp extends LitElement {
     static get styles() {
@@ -88,6 +89,16 @@ export class EventsHelp extends LitElement {
                 margin: 0;
                 color: var(--text-color-dark);
             }
+
+            .demo-image {
+                width: 100%;
+                max-width: 800px;
+                height: auto;
+                border-radius: var(--border-radius-normal);
+                box-shadow: var(--shadow-1-soft);
+                margin: var(--spacing-normal) 0;
+                display: block;
+            }
         `;
     }
 
@@ -96,14 +107,7 @@ export class EventsHelp extends LitElement {
             <div class="help-section">
                 <h2 class="section-title">What Are Events?</h2>
                 <div class="help-content">
-                    <p>Events are special occasions where gift-giving happens. They help coordinate group gift-giving and ensure everyone knows about upcoming celebrations:</p>
-                    <ul class="help-list">
-                        <li><strong>Birthdays:</strong> Personal birthday celebrations</li>
-                        <li><strong>Holidays:</strong> Christmas, Hanukkah, Valentine's Day</li>
-                        <li><strong>Special Occasions:</strong> Weddings, graduations, baby showers</li>
-                        <li><strong>Anniversaries:</strong> Work anniversaries, relationship milestones</li>
-                        <li><strong>Group Celebrations:</strong> Office parties, family reunions</li>
-                    </ul>
+                    <p>Events are an easy way to track what you've gotten for an event (such as a birthday or Christmas) as well as who you still need to get a gift for</p>
                 </div>
             </div>
 
@@ -113,109 +117,38 @@ export class EventsHelp extends LitElement {
                     <p>To create a new event:</p>
                     <ul class="help-list">
                         <li>Go to <a href="/events" class="help-link">Events</a> in the sidebar</li>
-                        <li>Click "Create New Event"</li>
-                        <li>Choose a descriptive title (e.g., "Sarah's Birthday 2024")</li>
-                        <li>Set the event date and time</li>
-                        <li>Add a description with event details</li>
-                        <li>Choose who the event is celebrating (the honoree)</li>
-                        <li>Invite attendees who might want to give gifts</li>
+                        <li>Click "Create Event"</li>
+                        <li>Choose a descriptive title (e.g., "Sarah's Birthday 2024", "Christmas 2024")</li>
+                        <li>Set the event date if you want</li>
+                        <li>Select everyone who you will be getting gifts for (you can edit this later)</li>
                     </ul>
                 </div>
             </div>
 
-            <div class="tip-box">
-                <div class="tip-title">📅 Planning Tip</div>
-                <p>Create events well in advance! This gives people time to browse lists, coordinate gifts, and plan their participation. Aim for at least 2-3 weeks notice for birthdays and holidays.</p>
-            </div>
-
             <div class="help-section">
-                <h2 class="section-title">Event Types and Settings</h2>
+                <h2 class="section-title">How Events Work</h2>
                 <div class="help-content">
-                    <p>Different events have different needs:</p>
-                    <ul class="help-list">
-                        <li><strong>Birthday Events:</strong> Focus on one person's wishlist</li>
-                        <li><strong>Holiday Events:</strong> Multiple people might have lists to share</li>
-                        <li><strong>Wedding Events:</strong> Usually feature a couple's registry</li>
-                        <li><strong>Group Events:</strong> Multiple honorees (like office celebrations)</li>
-                    </ul>
+                    <p>Events are designed for <strong>personal gift tracking</strong> - they help you organize and track your gift-giving for special occasions. Once you create an event, you'll see a personalized overview showing:</p>
                     
-                    <p>You can customize each event with:</p>
                     <ul class="help-list">
-                        <li>Privacy settings (public, private, or invite-only)</li>
-                        <li>RSVP requirements</li>
-                        <li>Gift coordination features</li>
-                        <li>Deadline reminders</li>
+                        <li><strong>List of People:</strong> Everyone you want to get gifts for in this event</li>
+                        <li><strong>Their Gifts:</strong> All the items you've marked as "gotten" or "go in on" from their wishlists</li>
+                        <li><strong>Gift Status Tracking:</strong> Progress indicators for each gift you're handling</li>
+                        <li><strong>Personal Notes:</strong> Private notes for each person to help with your planning</li>
+                        <li><strong>Price:</strong> Privately keep track of how much you actually paid for each gift</li>
                     </ul>
+
+                    <img src="${eventDemoImage}" alt="Event demo showing gift tracking interface" class="demo-image" loading="lazy">
+
                 </div>
             </div>
 
             <div class="help-section">
-                <h2 class="section-title">Managing Event Attendees</h2>
+                <h2 class="section-title">Video Demo</h2>
                 <div class="help-content">
-                    <p>Once you've created an event, you can manage who participates:</p>
-                    <ul class="help-list">
-                        <li><strong>Send Invitations:</strong> Invite specific users to the event</li>
-                        <li><strong>Manage RSVPs:</strong> Track who's planning to attend</li>
-                        <li><strong>Share Lists:</strong> Make relevant wishlists visible to attendees</li>
-                        <li><strong>Send Reminders:</strong> Notify people about upcoming deadlines</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="help-section">
-                <h2 class="section-title">Participating in Events</h2>
-                <div class="help-content">
-                    <p>When you're invited to an event:</p>
-                    <ul class="help-list">
-                        <li>You'll receive a notification about the invitation</li>
-                        <li>RSVP to let the organizer know you'll participate</li>
-                        <li>View the honoree's wishlist(s) for gift ideas</li>
-                        <li>Use the gift tracking features to coordinate with others</li>
-                        <li>Mark items as "getting" to avoid duplicate gifts</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="help-section">
-                <h2 class="section-title">Event Timeline and Reminders</h2>
-                <div class="help-content">
-                    <p>Events work best with good timing:</p>
-                    <ul class="help-list">
-                        <li><strong>3-4 weeks before:</strong> Create and send invitations</li>
-                        <li><strong>2 weeks before:</strong> Send reminder to RSVP</li>
-                        <li><strong>1 week before:</strong> Final reminder about gift coordination</li>
-                        <li><strong>Day of event:</strong> Enjoy the celebration!</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="tip-box">
-                <div class="tip-title">🎉 Success Secret</div>
-                <p>The best events combine wishlist sharing with social coordination. Don't just focus on the gifts - use the event to bring people together and celebrate the honoree!</p>
-            </div>
-
-            <div class="help-section">
-                <h2 class="section-title">Recurring Events</h2>
-                <div class="help-content">
-                    <p>For events that happen annually:</p>
-                    <ul class="help-list">
-                        <li>Consider creating template events for birthdays</li>
-                        <li>Copy previous year's events as a starting point</li>
-                        <li>Update dates and refresh invitation lists</li>
-                        <li>Keep historical events for reference</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="help-section">
-                <h2 class="section-title">Event Privacy and Sharing</h2>
-                <div class="help-content">
-                    <p>Choose the right privacy level for your event:</p>
-                    <ul class="help-list">
-                        <li><strong>Public Events:</strong> Open celebrations anyone can join</li>
-                        <li><strong>Private Events:</strong> Close family and friends only</li>
-                        <li><strong>Group Events:</strong> Limited to specific groups or organizations</li>
-                    </ul>
+                    <p>Here is a video where I go over the event functionality:</p>
+                    
+                    <a href="https://www.loom.com/share/28346d4b2dee48db8b6c8549afc515dd?sid=801e4eae-7058-4970-8715-eac01c7e5e43"  class="help-link">(Link to video)</a>
                 </div>
             </div>
         `;

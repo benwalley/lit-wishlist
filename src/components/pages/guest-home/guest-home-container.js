@@ -24,8 +24,14 @@ export class GuestHomeContainer extends observeState(LitElement) {
                 }
                 
                 h1 {
-                    font-size: var(--font-size-xx-large);
+                    font-size: var(--font-size-x-large);
                     margin: 0;
+                }
+                
+                @media (min-width: 600px) {
+                    h1 {
+                        font-size: var(--font-size-xx-large);
+                    }
                 }
                 
                 .left {
@@ -49,7 +55,7 @@ export class GuestHomeContainer extends observeState(LitElement) {
                         display: flex;
                         flex-direction: row;
                         gap: var(--spacing-small);
-                        align-items: center;
+                        align-items: flex-start;
                         
                         h3 {
                             margin: 0;
@@ -63,12 +69,32 @@ export class GuestHomeContainer extends observeState(LitElement) {
                             background: var(--fancy-purple-gradient);
                             width: 40px;
                             height: 40px;
+                            margin-top: 5px;
                             border-radius: var(--border-radius-normal);
                             display: flex;
+                            flex-shrink: 0;
                             align-items: center;
                             justify-content: center;
                             color: var(--light-text-color);
                             font-size: var(--font-size-large);
+                        }
+                    }
+                }
+                
+                .right-side {
+                    font-size: var(--font-size-small);
+                    
+                    h3 {
+                        font-size: var(--font-size-normal);
+                    }
+                }
+                
+                @media (min-width: 600px) {
+                    .right-side {
+                        font-size: var(--font-size-normal);
+
+                        h3 {
+                            font-size: var(--font-size-medium);
                         }
                     }
                 }
@@ -118,7 +144,7 @@ export class GuestHomeContainer extends observeState(LitElement) {
                         <!-- Left Section -->
                         <div class="left">
                             <div class="form-container">
-                                <h1>Free Online Wishlist Maker</h1>
+                                <h1>Online Wishlist Maker</h1>
                                 <p class="details">Create and share wishlists for birthdays, Christmas, weddings, and any special occasion. Join thousands who use our free wishlist maker to coordinate gifts with family and friends.</p>
                                 <ul class="details">
                                     <li>

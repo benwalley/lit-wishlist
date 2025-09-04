@@ -6,13 +6,21 @@ import './how-to-use-content.js';
 export class HowToUsePage extends observeState(LitElement) {
     static get properties() {
         return {
-            loading: { type: Boolean }
+            loading: { type: Boolean },
+            section: { type: String }
         };
     }
 
     constructor() {
         super();
         this.loading = false;
+        this.section = 'getting-started';
+    }
+
+    onBeforeEnter(location) {
+        // Extract section parameter from route
+        this.section = location.params?.section || 'getting-started';
+        return true;
     }
 
     static get styles() {
@@ -69,7 +77,7 @@ export class HowToUsePage extends observeState(LitElement) {
             </div>
             
             <div class="content-container">
-                <how-to-use-content></how-to-use-content>
+                <how-to-use-content .initialSection="${this.section}"></how-to-use-content>
             </div>
         `;
     }

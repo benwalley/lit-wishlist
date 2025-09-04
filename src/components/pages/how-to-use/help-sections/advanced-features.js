@@ -136,12 +136,9 @@ export class AdvancedFeaturesHelp extends LitElement {
                         <li>Choose the action you want to perform</li>
                         <li>Review and confirm your changes</li>
                     </ul>
+                    
+                    <p><a href="https://www.loom.com/share/1fc2f24386c94198802faf4434c479f4?sid=28449e57-3f8a-4d37-ac69-6d35355bcc0e"  class="help-link"><strong>Video Demo</strong> </a></p>
                 </div>
-            </div>
-
-            <div class="tip-box">
-                <div class="tip-title">⚡ Efficiency Tip</div>
-                <p>Before using bulk actions, use the filters to narrow down to the items you want to modify. This makes selection much faster and reduces the risk of accidentally changing the wrong items.</p>
             </div>
 
             <div class="help-section">
@@ -154,7 +151,6 @@ export class AdvancedFeaturesHelp extends LitElement {
                         <li>Amazon wishlists (public lists only)</li>
                         <li>CSV files with item data</li>
                         <li>Other wishlist platforms (varies)</li>
-                        <li>Manual copy-paste from websites</li>
                     </ul>
                     
                     <p><strong>Import process:</strong></p>
@@ -162,15 +158,9 @@ export class AdvancedFeaturesHelp extends LitElement {
                         <li>Go to the Import page</li>
                         <li>Choose your import source</li>
                         <li>Provide the wishlist URL or upload file</li>
-                        <li>Review imported items before saving</li>
-                        <li>Edit any items that didn't import correctly</li>
-                    </ul>
-                    
-                    <p><strong>Exporting your data:</strong></p>
-                    <ul class="help-list">
-                        <li>You can export your lists to CSV format</li>
-                        <li>Useful for backup or moving to other platforms</li>
-                        <li>Includes all item details and metadata</li>
+                        <li>Review imported items and set name, publicity, and priority</li>
+                        <li>Select the list(s) you want to add the items to</li>
+                        <li>Click Import Items</li>
                     </ul>
                 </div>
             </div>
@@ -178,114 +168,20 @@ export class AdvancedFeaturesHelp extends LitElement {
             <div class="help-section">
                 <h2 class="section-title">Subuser Management</h2>
                 <div class="help-content">
-                    <p>If you have access to <a href="/subusers" class="help-link">Subusers</a>, you can manage accounts for family members:</p>
+                    <p>With the <a href="/subusers" class="help-link">Subusers</a> feature, you can manage accounts for family members:</p>
                     
                     <p><strong>What are subusers?</strong></p>
                     <ul class="help-list">
                         <li>Additional accounts under your primary account</li>
                         <li>Perfect for children or family members</li>
-                        <li>You maintain control over privacy settings</li>
-                        <li>Separate wishlists but shared family access</li>
+                        <li>Separate wishlists</li>
+                        <li>You maintain control over child user's groups</li>
+                        <li>Child can have their own login details, but you can also log in directly from parent account</li>
                     </ul>
                     
-                    <p><strong>Managing subusers:</strong></p>
-                    <ul class="help-list">
-                        <li>Create subuser accounts with appropriate permissions</li>
-                        <li>Set privacy defaults for each subuser</li>
-                        <li>Monitor and approve sharing settings</li>
-                        <li>Coordinate gift-giving within the family</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="warning-box">
-                <div class="warning-title">👨‍👩‍👧‍👦 Family Account Note</div>
-                <p>Subuser features may not be available to all accounts. Check with the platform administrators if you need family account management capabilities.</p>
-            </div>
-
-            <div class="help-section">
-                <h2 class="section-title">API and Integration</h2>
-                <div class="help-content">
-                    <p>For power users, there may be API access available:</p>
-                    
-                    <p><strong>Potential integrations:</strong></p>
-                    <ul class="help-list">
-                        <li>Browser extensions for easy item addition</li>
-                        <li>Mobile app synchronization</li>
-                        <li>Third-party service connections</li>
-                        <li>Automated price tracking</li>
-                    </ul>
-                    
-                    <p><strong>Custom solutions:</strong></p>
-                    <ul class="help-list">
-                        <li>If you have specific integration needs, contact support</li>
-                        <li>Bulk data operations may be possible via API</li>
-                        <li>Custom reporting and analytics might be available</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="help-section">
-                <h2 class="section-title">Advanced Sharing and Permissions</h2>
-                <div class="help-content">
-                    <p>Fine-tune who can see and interact with your content:</p>
-                    
-                    <p><strong>Granular permissions:</strong></p>
-                    <ul class="help-list">
-                        <li>Set different privacy levels for different lists</li>
-                        <li>Give some users "edit" access to help maintain lists</li>
-                        <li>Create time-limited access for special events</li>
-                        <li>Restrict certain items to specific user groups</li>
-                    </ul>
-                    
-                    <p><strong>Advanced group management:</strong></p>
-                    <ul class="help-list">
-                        <li>Create nested groups (groups within groups)</li>
-                        <li>Set up automatic group membership rules</li>
-                        <li>Schedule group access changes</li>
-                        <li>Bulk manage group memberships</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="help-section">
-                <h2 class="section-title">Automation and Scheduling</h2>
-                <div class="help-content">
-                    <p>Automate repetitive tasks:</p>
-                    
-                    <p><strong>Recurring events:</strong></p>
-                    <ul class="help-list">
-                        <li>Set up annual birthday events that create automatically</li>
-                        <li>Schedule holiday reminder notifications</li>
-                        <li>Auto-archive old events after they're completed</li>
-                    </ul>
-                    
-                    <p><strong>List maintenance:</strong></p>
-                    <ul class="help-list">
-                        <li>Schedule reminders to review and update lists</li>
-                        <li>Auto-remove items that are no longer available</li>
-                        <li>Set up price change notifications</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="tip-box">
-                <div class="tip-title">🚀 Power User Secret</div>
-                <p>Combine multiple advanced features for maximum efficiency: use bulk actions to update items imported from other platforms, then organize them with advanced group sharing, and set up automation to maintain everything!</p>
-            </div>
-
-            <div class="help-section">
-                <h2 class="section-title">Performance Optimization</h2>
-                <div class="help-content">
-                    <p>As your wishlist collection grows, optimize performance:</p>
-                    
-                    <ul class="help-list">
-                        <li>Archive old lists instead of deleting them</li>
-                        <li>Use specific search terms instead of browsing everything</li>
-                        <li>Organize items with good descriptions for better searchability</li>
-                        <li>Regularly clean up unused groups and inactive events</li>
-                        <li>Use filters effectively in bulk operations</li>
-                    </ul>
+                    <p><a href="https://www.loom.com/share/a01290a6d0d44c798bed1c14a60b7f29?sid=c3ab52fd-6d99-4efc-9c82-b29e51d8be46"  class="help-link">
+                        <strong>Video Details</strong>
+                    </a></p>
                 </div>
             </div>
         `;

@@ -91,6 +91,10 @@ export class GroupViewContainer extends observeState(LitElement) {
                 .groups-list-container {
                     grid-column: 1 / -1;
                 }
+                
+                loading-screen {
+                    height: 100%;
+                }
 
 
             `
@@ -99,7 +103,7 @@ export class GroupViewContainer extends observeState(LitElement) {
 
     render() {
         if (this.loading) {
-            return html`<loading-screen size="medium" version="Loading group data..."></loading-screen>`;
+            return html`<loading-screen size="medium"></loading-screen>`;
         }
 
         return html`

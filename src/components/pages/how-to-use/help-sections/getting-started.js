@@ -97,6 +97,9 @@ export class GettingStartedHelp extends LitElement {
                 <h2 class="section-title">Welcome to Your Wishlist</h2>
                 <div class="help-content">
                     <p>Welcome! This guide will help you get started with creating and managing your wishlists, sharing them with friends and family, and making the most of all available features.</p>
+                    <p>For a quick overview of getting started, you can watch <a  class="help-link" href="https://www.loom.com/share/220cdfb0302f463192d9e34bfb1fd27a?sid=1a58f102-a911-481f-a049-d36d55e5df4e">
+                        <strong>this video.</strong>
+                    </a></p>
                 </div>
             </div>
 
@@ -107,23 +110,7 @@ export class GettingStartedHelp extends LitElement {
                     <ul class="help-list">
                         <li>Your username is how others will find and identify you</li>
                         <li>You can upload a profile picture to personalize your account</li>
-                        <li>Your email is used for notifications and account recovery</li>
                         <li>You can change your password anytime in Settings</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="help-section">
-                <h2 class="section-title">Navigation Basics</h2>
-                <div class="help-content">
-                    <p>The sidebar on the left is your main navigation tool:</p>
-                    <ul class="help-list">
-                        <li><strong>Dashboard:</strong> Your personal overview and quick actions</li>
-                        <li><strong>All Lists:</strong> Browse all lists you have access to</li>
-                        <li><strong>My Lists:</strong> Lists you've created</li>
-                        <li><strong>Groups:</strong> Manage and join user groups</li>
-                        <li><strong>Events:</strong> Create and manage gift-giving events</li>
-                        <li><strong>Users:</strong> Find and connect with other users</li>
                     </ul>
                 </div>
             </div>
@@ -133,28 +120,9 @@ export class GettingStartedHelp extends LitElement {
                 <div class="help-content">
                     <p>Ready to dive in? Follow these steps to get started:</p>
                     <ul class="help-list">
-                        <li>Create your first list by going to <a href="/my-lists" class="help-link">My Lists</a></li>
-                        <li>Add some items to your list with descriptions and links</li>
-                        <li>Set up your privacy preferences for who can see your lists</li>
-                        <li>Invite friends by finding them in <a href="/users" class="help-link">All Users</a></li>
-                        <li>Join or create groups for easier sharing</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="tip-box">
-                <div class="tip-title">💡 Pro Tip</div>
-                <p>Start by creating a "Birthday Wishlist" or "Holiday Wishlist" - these are great first lists that you can share with family and friends throughout the year!</p>
-            </div>
-
-            <div class="help-section">
-                <h2 class="section-title">Need Help?</h2>
-                <div class="help-content">
-                    <p>If you get stuck or have questions:</p>
-                    <ul class="help-list">
-                        <li>Check the other sections in this help guide</li>
-                        <li>Visit <a href="/qa" class="help-link">Questions & Answers</a> to see common questions</li>
-                        <li>Contact support at benwalleyorigami@gmail.com</li>
+                        <li>When you create an account, a default list will be created for you. You can edit the name, description, and image if you'd like.</li>
+                        <li>Join or create a group to share your list with friends or family</li>
+                        <li>Add some items to your list/li>
                     </ul>
                 </div>
             </div>

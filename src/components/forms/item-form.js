@@ -307,11 +307,11 @@ export class ItemForm extends observeState(LitElement) {
     // Public Methods
     async fetchItemFromUrl(url) {
         if (!url) return;
-        
+
         this.fetchUrl = url;
         this.showFetchSection = true;
         await this.updateComplete;
-        
+
         // Automatically trigger the fetch
         await this._handleFetchItem();
     }
@@ -357,7 +357,6 @@ export class ItemForm extends observeState(LitElement) {
         this.fetchUrl = '';
         this.isFetching = false;
         this.showFetchSection = true;
-        this.selectedListIds = [];
     }
 
     async submitForm() {
@@ -386,10 +385,10 @@ export class ItemForm extends observeState(LitElement) {
             lists: this.selectedListIds,
         };
 
-        const endpoint = this.mode === 'edit' && this.itemData?.id 
-            ? `/listItems/${this.itemData.id}` 
+        const endpoint = this.mode === 'edit' && this.itemData?.id
+            ? `/listItems/${this.itemData.id}`
             : '/listItems/create';
-        
+
         const method = this.mode === 'edit' ? 'PUT' : 'POST';
 
         const options = {
@@ -407,14 +406,15 @@ export class ItemForm extends observeState(LitElement) {
             messagesState.addMessage(`Item ${action} successfully!`, 'success');
             triggerUpdateList();
             triggerUpdateItem();
-            
+            this.clearForm();
+
             // Dispatch success event
             this.dispatchEvent(new CustomEvent('item-saved', {
                 detail: { item: response.data, mode: this.mode },
                 bubbles: true,
                 composed: true
             }));
-            
+
             return true;
         }
 

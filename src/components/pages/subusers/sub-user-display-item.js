@@ -127,7 +127,7 @@ class SubUserDisplayItem extends observeState(LitElement) {
                     border: 1px solid var(--border-color);
                     color: var(--blue-darker);
                     text-decoration: none;
-                    padding: 2px 7px;
+                    padding: 0px 7px 0px 2px;
                     display: flex;
                     align-items: center;
                     justify-content: center;

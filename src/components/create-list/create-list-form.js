@@ -277,7 +277,7 @@ export class CreateListForm extends LitElement {
                                 <your-users-list
                                         class="full-width"
                                         apiEndpoint="/users/accessible"
-                                        .selectedUsers="${this.users}"
+                                        .selectedUserIds="${this.users}"
                                         requireCurrentUser
                                         @selection-changed="${this._handleUserSelectionChanged}"
                                 ></your-users-list>

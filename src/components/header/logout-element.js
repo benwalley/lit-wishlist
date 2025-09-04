@@ -5,6 +5,7 @@ import {globalState} from '../../state/globalStore.js';
 import {logout} from '../../helpers/api/users.js';
 import {setJwt, setRefreshToken} from '../../localStorage/tokens.js';
 import {clearAllStorage} from '../../localStorage/helpers.js';
+import {getDarkLightMode, setDarkLightMode} from '../../localStorage/themeStorage.js';
 import {navigate} from '../../router/main-router.js';
 import {messagesState} from '../../state/messagesStore.js';
 import {invalidateCache} from '../../helpers/caching.js';
@@ -74,7 +75,14 @@ export class LogoutElement extends observeState(LitElement) {
     }
 
     _frontendLogout() {
+        // Preserve dark mode setting before clearing storage
+        const currentTheme = getDarkLightMode();
+        
         clearAllStorage();
+        
+        // Restore dark mode setting after clearing storage
+        setDarkLightMode(currentTheme);
+        
         userState.userData = undefined;
         userState.myGroups = [];
         userState.subusers = [];

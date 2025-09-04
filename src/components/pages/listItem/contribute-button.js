@@ -9,8 +9,10 @@ import '../../global/multi-select-dropdown.js'
 import '../../global/qty-input.js'
 import './contributing-list.js'
 import {messagesState} from "../../../state/messagesStore.js";
+import {userState} from "../../../state/userStore.js";
+import {observeState} from "lit-element-state";
 
-export class CustomElement extends LitElement {
+export class CustomElement extends observeState(LitElement) {
     static properties = {
         itemId: { type: String },
         itemData: { type: Object },
@@ -51,6 +53,15 @@ export class CustomElement extends LitElement {
                 .contribute-button {
                     width: 100%;
                     font-size: var(--font-size-large);
+                    position: relative;
+                }
+                
+                .user-indicator-dot {
+                    width: 8px;
+                    height: 8px;
+                    background-color: var(--info-yellow);
+                    border-radius: 50%;
+                    z-index: 1;
                 }
 
                 .modal-header {
@@ -146,6 +157,15 @@ export class CustomElement extends LitElement {
         this.newData = e.detail.data;
     }
 
+    get currentUserIsContributing() {
+        const currentUserId = userState.userData?.id;
+        if (!currentUserId || !this.itemData?.goInOn) return false;
+
+        return this.itemData.goInOn.some(contributor =>
+            contributor.giverId === currentUserId
+        );
+    }
+
     render() {
         return html`
             ${this.compact ? html`
@@ -154,7 +174,8 @@ export class CustomElement extends LitElement {
             </button>` : html`
                 <button class="button shadow contribute-button ghost large fancy" @click="${this._openModal}">
                     <contribute-icon></contribute-icon>
-                    <span>Contribute</span>
+                    <span>Go In On</span>
+                    ${this.currentUserIsContributing ? html`<div class="user-indicator-dot"></div>` : ''}
                 </button>
             `}
             <custom-tooltip>Say that you want to go in on this</custom-tooltip>

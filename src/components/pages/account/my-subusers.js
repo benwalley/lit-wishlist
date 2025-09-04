@@ -5,7 +5,9 @@ import '../subusers/edit-subuser-modal.js';
 
 export class MySubusers extends observeState(LitElement) {
     static get properties() {
-        return {};
+        return {
+            editModal: { type: Object, state: true }
+        };
     }
 
     static get styles() {
@@ -29,10 +31,16 @@ export class MySubusers extends observeState(LitElement) {
 
     constructor() {
         super();
+        this.editModal = null;
     }
 
-    getEditModal() {
-        return this.shadowRoot?.querySelector('edit-subuser-modal') || null;
+    updated(changedProperties) {
+        super.updated(changedProperties);
+        
+        // Set the edit modal reference after the component has rendered
+        if (!this.editModal) {
+            this.editModal = this.shadowRoot?.querySelector('edit-subuser-modal') || null;
+        }
     }
 
     render() {
@@ -41,7 +49,7 @@ export class MySubusers extends observeState(LitElement) {
                 <h2 class="subusers-title">My Subusers</h2>
             </div>
             
-            <sub-users-list .editModal="${this.getEditModal()}"></sub-users-list>
+            <sub-users-list .editModal="${this.editModal}"></sub-users-list>
             
             <edit-subuser-modal></edit-subuser-modal>
         `;

@@ -241,7 +241,7 @@ export class CreateEventModal extends observeState(LitElement) {
                             <div class="user-selector-container">
                                 <your-users-list
                                     class="full-width"
-                                    .selectedUsers=${this.selectedUserIds}
+                                    .selectedUserIds=${this.selectedUserIds}
                                     @selection-changed=${this._handleUsersSelectionChanged}
                                 ></your-users-list>
                             </div>

@@ -243,7 +243,7 @@ export class GoInOnStack extends observeState(LitElement) {
                                         <div class="current-user-dot"></div>
                                     ` : ''}
                                 </a>
-                                <div class="participating-status">Wants to contribute</div>
+                                <div class="participating-status">Wants to go in on</div>
                             </div>
                         </div>
                     `)}

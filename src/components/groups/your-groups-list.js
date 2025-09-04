@@ -3,25 +3,17 @@ import './group-list-item.js';
 import '../../svg/check.js';
 import buttonStyles from '../../css/buttons.js'
 import helperStyles from '../../css/helpers.js'
-import {cachedFetch} from "../../helpers/caching.js";
 import {observeState} from "lit-element-state";
 import {userState} from "../../state/userStore.js";
-import {listenInitialUserLoaded} from "../../events/eventListeners.js";
 
 class GroupListComponent extends observeState(LitElement) {
     static properties = {
-        groups: { type: Array },
-        apiEndpoint: { type: String },
         selectedGroups: { type: Array },
-        loading: { type: Boolean },
     };
 
     constructor() {
         super();
-        this.groups = [];
-        this.apiEndpoint = '/groups/current';
         this.selectedGroups = []; // Using an array for selected groups
-        this.loading = true;
     }
 
     static get styles() {
@@ -148,21 +140,12 @@ class GroupListComponent extends observeState(LitElement) {
     connectedCallback() {
         super.connectedCallback();
 
-        // Only fetch data if user is authenticated
-        if (userState.userData?.id) {
-            this.fetchGroups();
-        } else {
-            this.loading = false; // Stop loading state
-        }
-
         // Bind methods
         this.toggleGroupSelection = this.toggleGroupSelection.bind(this);
         this.selectAll = this.selectAll.bind(this);
         this.clearSelection = this.clearSelection.bind(this);
 
         this.addEventListener('group-selected', this._handleGroupSelected);
-
-        listenInitialUserLoaded(() => this.fetchGroups())
     }
 
     disconnectedCallback() {
@@ -170,27 +153,8 @@ class GroupListComponent extends observeState(LitElement) {
         this.removeEventListener('group-selected', this._handleGroupSelected);
     }
 
-    async fetchGroups() {
-        // Don't fetch if user is not authenticated
-        if (!userState.userData?.id) {
-            this.loading = false;
-            return;
-        }
-
-        try {
-            this.loading = true;
-            const response = await cachedFetch(this.apiEndpoint, {}, true);
-            this.groups = await response;
-
-            // Optionally select all groups by default
-            // this.selectedGroups = this.groups.filter(g => g && g.id).map(g => g.id);
-
-            this._dispatchSelectionChangedEvent();
-        } catch (error) {
-            console.error('Error fetching groups:', error);
-        } finally {
-            this.loading = false;
-        }
+    get groups() {
+        return userState.myGroups || [];
     }
 
     _handleGroupSelected(e) {
@@ -243,12 +207,6 @@ class GroupListComponent extends observeState(LitElement) {
     }
 
     render() {
-        if (this.loading) {
-            return html`
-                <div class="loading">Loading groups...</div>
-            `;
-        }
-
         if (!this.groups || this.groups.length === 0) {
             return html`
                 <div class="empty-state">No groups found</div>
