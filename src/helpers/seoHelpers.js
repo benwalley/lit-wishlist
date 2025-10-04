@@ -169,8 +169,18 @@ export class SEOManager {
             '/bulk-actions': 'Bulk Actions',
             '/subusers': 'Subusers',
             '/money-tracking': 'Money Tracking',
-            '/qa': 'Questions & Answers'
+            '/qa': 'Questions & Answers',
+            '/add-item': 'Add Item',
         };
+
+        // Handle dynamic routes with better fallbacks
+        if (path.startsWith('/user/')) return 'User Profile';
+        if (path.startsWith('/group/')) return 'Group';
+        if (path.startsWith('/list/') && path.includes('/item/')) return 'Item Details';
+        if (path.startsWith('/list/')) return 'List';
+        if (path.startsWith('/item/')) return 'Item Details';
+        if (path.startsWith('/events/')) return 'Event Details';
+        if (path.startsWith('/how-to-use')) return 'How to Use';
 
         return titles[path] || 'Page';
     }

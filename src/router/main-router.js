@@ -28,6 +28,8 @@ import '../components/pages/public/public-item-view.js';
 import '../components/pages/users/all-users-container.js';
 import '../components/pages/add-item/add-item-page.js';
 import '../components/pages/how-to-use/how-to-use-page.js';
+import '../components/pages/admin/admin-page.js';
+import '../components/pages/admin/admin-database-page.js';
 
 // SEO update function for route changes
 const updateSEO = (context) => {
@@ -75,6 +77,30 @@ const requireAuth = (context, commands) => {
 // Public page action (includes SEO updates)
 const publicPageAction = (context) => {
     updateSEO(context);
+    return undefined;
+};
+
+// Super admin guard function
+const requireSuperAdmin = (context, commands) => {
+    // Update SEO for authenticated pages
+    updateSEO(context);
+
+    // If still loading user data, allow navigation (component will handle)
+    if (userState.loadingUser) {
+        return undefined;
+    }
+
+    // If no authenticated user, redirect to login page
+    if (!userState.userData?.id) {
+        return commands.redirect('/');
+    }
+
+    // If not super admin, redirect to account page
+    if (!userState.userData?.isSuperAdmin) {
+        return commands.redirect('/account');
+    }
+
+    // User is super admin, allow access
     return undefined;
 };
 
@@ -209,6 +235,16 @@ const routes = [
         path: '/how-to-use/:section',
         component: 'how-to-use-page',
         action: requireAuth,
+    },
+    {
+        path: '/admin',
+        component: 'admin-page',
+        action: requireSuperAdmin,
+    },
+    {
+        path: '/admin/database',
+        component: 'admin-database-page',
+        action: requireSuperAdmin,
     },
     {
         path: '(.*)',
