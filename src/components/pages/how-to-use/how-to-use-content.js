@@ -9,6 +9,7 @@ import './help-sections/events.js';
 import './help-sections/gift-tracking.js';
 import './help-sections/advanced-features.js';
 import './help-sections/privacy-sharing.js';
+import './help-sections/import-from-old-site.js';
 import '../../../svg/user.js';
 import '../../../svg/thick-list.js';
 import '../../../svg/group.js';
@@ -17,6 +18,7 @@ import '../../../svg/gift.js';
 import '../../../svg/gear.js';
 import '../../../svg/shield.js';
 import '../../../svg/question-mark.js';
+import '../../../svg/download.js';
 
 export class HowToUseContent extends observeState(LitElement) {
     static get properties() {
@@ -73,6 +75,12 @@ export class HowToUseContent extends observeState(LitElement) {
                 title: 'Privacy & Sharing',
                 icon: html`<shield-icon></shield-icon>`,
                 component: 'privacy-sharing-help'
+            },
+            {
+                id: 'import-from-old-site',
+                title: 'Import from Old Site',
+                icon: html`<download-icon></download-icon>`,
+                component: 'import-from-old-site-help'
             },
         ];
     }
@@ -221,6 +229,8 @@ export class HowToUseContent extends observeState(LitElement) {
                 return html`<advanced-features-help></advanced-features-help>`;
             case 'privacy-sharing':
                 return html`<privacy-sharing-help></privacy-sharing-help>`;
+            case 'import-from-old-site':
+                return html`<import-from-old-site-help></import-from-old-site-help>`;
             default:
                 return html`<getting-started-help></getting-started-help>`;
         }
