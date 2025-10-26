@@ -280,6 +280,7 @@ export class ListViewContainer extends observeState(LitElement) {
     _getActionDropdownItems() {
         const { ownerId, public: isPublic } = this.listData;
         const userId = userState?.userData?.id;
+        const parentId = userState?.userData?.parentId;
 
         // Base actions - only include share if list is public
         const baseActions = [];
@@ -293,8 +294,9 @@ export class ListViewContainer extends observeState(LitElement) {
             });
         }
 
-        // If user isn't the owner, add custom item action and return
-        if (ownerId !== userId) {
+        // If user isn't the owner and isn't a subuser of the owner, add custom item action and return
+        const isSubuserOfOwner = parentId && parentId === ownerId;
+        if (ownerId !== userId && !isSubuserOfOwner) {
             baseActions.push({
                 id: 'add-custom',
                 label: 'Add Custom Item',
@@ -302,6 +304,11 @@ export class ListViewContainer extends observeState(LitElement) {
                 classes: 'green-text',
                 action: () => this._handleAddCustomItem()
             });
+            return baseActions;
+        }
+
+        // If user is subuser of owner, return just base actions (no custom item action)
+        if (isSubuserOfOwner) {
             return baseActions;
         }
 
