@@ -35,23 +35,23 @@ import '../components/pages/admin/admin-database-page.js';
 const updateSEO = (context) => {
     const path = context.pathname;
     const params = context.params || {};
-    
+
     // Get SEO data for the current page
     const seoData = seoManager.getPageSEO(path, params);
-    
+
     // Update page SEO
     seoManager.updatePageSEO(seoData);
-    
+
     // Add structured data for homepage
     if (path === '/') {
         seoManager.updateStructuredData(seoManager.getWebApplicationSchema());
     }
-    
+
     // Dispatch navigation event to close any open tooltips/popovers
     window.dispatchEvent(new CustomEvent('routeChanged', {
         detail: { path, params }
     }));
-    
+
     return undefined;
 };
 
@@ -59,17 +59,17 @@ const updateSEO = (context) => {
 const requireAuth = (context, commands) => {
     // Update SEO for authenticated pages
     updateSEO(context);
-    
+
     // If still loading user data, allow navigation (auth-container will handle)
     if (userState.loadingUser) {
         return undefined;
     }
-    
+
     // If no authenticated user, redirect to login page
     if (!userState.userData?.id) {
         return commands.redirect('/');
     }
-    
+
     // User is authenticated, allow access
     return undefined;
 };
@@ -229,12 +229,10 @@ const routes = [
     {
         path: '/how-to-use',
         component: 'how-to-use-page',
-        action: requireAuth,
     },
     {
         path: '/how-to-use/:section',
         component: 'how-to-use-page',
-        action: requireAuth,
     },
     {
         path: '/admin',

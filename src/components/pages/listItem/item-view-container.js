@@ -27,6 +27,7 @@ import './contribute-button.js';
 import '../../global/action-dropdown.js';
 import './shared-with.js';
 import {openEditItemModal} from '../../add-to-list/edit-item-modal.js';
+import '../../add-to-list/add-custom-item-modal.js';
 import {messagesState} from "../../../state/messagesStore.js";
 import {canUserContribute} from "../../../helpers/userHelpers.js";
 import {userState} from "../../../state/userStore.js";
@@ -228,6 +229,18 @@ export class CustomElement extends observeState(LitElement) {
                     margin: 0;
                 }
 
+                .added-by-text {
+                    margin: 0;
+                    font-size: var(--font-size-x-small);
+                    color: var(--info-yellow);
+                    font-weight: 500;
+                    padding: 0 5px;
+                    border: 1px solid;
+                    background: var(--info-yellow-light);
+                    border-radius: 20px;
+                    margin-right: auto;
+                }
+
                 .tile {
                     border-radius: var(--border-radius-normal);
                     border: 1px solid var(--border-color);
@@ -362,9 +375,11 @@ export class CustomElement extends observeState(LitElement) {
                                                     <div class="gift-for-header">
                                                         <div class="gift-for-label">Gift for</div>
                                                     </div>
+                                                    
                                                     <a href="/user/${this.itemData.createdById}">
                                                         ${getUsernameById(this.itemData.createdById)}
                                                     </a>
+                                                    
                                                 </div>
                                                 <div class="privacy-icon">
                                                     ${this.itemData.isPublic ? html`
@@ -382,6 +397,11 @@ export class CustomElement extends observeState(LitElement) {
                                             <calendar-icon></calendar-icon>
                                             <span>Added ${formatDate(this.itemData.createdAt)}</span>
                                         </p>
+                                        ${this.itemData?.isCustom ? html`
+                                            <p class="added-by-text">
+                                                Added by ${getUsernameById(this.itemData?.customItemCreator)}
+                                            </p>
+                                        ` : ''}
                                         <priority-display
                                                 value="${this.itemData?.priority}"
                                                 heartSize="20px"
@@ -405,7 +425,7 @@ export class CustomElement extends observeState(LitElement) {
                                             <notes-display .itemData="${this.itemData}"></notes-display>
                                         </div>
 
-                                        ${canUserContribute(userState.userData, this.itemData) ? html`
+                                        ${canUserContribute(userState.userData, this.itemData, this.itemData?.listOwnerId) ? html`
                                         <div class="action-buttons">
                                             <get-this-button .itemId="${this.itemId}"
                                                              .itemData="${this.itemData}"></get-this-button>
@@ -439,6 +459,7 @@ export class CustomElement extends observeState(LitElement) {
                 <!-- Sidebar wrapped in an <aside> with an accessible name -->
 
             </div>
+            <add-custom-item-modal .listId="${this.listId}"></add-custom-item-modal>
         `;
     }
 }

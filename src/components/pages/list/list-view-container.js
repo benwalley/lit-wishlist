@@ -10,9 +10,11 @@ import '../../../svg/dots.js'
 import '../../../svg/world.js'
 import '../../../svg/lock.js'
 import '../../../svg/share.js'
+import '../../../svg/plus.js'
 import '../../global/action-dropdown.js'
 import '../../global/loading-screen.js'
 import '../../global/custom-modal.js'
+import '../../add-to-list/add-custom-item-modal.js'
 import '../../instructions/info-tooltip.js'
 import '../../instructions/publicity-details.js'
 import './list-shared-with-details.js'
@@ -268,6 +270,13 @@ export class ListViewContainer extends observeState(LitElement) {
         copyUrlToClipboard('/public/list/' + this.listId);
     }
 
+    _handleAddCustomItem() {
+        const modal = this.shadowRoot.querySelector('add-custom-item-modal');
+        if (modal && typeof modal.openModal === 'function') {
+            modal.openModal();
+        }
+    }
+
     _getActionDropdownItems() {
         const { ownerId, public: isPublic } = this.listData;
         const userId = userState?.userData?.id;
@@ -284,8 +293,17 @@ export class ListViewContainer extends observeState(LitElement) {
             });
         }
 
-        // If user isn't the owner, we're done
-        if (ownerId !== userId) return baseActions;
+        // If user isn't the owner, add custom item action and return
+        if (ownerId !== userId) {
+            baseActions.push({
+                id: 'add-custom',
+                label: 'Add Custom Item',
+                icon: html`<plus-icon class="action-icon"></plus-icon>`,
+                classes: 'green-text',
+                action: () => this._handleAddCustomItem()
+            });
+            return baseActions;
+        }
 
         // Extra owner-only actions
         const editActions = [
@@ -460,14 +478,14 @@ export class ListViewContainer extends observeState(LitElement) {
                 </div>
             ` : ''}
             <div class="list-items">
-                ${this.listData.listItems?.length 
+                ${this.listData.listItems?.length
                     ? this._getSortedItems().map(item => html`
-                        <item-tile .itemData="${item}" .listId="${this.listId}" @navigate="${this._navigateToItem}"></item-tile>
+                        <item-tile .itemData="${item}" .listId="${this.listId}" .listOwnerId="${this.listData?.ownerId}" @navigate="${this._navigateToItem}"></item-tile>
                     `)
                     : html`<p>No items in this list yet.</p>`
                 }
             </div>
-            
+            <add-custom-item-modal .listId="${this.listId}"></add-custom-item-modal>
         `;
     }
 }

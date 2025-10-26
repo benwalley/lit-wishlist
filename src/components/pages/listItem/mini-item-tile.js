@@ -13,7 +13,7 @@ import '../../../svg/group.js'
 import {canUserContribute} from "../../../helpers/userHelpers.js";
 import {observeState} from "lit-element-state";
 import {userState} from "../../../state/userStore.js";
-import {maxLength} from "../../../helpers/generalHelpers.js";
+import {maxLength, getUsernameById} from "../../../helpers/generalHelpers.js";
 import {envVars} from "../../../config.js";
 
 export class MiniItemTile extends observeState(LitElement) {
@@ -109,7 +109,20 @@ export class MiniItemTile extends observeState(LitElement) {
                     white-space: nowrap;
                     max-width: 100%;
                 }
-                
+
+                .added-by-text {
+                    margin: 0;
+                    font-size: var(--font-size-x-x-small);
+                    color: var(--info-yellow);
+                    font-weight: 500;
+                    padding: 0 5px;
+                    border: 1px solid;
+                    background: var(--info-yellow-light);
+                    border-radius: 20px;
+                    margin-right: auto;
+                    line-height: 1.1;
+                }
+
                 price-display {
                     margin-top: 4px;
                 }
@@ -213,6 +226,11 @@ export class MiniItemTile extends observeState(LitElement) {
 
                 <div class="right-side-container">
                     <h3 class="item-name">${maxLength(this.itemData?.name, envVars.LIST_ITEM_MAX_LENGTH)}</h3>
+                    ${this.itemData?.isCustom ? html`
+                        <p class="added-by-text">
+                            Added by ${getUsernameById(this.itemData?.customItemCreator)}
+                        </p>
+                    ` : ''}
                     <div class="row">
                         <priority-display
                                 .value="${this.itemData.priority}"
@@ -222,14 +240,14 @@ export class MiniItemTile extends observeState(LitElement) {
                     </div>
                 </div>
                 
-                ${canUserContribute(userState.userData, this.itemData) ? html`
+                ${canUserContribute(userState.userData, this.itemData, this.itemData?.listOwnerId) ? html`
                     <div class="status-indicators">
                         ${this.isGotten() ? html`
                             <div class="status-indicator gotten-indicator">
                                 <cart-icon></cart-icon>
                             </div>
                         ` : ''}
-                        
+
                         ${this.isContributing() ? html`
                             <div class="status-indicator contributing-indicator">
                                 <group-icon></group-icon>

@@ -143,6 +143,11 @@ export class UserDetails extends observeState(LitElement) {
                     width: 100%;
                     padding-top: 0;
                 }
+                
+                .description {
+                    padding: 0 var(--spacing-small);
+                    text-align: center;
+                }
             `
         ];
     }
@@ -244,7 +249,7 @@ export class UserDetails extends observeState(LitElement) {
                 <email-icon></email-icon>
                 <em>${this._getEmail()}</em>
             </div>
-            ${this._getPublicDescription() ? html`<p>${this._getPublicDescription()}</p>` : ''}
+            ${this._getPublicDescription() ? html`<p class="description">${this._getPublicDescription()}</p>` : ''}
             
             ${this._isPublic() ? html`
                 <button class="public-indicator publicity-indicator" @click=${this._handlePublicityClick}>

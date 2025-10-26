@@ -13,6 +13,7 @@ import '../../../svg/edit.js';
 import '../../../svg/delete.js';
 import '../../../svg/group.js';
 import {openEditItemModal} from "../../add-to-list/edit-item-modal.js";
+import {openEditCustomItemModal} from "../../add-to-list/add-custom-item-modal.js";
 import {deleteItem} from "../../../helpers/api/listItems.js";
 import '../../global/contributor-stack/contributor-stack-container.js'
 import {canUserContribute, canUserEditItem} from "../../../helpers/userHelpers.js";
@@ -42,7 +43,11 @@ export class ContributorsTopBar extends observeState(LitElement) {
             messagesState.addMessage('Error editing item. Please reload page and try again.', 'error');
             return;
         }
-        openEditItemModal(this.itemData)
+        if (this.itemData.isCustom) {
+            openEditCustomItemModal(this.itemData);
+        } else {
+            openEditItemModal(this.itemData);
+        }
     }
 
     handleCopyLink() {
@@ -369,13 +374,13 @@ export class ContributorsTopBar extends observeState(LitElement) {
                     <span class="desktop-only">Back To List</span>
                 </a>` : html`<span></span>`}
 
-                ${canUserContribute(userState.userData, this.itemData) ? html`<div class="contributor-details">
+                ${canUserContribute(userState.userData, this.itemData, this.itemData?.listOwnerId) ? html`<div class="contributor-details">
                     ${this.itemData
                             ? html`
                                 <div class="avatar-stack fade-in">
                                     <contributor-stack-container .itemData="${this.itemData}"></contributor-stack-container>
                                 </div>
-                                
+
                             `
                             : html`
                                 <div class="avatar-stack">
@@ -389,7 +394,7 @@ export class ContributorsTopBar extends observeState(LitElement) {
                 `}
                 </div>` : ''}
 
-                ${canUserContribute(userState.userData, this.itemData) ? html`<div class="amount-gotten fade-in ${this.totalNumberGotten === 0 ? 'none-gotten' : ''}">
+                ${canUserContribute(userState.userData, this.itemData, this.itemData?.listOwnerId) ? html`<div class="amount-gotten fade-in ${this.totalNumberGotten === 0 ? 'none-gotten' : ''}">
                     ${this.itemData
                             ? html`
                                 

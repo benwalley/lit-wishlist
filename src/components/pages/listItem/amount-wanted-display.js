@@ -82,7 +82,7 @@ export class CustomElement extends observeState(LitElement) {
 
     _canViewAmountGotten() {
         if(this.publicView) return false;
-        if(canUserContribute(userState.userData, this.itemData)) return true;
+        if(canUserContribute(userState.userData, this.itemData, this.itemData?.listOwnerId)) return true;
     }
 
     render() {

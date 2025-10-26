@@ -1,11 +1,11 @@
 import { userState } from '../state/userStore.js';
 
-export function canUserContribute(user, item) {
+export function canUserContribute(user, item, listOwnerId = null) {
     if(!user || !item) {
         return false;
     }
 
-    // if item is owned by the parent user or a subuser of the parent user, you can't contribute
+    // For regular items: if item is owned by the parent user or a subuser of the parent user, you can't contribute
     const parentId = user.parentId;
     // if you are the creator or your parent is the creator, you can't contribute
     if(item.createdById === parentId || item.createdById === user.id) {
@@ -37,6 +37,9 @@ export function canUserEditList(user, list) {
 
 export function canUserEditItem(user, itemData) {
     if(!user || !itemData) return false;
+    if(itemData?.isCustom && itemData.customItemCreator === user.id) {
+        return true;
+    }
     if (itemData?.createdById && itemData?.createdById === user.id) {
         return true;
     }

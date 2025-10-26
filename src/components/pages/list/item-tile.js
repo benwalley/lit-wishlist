@@ -16,6 +16,7 @@ import '../listItem/price-display.js'
 import './gotten-contributing-badges.js';
 import { navigate} from "../../../router/main-router.js";
 import {openEditItemModal} from '../../add-to-list/edit-item-modal.js';
+import {openEditCustomItemModal} from '../../add-to-list/add-custom-item-modal.js';
 import {showConfirmation} from "../../global/custom-confirm/confirm-helper.js";
 import {deleteItem} from "../../../helpers/api/listItems.js";
 import {messagesState} from "../../../state/messagesStore.js";
@@ -25,7 +26,7 @@ import {canUserContribute, canUserEditItem, isParentUserItem} from "../../../hel
 import {addItemToQueue} from "../../../helpers/viewedItems/index.js";
 import {viewedItemsState} from "../../../state/viewedItemsStore.js";
 import {listenInitialUserLoaded, listenUpdateItem, listenViewedItemsLoaded, listenUpdateViewedItems} from "../../../events/eventListeners.js";
-import {isItemViewed, maxLength} from "../../../helpers/generalHelpers.js";
+import {getUsernameById, isItemViewed, maxLength} from "../../../helpers/generalHelpers.js";
 import {envVars} from "../../../config.js";
 
 
@@ -33,6 +34,7 @@ export class ItemTile extends observeState(LitElement) {
     static properties = {
         itemData: {type: Object},
         listId: {type: String},
+        listOwnerId: {type: String},
         small: {type: Boolean},
         publicView: {type: Boolean},
     };
@@ -145,6 +147,18 @@ export class ItemTile extends observeState(LitElement) {
                         font-size: var(--font-size-small);
                     }
                 }
+
+                .added-by-text {
+                    margin: 0;
+                    font-size: var(--font-size-x-small);
+                    color: var(--info-yellow);
+                    font-weight: 500;
+                    padding: 0 5px;
+                    border: 1px solid;
+                    background: var(--info-yellow-light);
+                    border-radius: 20px;
+                    float: left;
+                }
                 
                 .small .item-name {
                     padding-right: 30px;
@@ -255,7 +269,11 @@ export class ItemTile extends observeState(LitElement) {
         e.stopPropagation();
 
         if (this.itemData) {
-            openEditItemModal(this.itemData);
+            if (this.itemData.isCustom) {
+                openEditCustomItemModal(this.itemData);
+            } else {
+                openEditItemModal(this.itemData);
+            }
         }
     }
 
@@ -306,7 +324,7 @@ export class ItemTile extends observeState(LitElement) {
                     <custom-tooltip>This item is not visible to non logged-in users</custom-tooltip>
                 `}
             </div>
-            ${canUserContribute(userState.userData, this.itemData) ? html`
+            ${canUserContribute(userState.userData, this.itemData, this.listOwnerId) ? html`
                 <gotten-contributing-badges
                     .itemData="${this.itemData}"
                 ></gotten-contributing-badges>
@@ -318,7 +336,17 @@ export class ItemTile extends observeState(LitElement) {
                     height="200"
             ></custom-image>
             <div class="right-side-container">
-                <h3 class="item-name">${maxLength(this.itemData?.name, envVars.LIST_ITEM_MAX_LENGTH)}</h3>
+                ${this.itemData?.isCustom ? html`
+                    <div>
+                        <h3 class="item-name">${maxLength(this.itemData?.name, envVars.LIST_ITEM_MAX_LENGTH)}</h3>
+                        <p class="added-by-text">
+                            Added by ${getUsernameById(this.itemData?.customItemCreator)}
+                        </p>
+                    </div>
+                ` : html`
+                    <h3 class="item-name">${maxLength(this.itemData?.name, envVars.LIST_ITEM_MAX_LENGTH)}</h3>
+                `}
+       
                 <div class="middle-row">
                     ${!this.small ? html`<div>
                         <price-display .itemData="${this.itemData}"></price-display>
@@ -352,7 +380,7 @@ export class ItemTile extends observeState(LitElement) {
                                 <edit-icon></edit-icon>
                             </button>
                         ` : ''}
-                ${canUserContribute(userState.userData, this.itemData) ? html`
+                ${canUserContribute(userState.userData, this.itemData, this.listOwnerId) ? html`
                             <get-this-button .itemId="${this.itemData?.id}" .itemData="${this.itemData}" compact></get-this-button>
                             <contribute-button .itemId="${this.itemData?.id}" .itemData="${this.itemData}" compact></contribute-button>
                         ` : ''}
