@@ -24,6 +24,7 @@ import '../../svg/user-list.js'
 import '../../svg/thick-list.js'
 import '../../svg/dashboard.js'
 import '../../svg/dollar.js'
+import '../../svg/admin.js'
 import {isCurrentUserSubuser} from "../../helpers/generalHelpers.js";
 import '../settings/settings-modal.js';
 
@@ -377,6 +378,20 @@ export class CustomElement extends observeState(LitElement) {
                             <span>How to Use</span>
                         </a></li>
                     </ul>
+
+                    ${userState.userData?.isSuperAdmin ? html`
+                        <h2 class="menu-section-heading">Admin</h2>
+                        <ul class="menu-section-list">
+                            <li><a href="/admin" class="menu-item-link ${this._isActive('/admin') ? 'active' : ''}" @click="${this._handleLinkClick}">
+                                <admin-icon class="icon"></admin-icon>
+                                <span>Admin Dashboard</span>
+                            </a></li>
+                            <li><a href="/admin/database" class="menu-item-link ${this._isActive('/admin/database') ? 'active' : ''}" @click="${this._handleLinkClick}">
+                                <admin-icon class="icon"></admin-icon>
+                                <span>Database</span>
+                            </a></li>
+                        </ul>
+                    ` : ''}
 
                     <div class="settings-section-container">
                         <ul>
