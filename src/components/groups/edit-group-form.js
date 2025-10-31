@@ -153,7 +153,7 @@ export class EditGroupForm extends LitElement {
                         showAi
                         allowNavigation
                         @image-changed="${this._onImageChanged}">
-                    <span>Click the camera or AI button to change your group picture</span>
+                    <span>Click the camera button to change your group picture</span>
                 </image-selector-with-nav>
 
                 <custom-input

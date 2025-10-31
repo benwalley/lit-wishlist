@@ -178,7 +178,7 @@ export class CustomElement extends observeState(LitElement) {
                                 showAi
                                 allowNavigation
                                 @image-changed="${this._onImageChanged}">
-                            <span style="text-align: center;">Click the camera or AI button to change your profile picture</span>
+                            <span style="text-align: center;">Click the camera button to change your profile picture</span>
                         </image-selector-with-nav>
 
                         <!-- Listen for value-changed events to update properties -->

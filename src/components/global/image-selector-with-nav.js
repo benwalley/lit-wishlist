@@ -180,7 +180,7 @@ export class ImageSelectorWithNav extends LitElement {
         if (!this.imageId || this.imageId === 0) {
             return '';
         }
-        
+
         return `${envVars.API_URL}/images/get/${this.imageId}`;
     }
 
@@ -429,7 +429,7 @@ export class ImageSelectorWithNav extends LitElement {
                                     imageId="${this.imageId}"
                                     @image-updated="${this._onImageChanged}"></image-changer>
                             ${this.showAi ? html`
-                                <button class="ai-generate-button primary shadow fancy" @click="${this._toggleAiInput}">
+                                <button class="ai-generate-button primary shadow fancy" style="display: none;" @click="${this._toggleAiInput}">
                                     <ai-icon></ai-icon>
                                 </button>
                             ` : ''}

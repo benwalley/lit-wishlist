@@ -161,7 +161,7 @@ export class CreateGroupForm extends LitElement {
                                 showAi
                                 allowNavigation
                                 @image-changed="${this._onImageChanged}">
-                            <span style="font-size: var(--font-size-small);">Click the camera or AI button to add a group image</span>
+                            <span style="font-size: var(--font-size-small);">Click the camera button to add a group image</span>
                         </image-selector-with-nav>
                     </div>
                     

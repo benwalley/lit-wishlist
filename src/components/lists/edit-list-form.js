@@ -271,7 +271,7 @@ export class EditListForm extends observeState(LitElement) {
                                 showAi
                                 allowNavigation
                                 @image-changed="${this._onImageChanged}">
-                            <span style="font-size: var(--font-size-small); color: var(--text-color-medium-dark);">Click the camera or AI button to change list image</span>
+                            <span style="font-size: var(--font-size-small); color: var(--text-color-medium-dark);">Click the camera button to change list image</span>
                         </image-selector-with-nav>
                         ${userState?.userData?.image ? html`
                             <button 
