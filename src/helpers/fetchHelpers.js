@@ -82,6 +82,16 @@ async function fetchWithRetry(url, options, useAuth) {
  */
 async function parseResponse(response) {
     let responseData;
+
+    // Handle network errors that were caught in fetchWithRetry
+    if (response.error) {
+        return {
+            success: false,
+            error: response.error,
+            message: response.message || 'Network error occurred'
+        };
+    }
+
     // If the response is not ok (i.e., status code is not 2xx)
     if (!(response.ok || response.success)) {
         const error = new Error(`Request failed with status ${response.status} (${response.statusText})`);
