@@ -25,9 +25,18 @@ export class EditItemModal extends LitElement {
         }
     }
 
-    _handleOpenEvent(event) {
+    async _handleOpenEvent(event) {
         if (event.detail && event.detail.itemData) {
             this.itemData = event.detail.itemData;
+
+            // Wait for the component to render
+            await this.updateComplete;
+
+            // Manually populate the form data
+            const form = this.shadowRoot.querySelector('edit-item-form');
+            if (form) {
+                form.populateFormData();
+            }
 
             // Open the modal
             const modal = this.shadowRoot.querySelector('custom-modal');

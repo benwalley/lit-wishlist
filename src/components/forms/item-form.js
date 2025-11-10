@@ -18,7 +18,7 @@ import '../../svg/gear.js';
 import '../global/process-loading-ring.js';
 import {customFetch} from "../../helpers/fetchHelpers.js";
 import {asyncItemFetch} from "../../helpers/api/asyncItemFetch.js";
-import {triggerUpdateItem, triggerUpdateList} from "../../events/eventListeners.js";
+import {triggerUpdateItem, triggerUpdateList, listenInitialUserLoaded} from "../../events/eventListeners.js";
 import {messagesState} from "../../state/messagesStore.js";
 
 export class ItemForm extends observeState(LitElement) {
@@ -301,7 +301,23 @@ export class ItemForm extends observeState(LitElement) {
 
     connectedCallback() {
         super.connectedCallback();
-        this._setDefaultListSelection();
+
+        // Only set default selection if user data is already loaded
+        if (userState.myLists && userState.myLists.length > 0) {
+            this._setDefaultListSelection();
+        }
+
+        // Listen for when user data is loaded
+        this.removeUserLoadedListener = listenInitialUserLoaded(() => {
+            this._setDefaultListSelection();
+        });
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        if (this.removeUserLoadedListener) {
+            this.removeUserLoadedListener();
+        }
     }
 
     // Public Methods

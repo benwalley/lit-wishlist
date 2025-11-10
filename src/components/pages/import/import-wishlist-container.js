@@ -478,7 +478,7 @@ class ImportWishlistContainer extends observeState(LitElement) {
                                 type="file"
                                 id="csv-file"
                                 class="file-input"
-                                accept=".csv"
+                                accept=".csv,text/csv,application/csv"
                                 @change=${this._handleFileChange}
                             >
                             <button

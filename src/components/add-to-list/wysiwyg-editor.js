@@ -11,9 +11,9 @@ export class WysiwygEditor extends LitElement {
 
         /* Outer wrapper gives us the rounded border visible in the mock-up */
         .wrapper {
-            border: 1px solid var(--wysiwyg-border, #E0E3E6);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            background: var(--wysiwyg-bg, #ffffff);
+            background: var(--background-light);
             overflow: hidden; /* keep toolbar radius */
             width: 100%;
             box-sizing: border-box;
@@ -25,8 +25,8 @@ export class WysiwygEditor extends LitElement {
             gap: 16px;
             align-items: center;
             padding: 8px 12px;
-            background: var(--wysiwyg-toolbar-bg, #F7F8FA);
-            border-bottom: 1px solid var(--wysiwyg-border, #E0E3E6);
+            background: var(background-light);
+            border-bottom: 1px solid var(--border-color);
             user-select: none;
         }
 
@@ -36,7 +36,6 @@ export class WysiwygEditor extends LitElement {
             font-size: 16px;
             line-height: 1;
             font-weight: 400;
-            color: var(--wysiwyg-icon, #111827);
         }
 
         button.active {
@@ -76,7 +75,7 @@ export class WysiwygEditor extends LitElement {
         const editor = this.#editor;
         if (this.content) editor.innerHTML = this.content;
     }
-    
+
     updated(changedProperties) {
         // Update editor content when content property changes
         if (changedProperties.has('content') && this.#editor) {

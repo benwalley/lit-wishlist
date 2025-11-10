@@ -10,3 +10,6 @@
  - make a way to delete unused images.
  - allow to add custom items to other people's lists
  - ensure email account create is actual email.
+ - when you add an item and then edit it, the amount you want says "range"
+ - when there is no amount wanted, the link covers the go in on button on PLP
+ - select list automatically if there is only one.

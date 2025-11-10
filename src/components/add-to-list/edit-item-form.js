@@ -68,12 +68,6 @@ export class EditItemForm extends LitElement {
         this.selectedListIds = [];
     }
 
-    updated(changedProperties) {
-        if (changedProperties.has('itemData') && this.itemData) {
-            this.populateFormData();
-        }
-    }
-
     populateFormData() {
         if (!this.itemData) return;
 
@@ -114,8 +108,8 @@ export class EditItemForm extends LitElement {
         this.imageIds = this.itemData.imageIds || [];
 
         // Set amount data
-        if (this.itemData.minAmountWanted && this.itemData.maxAmountWanted) {
-            this.amount = 'range';
+        if (parseFloat(this.itemData.minAmountWanted) && parseFloat(this.itemData.maxAmountWanted)) {
+            this.amount = '';
             this.minAmount = this.itemData.minAmountWanted;
             this.maxAmount = this.itemData.maxAmountWanted;
         } else if (this.itemData.amountWanted) {
@@ -129,7 +123,7 @@ export class EditItemForm extends LitElement {
         }
 
         // Set other properties
-        this.priority = this.itemData.priority || 1;
+        this.priority = parseFloat(this.itemData.priority) || 1;
         this.isPublic = this.itemData.isPublic || false;
         this.matchListVisibility = this.itemData.matchListVisibility !== false;
         this.visibleToUsers = this.itemData.visibleToUsers || [];
