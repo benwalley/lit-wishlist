@@ -2,16 +2,19 @@ import {LitElement, html, css} from 'lit';
 import buttonStyles from "../../../../css/buttons";
 import formStyles from "../../../../css/forms";
 import '../../../global/custom-input.js'
+import '../../../global/custom-textarea.js'
 import '../../../users/your-users-list.js'
 import '../../../groups/your-groups-list.js'
 import '../../../../svg/message.js';
-import '../../../../svg/check.js';
 import {messagesState} from "../../../../state/messagesStore.js";
 import '../../../global/due-date-picker.js';
+import '../../../global/custom-toggle.js';
 import { observeState } from 'lit-element-state';
 import { userState } from "../../../../state/userStore.js";
 import {createQA, updateQuestion} from "./qa-helpers.js";
 import {triggerUpdateNotifications, triggerUpdateQa} from "../../../../events/eventListeners.js";
+import {getUsernameById, getUserImageIdByUserId} from "../../../../helpers/generalHelpers.js";
+import {getGroupNameById, getGroupImageIdByGroupId} from "../../../../helpers/userHelpers.js";
 
 
 export class CustomElement extends observeState(LitElement) {
@@ -27,6 +30,7 @@ export class CustomElement extends observeState(LitElement) {
         askedById: {type: Number},
         preSelectedUsers: {type: Array},
         showOnlyAnswerMode: {type: Boolean},
+        onlyCreatorCanSeeResponses: {type: Boolean},
     };
 
     constructor() {
@@ -42,6 +46,7 @@ export class CustomElement extends observeState(LitElement) {
         this.askedById = null;
         this.preSelectedUsers = [];
         this.showOnlyAnswerMode = false;
+        this.onlyCreatorCanSeeResponses = false;
     }
 
     static get styles() {
@@ -99,43 +104,7 @@ export class CustomElement extends observeState(LitElement) {
                     font-size: var(--font-size-normal);
                     padding-bottom: var(--spacing-x-small);
                 }
-                
-                .checkbox-group {
-                    display: flex;
-                    align-items: center;
-                    gap: var(--spacing-small);
-                    cursor: pointer;
-                }
-                
-                .checkbox {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    min-width: 16px;
-                    height: 16px;
-                    border-radius: 4px;
-                    border: 2px solid var(--grayscale-300);
-                    transition: var(--transition-normal);
-                }
 
-                .checkbox.selected {
-                    border-color: var(--blue-normal);
-                    background-color: var(--blue-normal);
-                    color: white;
-                }
-
-                check-icon {
-                    width: 16px;
-                    height: 16px;
-                    color: white;
-                }
-                
-                .anonymous-label {
-                    font-weight: bold;
-                    font-size: var(--font-size-normal);
-                    cursor: pointer;
-                }
-                
                 .sharing-container {
                     display: grid;
                     grid-template-columns: 1fr;
@@ -147,6 +116,80 @@ export class CustomElement extends observeState(LitElement) {
                         display: grid;
                         grid-template-columns: 1fr 1fr;
                     }
+                }
+
+                .privacy-notice {
+                    line-height: 1.4;
+                    padding: var(--spacing-normal) 0;
+                }
+                
+                .simple-notice {
+                    background: var(--info-yellow-light);
+                    padding: var(--spacing-small);
+                    border-radius: var(--border-radius-normal);
+                    border: 1px solid var(--info-yellow);
+                    margin-top: var(--spacing-small);
+                }
+                
+                .edit-notice {
+                    background: var(--info-yellow-light);
+                    padding: var(--spacing-small);
+                    border-radius: var(--border-radius-normal);
+                    border: 1px solid var(--info-yellow);
+                    margin-top: var(--spacing-small);
+                }
+
+                .privacy-section {
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-x-small);
+                }
+
+                .chips-container {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: var(--spacing-x-small);
+                    margin-top: var(--spacing-x-small);
+                }
+
+                .chip {
+                    display: flex;
+                    align-items: center;
+                    gap: var(--spacing-x-small);
+                    padding: 2px 10px 2px 2px;
+                    border-radius: 20px;
+                    font-size: var(--font-size-small);
+                    border: 1px solid var(--border-color);
+                    background: var(--background-light);
+                    color: var(--text-color-dark);
+                }
+
+                .group-chip {
+                    border-color: var(--purple-normal);
+                    background: var(--purple-light);
+                    color: var(--purple-darker);
+                }
+
+                .user-chip {
+                    border-color: var(--blue-normal);
+                    background: var(--blue-light);
+                    color: var(--blue-darker);
+                }
+
+                .chip-link {
+                    text-decoration: none;
+                    color: inherit;
+                    font-weight: 500;
+                }
+
+                .chip-link:hover {
+                    text-decoration: underline;
+                }
+
+                .shared-with-label {
+                    font-size: var(--font-size-small);
+                    font-weight: 600;
+                    color: var(--text-color-dark);
                 }
             `
         ];
@@ -188,6 +231,7 @@ export class CustomElement extends observeState(LitElement) {
         this.questionId = data.questionId || null;
         this.askedById = data.askedById || null;
         this.showOnlyAnswerMode = data.showOnlyAnswerMode || false;
+        this.onlyCreatorCanSeeResponses = data.onlyCreatorCanSeeResponses !== undefined ? data.onlyCreatorCanSeeResponses : false;
     }
 
 
@@ -197,6 +241,10 @@ export class CustomElement extends observeState(LitElement) {
 
     _handleAnonymousToggle() {
         this.isAnonymous = !this.isAnonymous;
+    }
+
+    _handlePrivacyToggle(event) {
+        this.onlyCreatorCanSeeResponses = event.detail.checked;
     }
 
     _validateInput() {
@@ -222,6 +270,7 @@ export class CustomElement extends observeState(LitElement) {
             isAnonymous: this.isAnonymous,
             isEditMode: this.isEditMode,
             questionId: this.questionId,
+            onlyCreatorCanSeeResponses: this.onlyCreatorCanSeeResponses,
         };
         let response
         if (questionData.isEditMode) {
@@ -249,6 +298,7 @@ export class CustomElement extends observeState(LitElement) {
         this.isEditMode = false;
         this.questionId = null;
         this.askedById = null;
+        this.onlyCreatorCanSeeResponses = false;
     }
 
     _handleCancel() {
@@ -282,6 +332,40 @@ export class CustomElement extends observeState(LitElement) {
         }
     }
 
+    _renderUserChips() {
+        if (!this.sharedWithUserIds || this.sharedWithUserIds.length === 0) {
+            return '';
+        }
+        return this.sharedWithUserIds.map(userId => html`
+            <div class="chip user-chip">
+                <custom-avatar
+                    username="${getUsernameById(userId)}"
+                    imageId="${getUserImageIdByUserId(userId)}"
+                    size="20"
+                    round
+                ></custom-avatar>
+                <a class="chip-link" href="/user/${userId}">${getUsernameById(userId) || "a user who's not in your groups"}</a>
+            </div>
+        `);
+    }
+
+    _renderGroupChips() {
+        if (!this.sharedWithGroupIds || this.sharedWithGroupIds.length === 0) {
+            return '';
+        }
+        return this.sharedWithGroupIds.map(groupId => html`
+            <div class="chip group-chip">
+                <custom-avatar
+                    username="${getGroupNameById(groupId)}"
+                    imageId="${getGroupImageIdByGroupId(groupId)}"
+                    size="20"
+                    round
+                ></custom-avatar>
+                <a class="chip-link" href="/group/${groupId}">${getGroupNameById(groupId) || "A group you're not a member of"}</a>
+            </div>
+        `);
+    }
+
     render() {
         return html`
             <h2 class="modal-header">
@@ -303,14 +387,50 @@ export class CustomElement extends observeState(LitElement) {
                      `}
                 </div>
 
+                ${this.showFullEditMode() ? html`
+                <div class="privacy-section">
+                    <custom-toggle
+                            style="font-weight: bold;"
+                        .checked=${this.onlyCreatorCanSeeResponses}
+                        @change="${this._handlePrivacyToggle}"
+                        label="Make responses only visible to you"
+                    ></custom-toggle>
+                    ${this.onlyCreatorCanSeeResponses ? html`
+                        <div class="privacy-notice edit-notice">
+                            You can see all responses. Others will only see their own response.
+                        </div>
+                    ` : html`
+                        <div class="privacy-notice edit-notice">
+                            Everyone who this question is shared with, can see all responses to this question.
+                        </div>
+                    `}
+                </div>` : ''}
+
+                ${!this.isQuestionCreator() ? html`
+                <div class="privacy-section">
+                    ${this.onlyCreatorCanSeeResponses ? html`
+                        <div class="privacy-notice simple-notice">
+                            Only ${getUsernameById(this.askedById)} can see your answer.
+                        </div>
+                    ` : html`
+                        <div class="privacy-notice">
+                            <div class="shared-with-label">Answers visible to:</div>
+                            <div class="chips-container">
+                                ${this._renderUserChips()}
+                                ${this._renderGroupChips()}
+                            </div>
+                        </div>
+                    `}
+                </div>` : ''}
+
                 <div class="form-group">
                     <label class="section-label" style="margin: 0;">Your answer:</label>
-                    <custom-input
+                    <custom-textarea
                             .value=${this.answerText || ''}
                             @value-changed="${(e) => this.answerText = e.detail.value}"
-                            @keydown="${this._handleKeyDown}"
                             placeholder="Type your answer here..."
-                    ></custom-input>
+                            rows="4"
+                    ></custom-textarea>
                 </div>
 
                 ${this.showFullEditMode() ? html`
@@ -346,7 +466,7 @@ export class CustomElement extends observeState(LitElement) {
                         </div>
                     </div>
                 </div>` : ''}
-              
+
 
             </div>
            

@@ -62,7 +62,7 @@ export class CustomToggle extends LitElement {
     .label {
       margin-left: 8px;
       font-size: 14px;
-      color: #374151;
+      color: var(--text-color-dark);
     }
 
     .label.disabled {

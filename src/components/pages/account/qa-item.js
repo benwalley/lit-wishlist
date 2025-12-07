@@ -4,6 +4,7 @@ import '../../../svg/edit.js';
 import '../../../svg/delete.js';
 import '../../../svg/check.js';
 import '../../../svg/stopwatch.js';
+import '../../../svg/message.js';
 import '../../global/custom-input.js';
 import {messagesState} from "../../../state/messagesStore.js";
 import '../../loading/skeleton-loader.js';
@@ -11,7 +12,7 @@ import { observeState } from 'lit-element-state';
 import { userState } from "../../../state/userStore.js";
 import '../../pages/account/avatar.js'
 import {getUserImageIdByUserId, getUsernameById} from "../../../helpers/generalHelpers.js";
-import {triggerAddQuestionEvent} from "../../../events/custom-events.js";
+import {triggerAddQuestionEvent, triggerViewAnswersEvent} from "../../../events/custom-events.js";
 import {handleDeleteQuestion} from "./qa/qa-helpers.js";
 
 export class QAItem extends observeState(LitElement) {
@@ -47,13 +48,10 @@ export class QAItem extends observeState(LitElement) {
                     text-decoration: none;
                     margin: 0;
                     padding: var(--spacing-small);
-                    border-bottom: 1px solid var(--border-color);
+                    border: 1px solid var(--border-color);
+                    border-radius: var(--border-radius-normal);
                     height: auto;
-                    cursor: pointer;
-                    
-                    &:hover {
-                        background: var(--purple-light);
-                    }
+                    //background: var(--background-medium);
                 }
 
                 .item-container.editing {
@@ -61,28 +59,27 @@ export class QAItem extends observeState(LitElement) {
                     box-shadow: var(--shadow-1-soft);
                 }
 
-                .item-container.empty-answer {
-                    border-left: 4px solid var(--info-yellow);
-                }
-
-                .empty-answer .missing-info {
-                    display: inline-block;
-                    color: var(--info-yellow);
-                    font-size: var(--font-size-small);
-                    margin-top: var(--spacing-tiny);
-                    font-style: italic;
-                }
-
                 .actions {
                     position: absolute;
-                    right: var(--spacing-x-small);
-                    top: var(--spacing-x-small);
+                    right: var(--spacing-small);
+                    top: var(--spacing-small);
                     opacity: 1;
                     transform: translateX(0);
-                    pointer-events: auto;
                     display: flex;
-                    gap: var(--spacing-tiny);
-                    padding: var(--spacing-tiny);
+                }
+
+                .answer-count {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: var(--spacing-x-small);
+                    font-size: var(--font-size-x-small);
+                    color: var(--text-color-medium-dark);
+                    line-height: 1;
+                }
+
+                .answer-count message-icon {
+                    width: 16px;
+                    height: 16px;
                 }
 
                 .question {
@@ -90,16 +87,17 @@ export class QAItem extends observeState(LitElement) {
                     text-align: left;
                     color: var(--text-color-dark);
                     font-weight: bold;
-                }
-                
-                .question.display-only {
-                    padding-bottom: var(--spacing-normal);
+                    font-size: var(--font-size-normal);
+                    cursor: pointer;
+                    transition: var(--transition-normal);
                 }
 
                 .answer {
                     text-align: left;
-                    color: var(--medium-text-color);
+                    color: var(--blue-darker);
                     margin: 0;
+                    font-size: var(--font-size-x-small);
+                    line-height: 1.3;
                 }
                 
                 .edit-actions {
@@ -123,20 +121,29 @@ export class QAItem extends observeState(LitElement) {
                     display: flex;
                     flex-direction: row;
                     justify-content: space-between;
-                }
-                
-                .answer-container.editable {
-                    cursor: pointer;
+                    background: var(--blue-light);
+                    border: 1px solid var(--blue-normal);
+                    border-radius: var(--border-radius-normal);
+                    padding: var(--spacing-small);
+                    line-height: 1;
+                    box-sizing: border-box;
                 }
                 
                 .qa-item-asker {
                     font-size: var(--font-size-x-small);
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    gap: var(--spacing-x-small);
+                    padding-top: var(--spacing-x-small);
                 }
                 
                 .due-soon-indicator {
                     color: var(--green-normal);
                     font-size: var(--font-size-medium);
                     cursor: help;
+                    display: flex;
+                    padding-left: var(--spacing-small);
                     
                     &.due-week {
                         color: var(--delete-red);
@@ -151,8 +158,28 @@ export class QAItem extends observeState(LitElement) {
                     display: flex;
                     flex-direction: row;
                     justify-content: flex-start;
+                    gap: 0 var(--spacing-small);
+                    flex-wrap: wrap;
+                    width: 100%;
+                    padding-bottom: var(--spacing-small);
+                    padding-right: 40px;
+                }
+
+                .top-row.no-answer {
+                    border-bottom: 1px solid var(--border-color);
+                }
+
+                .bottom-row {
+                    width: 100%;
+                    padding-top: var(--spacing-small);
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: wrap;
                     gap: var(--spacing-small);
-                    padding-right: 70px;
+                }
+                
+                .edit-button {
+                    font-weight: bold;
                 }
             `
         ];
@@ -192,11 +219,36 @@ export class QAItem extends observeState(LitElement) {
         return userState.userData && this.item.askedById === userState.userData.id;
     }
 
+    // Get the current user's answer from the answers array
+    _getCurrentUserAnswer() {
+        if (!this.item.answers || !userState.userData?.id) {
+            return null;
+        }
+        return this.item.answers.find(
+            answer => parseInt(answer.answererId) === parseInt(userState.userData.id)
+        );
+    }
+
+    // Get the label for the edit/answer button
+    _getEditButtonLabel(hasUserAnswered) {
+        const isCreator = this._isQuestionCreator();
+
+        if (isCreator && hasUserAnswered) {
+            return 'Edit question or answer';
+        } else if (isCreator && !hasUserAnswered) {
+            return 'Answer or edit question';
+        } else if (!isCreator && hasUserAnswered) {
+            return 'Edit answer';
+        } else {
+            return 'Answer';
+        }
+    }
+
     // Open the edit popup for this question
     _openEditPopup() {
         const editData = {
             questionText: this.item.questionText,
-            answerText: this.item.answers?.[0]?.answerText || '',
+            answerText: this._getCurrentUserAnswer()?.answerText || '',
             dueDate: this.item.dueDate,
             sharedWithUserIds: this.item.sharedWithUserIds || this.item.sharedWithUsers?.map(user => user.id) || [],
             sharedWithGroupIds: this.item.sharedWithGroupIds || this.item.sharedWithGroups?.map(group => group.id) || [],
@@ -204,6 +256,7 @@ export class QAItem extends observeState(LitElement) {
             questionId: this.item.id,
             askedById: this.item.askedById,
             isEditMode: true,
+            onlyCreatorCanSeeResponses: this.item.onlyCreatorCanSeeResponses,
         };
 
         triggerAddQuestionEvent(editData);
@@ -213,6 +266,26 @@ export class QAItem extends observeState(LitElement) {
     // Toggle edit mode
     _toggleEdit() {
         this.enterEditMode();
+    }
+
+    // Handle viewing all answers
+    _handleViewAllAnswers(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const questionData = {
+            id: this.item.id,
+            questionText: this.item.questionText,
+            answers: this.item.answers || [],
+            askedById: this.item.askedById,
+            onlyCreatorCanSeeResponses: this.item.onlyCreatorCanSeeResponses,
+            sharedWithUserIds: this.item.sharedWithUserIds || [],
+            sharedWithGroupIds: this.item.sharedWithGroupIds || [],
+            dueDate: this.item.dueDate,
+            isAnonymous: this.item.isAnonymous,
+        };
+
+        triggerViewAnswersEvent(questionData);
     }
 
     // Save edits
@@ -303,53 +376,66 @@ export class QAItem extends observeState(LitElement) {
     }
 
     _renderViewMode() {
-        const hasEmptyAnswer = this.item.answers?.length === 0 || !this.item.answers[0]?.answerText?.trim();
+        const currentUserAnswer = this._getCurrentUserAnswer();
+        const hasEmptyAnswer = !currentUserAnswer || !currentUserAnswer.answerText?.trim();
         const dueStatus = this._getDueStatus();
+        const totalAnswers = this.item.answers?.length || 0;
+        const hasUserAnswered = !hasEmptyAnswer;
 
         return html`
-            <div class="top-row">
-                <h3 class="question" style="cursor: pointer;">${this.item.questionText}</h3>
-                ${dueStatus ? html`<div class="due-soon-indicator tooltip ${dueStatus}">
-                    <stopwatch-icon></stopwatch-icon>
-                    <custom-tooltip>${this._formatDueDate()}</custom-tooltip>
-                </div>` : ''}
-            </div>
-            
-            <div class="answer-container editable">
-                ${hasEmptyAnswer
-                        ? html`<span class="missing-info">click to answer</span>`
-                        : html`<p class="answer">${this.item.answers[0]?.answerText}</p>`
-                }
-               <div class="qa-item-asker">
-                    ${userState.userData?.id !== this.item.askedById ? html`
-                        <span>Asked by</span>
-                        <custom-avatar
+            <div class="top-row ${hasEmptyAnswer ? 'no-answer' : ''}">
+                <h3 class="question" @click="${this._openEditPopup}">${this.item.questionText}</h3>
+                <div class="qa-item-asker">
+                    <span>${getUsernameById(this.item.askedById)}</span>
+
+                    <custom-avatar
                                 .username="${getUsernameById(this.item.askedById)}"
                                 imageId="${getUserImageIdByUserId(this.item.askedById)}"
                                 size="16"
                                 shadow
                         >
                         </custom-avatar>
-                        <span>${getUsernameById(this.item.askedById)}</span>
-                    `: html`<span class="you">You asked this</span>`}
+                    ${dueStatus ? html`<div class="due-soon-indicator tooltip ${dueStatus}">
+                    <stopwatch-icon></stopwatch-icon>
+                    <custom-tooltip>${this._formatDueDate()}</custom-tooltip>
+                </div>` : ''}
                 </div>
             </div>
-            <div class="actions">
+            
+            ${hasEmptyAnswer ? '' : html`<div class="answer-container editable">
+               <p class="answer"><strong>Your Answer: </strong>${currentUserAnswer.answerText}</p>
+            </div>`}
+            <div class="bottom-row">
                 <button
-                        aria-label="edit"
-                        class="icon-button blue-text"
+                        aria-label="${this._getEditButtonLabel(hasUserAnswered)}"
+                        class="small-link-button blue-text edit-button"
                         @click="${this._toggleEdit}"
                 >
-                    <edit-icon></edit-icon>
+                    ${this._getEditButtonLabel(hasUserAnswered)}
                 </button>
+                ${totalAnswers > 0 ? html`
+                    <button
+                            aria-label="view all answers"
+                            class="small-link-button grey-text"
+                            @click="${this._handleViewAllAnswers}"
+                    >
+                        View all (${totalAnswers})
+                    </button>
+                ` : ''}
                 ${this._isQuestionCreator() ? html`<button
                         aria-label="delete"
-                        class="icon-button danger-text"
+                        class="small-link-button danger-text"
                         @click="${this._deleteItem}"
                 >
-                    <delete-icon></delete-icon>
+                    Delete
                 </button>` : ''}
             </div>
+                <div class="actions">
+                    <div class="answer-count" @click="${this._handleViewAllAnswers}">
+                        <message-icon></message-icon>
+                        <span>${totalAnswers}</span>
+                    </div>
+                </div>
         `;
     }
 
@@ -378,7 +464,7 @@ export class QAItem extends observeState(LitElement) {
     render() {
         const hasEmptyAnswer = this._hasEmptyAnswer();
         return html`
-            <div class="item-container ${hasEmptyAnswer ? 'empty-answer' : ''}" @click="${this._openEditPopup}">
+            <div class="item-container ${hasEmptyAnswer ? 'empty-answer' : ''}">
                 ${this._renderContent()}
             </div>
         `;

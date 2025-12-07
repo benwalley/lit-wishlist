@@ -65,4 +65,4 @@
  - There shold be a file for each type of component or practice we're using.
  - The documentation should be very simple and straight forward such as an example of usage and a few sentences of description
  - 
-
+- always find variable names from index.css instead of making them up

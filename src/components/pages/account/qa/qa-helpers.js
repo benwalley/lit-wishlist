@@ -39,6 +39,7 @@ export async function createQA(qaData) {
             sharedWithUserIds: qaData.sharedWithUserIds || [],
             sharedWithGroupIds: qaData.sharedWithGroupIds || [],
             dueDate: qaData.dueDate ? qaData.dueDate : null,
+            onlyCreatorCanSeeResponses: qaData.onlyCreatorCanSeeResponses || false,
         }
         if(qaData.answerText) {
             data.answerText = qaData.answerText;

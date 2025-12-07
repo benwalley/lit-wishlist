@@ -4,7 +4,7 @@ import '../../../global/custom-tooltip.js'
 import '../../../global/custom-modal.js'
 import './qa-page-question.js';
 import './qa-page-deleted-item.js';
-import {forceDeleteQA, getAskedQAItems, handleDeleteQuestion} from "./qa-helpers.js";
+import {forceDeleteQA, getAskedQAItems, getQAItems, handleDeleteQuestion} from "./qa-helpers.js";
 import {messagesState} from "../../../../state/messagesStore.js";
 import {userState} from "../../../../state/userStore.js";
 import {listenInitialUserLoaded, listenUpdateQa, triggerUpdateQa} from "../../../../events/eventListeners.js";
@@ -34,7 +34,7 @@ export class CustomElement extends observeState(LitElement) {
             css`
                 :host {
                     display: block;
-                    padding: var(--spacing-normal);
+                    padding: var(--spacing-normal) var(--spacing-normal-variable);
                     font-size: var(--font-size-normal);
                     color: var(--text-color-dark);
                 }
@@ -82,25 +82,27 @@ export class CustomElement extends observeState(LitElement) {
             }
 
             const userId = userState.userData.id;
-            const response = await getAskedQAItems(userId);
+            const response = await getQAItems(userId);
             const qaItems = response?.data || [];
             if(response.success) {
                 const filteredQuestions = qaItems.filter(item => item.deleted !== true);
                 const deletedQuestions = qaItems.filter(item => item.deleted === true);
-                
+
                 // Sort questions: unanswered first, then by date asked (newest first)
                 filteredQuestions.sort((a, b) => {
-                    const aUnanswered = a.answers.length === 0 || !a.answers[0]?.answerText?.trim();
-                    const bUnanswered = b.answers.length === 0 || !b.answers[0]?.answerText?.trim();
-                    
+                    const aUserAnswer = a.answers?.find(answer => parseInt(answer.answererId) === parseInt(userState.userData?.id));
+                    const bUserAnswer = b.answers?.find(answer => parseInt(answer.answererId) === parseInt(userState.userData?.id));
+                    const aUnanswered = !aUserAnswer || !aUserAnswer.answerText?.trim();
+                    const bUnanswered = !bUserAnswer || !bUserAnswer.answerText?.trim();
+
                     // Unanswered questions come first
                     if (aUnanswered && !bUnanswered) return -1;
                     if (!aUnanswered && bUnanswered) return 1;
-                    
+
                     // If both have same answered status, sort by question ID (assuming higher ID = more recent)
                     return b.id - a.id;
                 });
-                
+
                 this.questions = filteredQuestions;
                 this.deletedQuestions = deletedQuestions;
             }

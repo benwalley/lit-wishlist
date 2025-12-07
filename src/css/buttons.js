@@ -269,11 +269,35 @@ export default css`
             border: none;
             font-size: var(--font-size-x-small);
             gap: 2px;
+            
+            &.blue-text {
+                color: var(--blue-normal);
+            }
+
+            &.danger-text {
+                color: var(--delete-red);
+            }
+
+            &.grey-text {
+                color: var(--text-color-medium-dark);
+            }
 
 
             &:hover {
                 transform: none;
                 color: var(--purple-darker);
+
+                &.blue-text {
+                    color: var(--blue-darker);
+                }
+
+                &.danger-text {
+                    color: var(--delete-red-darker);
+                }
+
+                &.grey-text {
+                    color: var(--text-color-dark);
+                }
             }
         }
 

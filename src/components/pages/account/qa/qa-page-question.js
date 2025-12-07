@@ -5,7 +5,7 @@ import '../../../../svg/edit.js';
 import '../../../../svg/share.js';
 import '../../../global/custom-tooltip.js';
 import {observeState} from 'lit-element-state';
-import {getUserImageIdByUserId, getUsernameById} from '../../../../helpers/generalHelpers.js';
+import {getUserImageIdByUserId, getUsernameById, formatDate} from '../../../../helpers/generalHelpers.js';
 import {triggerAddQuestionEvent} from "../../../../events/custom-events.js";
 import {handleDeleteQuestion} from "./qa-helpers.js";
 import {userState} from "../../../../state/userStore.js";
@@ -53,14 +53,13 @@ export class CustomElement extends observeState(LitElement) {
                 .answer-item {
                     display: flex;
                     flex-wrap: wrap;
+                    flex-direction: column;
                     gap: var(--spacing-small);
-                    justify-content: space-between; 
-                    align-items: center;
-                    border-left: 2px solid var(--border-color);
-                    margin-left: 2px;
-                    padding: 0 var(--spacing-small);
-                    
-                    
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    border: 1px solid var(--border-color);
+                    padding: var(--spacing-small);
+                    border-radius: var(--border-radius-normal);
                 }
 
                 .answer-text {
@@ -144,6 +143,14 @@ export class CustomElement extends observeState(LitElement) {
                 .user-name {
                     font-weight: 600;
                     color: var(--medium-text-color);
+                }
+                
+                .due-date-container {
+                    padding: 0 10px;
+                    background: var(--green-light);
+                    border: 1px solid var(--green-normal);
+                    border-radius: 100px;
+                    font-size: var(--font-size-x-small);
                 }
             `
         ];
@@ -255,6 +262,12 @@ export class CustomElement extends observeState(LitElement) {
                         ></custom-avatar>
                         <span class="created-by-username">${getUsernameById(this.question.askedById)}</span>
                     </span>
+                    ${this.question.dueDate ? html`
+                        <div class="due-date-container">
+                            <span class="">Due:</span>
+                            <span class="created-by-username">${formatDate(this.question.dueDate)}</span>
+                        </div>
+                    ` : ''}
                 </div>
                 
                 <div class="answers-list">
@@ -266,7 +279,7 @@ export class CustomElement extends observeState(LitElement) {
                                     <div class="answer-text">
                                         ${answer.answerText}
                                         ${parseInt(answer.answererId) === parseInt(userState.userData?.id) ? html`
-                                            <button class="icon-button blue-text" 
+                                            <button class="icon-button blue-text"
                                                     aria-label="Edit Answer"
                                                     @click="${() => this._handleEditQuestion(true)}"
                                                     style="margin-left: var(--spacing-x-small);">
