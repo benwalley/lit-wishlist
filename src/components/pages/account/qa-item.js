@@ -163,6 +163,7 @@ export class QAItem extends observeState(LitElement) {
                     width: 100%;
                     padding-bottom: var(--spacing-small);
                     padding-right: 40px;
+                    box-sizing: border-box;
                 }
 
                 .top-row.no-answer {
