@@ -9,6 +9,7 @@ import '../../../../svg/message.js';
 import {messagesState} from "../../../../state/messagesStore.js";
 import '../../../global/due-date-picker.js';
 import '../../../global/custom-toggle.js';
+import '../../../../svg/hourglass.js';
 import { observeState } from 'lit-element-state';
 import { userState } from "../../../../state/userStore.js";
 import {createQA, updateQuestion} from "./qa-helpers.js";
@@ -31,6 +32,7 @@ export class CustomElement extends observeState(LitElement) {
         preSelectedUsers: {type: Array},
         showOnlyAnswerMode: {type: Boolean},
         onlyCreatorCanSeeResponses: {type: Boolean},
+        isSaving: {type: Boolean},
     };
 
     constructor() {
@@ -47,6 +49,7 @@ export class CustomElement extends observeState(LitElement) {
         this.preSelectedUsers = [];
         this.showOnlyAnswerMode = false;
         this.onlyCreatorCanSeeResponses = false;
+        this.isSaving = false;
     }
 
     static get styles() {
@@ -261,6 +264,9 @@ export class CustomElement extends observeState(LitElement) {
         const userIds = this.sharedWithUserIds?.length ? this.sharedWithUserIds : [userState.userData.id];
         // Gather the data
         if (!this._validateInput()) return;
+
+        this.isSaving = true;
+
         const questionData = {
             questionText: this.questionText,
             answerText: this.answerText,
@@ -272,19 +278,26 @@ export class CustomElement extends observeState(LitElement) {
             questionId: this.questionId,
             onlyCreatorCanSeeResponses: this.onlyCreatorCanSeeResponses,
         };
-        let response
-        if (questionData.isEditMode) {
-            response = await updateQuestion(questionData);
-        } else {
-            response = await createQA(questionData);
-        }
 
-        if (response.success) {
-            messagesState.addMessage(questionData.isEditMode ? 'Question updated successfully!' : 'Question sent successfully!');
-            this._handleCancel()
-            triggerUpdateQa();
-        } else {
-            messagesState.addMessage(response.message || 'Failed to save question', 'error');
+        try {
+            let response
+            if (questionData.isEditMode) {
+                response = await updateQuestion(questionData);
+            } else {
+                response = await createQA(questionData);
+            }
+
+            if (response.success) {
+                messagesState.addMessage(questionData.isEditMode ? 'Question updated successfully!' : 'Question sent successfully!');
+                this._handleCancel()
+                triggerUpdateQa();
+            } else {
+                messagesState.addMessage(response.message || 'Failed to save question', 'error');
+                this.isSaving = false;
+            }
+        } catch (error) {
+            messagesState.addMessage('An error occurred while saving', 'error');
+            this.isSaving = false;
         }
     }
 
@@ -299,6 +312,7 @@ export class CustomElement extends observeState(LitElement) {
         this.questionId = null;
         this.askedById = null;
         this.onlyCreatorCanSeeResponses = false;
+        this.isSaving = false;
     }
 
     _handleCancel() {
@@ -471,10 +485,10 @@ export class CustomElement extends observeState(LitElement) {
             </div>
            
             <div class="modal-footer">
-                <button class="button secondary" @click=${this._handleCancel}>Cancel</button>
-                <button class="button primary" @click=${this._handleSubmit}>
-                    <message-icon></message-icon>
-                    Save
+                <button class="button secondary" @click=${this._handleCancel} ?disabled=${this.isSaving}>Cancel</button>
+                <button class="button primary" @click=${this._handleSubmit} ?disabled=${this.isSaving}>
+                    ${this.isSaving ? html`<hourglass-icon></hourglass-icon>` : html`<message-icon></message-icon>`}
+                    ${this.isSaving ? 'Saving...' : 'Save'}
                 </button>
             </div>
         `;
