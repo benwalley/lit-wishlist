@@ -25,6 +25,7 @@ export class CustomElement extends observeState(LitElement) {
         newData: { type: Array, state: true },
         compact: { type: Boolean},
         modalOpen: { type: Boolean, state: true },
+        confirmed: { type: Boolean, state: true },
     };
 
     constructor() {
@@ -39,6 +40,7 @@ export class CustomElement extends observeState(LitElement) {
         this.newData = [];
         this.compact = false;
         this.modalOpen = false;
+        this.confirmed = false;
     }
 
     static get styles() {
@@ -126,15 +128,25 @@ export class CustomElement extends observeState(LitElement) {
     _openModal(e) {
         e.preventDefault();
         e.stopPropagation();
+        this.error = '';
+        this.confirmed = false;
         this.modalOpen = true;
     }
 
     _closeModal(e) {
         this.modalOpen = false;
+        this._notifyIfNotConfirmed();
     }
 
     _handleModalClosed(event) {
         this.modalOpen = false;
+        this._notifyIfNotConfirmed();
+    }
+
+    _notifyIfNotConfirmed() {
+        if (!this.confirmed) {
+            messagesState.addMessage('You did not mark that as gotten', 'error');
+        }
     }
 
     handleError(message) {
@@ -154,6 +166,7 @@ export class CustomElement extends observeState(LitElement) {
             const response = await bulkUpdateGetting(data);
             if(response.success) {
                 triggerUpdateItem();
+                this.confirmed = true;
                 this._closeModal();
                 messagesState.addMessage('Successfully updated getting data.', 'success');
             } else {

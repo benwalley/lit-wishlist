@@ -107,6 +107,11 @@ export class CustomElement extends observeState(LitElement) {
                     qty = getter.numberGetting || 0;
                 }
             }
+            // Pre-select the current user as getting one, so confirming the modal without
+            // any changes marks them as gotten instead of doing nothing.
+            if (qty === 0 && user.id === userState.userData?.id) {
+                qty = 1;
+            }
             userData.qty = qty;
             newUserList.push(userData);
         }
